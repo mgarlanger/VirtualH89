@@ -13,4 +13,7 @@ Additional details are available on my site: [Heathkit H89 Emulator](http://heat
 
 
 
+## Getting Started
+
+Including project files from Eclipse, they should auto-generate make files for both debug and release configurations.
 
