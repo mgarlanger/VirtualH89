@@ -10,7 +10,7 @@
 #include "config.h"
 #include "h89Types.h"
 #include "IODevice.h"
-#include "clockUser.h"
+#include "ClockUser.h"
 
 class DiskDrive;
 
