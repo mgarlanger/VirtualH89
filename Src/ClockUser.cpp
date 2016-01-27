@@ -6,7 +6,7 @@
 /// \author Mark Garlanger
 ///
 
-#include "clockUser.h"
+#include "ClockUser.h"
 
 
 ClockUser::ClockUser()

@@ -6,7 +6,7 @@
 ///
 
 #include "GeneralPurposePort.h"
-#include "h89.h"
+#include "H89.h"
 #include "logger.h"
 #include "h89-timer.h"
 #include "IODevice.h"

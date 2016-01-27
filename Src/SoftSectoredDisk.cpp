@@ -12,6 +12,7 @@
 #include "Sector.h"
 
 #include <fstream>
+#include <strings.h>
 
 SoftSectoredDisk::SoftSectoredDisk(const char *name,
                                    DiskImageFormat format): initialized_m(false)

@@ -4,7 +4,7 @@
 /// \author Mark Garlanger
 ///
 
-#include "h89.h"
+#include "H89.h"
 #include "h37.h"
 #include "logger.h"
 #include "DiskDrive.h"

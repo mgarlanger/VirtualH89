@@ -13,6 +13,7 @@
 
 #include "ParallelLink.h"
 
+#include <string.h>
 
 Z47Controller::Z47Controller(): curDisk(invalidDisk_c),
                                 curLinkState(st_Link_Undefined_c),

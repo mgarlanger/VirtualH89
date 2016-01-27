@@ -8,7 +8,7 @@
 
 #include "WallClock.h"
 #include "config.h"
-#include "clockUser.h"
+#include "ClockUser.h"
 #include "logger.h"
 #include <cstddef>
 

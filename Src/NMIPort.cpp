@@ -6,7 +6,7 @@
 ///
 
 #include "NMIPort.h"
-#include "h89.h"
+#include "H89.h"
 #include "logger.h"
 
 NMIPort::NMIPort(BYTE base, BYTE size): IODevice(base, size)

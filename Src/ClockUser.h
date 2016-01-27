@@ -1,5 +1,5 @@
 ///
-/// \name clockUser.h
+/// \name ClockUser.h
 ///
 ///  \date Aug 11, 2012
 ///  \author Mark Garlanger

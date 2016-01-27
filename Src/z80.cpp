@@ -9,7 +9,7 @@
 
 #include <ctime>
 #include <cassert>
-#include "h89.h"
+#include "H89.h"
 #include "WallClock.h"
 #include "disasm.h"
 #include "AddressBus.h"

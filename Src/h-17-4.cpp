@@ -7,7 +7,7 @@
 
 #include <strings.h>
 
-#include "H-17-4.h"
+#include "h-17-4.h"
 
 #include "logger.h"
 #include "FloppyDisk.h"

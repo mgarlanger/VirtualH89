@@ -11,7 +11,7 @@
 #include "h89Types.h"
 
 #include "h17.h"
-#include "h89.h"
+#include "H89.h"
 #include "logger.h"
 #include "WallClock.h"
 #include "DiskDrive.h"

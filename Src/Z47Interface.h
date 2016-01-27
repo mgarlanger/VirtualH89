@@ -11,7 +11,7 @@
 #define Z47INTERFACE_H_
 
 #include "IODevice.h"
-#include "clockUser.h"
+#include "ClockUser.h"
 #include "ParallelPortConnection.h"
 
 class Z47Interface: public virtual IODevice,
