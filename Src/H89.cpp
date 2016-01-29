@@ -29,6 +29,8 @@
 #include "EightInchDisk.h"
 #include "logger.h"
 
+#include <stdlib.h>
+
 H89::H89()
 {
     ab    = new AddressBus;
@@ -115,15 +117,23 @@ H89::H89()
 
     timer->setCPU(cpu);
 
+    monitorROM = NULL;
+    // TODO: use a config/INI file to get this
+    char *s = getenv("V89_ROM_IMAGE");
+    if (s != NULL) {
+        monitorROM = ROM::getROM(s, 0);
+    }
+    if (monitorROM == NULL) {
 #if MTR90
-    monitorROM = new ROM(4096);
-    monitorROM->setBaseAddress(0);
-    monitorROM->initialize(&MTR90_2_ROM[0], 4096);
+        monitorROM = new ROM(4096);
+        monitorROM->setBaseAddress(0);
+        monitorROM->initialize(&MTR90_2_ROM[0], 4096);
 #else
-    monitorROM = new ROM(2048);
-    monitorROM->setBaseAddress(0);
-    monitorROM->initialize(&MTR89_ROM[0], 2048);
+        monitorROM = new ROM(2048);
+        monitorROM->setBaseAddress(0);
+        monitorROM->initialize(&MTR89_ROM[0], 2048);
 #endif
+    }
 
     h17ROM     = new ROM(2048);
     h17ROM->setBaseAddress(6*1024);
