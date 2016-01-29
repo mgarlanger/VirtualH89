@@ -30,7 +30,7 @@ ROM::~ROM()
     size_m = 0;
 }
 
-ROM *ROM::getROM(char *filename, WORD addr) {
+ROM *ROM::getROM(const char *filename, WORD addr) {
     std::ifstream file;
     unsigned long int fileSize;
     BYTE *buf;

@@ -28,11 +28,33 @@
 #include "SoftSectoredDisk.h"
 #include "EightInchDisk.h"
 #include "logger.h"
+#include "propertyutil.h"
 
 #include <stdlib.h>
 
 H89::H89()
 {
+    PropertyUtil::PropertyMapT props;
+    // TODO: allow specification of config file via cmdline args.
+    std::string cfg;
+    char *env = getenv("V89_CONFIG");
+    if (env) {
+	// If file-not-found, we still might create it later...
+	cfg = env;
+	try {
+            PropertyUtil::read(cfg.c_str(), props);
+        } catch(std::exception e) {}
+    } else {
+        cfg = getenv("HOME");
+        cfg += "/.v89rc";
+        try {
+            PropertyUtil::read(cfg.c_str(), props);
+        } catch (std::exception e) {}
+    }
+    std::string s; // for general property queries.
+
+    // TODO: use properties to configure rest of hardware.
+    // Possibly set defaults and write/create file.
     ab    = new AddressBus;
     cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
     h19   = new H19;
@@ -68,8 +90,12 @@ H89::H89()
 
     driveUnitE0 = new H47Drive;
     driveUnitE1 = new H47Drive;
-    eight0      = new EightInchDisk("diskA.eightdisk", EightInchDisk::dif_8RAW);
-    eight1      = new EightInchDisk("diskB.eightdisk", EightInchDisk::dif_8RAW);
+    s = props["z47_drive0"];
+    if (s.empty()) s = "diskA.eightdisk";
+    eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+    s = props["z47_drive1"];
+    if (s.empty()) s = "diskB.eightdisk";
+    eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
 #else
     z47If       = nullptr;
     z47Cntrl    = nullptr;
@@ -93,16 +119,30 @@ H89::H89()
     modemPort   = new INS8250(Serial_ModemPort_c);
     auxPort     = new INS8250(Serial_AuxPort_c);
 
-    hard0       = new HardSectoredDisk("diskA.tmpdisk");
-    hard1       = new HardSectoredDisk("diskB.tmpdisk");
-    hard2       = new HardSectoredDisk("diskC.tmpdisk");
+    s = props["z17_drive0"];
+    if (s.empty()) s = "diskA.tmpdisk";
+    hard0       = new HardSectoredDisk(s.c_str());
+    s = props["z17_drive1"];
+    if (s.empty()) s = "diskB.tmpdisk";
+    hard1       = new HardSectoredDisk(s.c_str());
+    s = props["z17_drive2"];
+    if (s.empty()) s = "diskC.tmpdisk";
+    hard2       = new HardSectoredDisk(s.c_str());
 
 #if Z37
-    soft0 = new SoftSectoredDisk("diskA.softdisk", SoftSectoredDisk::dif_RAW);
-    soft1 = new SoftSectoredDisk("diskB.softdisk", SoftSectoredDisk::dif_RAW);
-    soft2 = new SoftSectoredDisk("diskC.softdisk", SoftSectoredDisk::dif_RAW);
+    s = props["z37_drive0"];
+    if (s.empty()) s = "diskA.softdisk";
+    soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+    s = props["z37_drive1"];
+    if (s.empty()) s = "diskB.softdisk";
+    soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+    s = props["z37_drive2"];
+    if (s.empty()) s = "diskC.softdisk";
+    soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
     soft3 = 0;
-//    soft3 = 0; new SoftSectoredDisk("diskD.softdisk", SoftSectoredDisk::dif_RAW);
+//    s = props["z37_drive3"];
+//    if (s.empty()) s = "diskD.softdisk";
+//    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
 
 //    soft0->dump();
 //    soft1->dump();
@@ -118,10 +158,9 @@ H89::H89()
     timer->setCPU(cpu);
 
     monitorROM = NULL;
-    // TODO: use a config/INI file to get this
-    char *s = getenv("V89_ROM_IMAGE");
-    if (s != NULL) {
-        monitorROM = ROM::getROM(s, 0);
+    s = props["monitor_rom"];
+    if (!s.empty()) {
+        monitorROM = ROM::getROM(s.c_str(), 0);
     }
     if (monitorROM == NULL) {
 #if MTR90

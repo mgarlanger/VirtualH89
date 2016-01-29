@@ -75,6 +75,7 @@ static void* cpuThreadFunc(void* v)
     sigemptyset(&set);
     sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_UNBLOCK, &set, 0);
+    H89 *h89 = (H89 *)v;
 
 #if FIXME
     if (l_flag)
@@ -85,8 +86,8 @@ static void* cpuThreadFunc(void* v)
         }
     }
 #else
-    h89.clearMemory(0);
-    h89.reset();
+    h89->clearMemory(0);
+    h89->reset();
 #endif
 #if 0
     powerUp();
@@ -94,7 +95,7 @@ static void* cpuThreadFunc(void* v)
     BYTE cpu_error;
 
     // load boot code into memory
-    cpu_error = h89.run();
+    cpu_error = h89->run();
 #endif
 
 #if FIXME
@@ -219,7 +220,7 @@ int main(int argc, char *argv[])
     }
 
     pthread_t thread;
-    pthread_create(&thread, NULL, &cpuThreadFunc, NULL);
+    pthread_create(&thread, NULL, cpuThreadFunc, &h89);
 
 #if OGL
 
@@ -248,7 +249,6 @@ int main(int argc, char *argv[])
     glutIgnoreKeyRepeat(1);
 
     glutMainLoop();
-    pthread_exit((void*) 0);
 
 #endif  // OGL
 #endif  // USE_PTHREAD
