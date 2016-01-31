@@ -10,8 +10,8 @@
 
 /// \todo - Should I just make size the number of KB, instead of bytes?
 RAM::RAM(int size): Memory(size),
-                    data_m(0),
-                    writeProtect_m(false)
+    data_m(0),
+    writeProtect_m(false)
 {
     debugss(ssRAM, INFO, "%s: Creating RAM: %d\n", __FUNCTION__, size_m);
 
@@ -46,6 +46,7 @@ void RAM::writeByte(WORD addr, BYTE val)
         debugss(ssRAM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n",
                 __FUNCTION__, addr, baseAddress_m, size_m);
     }
+
     else
     {
         data_m[offset] = val;
@@ -63,6 +64,7 @@ BYTE RAM::readByte(WORD addr)
         debugss(ssRAM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n",
                 __FUNCTION__, addr, baseAddress_m, size_m);
     }
+
     else
     {
         val = data_m[offset];
@@ -70,7 +72,7 @@ BYTE RAM::readByte(WORD addr)
 
     debugss(ssRAM, ALL, "%s: addr(%d) - %d\n", __FUNCTION__, addr, val);
 
-    return(val);
+    return (val);
 }
 
 

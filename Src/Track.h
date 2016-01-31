@@ -56,7 +56,7 @@ class Track
 
     void dump();
 
-    bool readSectorData(BYTE sector, WORD pos, BYTE &data);
+    bool readSectorData(BYTE sector, WORD pos, BYTE& data);
 };
 
 #endif // TRACK_H_

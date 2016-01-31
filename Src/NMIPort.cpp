@@ -22,14 +22,14 @@ BYTE NMIPort::in(BYTE addr)
 {
     debugss(ssIO, INFO, "%s: In: %d\n", __FUNCTION__, addr);
 
-	h89.raiseNMI();
-	/// \todo Determine the right value to return.
+    h89.raiseNMI();
+    /// \todo Determine the right value to return.
 
-	return(0xff);
+    return (0xff);
 }
 
 void NMIPort::out(BYTE addr, BYTE val)
 {
     debugss(ssIO, INFO, "%s: Out: %d\n", __FUNCTION__, addr);
-	h89.raiseNMI();
+    h89.raiseNMI();
 }

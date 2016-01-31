@@ -37,11 +37,12 @@ BYTE AddressBus::readByte(WORD addr)
     {
         return (mem[index]->readByte(addr));
     }
+
     else
     {
         // read from non-existent memory.
         // Based on a comment from Terry Gulczynski, on a H89A, U521 will put a 0x00 byte on
-    	// the data bus whenever you attempt to read from non-existent memory.
+        // the data bus whenever you attempt to read from non-existent memory.
 
         debugss(ssAddressBus, INFO, "%s: Non-existent memory\n", __FUNCTION__);
         return 0x00;
@@ -59,6 +60,7 @@ void AddressBus::writeByte(WORD addr, BYTE val)
     {
         mem[index]->writeByte(addr, val);
     }
+
     else
     {
         // otherwise just drop the byte...
@@ -83,20 +85,21 @@ void AddressBus::installMemory(Memory *memory)
     {
         int pos = (index + i) % numOfPages_c;
         debugss(ssAddressBus, VERBOSE, "%s: mem[%d] = 0x%llx", __FUNCTION__, pos,
-        		(unsigned long long int) memory);
+                (unsigned long long int) memory);
 
         if (mem[pos])
         {
-        	/// \todo with current design this is not an error, the swap between ROM and RAM
-        	///       will hit this condition. Need to change the design to make sure it
-        	///       behaves like a real H89 (i.e. write when the ROM and selected and it
-        	///       will write to RAM).
+            /// \todo with current design this is not an error, the swap between ROM and RAM
+            ///       will hit this condition. Need to change the design to make sure it
+            ///       behaves like a real H89 (i.e. write when the ROM and selected and it
+            ///       will write to RAM).
 
             debugss(ssAddressBus, VERBOSE, "%s: overriding , orig base: 0x%x orig size: %d\n",
                     __FUNCTION__, mem[pos]->getBaseAddress(), mem[pos]->getSize());
             debugss(ssAddressBus, VERBOSE, "%s: Base = %d  size = %d", __FUNCTION__, base,
                     size);
         }
+
         mem[pos] = memory;
     }
 }

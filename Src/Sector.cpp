@@ -13,13 +13,13 @@
 #include <iostream>
 
 Sector::Sector(): headNum_m(0),
-                  trackNum_m(0),
-                  sectorNum_m(0),
-                  deletedDataAddressMark_m(false),
-                  readError_m(false),
-                  valid_m(false),
-                  data_m(0),
-                  sectorLength_m(0)
+    trackNum_m(0),
+    sectorNum_m(0),
+    deletedDataAddressMark_m(false),
+    readError_m(false),
+    valid_m(false),
+    data_m(0),
+    sectorLength_m(0)
 {
 
 }
@@ -29,19 +29,20 @@ Sector::Sector(BYTE headNum,
                BYTE sectorNum,
                WORD sectorLength,
                BYTE *data): headNum_m(headNum),
-                            trackNum_m(trackNum),
-                            sectorNum_m(sectorNum),
-                            deletedDataAddressMark_m(false),
-                            readError_m(false),
-                            valid_m(false),
-                            sectorLength_m(sectorLength)
+    trackNum_m(trackNum),
+    sectorNum_m(sectorNum),
+    deletedDataAddressMark_m(false),
+    readError_m(false),
+    valid_m(false),
+    sectorLength_m(sectorLength)
 {
     data_m = new BYTE[sectorLength_m];
 
     if (data_m)
     {
         valid_m = true;
-        for(int i = 0;i < sectorLength_m; i++)
+
+        for (int i = 0; i < sectorLength_m; i++)
         {
             data_m[i] = data[i];
         }
@@ -53,19 +54,20 @@ Sector::Sector(BYTE headNum,
                BYTE sectorNum,
                WORD sectorLength,
                BYTE data): headNum_m(headNum),
-                            trackNum_m(trackNum),
-                            sectorNum_m(sectorNum),
-                            deletedDataAddressMark_m(false),
-                            readError_m(false),
-                            valid_m(false),
-                            sectorLength_m(sectorLength)
+    trackNum_m(trackNum),
+    sectorNum_m(sectorNum),
+    deletedDataAddressMark_m(false),
+    readError_m(false),
+    valid_m(false),
+    sectorLength_m(sectorLength)
 {
     data_m = new BYTE[sectorLength_m];
 
     if (data_m)
     {
         valid_m = true;
-        for(int i = 0;i < sectorLength_m; i++)
+
+        for (int i = 0; i < sectorLength_m; i++)
         {
             data_m[i] = data;
         }
@@ -78,6 +80,7 @@ Sector::~Sector()
     {
         delete[] data_m;
     }
+
     valid_m = false;
 }
 
@@ -95,19 +98,23 @@ void Sector::initialize(BYTE headNum,
             delete [] data;
         }
     }
+
     headNum_m = headNum;
     trackNum_m = trackNum;
     sectorNum_m = sectorNum;
     sectorLength_m = sectorLength;
     data_m = new BYTE[sectorLength_m];
+
     if (data_m)
     {
         valid_m = true;
-        for(int i = 0;i < sectorLength_m; i++)
+
+        for (int i = 0; i < sectorLength_m; i++)
         {
             data_m[i] = data[i];
         }
     }
+
     else
     {
         valid_m = false;
@@ -127,8 +134,8 @@ void Sector::setReadError(bool val)
 void Sector::dump()
 {
     printf("Sector dump - Side: %d Track: %d Sector: %d\n", headNum_m,
-                                                            trackNum_m,
-                                                            sectorNum_m);
+           trackNum_m,
+           sectorNum_m);
 
     char printable[17];
 
@@ -140,6 +147,7 @@ void Sector::dump()
         {
             printf("     0x%04x: ", i);
         }
+
         else
         {
             if ((i % 8) == 0)
@@ -149,12 +157,12 @@ void Sector::dump()
         }
 
         // store printable char for end of line
-        printable[i%16] = (isprint(data_m[i])) ? data_m[i] : '.';
+        printable[i % 16] = (isprint(data_m[i])) ? data_m[i] : '.';
 
         // print hex value
         printf("%02x", data_m[i]);
 
-        if (((i+1) % 16) == 0)
+        if (((i + 1) % 16) == 0)
         {
             printf("  %s\n", printable);
         }
@@ -166,7 +174,7 @@ BYTE Sector::getSectorNum()
     return sectorNum_m;
 }
 
-bool Sector::readData(WORD pos, BYTE &data)
+bool Sector::readData(WORD pos, BYTE& data)
 {
     debugss(ssFloppyDisk, INFO, "%s: pos: %d\n", __FUNCTION__, pos);
 
@@ -178,6 +186,7 @@ bool Sector::readData(WORD pos, BYTE &data)
 
         return true;
     }
+
     return false;
 }
 
@@ -193,5 +202,6 @@ bool Sector::writeData(WORD pos, BYTE data)
 
         return true;
     }
+
     return false;
 }

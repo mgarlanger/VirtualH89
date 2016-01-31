@@ -14,7 +14,7 @@
 #include "logger.h"
 
 ROM::ROM(int size): Memory(size),
-                    data_m(0)
+    data_m(0)
 {
     debugss(ssROM, INFO, "%s: Creating ROM: %d\n", __FUNCTION__, size_m);
 
@@ -30,25 +30,31 @@ ROM::~ROM()
     size_m = 0;
 }
 
-ROM *ROM::getROM(const char *filename, WORD addr) {
+ROM *ROM::getROM(const char *filename, WORD addr)
+{
     std::ifstream file;
     unsigned long int fileSize;
     BYTE *buf;
     ROM *rom = NULL;
 
     file.open(filename, std::ios::binary);
-    if (!file.is_open()) {
+
+    if (!file.is_open())
+    {
         debugss(ssROM, ERROR, "%s: ROM image \"%s\" cannot be opened\n", __FUNCTION__, filename);
         return NULL;
     }
+
     file.seekg(0, std::ios::end);
     fileSize = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    if (fileSize != 2048 && fileSize != 4096) {
+    if (fileSize != 2048 && fileSize != 4096)
+    {
         debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename, fileSize);
-	return NULL;
+        return NULL;
     }
+
     buf = new BYTE[fileSize];
     file.read((char *)buf, fileSize);
     file.close();
@@ -72,7 +78,7 @@ void ROM::initialize(BYTE *block, WORD size)
         size = size_m;
     }
 
-    for(int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
         debugss(ssROM, VERBOSE, "%s: block[%d] = %d\n", __FUNCTION__, i, block[i]);
         data_m[i] = block[i];
@@ -83,7 +89,7 @@ void ROM::initialize(BYTE *block, WORD size)
 void ROM::writeByte(WORD addr, BYTE val)
 {
     // can't write to ROM.
-	/// \todo update to set the RAM.
+    /// \todo update to set the RAM.
     debugss(ssROM, INFO, "%s: Attempting to write to ROM [%d] = %d\n",
             __FUNCTION__, addr, val);
     return;
@@ -101,11 +107,12 @@ BYTE ROM::readByte(WORD addr)
         assert((addr >= baseAddress_m) && (offset < size_m));
 
     }
+
     else
     {
         val = data_m[offset];
     }
 
     debugss(ssROM, ALL, "%s: addr[%d] = %d\n", __FUNCTION__, addr, val);
-    return(val);
+    return (val);
 }

@@ -8,15 +8,15 @@
 
 
 FloppyDisk::FloppyDisk(): writeProtect_m(false),
-                          maxTrack_m(0),
-                          maxPos_m(0)
+    maxTrack_m(0),
+    maxPos_m(0)
 {
 
 }
 
 FloppyDisk::FloppyDisk(const char *name): writeProtect_m(false),
-                                          maxTrack_m(0),
-                                          maxPos_m(0)
+    maxTrack_m(0),
+    maxPos_m(0)
 {
 
 }
@@ -33,7 +33,7 @@ void FloppyDisk::setWriteProtect(bool value)
 
 bool FloppyDisk::checkWriteProtect(void)
 {
-    return(writeProtect_m);
+    return (writeProtect_m);
 }
 
 void FloppyDisk::setMaxTrack(BYTE maxTrack)

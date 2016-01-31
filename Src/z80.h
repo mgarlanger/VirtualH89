@@ -48,51 +48,51 @@ class Z80: public virtual CPU
     // Reference variables to 'point' to the actual data in the register pair (RP).
 
     /// Register A
-    BYTE  &A;
+    BYTE&  A;
     /// Register A viewed as a signed byte
-    SBYTE &sA;
+    SBYTE& sA;
     /// Register Flags
-    BYTE  &F;
+    BYTE&  F;
     /// Full 16-bit register A and Flags
-    WORD  &AF;
+    WORD&  AF;
 
     /// Register B
-    BYTE  &B;
+    BYTE&  B;
     /// Register C
-    BYTE  &C;
+    BYTE&  C;
     /// Full 16-bit register B and C
-    WORD  &BC;
+    WORD&  BC;
 
     /// Register D
-    BYTE  &D;
+    BYTE&  D;
     /// Register E
-    BYTE  &E;
+    BYTE&  E;
     /// Full 16-bit register D and E
-    WORD  &DE;
+    WORD&  DE;
 
     /// Register H
-    BYTE  &H;
+    BYTE&  H;
     /// Register L
-    BYTE  &L;
+    BYTE&  L;
     /// Full 16-bit register H and L
-    WORD  &HL;
+    WORD&  HL;
     /// Full 16-bit register H and L accessed as a signed 16-bit value
-    SWORD &sHL;
+    SWORD& sHL;
 
-    BYTE  &W;
-    SBYTE &sW;
-    BYTE  &Z;
-    WORD  &WZ;
+    BYTE&  W;
+    SBYTE& sW;
+    BYTE&  Z;
+    WORD&  WZ;
 
-    BYTE  &IXl;
-    BYTE  &IXh;
-    WORD  &IX;
+    BYTE&  IXl;
+    BYTE&  IXh;
+    WORD&  IX;
 
-    BYTE  &IYl;
-    BYTE  &IYh;
-    WORD  &IY;
+    BYTE&  IYl;
+    BYTE&  IYh;
+    WORD&  IY;
 
-    WORD  &SP;
+    WORD&  SP;
 
     /// secondary registers. These can be just words since they are always copied to the
     /// primary registers before they can be accessed.
@@ -126,16 +126,16 @@ class Z80: public virtual CPU
     BYTE lastInstByte;
     enum instructionPrefix
     {
-    	ip_none,
-    	ip_dd,
-    	ip_fd
+        ip_none,
+        ip_dd,
+        ip_fd
     };
     enum cpuMode
     {
-    	cm_reset,
-    	cm_running,
-    	cm_singleStep,
-    	cm_halt
+        cm_reset,
+        cm_running,
+        cm_singleStep,
+        cm_halt
     };
     cpuMode mode;
 
@@ -174,7 +174,7 @@ class Z80: public virtual CPU
     void traceInstructions(void);
     // -- remove ^^^^^
 
-protected:
+  protected:
     /// Signed Flag
     static const BYTE S_FLAG  = 0x80;
     /// Zero Flag
@@ -214,20 +214,20 @@ protected:
     int cpu_state, int_type;
 
     // Register related
-    inline BYTE & getReg8(BYTE val);
+    inline BYTE& getReg8(BYTE val);
 
-    inline BYTE & getCoreReg8(BYTE val);
+    inline BYTE& getCoreReg8(BYTE val);
 
     inline BYTE getReg8Val(BYTE val);
 
     inline BYTE getCoreReg8Val(BYTE val);
 
     // Register related
-    inline WORD & getReg16(BYTE val);
+    inline WORD& getReg16(BYTE val);
 
-    inline WORD & getCoreReg16(BYTE val);
+    inline WORD& getCoreReg16(BYTE val);
 
-    inline WORD & getHLReg16(void);
+    inline WORD& getHLReg16(void);
 
     inline WORD getHLReg16Val(void);
 
@@ -239,9 +239,9 @@ protected:
 
     inline WORD getCoreReg16Val(BYTE val);
 
-    inline WORD & getReg16qq(BYTE val);
+    inline WORD& getReg16qq(BYTE val);
 
-    inline WORD & getCoreReg16qq(BYTE val);
+    inline WORD& getCoreReg16qq(BYTE val);
 
     inline WORD getReg16qqVal(BYTE val);
 
@@ -254,7 +254,7 @@ protected:
     // Routines related to the stack.
 
     inline void PUSH(WORD x);
-    inline void POP(WORD &x);
+    inline void POP(WORD& x);
 
     // Routines related to FLAGS.
 
@@ -270,12 +270,12 @@ protected:
     inline BYTE readInst(void)
     {
         ticks -= 4;
-        return(ab_m->readByte(PC++));
+        return (ab_m->readByte(PC++));
     };
     inline BYTE readMEM(WORD addr)
     {
         ticks -= 3;
-        return(ab_m->readByte(addr));
+        return (ab_m->readByte(addr));
     };
 
     inline void writeMEM(WORD addr, BYTE val)
@@ -286,29 +286,29 @@ protected:
 
     inline WORD readWord(WORD addr)
     {
-    	return((readMEM(addr + 1) << 8) | readMEM(addr));
+        return ((readMEM(addr + 1) << 8) | readMEM(addr));
     }
 
     inline void writeWord(WORD addr, WORD value)
     {
-    	writeMEM(addr++, value & 0xff);
-    	writeMEM(addr, value >> 8);
+        writeMEM(addr++, value & 0xff);
+        writeMEM(addr, value >> 8);
     }
 
     inline BYTE READn(void)
     {
-    	return(readMEM(PC++));
+        return (readMEM(PC++));
     };
 
     inline SBYTE sREADn(void)
     {
-        return((SBYTE) readMEM(PC++));
+        return ((SBYTE) readMEM(PC++));
     };
 
     inline WORD READnn(void)
     {
-    	PC += 2;
-    	return((readMEM(PC - 1) << 8) | readMEM(PC - 2));
+        PC += 2;
+        return ((readMEM(PC - 1) << 8) | readMEM(PC - 2));
     };
 
   private:
@@ -469,10 +469,10 @@ protected:
     void op_rlc_ihl(void);
     void op_sra_x(void);
     void op_sra_ihl(void);
-    void op_sb_n(BYTE &val);
+    void op_sb_n(BYTE& val);
     void op_sb_n_x(void);
     void op_sb_n_ihl(void);
-    void op_rb_n(BYTE &val);
+    void op_rb_n(BYTE& val);
     void op_rb_n_x(void);
     void op_rb_n_ihl(void);
     void op_tb_n(BYTE m, BYTE bit);
@@ -555,11 +555,11 @@ protected:
 
 enum
 {
-	STOPPED_C     = 0,
-	RUN_C         = 1,
-	HALT_C        = 2,
-	SINGLE_STEP_C = 3,
-	POWEROFF_C    = 255
+    STOPPED_C     = 0,
+    RUN_C         = 1,
+    HALT_C        = 2,
+    SINGLE_STEP_C = 3,
+    POWEROFF_C    = 255
 };
 
 // Types of interrupts

@@ -38,19 +38,32 @@ H89::H89()
     // TODO: allow specification of config file via cmdline args.
     std::string cfg;
     char *env = getenv("V89_CONFIG");
-    if (env) {
-	// If file-not-found, we still might create it later...
-	cfg = env;
-	try {
+
+    if (env)
+    {
+        // If file-not-found, we still might create it later...
+        cfg = env;
+
+        try
+        {
             PropertyUtil::read(cfg.c_str(), props);
-        } catch(std::exception e) {}
-    } else {
+        }
+
+        catch (std::exception e) {}
+    }
+    else
+    {
         cfg = getenv("HOME");
         cfg += "/.v89rc";
-        try {
+
+        try
+        {
             PropertyUtil::read(cfg.c_str(), props);
-        } catch (std::exception e) {}
+        }
+
+        catch (std::exception e) {}
     }
+
     std::string s; // for general property queries.
 
     // TODO: use properties to configure rest of hardware.
@@ -91,10 +104,20 @@ H89::H89()
     driveUnitE0 = new H47Drive;
     driveUnitE1 = new H47Drive;
     s = props["z47_drive0"];
-    if (s.empty()) s = "diskA.eightdisk";
+
+    if (s.empty())
+    {
+        s = "diskA.eightdisk";
+    }
+
     eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
     s = props["z47_drive1"];
-    if (s.empty()) s = "diskB.eightdisk";
+
+    if (s.empty())
+    {
+        s = "diskB.eightdisk";
+    }
+
     eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
 #else
     z47If       = nullptr;
@@ -120,24 +143,54 @@ H89::H89()
     auxPort     = new INS8250(Serial_AuxPort_c);
 
     s = props["z17_drive0"];
-    if (s.empty()) s = "diskA.tmpdisk";
+
+    if (s.empty())
+    {
+        s = "diskA.tmpdisk";
+    }
+
     hard0       = new HardSectoredDisk(s.c_str());
     s = props["z17_drive1"];
-    if (s.empty()) s = "diskB.tmpdisk";
+
+    if (s.empty())
+    {
+        s = "diskB.tmpdisk";
+    }
+
     hard1       = new HardSectoredDisk(s.c_str());
     s = props["z17_drive2"];
-    if (s.empty()) s = "diskC.tmpdisk";
+
+    if (s.empty())
+    {
+        s = "diskC.tmpdisk";
+    }
+
     hard2       = new HardSectoredDisk(s.c_str());
 
 #if Z37
     s = props["z37_drive0"];
-    if (s.empty()) s = "diskA.softdisk";
+
+    if (s.empty())
+    {
+        s = "diskA.softdisk";
+    }
+
     soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
     s = props["z37_drive1"];
-    if (s.empty()) s = "diskB.softdisk";
+
+    if (s.empty())
+    {
+        s = "diskB.softdisk";
+    }
+
     soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
     s = props["z37_drive2"];
-    if (s.empty()) s = "diskC.softdisk";
+
+    if (s.empty())
+    {
+        s = "diskC.softdisk";
+    }
+
     soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
     soft3 = 0;
 //    s = props["z37_drive3"];
@@ -159,10 +212,14 @@ H89::H89()
 
     monitorROM = NULL;
     s = props["monitor_rom"];
-    if (!s.empty()) {
+
+    if (!s.empty())
+    {
         monitorROM = ROM::getROM(s.c_str(), 0);
     }
-    if (monitorROM == NULL) {
+
+    if (monitorROM == NULL)
+    {
 #if MTR90
         monitorROM = new ROM(4096);
         monitorROM->setBaseAddress(0);
@@ -175,14 +232,14 @@ H89::H89()
     }
 
     h17ROM     = new ROM(2048);
-    h17ROM->setBaseAddress(6*1024);
+    h17ROM->setBaseAddress(6 * 1024);
     h17ROM->initialize(&H17_ROM[0], 2048);
 
     h17RAM     = new RAM(1024);
-    h17RAM->setBaseAddress(5*1024);
+    h17RAM->setBaseAddress(5 * 1024);
     /// TODO determine whether the default h17RAM is write-protected or write-enabled at boot.
 
-    CPM8k      = new RAM(8*1024);
+    CPM8k      = new RAM(8 * 1024);
     CPM8k->setBaseAddress(0);
 
     /// \todo - consolidate RAM into a single object
@@ -323,22 +380,22 @@ void H89::writeEnableH17RAM()
 
 void H89::selectSideH17(BYTE side)
 {
-	h17->selectSide(side);
+    h17->selectSide(side);
 }
 
 void H89::setSpeed(bool fast)
 {
-	cpu->setSpeed(fast);
+    cpu->setSpeed(fast);
 }
 
 bool H89::checkUpdated()
 {
-    return(h19->checkUpdated());
+    return (h19->checkUpdated());
 }
 
-H89Timer &H89::getTimer()
+H89Timer& H89::getTimer()
 {
-    return(*timer);
+    return (*timer);
 }
 
 void H89::raiseNMI(void)
@@ -361,16 +418,16 @@ void H89::continueCPU(void)
     cpu->continueRunning();
 }
 
-H89_IO &H89::getIO()
+H89_IO& H89::getIO()
 {
-    return(*h89io);
+    return (*h89io);
 }
 
 BYTE H89::run()
 {
     cpu->reset();
 
-    return(cpu->execute());
+    return (cpu->execute());
 }
 
 void H89::clearMemory(BYTE data)
@@ -378,8 +435,8 @@ void H89::clearMemory(BYTE data)
     ab->clearMemory(data);
 }
 
-AddressBus &H89::getAddressBus()
+AddressBus& H89::getAddressBus()
 {
-    return(*ab);
+    return (*ab);
 }
 

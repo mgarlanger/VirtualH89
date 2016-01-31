@@ -21,8 +21,8 @@ EightInchDisk::EightInchDisk()
 }
 
 EightInchDisk::EightInchDisk(const char *name,
-                             SoftSectoredDisk::DiskImageFormat format):SoftSectoredDisk(name,
-                                                                                        format)
+                             SoftSectoredDisk::DiskImageFormat format): SoftSectoredDisk(name,
+                                         format)
 {
 
 }
@@ -44,11 +44,13 @@ bool EightInchDisk::readRaw8(const char *name)
     BYTE *buf;
 
     file.open(name, std::ios::binary);
+
     if (!file.is_open())
     {
         debugss(ssFloppyDisk, ERROR, "%s: Unable to open file: %s\n", __FUNCTION__, name);
         return false;
     }
+
     file.seekg(0, std::ios::end);
     fileSize = file.tellg();
     file.seekg(0, std::ios::beg);
@@ -60,16 +62,17 @@ bool EightInchDisk::readRaw8(const char *name)
 
     debugss(ssFloppyDisk, INFO, "%s: RAW File: %s - Size: %lu\n", __FUNCTION__, name, fileSize);
 
-    switch(fileSize)
+    switch (fileSize)
     {
     case 256256: // 1 side, 77 track, 26 sectors, 128 byte - FM
         break;
+
     case 512512: // 1 side, 77 track, 26 sectors, 256 byte - MFM
         // 1 side, 77 track, x sectors, 256 byte - FM
         break;
     }
 
-    if (fileSize != (256*10*40))
+    if (fileSize != (256 * 10 * 40))
     {
         debugss(ssFloppyDisk, ERROR, "%s: Invalid File Size: %s - %ld\n", __FUNCTION__, name,
                 fileSize);
@@ -90,6 +93,7 @@ bool EightInchDisk::readRaw8(const char *name)
             track->setDensity(Track::singleDensity);
             track->setDataRate(Track::dr_300kbps);
         }
+
         tracks_m[0].push_back(track);
     }
 
@@ -102,7 +106,7 @@ bool EightInchDisk::readRaw8(const char *name)
 #endif
 
 #if 0
-bool EightInchDisk::readData(BYTE side, BYTE track, unsigned int pos, BYTE &data)
+bool EightInchDisk::readData(BYTE side, BYTE track, unsigned int pos, BYTE& data)
 {
 
     return false;
@@ -114,7 +118,7 @@ bool EightInchDisk::writeData(BYTE side, BYTE track, unsigned int pos, BYTE data
     return false;
 }
 
-void EightInchDisk::getControlInfo(unsigned int pos, bool &hole, bool &writeProtect)
+void EightInchDisk::getControlInfo(unsigned int pos, bool& hole, bool& writeProtect)
 {
 
 }
@@ -130,7 +134,7 @@ bool EightInchDisk::checkWriteProtect(void)
     return true;
 }
 
-bool EightInchDisk::readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE &data)
+bool EightInchDisk::readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE& data)
 {
 
     return false;

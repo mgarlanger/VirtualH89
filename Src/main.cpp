@@ -41,7 +41,7 @@
 #include "H89.h"
 #include "logger.h"
 
-const unsigned int screenRefresh_c = 1000/60;
+const unsigned int screenRefresh_c = 1000 / 60;
 unsigned int screenRefresh;
 
 using namespace std;
@@ -68,7 +68,7 @@ void usage(char *pn)
 }
 
 #if USE_PTHREAD
-static void* cpuThreadFunc(void* v)
+static void *cpuThreadFunc(void *v)
 {
     sigset_t set;
 
@@ -78,13 +78,15 @@ static void* cpuThreadFunc(void* v)
     H89 *h89 = (H89 *)v;
 
 #if FIXME
+
     if (l_flag)
     {
         if (load_core())
         {
-            return(1);
+            return (1);
         }
     }
+
 #else
     h89->clearMemory(0);
     h89->reset();
@@ -99,13 +101,15 @@ static void* cpuThreadFunc(void* v)
 #endif
 
 #if FIXME
+
     if (s_flag)
     {
         save_core();
     }
+
 #endif
 
-    return(0);
+    return (0);
 }
 #endif
 
@@ -113,7 +117,7 @@ static void* cpuThreadFunc(void* v)
 
 void display(void)
 {
-   h89.display();
+    h89.display();
 }
 
 void reshape(int w, int h)
@@ -137,6 +141,7 @@ void timer(int i)
     {
         fflush(console_out);
     }
+
     // Tell glut to redisplay the scene:
     if (h89.checkUpdated())
     {
@@ -154,22 +159,26 @@ void keyboard(unsigned char key, int x, int y)
 
 void special(int key, int x, int y)
 {
-    switch(key)
+    switch (key)
     {
-        case GLUT_KEY_UP:
-            h89.keypress('8');
-            break;
-        case GLUT_KEY_DOWN:
-            h89.keypress('2');
-            break;
-        case GLUT_KEY_LEFT:
-            h89.keypress('4');
-            break;
-        case GLUT_KEY_RIGHT:
-            h89.keypress('6');
-            break;
-        default:
-            break;
+    case GLUT_KEY_UP:
+        h89.keypress('8');
+        break;
+
+    case GLUT_KEY_DOWN:
+        h89.keypress('2');
+        break;
+
+    case GLUT_KEY_LEFT:
+        h89.keypress('4');
+        break;
+
+    case GLUT_KEY_RIGHT:
+        h89.keypress('6');
+        break;
+
+    default:
+        break;
     }
 }
 #endif
@@ -205,15 +214,16 @@ int main(int argc, char *argv[])
     sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &set, 0);
 
-    if ( (log_out = fopen("op.out","w")) == 0)
+    if ((log_out = fopen("op.out", "w")) == 0)
     {
         cerr << endl << "Unable to open op.out" << endl;
     }
 
-    if ( (console_out = fopen("console.out","w")) == 0)
+    if ((console_out = fopen("console.out", "w")) == 0)
     {
         cerr << endl << "Unable to open console.out" << endl;
     }
+
     else
     {
         cout << "Successfully opened console.out" << endl;
@@ -227,7 +237,7 @@ int main(int argc, char *argv[])
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(640, 500);
-    glutInitWindowPosition (500, 100);
+    glutInitWindowPosition(500, 100);
     glutCreateWindow((char *) "Virtual Heathkit H-89 All-in-One Computer");
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
@@ -238,7 +248,7 @@ int main(int argc, char *argv[])
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    glShadeModel (GL_FLAT);
+    glShadeModel(GL_FLAT);
 
     h89.init();
     glutReshapeFunc(reshape);
@@ -255,5 +265,5 @@ int main(int argc, char *argv[])
 
     fclose(log_out);
     fclose(console_out);
-    return(0);
+    return (0);
 }

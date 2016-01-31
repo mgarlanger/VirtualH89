@@ -14,30 +14,30 @@
 
 
 INS8250::INS8250(BYTE base, int intLevel): IODevice(base, 8),
-                             DLAB_m(false),
-                             ERBFI_m(false),
-                             receiveInterruptPending(false),
-                             OE_m(false),
-                             PE_m(false),
-                             FE_m(false),
-                             device_m(0),
-                             rxByteAvail(false),
-                             txByteAvail(false),
-                             lsBaudDiv(0),
-                             msBaudDiv(0),
-                             baud_m(0),
-                             lastTransmit(0),
-                             saveIER(0),
-                             saveIIR(0),
-                             saveLCR(0),
-                             saveMCR(0),
-                             saveLSR(0),
-                             saveMSR(0)
+    DLAB_m(false),
+    ERBFI_m(false),
+    receiveInterruptPending(false),
+    OE_m(false),
+    PE_m(false),
+    FE_m(false),
+    device_m(0),
+    rxByteAvail(false),
+    txByteAvail(false),
+    lsBaudDiv(0),
+    msBaudDiv(0),
+    baud_m(0),
+    lastTransmit(0),
+    saveIER(0),
+    saveIIR(0),
+    saveLCR(0),
+    saveMCR(0),
+    saveLSR(0),
+    saveMSR(0)
 
 {
-   intLevel_m = intLevel;
+    intLevel_m = intLevel;
 
-   /// \todo Use H89 manual to verify/set all the conditions on reset of chip.
+    /// \todo Use H89 manual to verify/set all the conditions on reset of chip.
 }
 
 INS8250::~INS8250()
@@ -52,6 +52,7 @@ BYTE INS8250::in(BYTE addr)
     if (verifyPort(addr))
     {
         BYTE offset = addr - baseAddress_m;
+
         switch (offset)
         {
         case RBR:  // Receiver Buffer Register
@@ -61,15 +62,17 @@ BYTE INS8250::in(BYTE addr)
                 // LS Byte
                 val = lsBaudDiv;
             }
+
             else
             {
                 if (rxByteAvail)
                 {
                     rxByteAvail = false;
                     receiveInterruptPending = false;
-                    return(RecvBuf);
+                    return (RecvBuf);
                 }
             }
+
             break;
 
         case IER:  // Interrupt Enable Register
@@ -79,10 +82,12 @@ BYTE INS8250::in(BYTE addr)
                 // LS Byte
                 val = msBaudDiv;
             }
+
             else
             {
                 val = saveIER;
             }
+
             break;
 
         case IIR:  // Interrupt Identification Register
@@ -90,10 +95,12 @@ BYTE INS8250::in(BYTE addr)
             {
                 val = IIR_DataAvailable;
             }
+
             else
             {
                 val = IIR_NoInterruptPending;
             }
+
             break;
 
         case LCR:  // Line Control Register
@@ -109,29 +116,35 @@ BYTE INS8250::in(BYTE addr)
             {
                 val |= LSB_DataReady;
             }
+
             if ((WallClock::instance()->getClock() - lastTransmit) > 2133)
             {
                 val |= LSB_THRE;
             }
+
             if (1) /// \todo - what to do here?
             {
                 val |= LSB_TSRE;
             }
+
             if (OE_m)
             {
-            	val |= LSB_Overrun;
-            	OE_m = false;
+                val |= LSB_Overrun;
+                OE_m = false;
             }
+
             if (FE_m)
             {
-            	val |= LSB_FramingError;
-            	FE_m = false;
+                val |= LSB_FramingError;
+                FE_m = false;
             }
+
             if (PE_m)
             {
-            	val |= LSB_ParityError;
-            	PE_m = false;
+                val |= LSB_ParityError;
+                PE_m = false;
             }
+
             break;
 
         case MSR:  // Modem Status Register
@@ -139,19 +152,22 @@ BYTE INS8250::in(BYTE addr)
             break;
 
         default:
-        	/// \todo determine  what value is set here.
-            return(0);
+            /// \todo determine  what value is set here.
+            return (0);
 
         }
-    	debugss(ss8250,INFO, "%s: %d(%d) <- %d", __FUNCTION__, addr, offset, val);
+
+        debugss(ss8250, INFO, "%s: %d(%d) <- %d", __FUNCTION__, addr, offset, val);
     }
+
     else
     {
-    	debugss(ss8250,ERROR, "%s: Verify Port failed: %d", __FUNCTION__, addr);
-        return(0);
+        debugss(ss8250, ERROR, "%s: Verify Port failed: %d", __FUNCTION__, addr);
+        return (0);
     }
+
     //debug("%d\n", val);
-    return(val);
+    return (val);
 }
 
 void INS8250::out(BYTE addr, BYTE val)
@@ -159,6 +175,7 @@ void INS8250::out(BYTE addr, BYTE val)
     if (verifyPort(addr))
     {
         BYTE offset = addr - baseAddress_m;
+
         switch (offset)
         {
         case THR:
@@ -170,50 +187,61 @@ void INS8250::out(BYTE addr, BYTE val)
                     device_m->receiveData(val);
                     lastTransmit = WallClock::instance()->getClock();
                 }
+
                 else
                 {
-                	debugss(ss8250,ERROR, "%s: THR - No device_m.", __FUNCTION__);
+                    debugss(ss8250, ERROR, "%s: THR - No device_m.", __FUNCTION__);
                 }
             }
+
             else
             {
-            	unsigned int div;
+                unsigned int div;
                 lsBaudDiv = val;
                 div = (msBaudDiv << 8) | (lsBaudDiv);
+
                 if (div)
                 {
-                	baud_m = 115200 / div;
+                    baud_m = 115200 / div;
                 }
+
                 debugss(ss8250, INFO, "baud_m = %d\n", baud_m);
             }
+
             break;
 
         case IER:
             if (!DLAB_m)
             {
                 saveIER = val;
+
                 if (val & IER_ReceiveData)
                 {
                     ERBFI_m = true;
                 }
+
                 else
                 {
                     ERBFI_m = false;
                 }
 
             }
+
             else
             {
-            	unsigned int div;
+                unsigned int div;
                 // set baud.
                 msBaudDiv = val;
                 div = (msBaudDiv << 8) | (lsBaudDiv);
+
                 if (div)
                 {
-                	baud_m = 115200 / div;
+                    baud_m = 115200 / div;
                 }
+
                 debugss(ss8250, INFO, "baud_m = %d\n", baud_m);
             }
+
             break;
 
         case IIR:
@@ -268,35 +296,40 @@ void INS8250::receiveData(BYTE data)
 {
     debugss(ss8250, ALL, "%s - %d\n", __FUNCTION__, data);
 
-	unsigned int baud = device_m->getBaudRate();
-	if (baud == baud_m)
-	{
-	    debugss(ss8250, ALL, "%s: Baud matches\n", __FUNCTION__);
-		PE_m = false;
-		FE_m = false;
-	}
-	else if (baud > baud_m)
-	{
-		// computer is at lower baud than the remote device.
-	    debugss(ss8250, ALL, "%s: device baud exceeds our baud.\n", __FUNCTION__);
-		PE_m = true;
-		FE_m = false;
-		// a full character will not be received, so we must exit and not set rxByteAvail
-		return;
-	}
-	else
-	{
-		// computer is at a faster baud than the remote device.
-	    debugss(ss8250, ALL, "%s: device baud lower\n", __FUNCTION__);
-		PE_m = false;
-		FE_m = true;
-	}
+    unsigned int baud = device_m->getBaudRate();
+
+    if (baud == baud_m)
+    {
+        debugss(ss8250, ALL, "%s: Baud matches\n", __FUNCTION__);
+        PE_m = false;
+        FE_m = false;
+    }
+
+    else if (baud > baud_m)
+    {
+        // computer is at lower baud than the remote device.
+        debugss(ss8250, ALL, "%s: device baud exceeds our baud.\n", __FUNCTION__);
+        PE_m = true;
+        FE_m = false;
+        // a full character will not be received, so we must exit and not set rxByteAvail
+        return;
+    }
+
+    else
+    {
+        // computer is at a faster baud than the remote device.
+        debugss(ss8250, ALL, "%s: device baud lower\n", __FUNCTION__);
+        PE_m = false;
+        FE_m = true;
+    }
 
     RecvBuf = data;
     rxByteAvail = true;
+
     if (ERBFI_m)
     {
         receiveInterruptPending = true;
+
         if (intLevel_m >= 0)
         {
             h89.raiseINT(intLevel_m);

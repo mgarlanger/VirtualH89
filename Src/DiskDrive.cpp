@@ -11,8 +11,8 @@
 
 
 DiskDrive::DiskDrive(): disk_m(0),
-                        headLoaded_m(false),
-                        numTracks_m(40)
+    headLoaded_m(false),
+    numTracks_m(40)
 {
 
 }
@@ -41,6 +41,7 @@ void DiskDrive::ejectDisk(const char *name)
     {
         disk_m->eject(name);
     }
+
     disk_m = 0;
 }
 
@@ -67,14 +68,17 @@ void DiskDrive::step(bool direction)
         {
             ++track_m;
         }
+
         debugss(ssDiskDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
+
     else
     {
         if (track_m)
         {
             --track_m;
         }
+
         debugss(ssDiskDrive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
     }
 }

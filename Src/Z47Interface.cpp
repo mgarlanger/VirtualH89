@@ -13,13 +13,13 @@
 #include "ParallelLink.h"
 
 Z47Interface::Z47Interface(int baseAddr): IODevice(baseAddr, H47_NumPorts_c),
-                                          interruptsEnabled_m(false),
-                                          DTR_m(false),
-                                          DDOut_m(false),
-                                          Busy_m(true),
-                                          Error_m(false),
-                                          Done_m(false),
-                                          linkToDrive_m(0)
+    interruptsEnabled_m(false),
+    DTR_m(false),
+    DDOut_m(false),
+    Busy_m(true),
+    Error_m(false),
+    Done_m(false),
+    linkToDrive_m(0)
 {
     debugss(ssH47, ALL, "%s(%d)\n", __FUNCTION__, baseAddr);
 
@@ -118,6 +118,7 @@ void Z47Interface::writeStatus(BYTE cmd)
         debugss(ssH47, INFO, "%s: Interrupts Enabled\n", __FUNCTION__);
         interruptsEnabled_m = true;
     }
+
     else
     {
         interruptsEnabled_m = false;
@@ -125,7 +126,7 @@ void Z47Interface::writeStatus(BYTE cmd)
 
     if ((cmd & cmd_Undefined_c) != 0)
     {
-        debugss(ssH47,WARNING, "%s: Unexpected command bits: 0x%02x\n", __FUNCTION__, cmd);
+        debugss(ssH47, WARNING, "%s: Unexpected command bits: 0x%02x\n", __FUNCTION__, cmd);
     }
 }
 
@@ -137,6 +138,7 @@ void Z47Interface::writeData(BYTE data)
     {
         linkToDrive_m->sendDriveData(data);
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);
@@ -144,7 +146,7 @@ void Z47Interface::writeData(BYTE data)
 }
 
 
-void Z47Interface::readStatus(BYTE &data)
+void Z47Interface::readStatus(BYTE& data)
 {
     BYTE val = 0;
 
@@ -168,7 +170,7 @@ void Z47Interface::readStatus(BYTE &data)
     debugss(ssH47, ALL, "%s - Status 0x%02x\n", __FUNCTION__, data);
 }
 
-void Z47Interface::readData(BYTE &data)
+void Z47Interface::readData(BYTE& data)
 {
     if (linkToDrive_m)
     {
@@ -190,6 +192,7 @@ void Z47Interface::connectDriveLink(ParallelLink *link)
     {
         linkToDrive_m->registerHost(this);
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);

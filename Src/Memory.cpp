@@ -8,7 +8,7 @@
 #include "logger.h"
 
 Memory::Memory(int size): baseAddress_m(0),
-                          size_m(size)
+    size_m(size)
 {
 
 }

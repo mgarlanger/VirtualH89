@@ -32,26 +32,30 @@ WallClock *WallClock::instance(void)
     {
         _inst = new WallClock();
     }
-    return(_inst);
+
+    return (_inst);
 }
 
 void WallClock::addTimerEvent()
 {
 #if TWOMSEC
+
     /// \todo Properly handle other CPU Speeds.
-	if (ticks_m > 4096)
-	{
-		clock_m += ticks_m;
-	}
-	else
-	{
-	    /// \todo determine if we need to notify all users here too for (4096 - ticks_m)
-	    ///       number of ticks.
+    if (ticks_m > 4096)
+    {
+        clock_m += ticks_m;
+    }
+
+    else
+    {
+        /// \todo determine if we need to notify all users here too for (4096 - ticks_m)
+        ///       number of ticks.
 
         clock_m += 4096;
-	}
+    }
+
 #else
-    clock_m += 4096*5;
+    clock_m += 4096 * 5;
 #endif
     ticks_m = 0;
 }
@@ -68,32 +72,32 @@ void WallClock::addTicks(unsigned ticks)
 
 long long unsigned int WallClock::getClock()
 {
-    return(clock_m + ticks_m);
+    return (clock_m + ticks_m);
 }
 
 long long unsigned int WallClock::getElapsedTime(long long unsigned int origTime)
 {
-	return(clock_m + ticks_m - origTime);
+    return (clock_m + ticks_m - origTime);
 }
 
-void WallClock::printTime(FILE* file)
+void WallClock::printTime(FILE *file)
 {
     // determine seconds, millisec, microseconds..
     /// \todo Properly handle other CPU Speeds.
 
-	unsigned long long time     = clock_m + ticks_m;
-	unsigned long long millisec = time >> 11;
-	unsigned long long seconds  = millisec / 1000;
+    unsigned long long time     = clock_m + ticks_m;
+    unsigned long long millisec = time >> 11;
+    unsigned long long seconds  = millisec / 1000;
 
-	millisec %= 1000;
+    millisec %= 1000;
 
-	fprintf(file,"%05lld.%03lld:%04lld - ", seconds, millisec, time & 0x7ff);
+    fprintf(file, "%05lld.%03lld:%04lld - ", seconds, millisec, time & 0x7ff);
 }
 
 bool WallClock::registerUser(ClockUser *user)
 {
-	users_m.push_back(user);
-	return true;
+    users_m.push_back(user);
+    return true;
 }
 
 bool WallClock::unregisterUser(ClockUser *user)

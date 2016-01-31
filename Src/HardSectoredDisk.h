@@ -28,13 +28,13 @@ class HardSectoredDisk: public FloppyDisk
     HardSectoredDisk();
     virtual ~HardSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE &data);
+    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data);
     virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-    virtual void getControlInfo(unsigned int pos, bool &hole, bool &writeProtect);
+    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect);
     void dump();
 
     virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos,
-                                BYTE &data);
+                                BYTE& data);
     virtual void eject(const char *name);
 
   private:
@@ -52,7 +52,7 @@ class HardSectoredDisk: public FloppyDisk
     unsigned int tracks_m = 80;
     unsigned int sides_m  = 2;
 
-	bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned int pos);
 };
 
 #endif // HARDSECTOREDDISK_H_

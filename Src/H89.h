@@ -148,7 +148,7 @@ class H89 : public Computer
 
     virtual void reset();
     virtual BYTE run();
-    virtual H89Timer &getTimer();
+    virtual H89Timer& getTimer();
 
     virtual void init();
 
@@ -172,11 +172,11 @@ class H89 : public Computer
 
     virtual void setSpeed(bool fast);
 
-    virtual H89_IO &getIO();
+    virtual H89_IO& getIO();
 
     virtual void clearMemory(BYTE data = 0);
 
-    virtual AddressBus &getAddressBus();
+    virtual AddressBus& getAddressBus();
 };
 
 extern H89 h89;

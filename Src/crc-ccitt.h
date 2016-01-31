@@ -15,17 +15,17 @@ class CRC_CCITT
 {
   public:
 
-	CRC_CCITT();
-	~CRC_CCITT();
+    CRC_CCITT();
+    ~CRC_CCITT();
 
-	void initCRC();
-	void updateCRC(BYTE val);
-	WORD getCRC();
+    void initCRC();
+    void updateCRC(BYTE val);
+    WORD getCRC();
 
   private:
-	WORD crc_m;
+    WORD crc_m;
 
-	static const WORD initValue_c = 0xffff;
+    static const WORD initValue_c = 0xffff;
     static const WORD crctable[256];
 
 };

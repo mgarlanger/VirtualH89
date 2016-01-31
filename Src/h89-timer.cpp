@@ -30,9 +30,9 @@ static const int TimerInterval_c = 10000;
 #endif
 
 H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
-                                                    intEnabled_m(false),
-                                                    count_m(0),
-                                                    intLevel(intlvl)
+    intEnabled_m(false),
+    count_m(0),
+    intLevel(intlvl)
 {
     // We need to start up the timer since it performs two tasks, it always provide the cpu
     // with extra clock ticks to accurately emulate the speed of the processor.
@@ -55,9 +55,9 @@ H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
 
 
 H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
-                      intEnabled_m(false),
-                      count_m(0),
-                      intLevel(intlvl)
+    intEnabled_m(false),
+    count_m(0),
+    intLevel(intlvl)
 {
     static struct itimerval tim;
 
@@ -109,7 +109,7 @@ int H89Timer::handleSignal(int signum)
     {
         debugss(ssTimer, ERROR, "%s: signum != SIGALRM: %d\n", __FUNCTION__, signum);
 
-        return(0);
+        return (0);
     }
 
     count_m++;
@@ -125,6 +125,7 @@ int H89Timer::handleSignal(int signum)
 
         // Only if interrrupt is enabled.
 #if USE_ONE_MSEC
+
         if ((intEnabled_m) && ((count_m & 0x01) == 0x00))
 #else
         if (intEnabled_m)
@@ -135,12 +136,13 @@ int H89Timer::handleSignal(int signum)
             cpu_m->raiseINT(intLevel);
         }
     }
+
     else
     {
         debugss(ssTimer, ERROR, "%s: cpu_m is NULL\n", __FUNCTION__);
     }
 
-    return(0);
+    return (0);
 }
 
 void H89Timer::enableINT()
@@ -155,6 +157,7 @@ void H89Timer::disableINT()
     debugss(ssTimer, INFO, "Disable INT\n");
 
     intEnabled_m = false;
+
     if (cpu_m)
     {
         cpu_m->lowerINT(intLevel);

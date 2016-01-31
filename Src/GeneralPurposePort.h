@@ -60,13 +60,13 @@ class GeneralPurposePort: public virtual IODevice
     /// MTR-89
 
     static const BYTE Mtr89_Port174_Mask_c    = 0x03;   // Mask for determining controller
-                                                        // at right slot
+    // at right slot
     static const BYTE Mtr89_Port174_H_88_1_c  = 0x00;   // H-88-1 hard-sectored controller
     static const BYTE Mtr89_Port174_Z_89_47_c = 0x01;   // Z-89-47 8" floppy disk controller
     static const BYTE Mtr89_Port174_Undef1_c  = 0x02;   // Undefined
     static const BYTE Mtr89_Port174_Undef2_c  = 0x03;   // Undefined
     static const BYTE Mtr89_Port170_Mask_c    = 0x0c;   // Mask for determining controller
-                                                        // at left slot
+    // at left slot
     static const BYTE Mtr89_Port170_Unused_c  = 0x00;   // Undefined
     static const BYTE Mtr89_Port170_Z_89_47_c = 0x04;   // Z-89-47 8" floppy disk controller
     static const BYTE Mtr89_Port170_Undef1_c  = 0x08;   // Undefined

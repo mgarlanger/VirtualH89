@@ -27,7 +27,7 @@ class H_17_4: public DiskDrive
     H_17_4();
     virtual ~H_17_4();
 
-    void getControlInfo(unsigned int pos, bool &hole, bool &trackZero, bool &writeProtect);
+    void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect);
 
     void selectSide(BYTE side);
     void step(bool direction);

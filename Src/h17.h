@@ -41,11 +41,12 @@ class H17 : public IODevice, public ClockUser
 
   private:
 
-    enum State {
-    	idleState,
-    	seekingSyncState,
-    	readingState,
-    	writingState
+    enum State
+    {
+        idleState,
+        seekingSyncState,
+        readingState,
+        writingState
     };
     State state_m;
 
@@ -71,10 +72,10 @@ class H17 : public IODevice, public ClockUser
 
     enum DiskDriveID
     {
-    	ds0 = 0,
-    	ds1 = 1,
-    	ds2 = 2,
-    	maxDiskDrive_c = 3
+        ds0 = 0,
+        ds1 = 1,
+        ds2 = 2,
+        maxDiskDrive_c = 3
     };
 
     DiskDriveID curDrive_m;
@@ -148,7 +149,7 @@ class H17 : public IODevice, public ClockUser
     static const BYTE Direction_Ctrl              = 0x20;  // (0 = out)
     static const BYTE StepCommand_Ctrl            = 0x40;  // (Active high)
     static const BYTE WriteEnableRAM_Ctrl         = 0x80;  // 0 - write protected
-                                                           // 1 - write enabled
+    // 1 - write enabled
 
     ///
     /// Read from the StatusPort_c
@@ -156,9 +157,9 @@ class H17 : public IODevice, public ClockUser
     static const BYTE ReceiveDataAvail_Flag       = 0x01;  // from controller
     static const BYTE ReceiverOverrun_Flag        = 0x02;  // from controller
     static const BYTE ReceiverParityErr_Flag      = 0x04;  // from controller, NEVER set
-                                                           // on H17
+    // on H17
     static const BYTE SyncDetect_Flag             = 0x08;  // ??? - Manual says it, but Heath
-                                                           // software didn't use it
+    // software didn't use it
     static const BYTE FillCharTransmitted_Flag    = 0x40;  // from controller
     static const BYTE TransmitterBufferEmpty_Flag = 0x80;  // from controller
 };

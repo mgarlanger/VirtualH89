@@ -13,7 +13,7 @@
 
 class EightInchDisk: public SoftSectoredDisk
 {
-public:
+  public:
     EightInchDisk();
     EightInchDisk(const char *name, SoftSectoredDisk::DiskImageFormat format);
 
@@ -31,7 +31,7 @@ public:
 
 //    virtual void dump(void);
 
-private:
+  private:
 
 
 };

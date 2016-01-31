@@ -15,8 +15,8 @@
 #include "ParallelPortConnection.h"
 
 class Z47Interface: public virtual IODevice,
-                    public virtual ClockUser,
-                    public virtual ParallelPortConnection
+    public virtual ClockUser,
+    public virtual ParallelPortConnection
 {
   public:
     Z47Interface(int baseAddr);
@@ -62,8 +62,8 @@ class Z47Interface: public virtual IODevice,
     static const BYTE cmd_MasterReset_c          = 0x02;
     static const BYTE cmd_InterruptsEnabled_c    = 0x40;
     static const BYTE cmd_Undefined_c            = ~(cmd_U137BSet_c |
-                                                     cmd_MasterReset_c |
-                                                     cmd_InterruptsEnabled_c);
+            cmd_MasterReset_c |
+            cmd_InterruptsEnabled_c);
 
     bool interruptsEnabled_m;
     bool DTR_m;
@@ -75,8 +75,8 @@ class Z47Interface: public virtual IODevice,
     void writeStatus(BYTE cmd);
     void writeData(BYTE data);
 
-    void readStatus(BYTE &status);
-    void readData(BYTE &data);
+    void readStatus(BYTE& status);
+    void readData(BYTE& data);
 
     ParallelLink *linkToDrive_m;
 };

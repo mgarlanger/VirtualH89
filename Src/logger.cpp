@@ -11,8 +11,8 @@ unsigned debugLevel[ssMax];
 
 
 logger::logger():  printToFile(false),
-                   printToScreen(false),
-                   logFile(NULL)
+    printToScreen(false),
+    logFile(NULL)
 {
 
 }

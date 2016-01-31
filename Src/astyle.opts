@@ -1,0 +1,13 @@
+# ASTYLE code formatting options. http://sourceforge.net/projects/astyle
+--indent=spaces=4
+--convert-tabs
+--style=break
+--add-brackets
+--indent-modifiers
+--pad-oper
+--pad-header
+--unpad-paren
+--align-pointer=name
+--align-reference=type
+--break-blocks=all
+--indent-cases

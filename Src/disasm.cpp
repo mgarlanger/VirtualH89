@@ -63,18 +63,20 @@ static int ddfd(const char *, WORD);
 
 BYTE readMemory(const WORD addr)
 {
-    return(h89.getAddressBus().readByte(addr));
+    return (h89.getAddressBus().readByte(addr));
 }
 
 ///
 /// Opcode  tables
 ///
-struct opt {
-    int (*fun) (const char *, WORD);
+struct opt
+{
+    int (*fun)(const char *, WORD);
     const char *text;
 };
 
-static struct opt optab[256] = {
+static struct opt optab[256] =
+{
     { opout,  "NOP"             },      // 0x00
     { nnout,  "LD\tBC,"         },      // 0x01
     { opout,  "LD\t(BC),A"      },      // 0x02
@@ -350,58 +352,63 @@ char Opcode_Str[64];
 void get_opcodes(WORD addr, int len)
 {
 #if OCTAL
+
     switch (len)
     {
-        case 1:
-            sprintf(Opcode_Str, "%03o            ", readMemory(addr));
-            break;
+    case 1:
+        sprintf(Opcode_Str, "%03o            ", readMemory(addr));
+        break;
 
-        case 2:
-            sprintf(Opcode_Str, "%03o %03o        ", readMemory(addr), readMemory(addr + 1));
-            break;
+    case 2:
+        sprintf(Opcode_Str, "%03o %03o        ", readMemory(addr), readMemory(addr + 1));
+        break;
 
-        case 3:
-            sprintf(Opcode_Str, "%03o %03o %03o    ", readMemory(addr), readMemory(addr + 1),
-                                                     readMemory(addr + 2));
-            break;
+    case 3:
+        sprintf(Opcode_Str, "%03o %03o %03o    ", readMemory(addr), readMemory(addr + 1),
+                readMemory(addr + 2));
+        break;
 
-        case 4:
-            sprintf(Opcode_Str, "%03o %03o %03o %02X3o", readMemory(addr),
-            		                                     readMemory(addr + 1),
-                                                         readMemory(addr + 2),
-                                                         readMemory(addr + 3));
-            break;
-        default:
-            sprintf(Opcode_Str, "xxx xxx xxx xxx");
-            break;
+    case 4:
+        sprintf(Opcode_Str, "%03o %03o %03o %02X3o", readMemory(addr),
+                readMemory(addr + 1),
+                readMemory(addr + 2),
+                readMemory(addr + 3));
+        break;
+
+    default:
+        sprintf(Opcode_Str, "xxx xxx xxx xxx");
+        break;
     }
 
 #else
+
     switch (len)
     {
-        case 1:
-            sprintf(Opcode_Str, "%02x         ", readMemory(addr));
-            break;
+    case 1:
+        sprintf(Opcode_Str, "%02x         ", readMemory(addr));
+        break;
 
-        case 2:
-            sprintf(Opcode_Str, "%02x %02x      ", readMemory(addr), readMemory(addr + 1));
-            break;
+    case 2:
+        sprintf(Opcode_Str, "%02x %02x      ", readMemory(addr), readMemory(addr + 1));
+        break;
 
-        case 3:
-            sprintf(Opcode_Str, "%02x %02x %02x   ", readMemory(addr), readMemory(addr + 1),
-                                                     readMemory(addr + 2));
-            break;
+    case 3:
+        sprintf(Opcode_Str, "%02x %02x %02x   ", readMemory(addr), readMemory(addr + 1),
+                readMemory(addr + 2));
+        break;
 
-        case 4:
-            sprintf(Opcode_Str, "%02x %02x %02x %02x", readMemory(addr),
-            		                                   readMemory(addr + 1),
-                                                       readMemory(addr + 2),
-                                                       readMemory(addr + 3));
-            break;
-        default:
-            sprintf(Opcode_Str, "xx xx xx xx");
-            break;
+    case 4:
+        sprintf(Opcode_Str, "%02x %02x %02x %02x", readMemory(addr),
+                readMemory(addr + 1),
+                readMemory(addr + 2),
+                readMemory(addr + 3));
+        break;
+
+    default:
+        sprintf(Opcode_Str, "xx xx xx xx");
+        break;
     }
+
 #endif
 }
 
@@ -431,7 +438,7 @@ BYTE disass(WORD addr)
 
     fprintf(log_out, " %s: %s\n", Opcode_Str, Disass_Str);
 
-    return(len);
+    return (len);
 }
 
 ///
@@ -440,7 +447,7 @@ BYTE disass(WORD addr)
 static int opout(const char *s, WORD)
 {
     sprintf(Disass_Str, "%s", s);
-    return(1);
+    return (1);
 }
 
 ///
@@ -454,7 +461,7 @@ static int nout(const char *s, WORD addr)
 #else
     sprintf(Disass_Str, "%s%02X", s, readMemory(addr + 1));
 #endif
-    return(2);
+    return (2);
 }
 
 ///
@@ -463,7 +470,7 @@ static int nout(const char *s, WORD addr)
 static int iout(const char *s, WORD addr)
 {
     sprintf(Disass_Str, s, readMemory(addr + 1));
-    return(2);
+    return (2);
 }
 
 ///
@@ -472,7 +479,7 @@ static int iout(const char *s, WORD addr)
 static int rout(const char *s, WORD addr)
 {
     sprintf(Disass_Str, "%s%04X", s, addr + ((signed char) readMemory(addr + 1)) + 2);
-    return(2);
+    return (2);
 }
 
 ///
@@ -484,7 +491,7 @@ static int nnout(const char *s, WORD addr)
 
     i = readMemory(addr + 1) + (readMemory(addr + 2) << 8);
     sprintf(Disass_Str, "%s%04X", s, i);
-    return(3);
+    return (3);
 }
 
 ///
@@ -496,7 +503,7 @@ static int inout(const char *s, WORD addr)
 
     i = readMemory(addr + 1) + (readMemory(addr + 2) << 8);
     sprintf(Disass_Str, s, i);
-    return(3);
+    return (3);
 }
 
 ///
@@ -507,46 +514,61 @@ static int cbop(const char *s, WORD addr)
     int b2;
 
     b2 = readMemory(addr + 1);
-    switch (b2 & 0xc0) {
+
+    switch (b2 & 0xc0)
+    {
     case 0x00:
-        switch (b2 & 0x38) {
+        switch (b2 & 0x38)
+        {
         case 0x00:
             sprintf(Disass_Str, "RLC\t%s", reg[b2 & 7]);
             break;
+
         case 0x08:
             sprintf(Disass_Str, "RRC\t%s", reg[b2 & 7]);
             break;
+
         case 0x10:
             sprintf(Disass_Str, "RL\t%s", reg[b2 & 7]);
             break;
+
         case 0x18:
             sprintf(Disass_Str, "RR\t%s", reg[b2 & 7]);
             break;
+
         case 0x20:
             sprintf(Disass_Str, "SLA\t%s", reg[b2 & 7]);
             break;
+
         case 0x28:
             sprintf(Disass_Str, "SRA\t%s", reg[b2 & 7]);
             break;
+
         case 0x30:
             sprintf(Disass_Str, "SLL\t%s", reg[b2 & 7]);
             break;
+
         case 0x38:
             sprintf(Disass_Str, "SRL\t%s", reg[b2 & 7]);
             break;
         }
+
         break;
+
     case 0x40:
         sprintf(Disass_Str, "BIT\t%c,%s", ((b2 >> 3) & 7) + '0', reg[b2 & 7]);
         break;
+
     case 0x80:
         sprintf(Disass_Str, "RES\t%c,%s", ((b2 >> 3) & 7) + '0', reg[b2 & 7]);
         break;
+
     case 0xC0:
         sprintf(Disass_Str, "SET\t%c,%s", ((b2 >> 3) & 7) + '0', reg[b2 & 7]);
         break;
     }
-    return(2);
+
+    return (2);
 
 }
 
@@ -560,192 +582,251 @@ static int edop(const char *s, WORD addr)
 
     Disass_Str[0] = 0;
     b2 = readMemory(addr + 1);
-    switch (b2) {
+
+    switch (b2)
+    {
     case 0x40:
         strcat(Disass_Str, "IN\tB,(C)");
         break;
+
     case 0x41:
         strcat(Disass_Str, "OUT\t(C),B");
         break;
+
     case 0x42:
         strcat(Disass_Str, "SBC\tHL,BC");
         break;
+
     case 0x43:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t(%04X),BC", i);
         len = 4;
         break;
+
     case 0x44:
         strcat(Disass_Str, "NEG");
         break;
+
     case 0x45:
         strcat(Disass_Str, "RETN");
         break;
+
     case 0x46:
         strcat(Disass_Str, "IM\t0");
         break;
+
     case 0x47:
         strcat(Disass_Str, "LD\tI,A");
         break;
+
     case 0x48:
         strcat(Disass_Str, "IN\tC,(C)");
         break;
+
     case 0x49:
         strcat(Disass_Str, "OUT\t(C),C");
         break;
+
     case 0x4a:
         strcat(Disass_Str, "ADC\tHL,BC");
         break;
+
     case 0x4b:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\tBC,(%04X)", i);
         len = 4;
         break;
+
     case 0x4d:
         strcat(Disass_Str, "RETI");
         break;
+
     case 0x4f:
         strcat(Disass_Str, "LD\tR,A");
         break;
+
     case 0x50:
         strcat(Disass_Str, "IN\tD,(C)");
         break;
+
     case 0x51:
         strcat(Disass_Str, "OUT\t(C),D");
         break;
+
     case 0x52:
         strcat(Disass_Str, "SBC\tHL,DE");
         break;
+
     case 0x53:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t(%04X),DE", i);
         len = 4;
         break;
+
     case 0x56:
         strcat(Disass_Str, "IM\t1");
         break;
+
     case 0x57:
         strcat(Disass_Str, "LD\tA,I");
         break;
+
     case 0x58:
         strcat(Disass_Str, "IN\tE,(C)");
         break;
+
     case 0x59:
         strcat(Disass_Str, "OUT\t(C),E");
         break;
+
     case 0x5a:
         strcat(Disass_Str, "ADC\tHL,DE");
         break;
+
     case 0x5b:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\tDE,(%04X)", i);
         len = 4;
         break;
+
     case 0x5e:
         strcat(Disass_Str, "IM\t2");
         break;
+
     case 0x5f:
         strcat(Disass_Str, "LD\tA,R");
         break;
+
     case 0x60:
         strcat(Disass_Str, "IN\tH,(C)");
         break;
+
     case 0x61:
         strcat(Disass_Str, "OUT\t(C),H");
         break;
+
     case 0x62:
         strcat(Disass_Str, "SBC\tHL,HL");
         break;
+
     case 0x67:
         strcat(Disass_Str, "RRD");
         break;
+
     case 0x68:
         strcat(Disass_Str, "IN\tL,(C)");
         break;
+
     case 0x69:
         strcat(Disass_Str, "OUT\t(C),L");
         break;
+
     case 0x6a:
         strcat(Disass_Str, "ADC\tHL,HL");
         break;
+
     case 0x6f:
         strcat(Disass_Str, "RLD");
         break;
+
     case 0x72:
         strcat(Disass_Str, "SBC\tHL,SP");
         break;
+
     case 0x73:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t(%04X),SP", i);
         len = 4;
         break;
+
     case 0x78:
         strcat(Disass_Str, "IN\tA,(C)");
         break;
+
     case 0x79:
         strcat(Disass_Str, "OUT\t(C),A");
         break;
+
     case 0x7a:
         strcat(Disass_Str, "ADC\tHL,SP");
         break;
+
     case 0x7b:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\tSP,(%04X)", i);
         len = 4;
         break;
+
     case 0xa0:
         strcat(Disass_Str, "LDI");
         break;
+
     case 0xa1:
         strcat(Disass_Str, "CPI");
         break;
+
     case 0xa2:
         strcat(Disass_Str, "INI");
         break;
+
     case 0xa3:
         strcat(Disass_Str, "OUTI");
         break;
+
     case 0xa8:
         strcat(Disass_Str, "LDD");
         break;
+
     case 0xa9:
         strcat(Disass_Str, "CPD");
         break;
+
     case 0xaa:
         strcat(Disass_Str, "IND");
         break;
+
     case 0xab:
         strcat(Disass_Str, "OUTD");
         break;
+
     case 0xb0:
         strcat(Disass_Str, "LDIR");
         break;
+
     case 0xb1:
         strcat(Disass_Str, "CPIR");
         break;
+
     case 0xb2:
         strcat(Disass_Str, "INIR");
         break;
+
     case 0xb3:
         strcat(Disass_Str, "OTIR");
         break;
+
     case 0xb8:
         strcat(Disass_Str, "LDDR");
         break;
+
     case 0xb9:
         strcat(Disass_Str, "CPDR");
         break;
+
     case 0xba:
         strcat(Disass_Str, "INDR");
         break;
+
     case 0xbb:
         strcat(Disass_Str, "OTDR");
         break;
+
     default:
         strcat(Disass_Str, unkown);
         break;
     }
-    return(len);
+
+    return (len);
 }
 
 ///
@@ -763,241 +844,313 @@ static int ddfd(const char *s, WORD addr)
     {
         ireg = regix;
     }
+
     else
     {
         ireg = regiy;
     }
 
     b2 = readMemory(addr + 1);
+
     if (b2 >= 0x70 && b2 <= 0x77)
     {
         sprintf(Disass_Str, "LD\t(%s+%02X),%s", ireg, readMemory(addr + 2),
-        		                                      reg[b2 & 7]);
-        return(3);
+                reg[b2 & 7]);
+        return (3);
     }
-    switch (b2) {
+
+    switch (b2)
+    {
     case 0x09:
         sprintf(Disass_Str, "ADD\t%s,BC", ireg);
         len = 2;
         break;
+
     case 0x19:
         sprintf(Disass_Str, "ADD\t%s,DE", ireg);
         len = 2;
         break;
+
     case 0x21:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t%s,%04X", ireg, i);
         len = 4;
         break;
+
     case 0x22:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t(%04X),%s", i, ireg);
         len = 4;
         break;
+
     case 0x23:
         sprintf(Disass_Str, "INC\t%s", ireg);
         len = 2;
         break;
+
     case 0x29:
         sprintf(Disass_Str, "ADD\t%s,%s", ireg, ireg);
         len = 2;
         break;
+
     case 0x2a:
         i = readMemory(addr + 2) + (readMemory(addr + 3) << 8);
         sprintf(Disass_Str, "LD\t%s,(%04X)", ireg, i);
         len = 4;
         break;
+
     case 0x2b:
         sprintf(Disass_Str, "DEC\t%s", ireg);
         len = 2;
         break;
+
     case 0x34:
         sprintf(Disass_Str, "INC\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x35:
         sprintf(Disass_Str, "DEC\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x36:
         sprintf(Disass_Str, "LD\t(%s+%02X),%02X", ireg, readMemory(addr + 2),
-        		                                        readMemory(addr + 3));
+                readMemory(addr + 3));
         len = 4;
         break;
+
     case 0x39:
         sprintf(Disass_Str, "ADD\t%s,SP", ireg);
         len = 2;
         break;
+
     case 0x46:
         sprintf(Disass_Str, "LD\tB,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x4e:
         sprintf(Disass_Str, "LD\tC,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x56:
         sprintf(Disass_Str, "LD\tD,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x5e:
         sprintf(Disass_Str, "LD\tE,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x66:
         sprintf(Disass_Str, "LD\tH,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x6e:
         sprintf(Disass_Str, "LD\tL,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x7e:
         sprintf(Disass_Str, "LD\tA,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x86:
         sprintf(Disass_Str, "ADD\tA,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x8e:
         sprintf(Disass_Str, "ADC\tA,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x96:
         sprintf(Disass_Str, "SUB\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0x9e:
         sprintf(Disass_Str, "SBC\tA,(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0xa6:
         sprintf(Disass_Str, "AND\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0xae:
         sprintf(Disass_Str, "XOR\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0xb6:
         sprintf(Disass_Str, "OR\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0xbe:
         sprintf(Disass_Str, "CP\t(%s+%02X)", ireg, readMemory(addr + 2));
         break;
+
     case 0xcb:
-        switch (readMemory(addr + 3)) {
+        switch (readMemory(addr + 3))
+        {
         case 0x06:
             sprintf(Disass_Str, "RLC\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x0e:
             sprintf(Disass_Str, "RRC\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x16:
             sprintf(Disass_Str, "RL\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x1e:
             sprintf(Disass_Str, "RR\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x26:
             sprintf(Disass_Str, "SLA\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x2e:
             sprintf(Disass_Str, "SRA\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x36:  // Undocumented SLL
             sprintf(Disass_Str, "SLL\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x3e:
             sprintf(Disass_Str, "SRL\t(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x46:
             sprintf(Disass_Str, "BIT\t0,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x4e:
             sprintf(Disass_Str, "BIT\t1,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x56:
             sprintf(Disass_Str, "BIT\t2,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x5e:
             sprintf(Disass_Str, "BIT\t3,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x66:
             sprintf(Disass_Str, "BIT\t4,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x6e:
             sprintf(Disass_Str, "BIT\t5,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x76:
             sprintf(Disass_Str, "BIT\t6,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x7e:
             sprintf(Disass_Str, "BIT\t7,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x86:
             sprintf(Disass_Str, "RES\t0,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x8e:
             sprintf(Disass_Str, "RES\t1,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x96:
             sprintf(Disass_Str, "RES\t2,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0x9e:
             sprintf(Disass_Str, "RES\t3,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xa6:
             sprintf(Disass_Str, "RES\t4,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xae:
             sprintf(Disass_Str, "RES\t5,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xb6:
             sprintf(Disass_Str, "RES\t6,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xbe:
             sprintf(Disass_Str, "RES\t7,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xc6:
             sprintf(Disass_Str, "SET\t0,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xce:
             sprintf(Disass_Str, "SET\t1,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xd6:
             sprintf(Disass_Str, "SET\t2,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xde:
             sprintf(Disass_Str, "SET\t3,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xe6:
             sprintf(Disass_Str, "SET\t4,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xee:
             sprintf(Disass_Str, "SET\t5,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xf6:
             sprintf(Disass_Str, "SET\t6,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         case 0xfe:
             sprintf(Disass_Str, "SET\t7,(%s+%02X)", ireg, readMemory(addr + 2));
             break;
+
         default:
             strcat(Disass_Str, unkown);
             break;
         }
+
         len = 4;
         break;
+
     case 0xe1:
         sprintf(Disass_Str, "POP\t%s", ireg);
         len = 2;
         break;
+
     case 0xe3:
         sprintf(Disass_Str, "EX\t(SP),%s", ireg);
         len = 2;
         break;
+
     case 0xe5:
         sprintf(Disass_Str, "PUSH\t%s", ireg);
         len = 2;
         break;
+
     case 0xe9:
         sprintf(Disass_Str, "JP\t(%s)", ireg);
         len = 2;
         break;
+
     case 0xf9:
         sprintf(Disass_Str, "LD\tSP,%s", ireg);
         len = 2;
         break;
+
     default:
         strcat(Disass_Str, unkown);
         break;
     }
-    return(len);
+
+    return (len);
 }

@@ -15,19 +15,19 @@ class PropertyUtil
 {
     //enum { DEBUG = 0 };
 
-public:
+  public:
 
     typedef std::map<std::string, std::string> PropertyMapT;
     typedef PropertyMapT::value_type           value_type;
     typedef PropertyMapT::iterator             iterator;
 
-    static void read(const char *filename, PropertyMapT &map);
-    static void read(std::istream &is, PropertyMapT &map);
-    static void write(const char *filename, PropertyMapT &map, const char *header = NULL);
-    static void write(std::ostream &os, PropertyMapT &map, const char *header = NULL);
-    static void print(std::ostream &os, PropertyMapT &map);
+    static void read(const char *filename, PropertyMapT& map);
+    static void read(std::istream& is, PropertyMapT& map);
+    static void write(const char *filename, PropertyMapT& map, const char *header = NULL);
+    static void write(std::ostream& os, PropertyMapT& map, const char *header = NULL);
+    static void print(std::ostream& os, PropertyMapT& map);
 
-private:
+  private:
 
     static inline char m_hex(int nibble)
     {

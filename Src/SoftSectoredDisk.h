@@ -27,15 +27,15 @@ class SoftSectoredDisk: public FloppyDisk
         dif_8RAW
     };
 
-	SoftSectoredDisk(const char *name, DiskImageFormat format);
-	SoftSectoredDisk();
-	virtual ~SoftSectoredDisk();
+    SoftSectoredDisk(const char *name, DiskImageFormat format);
+    SoftSectoredDisk();
+    virtual ~SoftSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE &data);
+    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data);
     virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-    virtual void getControlInfo(unsigned int pos, bool &hole, bool &writeProtect);
+    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect);
 
-    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE &data);
+    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE& data);
     virtual void eject(const char *name);
 
   private:
@@ -56,15 +56,15 @@ class SoftSectoredDisk: public FloppyDisk
     // move these to track, that is how it is encoded in IMD files.
 //    DataRate dataRate_m;
 
-	bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned int pos);
 
-	void determineDiskFormat(const char *name, DiskImageFormat &format);
-	bool readTD0(const char *name);
+    void determineDiskFormat(const char *name, DiskImageFormat& format);
+    bool readTD0(const char *name);
     bool readIMD(const char *name);
     bool readRaw(const char *name);
     bool readRaw8(const char *name);
 
-protected:
+  protected:
     void dump();
 
 };
