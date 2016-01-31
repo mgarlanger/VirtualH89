@@ -10,6 +10,7 @@
 #include "ROM.h"
 
 #include <cassert>
+#include <fstream>
 #include "logger.h"
 
 ROM::ROM(int size): Memory(size),
@@ -27,6 +28,36 @@ ROM::~ROM()
     delete[] data_m;
     data_m = 0;
     size_m = 0;
+}
+
+ROM *ROM::getROM(const char *filename, WORD addr) {
+    std::ifstream file;
+    unsigned long int fileSize;
+    BYTE *buf;
+    ROM *rom = NULL;
+
+    file.open(filename, std::ios::binary);
+    if (!file.is_open()) {
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" cannot be opened\n", __FUNCTION__, filename);
+        return NULL;
+    }
+    file.seekg(0, std::ios::end);
+    fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    if (fileSize != 2048 && fileSize != 4096) {
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename, fileSize);
+	return NULL;
+    }
+    buf = new BYTE[fileSize];
+    file.read((char *)buf, fileSize);
+    file.close();
+
+    rom = new ROM(fileSize);
+    rom->setBaseAddress(addr);
+    rom->initialize(buf, fileSize);
+    delete buf;
+    return rom;
 }
 
 void ROM::initialize(BYTE *block, WORD size)
