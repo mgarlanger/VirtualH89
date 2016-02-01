@@ -27,7 +27,7 @@ class Computer
 
     virtual void reset() = 0;
     virtual BYTE run() = 0;
-    virtual H89Timer &getTimer() = 0;
+    virtual H89Timer& getTimer() = 0;
 
     virtual void init() = 0;
 
@@ -38,11 +38,11 @@ class Computer
     virtual void raiseNMI(void) = 0;
     virtual void continueCPU(void) = 0;
 
-    virtual H89_IO &getIO() = 0;
+    virtual H89_IO& getIO() = 0;
 
     virtual void clearMemory(BYTE data = 0) = 0;
 
-    virtual AddressBus &getAddressBus() = 0;
+    virtual AddressBus& getAddressBus() = 0;
 };
 
 #endif // COMPUTER_H_

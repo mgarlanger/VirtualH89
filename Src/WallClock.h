@@ -61,7 +61,7 @@ class WallClock
 
     long long unsigned int getElapsedTime(long long unsigned int origTime);
 
-    void printTime(FILE* file);
+    void printTime(FILE *file);
 
     bool addCallback(ClockUser *user, unsigned long long timeUs);
 };

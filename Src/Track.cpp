@@ -12,9 +12,9 @@
 #include "logger.h"
 
 Track::Track(BYTE sideNum, BYTE trackNum): sideNum_m(sideNum),
-                                           trackNum_m(trackNum),
-                                           density_m(density_Unknown),
-                                           dataRate_m(dr_Unknown)
+    trackNum_m(trackNum),
+    density_m(density_Unknown),
+    dataRate_m(dr_Unknown)
 {
 
 }
@@ -55,11 +55,11 @@ void Track::setDataRate(DataRate datarate)
     dataRate_m = datarate;
 }
 
-bool Track::readSectorData(BYTE sector, WORD pos, BYTE &data)
+bool Track::readSectorData(BYTE sector, WORD pos, BYTE& data)
 {
     debugss(ssFloppyDisk, INFO, "%s: sector: %d pos: %d\n", __FUNCTION__, sector, pos);
 
-    for(int i = 0; i < sectors_m.size(); i++)
+    for (int i = 0; i < sectors_m.size(); i++)
     {
         if (sectors_m[i]->getSectorNum() == sector)
         {

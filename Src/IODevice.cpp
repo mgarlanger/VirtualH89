@@ -7,7 +7,7 @@
 #include "IODevice.h"
 
 IODevice::IODevice(BYTE base, BYTE numPorts): baseAddress_m(base),
-                                              numPorts_m(numPorts)
+    numPorts_m(numPorts)
 {
 
 }
@@ -19,12 +19,12 @@ IODevice::~IODevice()
 
 BYTE IODevice::getBaseAddress(void)
 {
-    return(baseAddress_m);
+    return (baseAddress_m);
 }
 
 BYTE IODevice::getNumPorts(void)
 {
-    return(numPorts_m);
+    return (numPorts_m);
 }
 
 bool IODevice::verifyPort(BYTE addr)
@@ -34,5 +34,5 @@ bool IODevice::verifyPort(BYTE addr)
 
 BYTE IODevice::getPortOffset(BYTE addr)
 {
-	return(addr - baseAddress_m);
+    return (addr - baseAddress_m);
 }

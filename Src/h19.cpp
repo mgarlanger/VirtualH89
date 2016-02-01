@@ -22,8 +22,8 @@ static  pthread_mutex_t h19_mutex;
 
 
 H19::H19(): updated(true),
-            offline(false),
-            curCursor(false)
+    offline(false),
+    curCursor(false)
 {
     pthread_mutex_init(&h19_mutex, NULL);
     reset();
@@ -37,7 +37,7 @@ H19::~H19()
 
 bool H19::checkUpdated()
 {
-    pthread_mutex_lock (&h19_mutex);
+    pthread_mutex_lock(&h19_mutex);
     static unsigned int count = 0;
 
     if (!cursorOff)
@@ -48,9 +48,10 @@ bool H19::checkUpdated()
             updated = true;
         }
     }
+
     bool tmp = updated;
     updated = false;
-    pthread_mutex_unlock (&h19_mutex);
+    pthread_mutex_unlock(&h19_mutex);
     return tmp;
 }
 
@@ -59,17 +60,18 @@ void H19::init()
     GLuint i;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    fontOffset = glGenLists (0x101);
+    fontOffset = glGenLists(0x101);
+
     for (i = 0; i < 0x100; i++)
     {
-       glNewList(fontOffset + i, GL_COMPILE);
-       glBitmap(8, 20, 0.0, 0.0, 0.0, -20.0, &fontTable[i*20]);
-       glEndList();
+        glNewList(fontOffset + i, GL_COMPILE);
+        glBitmap(8, 20, 0.0, 0.0, 0.0, -20.0, &fontTable[i * 20]);
+        glEndList();
     }
 
     // Special character to wrap around.
     glNewList(fontOffset + 0x100, GL_COMPILE);
-    glBitmap(8, 20, 0.0, 0.0, 8.0, 500.0, &fontTable[32*20]);
+    glBitmap(8, 20, 0.0, 0.0, 8.0, 500.0, &fontTable[32 * 20]);
     glEndList();
 }
 
@@ -77,12 +79,12 @@ void H19::init()
 
 // GLUT routine used to redisplay the screen when needed.
 
-#define max(a,b)	((a) > (b) ? (a) : (b))
-#define min(a,b)	((a) < (b) ? (a) : (b))
+#define max(a,b)    ((a) > (b) ? (a) : (b))
+#define min(a,b)    ((a) < (b) ? (a) : (b))
 
 void H19::display()
 {
-    pthread_mutex_lock (&h19_mutex);
+    pthread_mutex_lock(&h19_mutex);
     //GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
     GLfloat color[3] = { 0.0, 1.0, 0.0 };  // green
     //GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
@@ -93,49 +95,51 @@ void H19::display()
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3fv(color);
 
-    glRasterPos2i(0, 24*20);
+    glRasterPos2i(0, 24 * 20);
 
-    glPushAttrib (GL_LIST_BIT);
+    glPushAttrib(GL_LIST_BIT);
     glListBase(fontOffset);
-    glCallLists(26*cols, GL_UNSIGNED_INT, (GLuint *) screen);
-    glPopAttrib ();
+    glCallLists(26 * cols, GL_UNSIGNED_INT, (GLuint *) screen);
+    glPopAttrib();
     glEnable(GL_COLOR_LOGIC_OP);
 
 #if CURSOR
+
     if ((!cursorOff) && (curCursor))
     {
 #if 0
-        glRasterPos2i(PosX*8, (24-PosY)*20);
+        glRasterPos2i(PosX * 8, (24 - PosY) * 20);
 #else
 
-        glRasterPos2i(min(PosX,79)*8, (24-PosY)*20);
+        glRasterPos2i(min(PosX, 79) * 8, (24 - PosY) * 20);
 
 #endif
-        glPushAttrib (GL_LIST_BIT);
+        glPushAttrib(GL_LIST_BIT);
         //  glEnable(GL_COLOR_LOGIC_OP);
         glLogicOp(GL_COPY);
         glListBase(fontOffset);
-        GLuint cursor = (cursorBlock) ? (128+32) : 27;
+        GLuint cursor = (cursorBlock) ? (128 + 32) : 27;
         glCallLists(1, GL_UNSIGNED_INT, &cursor);
-        glPopAttrib ();
+        glPopAttrib();
     }
+
 #endif
 
     glLogicOp(GL_COPY);
     glutSwapBuffers();
-    pthread_mutex_unlock (&h19_mutex);
+    pthread_mutex_unlock(&h19_mutex);
 }
 
 void H19::receiveData(BYTE ch)
 {
-    pthread_mutex_lock (&h19_mutex);
+    pthread_mutex_lock(&h19_mutex);
     processCharacter(ch);
-    pthread_mutex_unlock (&h19_mutex);
+    pthread_mutex_unlock(&h19_mutex);
 }
 
 void H19::keypress(char ch)
 {
-    pthread_mutex_lock (&h19_mutex);
+    pthread_mutex_lock(&h19_mutex);
     /// \todo - Send the key to the serial port unless offline.
 
     /// \todo fix this
@@ -143,12 +147,13 @@ void H19::keypress(char ch)
     {
         processCharacter(ch);
     }
+
     else
     {
         sendData(ch);
     }
 
-    pthread_mutex_unlock (&h19_mutex);
+    pthread_mutex_unlock(&h19_mutex);
 }
 
 void H19::reset()
@@ -176,11 +181,11 @@ void H19::reset()
 
     for (unsigned int y = 0; y < rows; ++y)
     {
-    	eraseLine(y);
+        eraseLine(y);
     }
 
     // specify the special symbol to end the line.
-    for(unsigned int x = 0; x < cols; ++x)
+    for (unsigned int x = 0; x < cols; ++x)
     {
         screen[x][rows] = 0x100;
     }
@@ -189,7 +194,7 @@ void H19::reset()
 
 void H19::processCharacter(char ch)
 {
-	// mask off the high bit just in case, the real H19 would not have it set.
+    // mask off the high bit just in case, the real H19 would not have it set.
     ch &= 0x7f;
 
     if (mode == Normal)
@@ -224,60 +229,73 @@ void H19::processCharacter(char ch)
         case ascii::DEL:
             // From manual, these characters are not processed by the terminal
             break;
+
         case ascii::BEL:   // Rings the bell.
             /// \todo - implement ringing bell.
 #if CONSOLE_LOG
-            fprintf(console_out,"<BEL>");
+            fprintf(console_out, "<BEL>");
 #endif
 
             break;
+
         case ascii::BS:    // Backspace
 #if CONSOLE_LOG
-            fprintf(console_out,"<BS>");
+            fprintf(console_out, "<BS>");
 #endif
             processBS();
             break;
+
         case ascii::HT:    // Horizontal Tab
 #if CONSOLE_LOG
-            fprintf(console_out,"<TAB>");
+            fprintf(console_out, "<TAB>");
 #endif
             processTAB();
             break;
+
         case ascii::LF:    // Line Feed
             processLF();
+
             if (autoCR)
             {
                 processCR();
             }
+
 #if CONSOLE_LOG
-            fprintf(console_out,"\n");
+            fprintf(console_out, "\n");
 #endif
             break;
+
         case ascii::CR:    // Carriage Return
             processCR();
+
             if (autoLF)
             {
                 processLF();
             }
+
             break;
+
         case ascii::CAN:   // Cancel.
             break;
+
         case ascii::ESC:   // Escape
             mode = Escape;
 #if CONSOLE_LOG
-            fprintf(console_out,"<ESC>");
+            fprintf(console_out, "<ESC>");
 #endif
 
             break;
+
         default:
             // if Printable character display it.
 #if CONSOLE_LOG
             fprintf(console_out, "%c", ch);
 #endif
             displayCharacter(ch);
-			break;
+            break;
         }
     }
+
     else if (mode == Escape)
     {
         // Assume we go back to Normal, so only the few that don't need to set the mode.
@@ -300,30 +318,39 @@ void H19::processCharacter(char ch)
             PosX = PosY = 0;
             updated = true;
             break;
+
         case 'C': // Cursor Forward
-        	cursorForward();
+            cursorForward();
             break;
+
         case 'D': // Cursor Backward
-        	processBS(); // same processing as cursor backward
+            processBS(); // same processing as cursor backward
             break;
+
         case 'B': // Cursor Down
-        	cursorDown();
+            cursorDown();
             break;
+
         case 'A': // Cursor Up
-        	cursorUp();
+            cursorUp();
             break;
+
         case 'I': // Reverse Index
             reverseIndex();
             break;
+
         case 'n': // Cursor Position Report
-        	cursorPositionReport();
+            cursorPositionReport();
             break;
+
         case 'j': // Save cursor position
-        	saveCursorPosition();
+            saveCursorPosition();
             break;
+
         case 'k': // Restore cursor position
-        	restoreCursorPosition();
+            restoreCursorPosition();
             break;
+
         case 'Y': // Direct Cursor Addressing
             mode = DCA_1;
             break;
@@ -331,20 +358,25 @@ void H19::processCharacter(char ch)
         // Erase and Editing
 
         case 'E': // Clear Display
-        	clearDisplay();
+            clearDisplay();
             break;
+
         case 'b': // Erase Beginning of Display
             eraseBOD();
             break;
+
         case 'J': // Erase to End of Page
             eraseEOP();
             break;
+
         case 'l': // Erase entire Line
             eraseEL();
             break;
+
         case 'o': // Erase Beginning Of Line
             eraseBOL();
             break;
+
         case 'K': // Erase To End Of Line
             eraseEOL();
             break;
@@ -364,6 +396,7 @@ void H19::processCharacter(char ch)
         case '@': // Enter Insert Character Mode
             insertMode = true;
             break;
+
         case 'O': // Exit Insert Character Mode
             insertMode = false;
             break;
@@ -398,6 +431,7 @@ void H19::processCharacter(char ch)
         case '[': // Enter Hold Screen Mode
             holdScreen = true;
             break;
+
         case '\\': // Exit Hold Screen Mode
             holdScreen = false;
             break;
@@ -405,6 +439,7 @@ void H19::processCharacter(char ch)
         case 'p': // Enter Reverse Video Mode
             reverseVideo = true;
             break;
+
         case 'q': // Exit Reverse Video Mode
             reverseVideo = false;
             break;
@@ -420,6 +455,7 @@ void H19::processCharacter(char ch)
         case 't': // Enter Keypad Shifted Mode
             keypadShifted = true;
             break;
+
         case 'u': // Exit Keypad Shifted Mode
             // ROM - just sets the mode
             keypadShifted = false;
@@ -429,6 +465,7 @@ void H19::processCharacter(char ch)
             // ROM - just sets the mode
             keypadShifted = true;
             break;
+
         case '>': // Exit Alternate Keypad Mode
             // ROM - just sets the mode
             keypadShifted = false;
@@ -440,6 +477,7 @@ void H19::processCharacter(char ch)
             /// \todo - determine whether to do this.
             keyboardEnabled = false;
             break;
+
         case '{': // Keyboard Enable
             keyboardEnabled = true;
             break;
@@ -447,19 +485,21 @@ void H19::processCharacter(char ch)
         case 'v': // Wrap Around at End Of Line
             wrapEOL = true;
             break;
+
         case 'w': // Discard At End Of Line
             wrapEOL = false;
             break;
 
         case 'Z': // Identify as VT52 (Data: ESC / K)
             sendData(ascii::ESC);
-        	sendData('/');
-        	sendData('K');
+            sendData('/');
+            sendData('K');
             break;
 
         case ']': // Transmit 25th Line
-        	transmitLine25();
-        	break;
+            transmitLine25();
+            break;
+
         case '#': // Transmit Page
             transmitPage();
             break;
@@ -470,101 +510,126 @@ void H19::processCharacter(char ch)
             break;
         }
     }
+
     else if (mode == SetMode)
     {
         mode = Normal;
+
         switch (ch)
         {
         case '1': // Enable 25th line
             // From the ROM, it erases line 25 on the enable, but here we erase on the disable.
             line25 = true;
             break;
+
         case '2': // No key click
             keyClick = true;
             break;
+
         case '3': // Hold screen mode
             holdScreen = true;
             break;
+
         case '4': // Block Cursor
             cursorBlock = true;
             updated = true;
             break;
+
         case '5': // Cursor Off
             cursorOff = true;
             updated = true;
             break;
+
         case '6': // Keypad Shifted
             keypadShifted = true;
             break;
+
         case '7': // Alternate Keypad mode
             altKeypadMode = true;
             break;
+
         case '8': // Auto LF
             autoLF = true;
             break;
+
         case '9': // Auto CR
             autoCR = true;
             break;
+
         default:
             /// \todo Need to process ch as if none of this happened...
             debugss(ssH19, WARNING, "Invalid set Mode: %c\n", ch);
             break;
         }
     }
+
     else if (mode == ResetMode)
     {
         mode = Normal;
+
         switch (ch)
         {
         case '1': // Disable 25th line
-        	eraseLine(rowsMain);
+            eraseLine(rowsMain);
             line25 = false;
             updated = true;
             break;
+
         case '2': // key click
             keyClick = false;
             break;
+
         case '3': // Hold screen mode
             holdScreen = false;
             break;
+
         case '4': // Block Cursor
             cursorBlock = false;
             updated = true;
             break;
+
         case '5': // Cursor On
             cursorOff = false;
             updated = true;
             break;
+
         case '6': // Keypad Unshifted
             keypadShifted = false;
             break;
+
         case '7': // Exit Alternate Keypad mode
             altKeypadMode = false;
             break;
+
         case '8': // No Auto LF
             autoLF = false;
             break;
+
         case '9': // No Auto CR
             autoCR = false;
             break;
+
         default:
             /// \todo Need to process ch as if none of this happened...
             debugss(ssH19, WARNING, "Invalid reset Mode: %c\n", ch);
             break;
         }
     }
+
     else if (mode == DCA_1)
     {
-    	// From actual H19, once the line is specified, the cursor
-    	// immediately moves to that line, so no need to save the
-    	// position and wait for the entire command.
-    	/// \todo verify that this is the same on newer H19s.
+        // From actual H19, once the line is specified, the cursor
+        // immediately moves to that line, so no need to save the
+        // position and wait for the entire command.
+        /// \todo verify that this is the same on newer H19s.
         if (ch == ascii::CAN)
         {
             // cancel
             mode = Normal;
         }
-        else {
+
+        else
+        {
             // \todo handle error conditions
 
             int pos = ch - 31;
@@ -574,6 +639,7 @@ void H19::processCharacter(char ch)
             {
                 PosY = pos - 1;
             }
+
             else
             {
                 /// \todo check to see how a real h19 handles this.
@@ -583,6 +649,7 @@ void H19::processCharacter(char ch)
             mode = DCA_2;
         }
     }
+
     else if (mode == DCA_2)
     {
         if (ch == ascii::CAN)
@@ -590,16 +657,19 @@ void H19::processCharacter(char ch)
             // cancel
             mode = Normal;
         }
+
         else
         {
             int pos = ch - 31;
+
             if ((pos > 0) && (pos < 81))
             {
                 PosX = pos - 1;
             }
+
             else
             {
-                PosX = (cols-1);
+                PosX = (cols - 1);
             }
 
             updated = true;
@@ -613,82 +683,88 @@ void H19::processCharacter(char ch)
 void H19::displayCharacter(unsigned int ch)
 {
     // when in graphic mode, use this lookup table to determine character to display,
-	// note: although entries 0 to 31 are defined, they are not used, since the control
-	// characters are specifically checked in the switch statement.
+    // note: although entries 0 to 31 are defined, they are not used, since the control
+    // characters are specifically checked in the switch statement.
     static char graphicLookup[0x80] =
     {
-         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,  31,
         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,  47,
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,  63,
         64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,  79,
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 127, 31,
-         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,  32
     };
 
-	unsigned int symbol;
+    unsigned int symbol;
 
-	if (graphicMode)
-	{
-	    // Look up symbol
-	    symbol = graphicLookup[ch];
-	}
-	else
-	{
-	    symbol = ch;
-	}
+    if (graphicMode)
+    {
+        // Look up symbol
+        symbol = graphicLookup[ch];
+    }
 
-	if (reverseVideo)
-	{
-	    // set the high-bit for reverse video.
-	    symbol |= 0x80;
-	}
+    else
+    {
+        symbol = ch;
+    }
 
-	if (!((PosX <= cols) && (PosY<rows)))
-	{
-	    debugss(ssH19, ERROR, "Invalid PosX, PosY: %d, %d\n", PosX, PosY);
-	    PosX = 0;
-	    PosY = 0;
-	}
+    if (reverseVideo)
+    {
+        // set the high-bit for reverse video.
+        symbol |= 0x80;
+    }
 
-	if (insertMode)
-	{
-	    for (unsigned int x = (cols-1); x > PosX; --x)
-	    {
-	        screen[x][PosY] = screen[x-1][PosY];
-	    }
-	}
+    if (!((PosX <= cols) && (PosY < rows)))
+    {
+        debugss(ssH19, ERROR, "Invalid PosX, PosY: %d, %d\n", PosX, PosY);
+        PosX = 0;
+        PosY = 0;
+    }
 
-	if (PosX >= cols)
-	{
-	    if (wrapEOL)
-	    {
-	        PosX = 0;
-	        if (PosY < (rowsMain-1))
-	        {
-	            PosY++;
-	        }
-	        else if (PosY == (rowsMain-1))
+    if (insertMode)
+    {
+        for (unsigned int x = (cols - 1); x > PosX; --x)
+        {
+            screen[x][PosY] = screen[x - 1][PosY];
+        }
+    }
+
+    if (PosX >= cols)
+    {
+        if (wrapEOL)
+        {
+            PosX = 0;
+
+            if (PosY < (rowsMain - 1))
             {
-	        	scroll();
-	        }
-	        else
-	        {
-	        	// On a real H19, it just wraps back to column 0, and stays
-	        	// on line 25 (24)
-	        	assert (PosY == rowsMain);
-	        }
-	    }
-	    else
-	    {
-	        PosX = (cols-1);
-	    }
-	}
-	screen[PosX][PosY] = symbol;
-	PosX++;
+                PosY++;
+            }
 
-	updated = true;
+            else if (PosY == (rowsMain - 1))
+            {
+                scroll();
+            }
+
+            else
+            {
+                // On a real H19, it just wraps back to column 0, and stays
+                // on line 25 (24)
+                assert(PosY == rowsMain);
+            }
+        }
+
+        else
+        {
+            PosX = (cols - 1);
+        }
+    }
+
+    screen[PosX][PosY] = symbol;
+    PosX++;
+
+    updated = true;
 }
 
 /// \brief Process Carriage Return
@@ -715,14 +791,15 @@ void H19::processLF()
     }
 
     // Determine if we can just move down a row, or if we have to scroll.
-    if (PosY < (rowsMain-1))
+    if (PosY < (rowsMain - 1))
     {
         ++PosY;
     }
+
     else
     {
         // must be line 24 - have to scroll.
-    	scroll();
+        scroll();
     }
 
     updated = true;
@@ -750,7 +827,8 @@ void H19::processTAB()
         PosX &= 0xf8;
         updated = true;
     }
-    else if (PosX < (cols-1))
+
+    else if (PosX < (cols - 1))
     {
         PosX++;
         updated = true;
@@ -773,8 +851,8 @@ void H19::cursorHome()
 void H19::cursorForward()
 {
     // ROM comment says that it will wrap around when at pos 80, but the code does not do that,
-	// and verifying on a real H89, even with wrap-around enabled, the cursor will not wrap.
-    if (PosX < (cols-1))
+    // and verifying on a real H89, even with wrap-around enabled, the cursor will not wrap.
+    if (PosX < (cols - 1))
     {
         ++PosX;
         updated = true;
@@ -786,8 +864,8 @@ void H19::cursorForward()
 void H19::cursorDown()
 {
     // ROM - Moves the cursor down one line on the display but does not cause a scroll past
-	// the last line
-    if (PosY < (rowsMain-1))
+    // the last line
+    if (PosY < (rowsMain - 1))
     {
         ++PosY;
         updated = true;
@@ -823,16 +901,18 @@ void H19::reverseIndex()
         // simply move up a row
         --PosY;
     }
+
     else
     {
         // must be line 0 - have to scroll down.
-        for (int y = (rowsMain-1); y > 0; --y)
+        for (int y = (rowsMain - 1); y > 0; --y)
         {
             for (unsigned int x = 0; x < cols; ++x)
             {
-                screen[x][y] = screen[x][y-1];
+                screen[x][y] = screen[x][y - 1];
             }
         }
+
         eraseLine(0);
     }
 
@@ -846,9 +926,9 @@ void H19::cursorPositionReport()
 {
     // Send ESC Y <PosY+0x20> <PosX+0x20>
     sendData(ascii::ESC);
-	sendData('Y');
-	sendData(PosY + 0x20);
-	sendData(PosX + 0x20);
+    sendData('Y');
+    sendData(PosY + 0x20);
+    sendData(PosX + 0x20);
 
 }
 
@@ -876,18 +956,20 @@ void H19::restoreCursorPosition()
 /// \brief Clear Display
 void H19::clearDisplay()
 {
-	// if on line 25, then only erase line 25
+    // if on line 25, then only erase line 25
     if (onLine25())
     {
         eraseEL();
         /// \todo determine if 'PosX = 0' is needed.
     }
+
     else
     {
         for (unsigned int y = 0; y < rowsMain; ++y)
         {
             eraseLine(y);
         }
+
         PosX = PosY = 0;
     }
 
@@ -925,7 +1007,7 @@ void H19::eraseEOP()
     /// \todo what about line 25?
     while (y < rowsMain)
     {
-    	eraseLine(y);
+        eraseLine(y);
         ++y;
     }
 
@@ -936,7 +1018,7 @@ void H19::eraseEOP()
 ///
 void H19::eraseEL()
 {
-	eraseLine(PosY);
+    eraseLine(PosY);
 
     updated = true;
 }
@@ -950,7 +1032,8 @@ void H19::eraseBOL()
     do
     {
         screen[x--][PosY] = ascii::SP;
-    } while (x >= 0);
+    }
+    while (x >= 0);
 
     updated = true;
 }
@@ -964,7 +1047,8 @@ void H19::eraseEOL()
     do
     {
         screen[x++][PosY] = ascii::SP;
-    } while (x < cols);
+    }
+    while (x < cols);
 
     updated = true;
 }
@@ -976,13 +1060,14 @@ void H19::insertLine()
     /// \todo - Determine how the REAL H89 does this on Line 25, the ROM listing is not clear.
     /// - a real H19 messes up with either an insert or delete line on line 25.
     /// - note tested with early H19, newer H19 roms should have this fixed.
-    for (unsigned int y = (rowsMain-1); y > PosY; --y)
+    for (unsigned int y = (rowsMain - 1); y > PosY; --y)
     {
-        for(unsigned int x = 0; x < cols; ++x)
+        for (unsigned int x = 0; x < cols; ++x)
         {
-            screen[x][y] = screen[x][y-1];
+            screen[x][y] = screen[x][y - 1];
         }
     }
+
     eraseLine(PosX);
 
     PosX = 0;
@@ -1001,16 +1086,16 @@ void H19::deleteLine()
     PosX = 0;
 
     // move all the lines up.
-    for (unsigned int y = PosY; y < (rowsMain-1); ++y)
+    for (unsigned int y = PosY; y < (rowsMain - 1); ++y)
     {
-        for(unsigned int x = 0; x < cols; ++x)
+        for (unsigned int x = 0; x < cols; ++x)
         {
-            screen[x][y] = screen[x][y+1];
+            screen[x][y] = screen[x][y + 1];
         }
     }
 
     // clear line 24.
-    eraseLine((rowsMain-1));
+    eraseLine((rowsMain - 1));
 
     updated = true;
 }
@@ -1020,13 +1105,13 @@ void H19::deleteLine()
 void H19::deleteChar()
 {
     // move all character in.
-    for (unsigned int x = PosX; x < (cols-1); x++)
+    for (unsigned int x = PosX; x < (cols - 1); x++)
     {
-        screen[x][PosY] = screen[x+1][PosY];
+        screen[x][PosY] = screen[x + 1][PosY];
     }
 
     // clear the last column
-    screen[cols-1][PosY] = ascii::SP;
+    screen[cols - 1][PosY] = ascii::SP;
 
     updated = true;
 }
@@ -1034,6 +1119,7 @@ void H19::deleteChar()
 void H19::eraseLine(unsigned int line)
 {
     assert(line < rows);
+
     for (unsigned int x = 0; x < cols; ++x)
     {
         screen[x][line] = ascii::SP;
@@ -1050,7 +1136,7 @@ void H19::processEnableLine25()
 
 void H19::transmitLines(int start, int end)
 {
-	/// \todo verify this table.
+    /// \todo verify this table.
     static char characterLookup[0x80] =
     {
         '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',  'o',
@@ -1059,85 +1145,92 @@ void H19::transmitLines(int start, int end)
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
         64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-        96, 97, 98, 99,100,101,102,103,104,105,106,107,108,109,110,111,
-       112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,'^'
+        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+        112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, '^'
     };
 
-	bool reverse = false;
-	bool graphics = false;
-	unsigned char  ch;
+    bool reverse = false;
+    bool graphics = false;
+    unsigned char  ch;
 
-	for (int line = start; line <= end; line++)
-	{
-		for(unsigned int col = 0; col < cols; col++)
-		{
-			bool newReverse = ((screen[col][line] & 0x80) == 0x80);
-			/// \todo determine if we should only change for lower case and graphics characters.
-			///
-			bool newGraphics = (((screen[col][line] & 0x7f) < 0x20) ||
-					            ((screen[col][line] & 0x7f) == 0x7f));
+    for (int line = start; line <= end; line++)
+    {
+        for (unsigned int col = 0; col < cols; col++)
+        {
+            bool newReverse = ((screen[col][line] & 0x80) == 0x80);
+            /// \todo determine if we should only change for lower case and graphics characters.
+            ///
+            bool newGraphics = (((screen[col][line] & 0x7f) < 0x20) ||
+                                ((screen[col][line] & 0x7f) == 0x7f));
 
-			/// \todo - determine which mode a real H19 sends first.
-			if (newReverse != reverse)
-			{
-				if (newReverse)
-				{
-					/// \todo - if in ANSI mode, must send the ANSI codes
-					// send turn on reverse
+            /// \todo - determine which mode a real H19 sends first.
+            if (newReverse != reverse)
+            {
+                if (newReverse)
+                {
+                    /// \todo - if in ANSI mode, must send the ANSI codes
+                    // send turn on reverse
                     sendData(ascii::ESC);
                     sendData('p');
-				}
-				else
-				{
-					// send turn off reverse
+                }
+
+                else
+                {
+                    // send turn off reverse
                     sendData(ascii::ESC);
                     sendData('q');
-				}
-				reverse = newReverse;
-			}
+                }
 
-			if (newGraphics != graphics)
-			{
-				if (newGraphics)
-				{
-					// send turn on graphics
-					sendData(ascii::ESC);
-					sendData('F');
-				}
-				else
-				{
-					// send turn off graphics
-					sendData(ascii::ESC);
-					sendData('G');
-				}
-			    graphics = newGraphics;
-			}
+                reverse = newReverse;
+            }
 
-			// mask off the inverse video.
-			ch = screen[col][line] & 0x7f;
-			if (graphics)
-			{
-				// look up the character
-				ch = characterLookup[ch];
-			}
+            if (newGraphics != graphics)
+            {
+                if (newGraphics)
+                {
+                    // send turn on graphics
+                    sendData(ascii::ESC);
+                    sendData('F');
+                }
 
-			// finally send the character.
-			sendData(ch);
-		}
-	}
-	/// \todo - determine if we need to turn off inverse and graphics if they are on.
+                else
+                {
+                    // send turn off graphics
+                    sendData(ascii::ESC);
+                    sendData('G');
+                }
+
+                graphics = newGraphics;
+            }
+
+            // mask off the inverse video.
+            ch = screen[col][line] & 0x7f;
+
+            if (graphics)
+            {
+                // look up the character
+                ch = characterLookup[ch];
+            }
+
+            // finally send the character.
+            sendData(ch);
+        }
+    }
+
+    /// \todo - determine if we need to turn off inverse and graphics if they are on.
 }
 
 /// \brief Process transmit line 25
 ///
 void H19::transmitLine25()
 {
-	// if line 25 is not enabled, only send CR and ring bell.
+    // if line 25 is not enabled, only send CR and ring bell.
     if (line25)
     {
         // Transmit line 25.
-        transmitLines(rowsMain,rowsMain);
+        transmitLines(rowsMain, rowsMain);
     }
+
     sendData(ascii::CR);
     bell();
 }
@@ -1146,9 +1239,9 @@ void H19::transmitLine25()
 ///
 void H19::transmitPage()
 {
-	transmitLines(0,rowsMain-1);
-	sendData(ascii::CR);
-	bell();
+    transmitLines(0, rowsMain - 1);
+    sendData(ascii::CR);
+    bell();
 }
 
 /// \brief Ring the H19 bell.
@@ -1161,8 +1254,8 @@ void H19::bell(void)
 
 unsigned int H19::getBaudRate()
 {
-	/// \todo get this from the dip switch.
-	return(9600);
+    /// \todo get this from the dip switch.
+    return (9600);
 }
 
 void H19::run()

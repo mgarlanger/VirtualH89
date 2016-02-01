@@ -17,7 +17,8 @@ class AddressBus;
 ///
 /// Basic processor abstraction class.
 ///
-class CPU {
+class CPU
+{
   private:
 
   public:

@@ -58,12 +58,12 @@ class H19 : public Terminal//, public BaseThread
     // state variables
     enum InputMode
     {
-    	Normal,
-    	Escape,
-    	DCA_1,
-    	DCA_2,
-    	SetMode,
-    	ResetMode
+        Normal,
+        Escape,
+        DCA_1,
+        DCA_2,
+        SetMode,
+        ResetMode
     };
     InputMode mode;
     bool updated;
@@ -88,7 +88,7 @@ class H19 : public Terminal//, public BaseThread
     bool offline;
 
     GLuint fontOffset;
-    GLuint screen[cols][rows+1];  // extra row for GLUT wraparound.
+    GLuint screen[cols][rows + 1]; // extra row for GLUT wraparound.
 
     bool curCursor;
     unsigned int  PosX, PosY;
@@ -103,16 +103,17 @@ class H19 : public Terminal//, public BaseThread
     virtual void processTAB();
 
     inline virtual void scroll()
-	{
-        for (unsigned int y = 0; y < (rowsMain-1); ++y)
+    {
+        for (unsigned int y = 0; y < (rowsMain - 1); ++y)
         {
             for (unsigned int x = 0; x < cols; ++x)
             {
-                screen[x][y] = screen[x][y+1];
+                screen[x][y] = screen[x][y + 1];
             }
         }
-        eraseLine(rowsMain-1);
-	};
+
+        eraseLine(rowsMain - 1);
+    };
 
     //
     // internal routines to handle ESC sequences.
@@ -153,7 +154,7 @@ class H19 : public Terminal//, public BaseThread
 
     inline bool onLine25()
     {
-    	return(PosX == (rows-1));
+        return (PosX == (rows - 1));
     };
     virtual void bell(void);
 };

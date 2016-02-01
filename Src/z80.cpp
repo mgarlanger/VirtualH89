@@ -23,23 +23,24 @@
 #if PARITY_TABLE
 /// Precalculated Parity table based on byte value.
 ///
-const BYTE Z80::parity[256] = {
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-        1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1
+const BYTE Z80::parity[256] =
+{
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1
 };
 #endif
 
@@ -48,42 +49,44 @@ const BYTE Z80::parity[256] = {
 /// Since 8 bit values are all we have to check, setting up a table
 /// is much more efficient than recalculating these values
 /// up to 500,000 times a sec (at 2Mhz).
-const BYTE Z80::ZSP[256] = {
-        0x44, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
-        0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
-        0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84
+const BYTE Z80::ZSP[256] =
+{
+    0x44, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
+    0x04, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+    0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84
 };
 
-const opCodeMethod Z80::op_code[256] = {
+const opCodeMethod Z80::op_code[256] =
+{
     &Z80::op_nop,               /* 0x00 - 000 */
     &Z80::op_ld_xx_nn,          /* 0x01 - 001 */
     &Z80::op_ld_ibc_a,          /* 0x02 - 002 */
@@ -342,7 +345,8 @@ const opCodeMethod Z80::op_code[256] = {
     &Z80::op_rst                /* 0xff - 377 */
 };
 
-const opCodeMethod Z80::op_cb[256] = {
+const opCodeMethod Z80::op_cb[256] =
+{
     &Z80::op_rlc_x,             /* 0x00 */
     &Z80::op_rlc_x,             /* 0x01 */
     &Z80::op_rlc_x,             /* 0x02 */
@@ -602,7 +606,8 @@ const opCodeMethod Z80::op_cb[256] = {
 };
 
 
-const opCodeMethod Z80::op_ed[256] = {
+const opCodeMethod Z80::op_ed[256] =
+{
     &Z80::op_ed_nop,            /* 0x00 */
     &Z80::op_ed_nop,            /* 0x01 */
     &Z80::op_ed_nop,            /* 0x02 */
@@ -861,7 +866,8 @@ const opCodeMethod Z80::op_ed[256] = {
     &Z80::op_ed_nop             /* 0xff */
 };
 
-const opCodeMethod Z80::op_xxcb[32] = {
+const opCodeMethod Z80::op_xxcb[32] =
+{
     &Z80::op_rlc_xx_d,          /* 0x06 */
     &Z80::op_rrc_xx_d,          /* 0x0e */
     &Z80::op_rl_xx_d,           /* 0x16 */
@@ -898,105 +904,112 @@ const opCodeMethod Z80::op_xxcb[32] = {
 
 #define COMMON_GET 1
 
-inline BYTE & Z80::getReg8(BYTE val)
+inline BYTE& Z80::getReg8(BYTE val)
 {
     switch (val & 0x7)
     {
     case 0:
-        return(B);
+        return (B);
 
     case 1:
-        return(C);
+        return (C);
 
     case 2:
-        return(D);
+        return (D);
 
     case 3:
-        return(E);
+        return (E);
 
     case 4:
         switch (prefix)
         {
         case ip_dd:
-            return(IXh);
+            return (IXh);
 
         case ip_fd:
-            return(IYh);
+            return (IYh);
 
         case ip_none:
         default:
-            return(H);
+            return (H);
 
         }
+
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
         assert(0);
-        return(W);
+        return (W);
+
     case 5:
         switch (prefix)
         {
         case ip_dd:
-            return(IXl);
+            return (IXl);
 
         case ip_fd:
-            return(IYl);
+            return (IYl);
 
         case ip_none:
         default:
-            return(L);
+            return (L);
 
         }
+
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
         assert(0);
-        return(Z);
+        return (Z);
+
     case 6:
         // Should never be called in with this value.
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
         assert(0);
-        return(Z);
+        return (Z);
+
     case 7:
-        return(A);
+        return (A);
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
     assert(0);
-    return(Z);
+    return (Z);
 }
 
-inline BYTE & Z80::getCoreReg8(BYTE val)
+inline BYTE& Z80::getCoreReg8(BYTE val)
 {
     switch (val & 0x7)
     {
     case 0:
-        return(B);
+        return (B);
 
     case 1:
-        return(C);
+        return (C);
 
     case 2:
-        return(D);
+        return (D);
 
     case 3:
-        return(E);
+        return (E);
 
     case 4:
-        return(H);
+        return (H);
 
     case 5:
-        return(L);
+        return (L);
 
     case 6:
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
         assert(0);
-        return(Z);
+        return (Z);
 
     case 7:
-        return(A);
+        return (A);
 
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x7)
     assert(0);
-    return(Z);
+    return (Z);
 }
 
 inline BYTE Z80::getReg8Val(BYTE val)
@@ -1010,69 +1023,80 @@ inline BYTE Z80::getCoreReg8Val(BYTE val)
 }
 
 // Register related
-inline WORD & Z80::getReg16(BYTE val)
+inline WORD& Z80::getReg16(BYTE val)
 {
     switch (val & 0x3)
     {
     case 0:
-        return(BC);
+        return (BC);
+
     case 1:
-        return(DE);
+        return (DE);
+
     case 2:
         switch (prefix)
         {
         case ip_dd:
-            return(IX);
+            return (IX);
+
         case ip_fd:
-            return(IY);
+            return (IY);
+
         case ip_none:
         default:
-            return(HL);
+            return (HL);
         }
+
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x3)
         assert(0);
-        return(WZ);
+        return (WZ);
+
     case 3:
-        return(SP);
+        return (SP);
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x3)
     assert(0);
-    return(WZ);
+    return (WZ);
 }
 
-inline WORD & Z80::getCoreReg16(BYTE val)
+inline WORD& Z80::getCoreReg16(BYTE val)
 {
     switch (val & 0x3)
     {
     case 0:
-        return(BC);
+        return (BC);
+
     case 1:
-        return(DE);
+        return (DE);
+
     case 2:
-        return(HL);
+        return (HL);
+
     case 3:
-        return(SP);
+        return (SP);
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 0x3)
     assert(0);
-    return(WZ);
+    return (WZ);
 }
 
-inline WORD & Z80::getHLReg16(void)
+inline WORD& Z80::getHLReg16(void)
 {
     switch (prefix)
     {
     case ip_dd:
-        return(IX);
+        return (IX);
 
     case ip_fd:
-        return(IY);
+        return (IY);
 
     case ip_none:
     default:
-        return(HL);
+        return (HL);
     }
 }
 
@@ -1081,10 +1105,10 @@ inline WORD Z80::getIxReg16Val(void)
     switch (prefix)
     {
     case ip_dd:
-        return(IX);
+        return (IX);
 
     case ip_fd:
-        return(IY);
+        return (IY);
 
     case ip_none:
         break;
@@ -1093,7 +1117,7 @@ inline WORD Z80::getIxReg16Val(void)
     // should not have been called.
     debugss(ssZ80, FATAL, "%s: Invalid prefix mode", __FUNCTION__)
     assert(0);
-    return(WZ);
+    return (WZ);
 
 }
 
@@ -1102,14 +1126,14 @@ inline WORD Z80::getIndirectAddr(void)
     switch (prefix)
     {
     case ip_dd:
-        return(IX + sREADn());
+        return (IX + sREADn());
 
     case ip_fd:
-        return(IY + sREADn());
+        return (IY + sREADn());
 
     case ip_none:
     default:
-        return(HL);
+        return (HL);
     }
 }
 
@@ -1129,58 +1153,66 @@ inline WORD Z80::getCoreReg16Val(BYTE val)
 }
 
 
-inline WORD & Z80::getReg16qq(BYTE val)
+inline WORD& Z80::getReg16qq(BYTE val)
 {
     switch (val & 0x3)
     {
     case 0:
-        return(BC);
+        return (BC);
 
     case 1:
-        return(DE);
+        return (DE);
 
     case 2:
         switch (prefix)
         {
         case ip_dd:
-            return(IX);
+            return (IX);
+
         case ip_fd:
-            return(IY);
+            return (IY);
+
         case ip_none:
         default:
-            return(HL);
+            return (HL);
         }
+
         // All cases are handled above, can never get to this point, but to quiet the compiler
         debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 3)
         assert(0);
-        return(WZ);
+        return (WZ);
 
     case 3:
-        return(AF);
+        return (AF);
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 3)
     assert(0);
-    return(WZ);
+    return (WZ);
 }
 
-inline WORD & Z80::getCoreReg16qq(BYTE val)
+inline WORD& Z80::getCoreReg16qq(BYTE val)
 {
     switch (val & 0x3)
     {
     case 0:
-        return(BC);
+        return (BC);
+
     case 1:
-        return(DE);
+        return (DE);
+
     case 2:
-        return(HL);
+        return (HL);
+
     case 3:
-        return(AF);
+        return (AF);
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__,  val & 3)
     assert(0);
-    return(WZ);
+    return (WZ);
 }
 
 inline WORD Z80::getReg16qqVal(BYTE val)
@@ -1204,34 +1236,35 @@ inline bool Z80::checkCondition(BYTE val)
     switch ((val >> 3) & 0x7)
     {
     case 0: // NZ non-zero
-        return((F & Z_FLAG) == 0);
+        return ((F & Z_FLAG) == 0);
 
     case 1:  // Z zero
-        return((F & Z_FLAG) != 0);
+        return ((F & Z_FLAG) != 0);
 
     case 2:  // NC no carry
-        return((F & C_FLAG) == 0);
+        return ((F & C_FLAG) == 0);
 
     case 3:  //  C carry
-        return((F & C_FLAG) != 0);
+        return ((F & C_FLAG) != 0);
 
     case 4:  // PO parity odd
-        return((F & P_FLAG) == 0);
+        return ((F & P_FLAG) == 0);
 
     case 5:  // PE parity even
-        return((F & P_FLAG) != 0);
+        return ((F & P_FLAG) != 0);
 
     case 6:  // P sign positive
-        return((F & S_FLAG) == 0);
+        return ((F & S_FLAG) == 0);
 
     case 7:  // M sign negative
-        return((F & S_FLAG) != 0);
+        return ((F & S_FLAG) != 0);
 
     }
+
     // All cases are handled above, can never get to this point, but to quiet the compiler
     debugss(ssZ80, FATAL, "%s: Unknown cond: %d", __FUNCTION__, (val >> 3) & 7);
     assert(0);
-    return(false);
+    return (false);
 }
 
 // Routines related to the stack.
@@ -1242,7 +1275,7 @@ inline void Z80::PUSH(WORD x)
     writeMEM(--SP, x & 0xff);
 };
 
-inline void Z80::POP(WORD &x)
+inline void Z80::POP(WORD& x)
 {
     x = (readMEM(SP + 1) << 8) | readMEM(SP);
     SP += 2;
@@ -1262,7 +1295,7 @@ inline void Z80::CLEAR_FLAGS(BYTE flags)
 
 inline bool Z80::CHECK_FLAGS(BYTE flags)
 {
-    return((F & flags) != 0);
+    return ((F & flags) != 0);
 };
 
 inline void Z80::COND_FLAGS(bool cond, BYTE flags)
@@ -1271,6 +1304,7 @@ inline void Z80::COND_FLAGS(bool cond, BYTE flags)
     {
         SET_FLAGS(flags);
     }
+
     else
     {
         CLEAR_FLAGS(flags);
@@ -1302,50 +1336,52 @@ inline void Z80::SET_ZSP_FLAGS(BYTE val)
 /// @param ticksPerSecond Number of interrupts per second for the clock
 ///
 Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
-                                              sA(af.shi),
-                                              F(af.lo),
-                                              AF(af.val),
-                                              B(bc.hi),
-                                              C(bc.lo),
-                                              BC(bc.val),
-                                              D(de.hi),
-                                              E(de.lo),
-                                              DE(de.val),
-                                              H(hl.hi),
-                                              L(hl.lo),
-                                              HL(hl.val),
-                                              sHL(hl.sval),
-                                              W(wz.hi),
-                                              sW(wz.shi),
-                                              Z(wz.lo),
-                                              WZ(wz.val),
-                                              IXl(ix.lo),
-                                              IXh(ix.hi),
-                                              IX(ix.val),
-                                              IYl(iy.lo),
-                                              IYh(iy.hi),
-                                              IY(iy.val),
-                                              SP(sp.val),
-                                              INT_Line(false),
-                                              intLevel_m(0),
-                                              ticks(0),
-                                              lastInstTicks(0),
-                                              curInstByte(0),
-                                              mode(cm_reset),
-                                              prefix(ip_none),
-                                              resetReq(false),
-                                              curIntrMethod(&Z80::processIntrIM0)
+    sA(af.shi),
+    F(af.lo),
+    AF(af.val),
+    B(bc.hi),
+    C(bc.lo),
+    BC(bc.val),
+    D(de.hi),
+    E(de.lo),
+    DE(de.val),
+    H(hl.hi),
+    L(hl.lo),
+    HL(hl.val),
+    sHL(hl.sval),
+    W(wz.hi),
+    sW(wz.shi),
+    Z(wz.lo),
+    WZ(wz.val),
+    IXl(ix.lo),
+    IXh(ix.hi),
+    IX(ix.val),
+    IYl(iy.lo),
+    IYh(iy.hi),
+    IY(iy.val),
+    SP(sp.val),
+    INT_Line(false),
+    intLevel_m(0),
+    ticks(0),
+    lastInstTicks(0),
+    curInstByte(0),
+    mode(cm_reset),
+    prefix(ip_none),
+    resetReq(false),
+    curIntrMethod(&Z80::processIntrIM0)
 
 {
     debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,
-                                                                           clockRate,
-                                                                           ticksPerSecond);
+            clockRate,
+            ticksPerSecond);
+
     if ((clockRate) && (ticksPerSecond))
     {
-        ticksPerClock_m = clockRate/ticksPerSecond;
+        ticksPerClock_m = clockRate / ticksPerSecond;
         ClockRate_m = clockRate;
         ticksPerSecond_m = ticksPerSecond;
     }
+
     else
     {
         // Assume a 4MHz processor with a 10ms clock interrupt.
@@ -1405,57 +1441,70 @@ void Z80::addClockTicks()
     if (ticks < 0)
     {
         debugss(ssZ80, ALL, "%s: ticks(%d) += ticksPerClock(%lu)\n", __FUNCTION__, ticks,
-        		                                                    ticksPerClock_m);
+                ticksPerClock_m);
         ticks += ticksPerClock_m;
     }
+
     else
     {
         // else just set it, otherwise we run the risk of accumulating too many ticks if
-    	// the CPU was idle waiting for input.
+        // the CPU was idle waiting for input.
         debugss(ssZ80, ALL, "%s: ticks(%d) = ticksPerClock(%lu)\n", __FUNCTION__,
-        		ticks, ticksPerClock_m);
+                ticks, ticksPerClock_m);
         ticks = ticksPerClock_m;
     }
+
     lastInstTicks = ticks;
 }
 
 void Z80::setSpeed(bool fast)
 {
-	debugss(ssZ80, WARNING, "%s: - %d\n", __FUNCTION__, fast);
-	if (fast)
-	{
+    debugss(ssZ80, WARNING, "%s: - %d\n", __FUNCTION__, fast);
+
+    if (fast)
+    {
 #if NEW_TICKS
-		if (ticks > 0)
-		{
-			ticks *= speedUpFactor_c;
-			lastInstTicks = ticks;
-		}
+
+        if (ticks > 0)
+        {
+            ticks *= speedUpFactor_c;
+            lastInstTicks = ticks;
+        }
+
 #else
-		if (ticks > 0)
-		{
-			ticks *= speedUpFactor_c;
-		}
+
+        if (ticks > 0)
+        {
+            ticks *= speedUpFactor_c;
+        }
+
 #endif
-		ClockRate_m = 2048000 * speedUpFactor_c;
-        ticksPerClock_m = ClockRate_m/ticksPerSecond_m;
-	}
-	else
-	{
+        ClockRate_m = 2048000 * speedUpFactor_c;
+        ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
+    }
+
+    else
+    {
 #if NEW_TICKS
-		if (ticks > 0)
-		{
-			ticks /= speedUpFactor_c;
-			lastInstTicks = ticks;
-		}
+
+        if (ticks > 0)
+        {
+            ticks /= speedUpFactor_c;
+            lastInstTicks = ticks;
+        }
+
 #else
-		if (ticks > 0)
-		{
-			ticks /= speedUpFactor_c;
-		}
+
+        if (ticks > 0)
+        {
+            ticks /= speedUpFactor_c;
+        }
+
 #endif
-		ClockRate_m = 2048000;
-        ticksPerClock_m = ClockRate_m/ticksPerSecond_m;
-	}
+        ClockRate_m = 2048000;
+        ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
+    }
+
     WallClock::instance()->updateTicksPerSecond(ClockRate_m);
 
 }
@@ -1555,7 +1604,7 @@ void Z80::traceInstructions(void)
     //if (tks != ticks)
     {
         fprintf(opcode_out, " ticks = %d\n", ticks);
-    //  fprintf(opcode_out, " ticksPerSecond = %d\n", ticksPerSecond_m);
+        //  fprintf(opcode_out, " ticksPerSecond = %d\n", ticksPerSecond_m);
         tks = ticks;
     }
     return;
@@ -1569,38 +1618,43 @@ void Z80::traceInstructions(void)
 //  fprintf(opcode_out, "%04x: ", PC);
     fprintf(opcode_out, "%04x %04x %04x %04x %04x\n",
             AF, BC, DE, HL, SP);
-    fprintf(opcode_out, "%03o.%03o (%02x.%02x): ", (PC>> 8), PC & 0xff, (PC>> 8),
-                                                   PC & 0xff);
+    fprintf(opcode_out, "%03o.%03o (%02x.%02x): ", (PC >> 8), PC & 0xff, (PC >> 8),
+            PC & 0xff);
 
-    disass( &p, PC);
+    disass(&p, PC);
 #endif
 #if 0
     fprintf(opcode_out, "%04x %04x %04x %04x %04x %04x ", PC, AF, BC, DE, HL, SP);
-    fprintf(opcode_out, "PC: %03o.%03o (%02x.%02x): %03o %03o %03o\n", (PC>> 8), PC & 0xff,
-                                                                       (PC>> 8), PC & 0xff,
-                                                                       readMEM(PC),
-                                                                       readMEM(PC+1),
-                                                                       readMEM(PC+2));
+    fprintf(opcode_out, "PC: %03o.%03o (%02x.%02x): %03o %03o %03o\n", (PC >> 8), PC & 0xff,
+            (PC >> 8), PC & 0xff,
+            readMEM(PC),
+            readMEM(PC + 1),
+            readMEM(PC + 2));
 #else
 //  fprintf(opcode_out, "%03o.%03o %04x %04x %04x %04x %04x %04x ", PC >> 8, PC & 0xff,
 //    PC, AF, BC, DE, HL, SP);
 //  debug(" %04x %04x %04x %04x %04x %04x : ", PC, AF, BC, DE, HL, SP);
 #if 1
+
     //debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
     //          PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
     if (chkdebuglevel(ssZ80, ALL))
     {
 #if 0
-    	debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x\n",
-    	        PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
-#else
-    	if(1) {
-        debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
+        debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x\n",
                 PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
-        disass(PC);
-    	}
+#else
+
+        if (1)
+        {
+            debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
+                    PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
+            disass(PC);
+        }
+
 #endif
     }
+
 #endif
 #endif
 }
@@ -1613,7 +1667,7 @@ BYTE Z80::step(void)
 {
     //
     cpu_state = SINGLE_STEP_C;
-    return(execute(1));
+    return (execute(1));
 }
 
 void Z80::processIntrIM0(void)
@@ -1632,54 +1686,63 @@ void Z80::processIntrIM0(void)
         op_rst38();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x40)
     {
         intLevel_m &= ~(0x40);
         op_rst30();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x20)
     {
         intLevel_m &= ~(0x20);
         op_rst28();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x10)
     {
         intLevel_m &= ~(0x10);
         op_rst20();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x08)
     {
         intLevel_m &= ~(0x08);
         op_rst18();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x04)
     {
         intLevel_m &= ~(0x04);
         op_rst10();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x02)
     {
         intLevel_m &= ~(0x02);
         op_rst08();
         ticks -= 4;
     }
+
     else if (intLevel_m & 0x01)
     {
         intLevel_m &= ~(0x01);
         op_rst00();
         ticks -= 4;
     }
+
     else
     {
         // invalid interrupt level.
         debugss(ssZ80, ERROR, "%s: Invalid interrupt level: %d\n",
-                              __FUNCTION__, intLevel_m);
+                __FUNCTION__, intLevel_m);
     }
+
     // Only if that was the last interrupt do we reset the type.
     if (intLevel_m == 0)
     {
@@ -1722,7 +1785,8 @@ BYTE Z80::execute(WORD numInst)
 
     cpu_state = RUN_C;
 
-    do {
+    do
+    {
         prefix = ip_none;
         curInstByte = 0;
         lastInstByte = 0;
@@ -1744,11 +1808,13 @@ BYTE Z80::execute(WORD numInst)
         his[h_next].h_iy = IY;
         his[h_next].h_sp = SP;
         h_next++;
+
         if (h_next == HISIZE)
         {
             h_flag = 1;
             h_next = 0;
         }
+
 #endif
 
 
@@ -1764,6 +1830,7 @@ BYTE Z80::execute(WORD numInst)
             PC = 0x66;
             mode = cm_running;
         }
+
         else if ((int_type & Intr_INT) && (IFF1) && (!lastEI))
         {
             // ISR required to enable interrupts (EI).
@@ -1772,27 +1839,34 @@ BYTE Z80::execute(WORD numInst)
 
             (this->*curIntrMethod)();
         }
+
 #if 0
+
         else if (int_type & Intr_INT)
         {
             debugss(ssZ80, ERROR, "Interrupt, but can't process - %d %d\n", IFF1, lastEI);
         }
+
 #endif
 
         lastEI = false;
 
 #if NOTNOW
-        debug("%04o.%04o", (PC>>8), PC & 0xff);
+        debug("%04o.%04o", (PC >> 8), PC & 0xff);
+
         if (PC < 8192)
         {
             traceInstructions();//debug("\n");
         }
+
         else
         {
             traceInstructions();
         }
+
 #endif
 #if NEW_TICKS
+
         // check to see if the clock has any ticks left
         if (ticks <= 0)
         {
@@ -1807,7 +1881,9 @@ BYTE Z80::execute(WORD numInst)
             nanosleep(&sp, &act);
             continue;
         }
+
 #else
+
         // check to see if the clock has any ticks left
         if (ticks <= 0)
         {
@@ -1821,8 +1897,10 @@ BYTE Z80::execute(WORD numInst)
             sp.tv_nsec = 0;
             nanosleep(&sp, &act);
         }
+
 #endif
 #if 0
+
         // If in halt, we just do a NOP, without any PC changes.
         if (mode == cm_halt)
         {
@@ -1831,11 +1909,12 @@ BYTE Z80::execute(WORD numInst)
             WallClock::instance()->addTicks(4);
             continue;
         }
+
 #endif
 
         //traceInstructions();
         lastInstByte = curInst[0] = readInst();
-        (this->*op_code[curInst[0]]) ();
+        (this->*op_code[curInst[0]])();
         unsigned int val = lastInstTicks - ticks;
         lastInstTicks = ticks;
         WallClock::instance()->addTicks(val);
@@ -1857,13 +1936,15 @@ BYTE Z80::execute(WORD numInst)
 #ifdef WANT_GUI
         check_gui_break();
 #endif
+
         if ((cpu_state == RUN_C) && (limited) && (--numInst == 0))
         {
             cpu_state = SINGLE_STEP_C;
         }
-    } while (cpu_state == RUN_C);
+    }
+    while (cpu_state == RUN_C);
 
-    return(0);
+    return (0);
 }
 
 ///
@@ -1997,11 +2078,13 @@ void Z80::op_ccf(void)
         SET_FLAGS(H_FLAG);
         CLEAR_FLAGS(C_FLAG);
     }
+
     else
     {
         CLEAR_FLAGS(H_FLAG);
         SET_FLAGS(C_FLAG);
     }
+
     CLEAR_FLAGS(N_FLAG);
 }
 
@@ -2096,10 +2179,13 @@ void Z80::op_daa(void)
             {
                 CLEAR_FLAGS(H_FLAG);
             }
+
             tmp_a = (tmp_a - 6) & 0xff;
         }
+
         tmp_a -= adjustment;
     }
+
     else
     {
         // Addition
@@ -2108,6 +2194,7 @@ void Z80::op_daa(void)
             COND_FLAGS((low_nibble > 9), H_FLAG);
             tmp_a += 6;
         }
+
         if (carry || ((tmp_a & 0x1f0) > 0x90))
         {
             tmp_a += 0x60;
@@ -2788,9 +2875,9 @@ void Z80::op_ld_inn_hl(void)
 ///
 void Z80::op_inc_xx(void)
 {
-	getReg16(lastInstByte >> 4)++;
+    getReg16(lastInstByte >> 4)++;
 
-	ticks -= 2;
+    ticks -= 2;
 }
 
 ///
@@ -2876,7 +2963,7 @@ void Z80::op_dec_xx(void)
 ///
 /// \retval none
 ///
-void Z80::op_add_reg16(WORD &res, WORD val)
+void Z80::op_add_reg16(WORD& res, WORD val)
 {
     unsigned int sum = res + val;
 
@@ -2980,7 +3067,7 @@ void Z80::op_and(BYTE val)
 /// \retval none
 void Z80::op_and_x(void)
 {
-	op_and(getReg8Val(lastInstByte));
+    op_and(getReg8Val(lastInstByte));
 }
 
 /// \retval none
@@ -3081,14 +3168,14 @@ void Z80::op_or(BYTE val)
 ///
 void Z80::op_or_x(void)
 {
-	op_or(getReg8Val(lastInstByte));
+    op_or(getReg8Val(lastInstByte));
 }
 
 /// \retval none
 ///
 void Z80::op_or_ihl(void)
 {
-   op_or(readMEM(getIndirectAddr()));
+    op_or(readMEM(getIndirectAddr()));
 }
 
 /// \retval none
@@ -3787,7 +3874,7 @@ void Z80::op_cp_n(void)
 ///
 /// \retval none
 ///
-void Z80::op_inc(BYTE &val)
+void Z80::op_inc(BYTE& val)
 {
     COND_FLAGS(((val & 0xf) == 0xf), H_FLAG);
 
@@ -3886,7 +3973,7 @@ void Z80::op_inc_ihl(void)
 ///
 /// \retval none
 ///
-void Z80::op_dec(BYTE &val)
+void Z80::op_dec(BYTE& val)
 {
     COND_FLAGS(((val & 0xf) == 0), H_FLAG);
     COND_FLAGS((val == 0x80), P_FLAG);
@@ -4374,9 +4461,10 @@ void Z80::op_djnz(void)          // DJNZ
 {
     if (--B)
     {
-    	ticks -= 3;
+        ticks -= 3;
         op_jr();
     }
+
     else
     {
         PC++;
@@ -4416,6 +4504,7 @@ void Z80::op_jp_cc(void)
     {
         PC = READnn();
     }
+
     else
     {
         PC += 2;
@@ -4437,6 +4526,7 @@ void Z80::op_call_cc(void)
 
         ticks -= 5;
     }
+
     else
     {
         PC += 2;
@@ -4451,7 +4541,8 @@ void Z80::op_call_cc(void)
 ///
 void Z80::op_ret_cc(void)
 {
-	ticks -= 1;
+    ticks -= 1;
+
     if (checkCondition(curInst[0]))
     {
         POP(PC);
@@ -4468,6 +4559,7 @@ void Z80::op_jr_z(void)           // JR Z,n
     {
         op_jr();
     }
+
     else
     {
         PC++;
@@ -4486,6 +4578,7 @@ void Z80::op_jr_nz(void)      // JR NZ,n
     {
         op_jr();
     }
+
     else
     {
         PC++;
@@ -4502,6 +4595,7 @@ void Z80::op_jr_c(void)       // JR C,n
     {
         op_jr();
     }
+
     else
     {
         PC++;
@@ -4518,6 +4612,7 @@ void Z80::op_jr_nc(void)      // JR NC,n
     {
         op_jr();
     }
+
     else
     {
         PC++;
@@ -4578,11 +4673,11 @@ void Z80::op_jr_nc(void)      // JR NC,n
 ///
 void Z80::op_rst(void)
 {
-	PUSH(PC);
+    PUSH(PC);
 
-	PC = (lastInstByte & 0x38);
+    PC = (lastInstByte & 0x38);
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x00
@@ -4594,7 +4689,7 @@ void Z80::op_rst00(void)
     PUSH(PC);
     PC = 0x00;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x08
@@ -4606,7 +4701,7 @@ void Z80::op_rst08(void)
     PUSH(PC);
     PC = 0x08;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x10
@@ -4618,7 +4713,7 @@ void Z80::op_rst10(void)
     PUSH(PC);
     PC = 0x10;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x18
@@ -4630,7 +4725,7 @@ void Z80::op_rst18(void)
     PUSH(PC);
     PC = 0x18;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x20
@@ -4642,7 +4737,7 @@ void Z80::op_rst20(void)
     PUSH(PC);
     PC = 0x20;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x28
@@ -4654,7 +4749,7 @@ void Z80::op_rst28(void)
     PUSH(PC);
     PC = 0x28;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x30
@@ -4666,7 +4761,7 @@ void Z80::op_rst30(void)
     PUSH(PC);
     PC = 0x30;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 /// \brief Restart 0x38
@@ -4678,7 +4773,7 @@ void Z80::op_rst38(void)
     PUSH(PC);
     PC = 0x38;
 
-	ticks -= 1;
+    ticks -= 1;
 }
 
 ///
@@ -4689,7 +4784,8 @@ void Z80::op_rst38(void)
 void Z80::op_cb_handle(void)
 {
 
-    switch (prefix) {
+    switch (prefix)
+    {
     case ip_dd:
     case ip_fd:
         lastInstByte = curInst[2] = readInst();
@@ -4699,13 +4795,14 @@ void Z80::op_cb_handle(void)
 
         lastInstByte = curInst[3] = readInst();
 
-        (this->*op_xxcb[curInst[3] >> 3]) ();
+        (this->*op_xxcb[curInst[3] >> 3])();
         break;
+
     case ip_none:
     default:
         lastInstByte = curInst[1] = readInst();
 
-        (this->*op_cb[curInst[1]]) ();
+        (this->*op_cb[curInst[1]])();
         break;
     }
 }
@@ -4714,7 +4811,7 @@ void Z80::op_cb_handle(void)
 ///
 /// \retval none
 ///
-void Z80::op_srl(BYTE &m)
+void Z80::op_srl(BYTE& m)
 {
     COND_FLAGS((m & 1), C_FLAG);
 
@@ -4728,7 +4825,7 @@ void Z80::op_srl(BYTE &m)
 ///
 void Z80::op_srl_x(void)
 {
-	op_srl(getReg8(lastInstByte));
+    op_srl(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4749,7 +4846,7 @@ void Z80::op_srl_ihl(void)     // SRL (HL)
 ///
 /// \retval none
 ///
-void Z80::op_sla(BYTE &m)
+void Z80::op_sla(BYTE& m)
 {
     COND_FLAGS((m & 0x80), C_FLAG);
 
@@ -4763,7 +4860,7 @@ void Z80::op_sla(BYTE &m)
 ///
 void Z80::op_sla_x(void)
 {
-	op_sla(getReg8(lastInstByte));
+    op_sla(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4786,7 +4883,7 @@ void Z80::op_sla_ihl(void)     // SLA (HL)
 ///
 /// \retval none
 ///
-void Z80::op_undoc_sll(BYTE &m)      // SLL m
+void Z80::op_undoc_sll(BYTE& m)      // SLL m
 {
     COND_FLAGS((m & 0x80), C_FLAG);
 
@@ -4802,7 +4899,7 @@ void Z80::op_undoc_sll(BYTE &m)      // SLL m
 ///
 void Z80::op_sll_x(void)
 {
-	op_undoc_sll(getReg8(lastInstByte));
+    op_undoc_sll(getReg8(lastInstByte));
 }
 
 /// SLL (HL)
@@ -4824,9 +4921,9 @@ void Z80::op_sll_ihl(void)
 ///
 /// \retval none
 ///
-void Z80::op_rl(BYTE &m)     // RL m
+void Z80::op_rl(BYTE& m)     // RL m
 {
-    BYTE carry = CHECK_FLAGS(C_FLAG) ? 0x01: 0x00;
+    BYTE carry = CHECK_FLAGS(C_FLAG) ? 0x01 : 0x00;
 
     COND_FLAGS((m & 128), C_FLAG);
 
@@ -4841,7 +4938,7 @@ void Z80::op_rl(BYTE &m)     // RL m
 ///
 void Z80::op_rl_x(void)
 {
-	op_rl(getReg8(lastInstByte));
+    op_rl(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4863,7 +4960,7 @@ void Z80::op_rl_ihl(void)      // RL (HL)
 ///
 /// \retval none
 ///
-void Z80::op_rr(BYTE &m)     // RR m
+void Z80::op_rr(BYTE& m)     // RR m
 {
     BYTE carry = CHECK_FLAGS(C_FLAG) ? 0x80 : 0x00;
 
@@ -4880,7 +4977,7 @@ void Z80::op_rr(BYTE &m)     // RR m
 ///
 void Z80::op_rr_x(void)
 {
-	op_rr(getReg8(lastInstByte));
+    op_rr(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4901,7 +4998,7 @@ void Z80::op_rr_ihl(void)      /* RR (HL) */
 ///
 /// \retval none
 ///
-void Z80::op_rrc(BYTE &m)    /* RRC m */
+void Z80::op_rrc(BYTE& m)    /* RRC m */
 {
     BYTE carry = (m & 0x01) ? 0x80 : 0x00;
 
@@ -4918,7 +5015,7 @@ void Z80::op_rrc(BYTE &m)    /* RRC m */
 ///
 void Z80::op_rrc_x(void)
 {
-	op_rrc(getReg8(lastInstByte));
+    op_rrc(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4939,7 +5036,7 @@ void Z80::op_rrc_ihl(void)     // RRC (HL)
 ///
 /// \retval none
 ///
-void Z80::op_rlc(BYTE &m)    // RLC m
+void Z80::op_rlc(BYTE& m)    // RLC m
 {
     BYTE carry = (m & 0x80) ? 0x01 : 0x00;
 
@@ -4956,7 +5053,7 @@ void Z80::op_rlc(BYTE &m)    // RLC m
 ///
 void Z80::op_rlc_x(void)
 {
-	op_rlc(getReg8(lastInstByte));
+    op_rlc(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -4976,7 +5073,7 @@ void Z80::op_rlc_ihl(void)     // RLC (HL)
 /// \todo - document SRA - Shift Right Arithmetic
 /// \retval none
 ///
-void Z80::op_sra(BYTE &m)    // SRA m
+void Z80::op_sra(BYTE& m)    // SRA m
 {
     BYTE i = m & 0x80;
 
@@ -4993,7 +5090,7 @@ void Z80::op_sra(BYTE &m)    // SRA m
 ///
 void Z80::op_sra_x(void)
 {
-	op_sra(getReg8(lastInstByte));
+    op_sra(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -5013,16 +5110,16 @@ void Z80::op_sra_ihl(void)     // SRA (HL)
 /// \todo - document SET
 /// \retval none
 ///
-void Z80::op_sb_n(BYTE &val)
+void Z80::op_sb_n(BYTE& val)
 {
-	val |= getBit(lastInstByte);
+    val |= getBit(lastInstByte);
 }
 
 /// \retval none
 ///
 void Z80::op_sb_n_x(void)
 {
-	op_sb_n(getReg8(lastInstByte));
+    op_sb_n(getReg8(lastInstByte));
 }
 
 /// \retval none
@@ -5043,7 +5140,7 @@ void Z80::op_sb_n_ihl(void)
 ///
 /// \retval none
 ///
-void Z80::op_rb_n(BYTE &val)
+void Z80::op_rb_n(BYTE& val)
 {
     val &= ~getBit(lastInstByte);
 }
@@ -5079,14 +5176,14 @@ void Z80::op_tb_n(BYTE m, BYTE bit)
     m &= bit;
 
     COND_FLAGS((!(m)), (Z_FLAG | P_FLAG));
-	COND_FLAGS((m & 0x80), S_FLAG);
+    COND_FLAGS((m & 0x80), S_FLAG);
 }
 
 /// \retval none
 ///
 void Z80::op_tb_n_x(void)
 {
-	op_tb_n(getReg8(lastInstByte), getBit(lastInstByte));
+    op_tb_n(getReg8(lastInstByte), getBit(lastInstByte));
 }
 
 /// \retval none
@@ -5111,7 +5208,7 @@ void Z80::op_dd_handle(void)
 
     lastInstByte = curInst[1] = readInst();
 
-    (this->*op_code[curInst[1]]) ();
+    (this->*op_code[curInst[1]])();
 }
 
 ///
@@ -5123,7 +5220,7 @@ void Z80::op_ed_handle(void)
 {
     lastInstByte = curInst[1] = readInst();
 
-    (this->*op_ed[curInst[1]]) ();
+    (this->*op_ed[curInst[1]])();
 }
 
 ///
@@ -5359,7 +5456,7 @@ void Z80::op_neg(void)
 {
     COND_FLAGS((A), C_FLAG);
     COND_FLAGS((A == 0x80), P_FLAG);
-    COND_FLAGS(( A & 0xf ), H_FLAG);
+    COND_FLAGS((A & 0xf), H_FLAG);
 
     A = 0 - A;
 
@@ -5373,7 +5470,7 @@ void Z80::op_neg(void)
 ///
 /// \retval none
 ///
-void Z80::op_in_ic(BYTE &reg)
+void Z80::op_in_ic(BYTE& reg)
 {
     reg = (h89.getIO()).in(C);
 
@@ -5402,7 +5499,7 @@ void Z80::op_in_x_c(void)
 ///
 void Z80::op_in_f_ic(void)
 {
-	BYTE tmp;
+    BYTE tmp;
 
     op_in_ic(tmp);
 }
@@ -5457,6 +5554,7 @@ void Z80::op_ini(void)           // INI
 void Z80::op_inir(void)
 {
     op_ini();
+
     if (B)
     {
         PC -= 2;
@@ -5491,6 +5589,7 @@ void Z80::op_ind(void)
 void Z80::op_indr(void)
 {
     op_ind();
+
     if (B)
     {
         PC -= 2;
@@ -5525,6 +5624,7 @@ void Z80::op_outi(void)
 void Z80::op_otir(void)
 {
     op_outi();
+
     if (B)
     {
         PC -= 2;
@@ -5559,6 +5659,7 @@ void Z80::op_outd(void)
 void Z80::op_otdr(void)
 {
     op_outd();
+
     if (B)
     {
         PC -= 2;
@@ -5653,21 +5754,21 @@ void Z80::op_ld_inn_xx(void)
 ///
 void Z80::op_adc16(WORD op)
 {
-    WORD carry = ( CHECK_FLAGS(C_FLAG) ) ? 1 : 0;
+    WORD carry = (CHECK_FLAGS(C_FLAG)) ? 1 : 0;
     SWORD sOp = op;
     int i;
 
-    COND_FLAGS( ((HL & 0x0fff) + (op & 0x0fff) + carry) > 0x0fff, H_FLAG);
+    COND_FLAGS(((HL & 0x0fff) + (op & 0x0fff) + carry) > 0x0fff, H_FLAG);
 
     i = sHL + sOp + carry;
 
-    COND_FLAGS( (i > 32767) || (i < -32768), P_FLAG);
-    COND_FLAGS( (HL + op + carry) & 0x10000, C_FLAG);
+    COND_FLAGS((i > 32767) || (i < -32768), P_FLAG);
+    COND_FLAGS((HL + op + carry) & 0x10000, C_FLAG);
 
     i &= 0xffff;
 
-    COND_FLAGS( !i, Z_FLAG);
-    COND_FLAGS( i & 0x8000, S_FLAG);
+    COND_FLAGS(!i, Z_FLAG);
+    COND_FLAGS(i & 0x8000, S_FLAG);
     CLEAR_FLAGS(N_FLAG);
 
     HL = i;
@@ -5694,21 +5795,21 @@ void Z80::op_adc_hl_xx(void)
 ///
 void Z80::op_sbc16(WORD op)
 {
-    WORD carry = ( CHECK_FLAGS(C_FLAG) ) ? 1 : 0;
+    WORD carry = (CHECK_FLAGS(C_FLAG)) ? 1 : 0;
     SWORD sOp = op;
     int i;
 
-    COND_FLAGS( ((op & 0x0fff) + carry) > (HL & 0x0fff), H_FLAG);
+    COND_FLAGS(((op & 0x0fff) + carry) > (HL & 0x0fff), H_FLAG);
 
     i = sHL - sOp - carry;
 
-    COND_FLAGS( (i > 32767) || (i < -32768) , P_FLAG);
-    COND_FLAGS( (op + carry) > HL , C_FLAG);
+    COND_FLAGS((i > 32767) || (i < -32768) , P_FLAG);
+    COND_FLAGS((op + carry) > HL , C_FLAG);
 
     i &= 0xffff;
 
-    COND_FLAGS( !i , Z_FLAG);
-    COND_FLAGS( i & 0x8000 , S_FLAG);
+    COND_FLAGS(!i , Z_FLAG);
+    COND_FLAGS(i & 0x8000 , S_FLAG);
     SET_FLAGS(N_FLAG);
 
     HL = i;
@@ -5749,6 +5850,7 @@ void Z80::op_ldi(void)
 void Z80::op_ldir(void)
 {
     op_ldi();
+
     if (BC)
     {
         // BC not zero, repeat instruction.
@@ -5781,6 +5883,7 @@ void Z80::op_ldd(void)
 void Z80::op_lddr(void)
 {
     op_ldd();
+
     if (BC)
     {
         // BC not zero, repeat instruction.
@@ -5849,7 +5952,7 @@ void Z80::op_cpd(void)
 
     i = readMEM(HL--);
 
-    COND_FLAGS( (i & 0xf) > (A & 0xf), H_FLAG);
+    COND_FLAGS((i & 0xf) > (A & 0xf), H_FLAG);
 
     i = A - i;
 
@@ -5938,10 +6041,10 @@ void Z80::op_rrd_ihl(void)
 void Z80::op_fd_handle(void)
 {
 
-	prefix = ip_fd;
-	lastInstByte = curInst[1] = readInst();
+    prefix = ip_fd;
+    lastInstByte = curInst[1] = readInst();
 
-    (this->*op_code[curInst[1]]) ();
+    (this->*op_code[curInst[1]])();
 }
 
 //
@@ -5977,7 +6080,7 @@ void Z80::op_rb_n_xx_d(void)
     // The undocumented function of also storing it to one of the register.
     if ((curInst[3] & 0x7) != 0x06)
     {
-    	getCoreReg8(curInst[3]) = val;
+        getCoreReg8(curInst[3]) = val;
     }
 
     ticks -= 1;
@@ -5999,7 +6102,7 @@ void Z80::op_sb_n_xx_d(void)
     // The undocumented function of also storing it to one of the register.
     if ((curInst[3] & 0x7) != 0x06)
     {
-    	getCoreReg8(curInst[3]) = val;
+        getCoreReg8(curInst[3]) = val;
     }
 
     ticks -= 1;

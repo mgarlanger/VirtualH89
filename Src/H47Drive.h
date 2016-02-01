@@ -14,12 +14,12 @@
 
 class H47Drive: public DiskDrive
 {
-public:
+  public:
     H47Drive();
     virtual ~H47Drive();
 
-    virtual void getControlInfo(unsigned int pos, bool &hole, bool &trackZero,
-                                bool &writeProtect);
+    virtual void getControlInfo(unsigned int pos, bool& hole, bool& trackZero,
+                                bool& writeProtect);
 
     virtual void selectSide(BYTE side);
     virtual void step(bool direction);
@@ -29,7 +29,7 @@ public:
     virtual BYTE readSectorData(BYTE sector, unsigned int pos);
     virtual void insertDisk(FloppyDisk *disk);
 
-private:
+  private:
     static const unsigned int maxTracks_c          = 77;
     static const unsigned int maxSectorsPerTrack_c = 26;
     static const unsigned int maxBytesPerSector_c  = 256;

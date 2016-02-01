@@ -12,20 +12,21 @@
 #include "IODevice.h"
 
 const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Count_c] =
-                                                     { 0x04,
-    		                                           0x0c,
-    		                                           0x04,
-    		                                           0x08,
-    		                                           0x0c,
-    		                                           0x08,
-    		                                           0x00
-                                                     };
+{
+    0x04,
+    0x0c,
+    0x04,
+    0x08,
+    0x0c,
+    0x08,
+    0x00
+};
 
 GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
-                                          mms128k_Unlocked(false),
-                                          mms128k_Unlock_Pos(0),
-                                          curSide_m(-1),
-                                          fast_m(false)
+    mms128k_Unlocked(false),
+    mms128k_Unlock_Pos(0),
+    curSide_m(-1),
+    fast_m(false)
 {
 
 }
@@ -119,10 +120,10 @@ BYTE GeneralPurposePort::in(BYTE addr)
     {
         //return(Mtr89_MemoryTest_Off_c);
 
-        return(Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
+        return (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
     }
 
-    return(0);
+    return (0);
 }
 
 void GeneralPurposePort::out(BYTE addr, BYTE val)
@@ -135,6 +136,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: Enable Timer Interrupt.\n", __FUNCTION__);
             h89.getTimer().enableINT();
         }
+
         else
         {
             debugss(ssGpp, ALL, "%s: Disable Timer Interrupt.\n", __FUNCTION__);
@@ -147,6 +149,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
             h89.disableROM();
         }
+
         else
         {
             // re-enable the ROM
@@ -166,31 +169,33 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: H17 Set Side 1.\n", __FUNCTION__);
             h89.selectSideH17(1);
         }
+
         else
         {
             debugss(ssGpp, ALL, "%s: H17 Set Side 0.\n", __FUNCTION__);
-        	h89.selectSideH17(0);
+            h89.selectSideH17(0);
         }
 
         /// Speed changes, may need to change to support MMS 128k expansion.
         if (val & gpp_4MHz_2MHz_Select_c)
         {
-        	/// \todo this needs to be put in the H89 class...
-        	if (!fast_m)
-        	{
+            /// \todo this needs to be put in the H89 class...
+            if (!fast_m)
+            {
                 debugss(ssGpp, ALL, "%s: Set Fast speed.\n", __FUNCTION__);
-        	    h89.setSpeed(true);
-        	    fast_m = true;
-        	}
+                h89.setSpeed(true);
+                fast_m = true;
+            }
         }
+
         else
         {
-        	if (fast_m)
-        	{
+            if (fast_m)
+            {
                 debugss(ssGpp, ALL, "%s: Set Standard speed.\n", __FUNCTION__);
-        	    h89.setSpeed(false);
-        	    fast_m = false;
-        	}
+                h89.setSpeed(false);
+                fast_m = false;
+            }
         }
     }
 }

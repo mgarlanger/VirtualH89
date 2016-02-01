@@ -23,11 +23,11 @@
 ///
 class H_17_1: public DiskDrive
 {
-public:
+  public:
     H_17_1();
     virtual ~H_17_1();
 
-    void getControlInfo(unsigned int pos, bool &hole, bool &trackZero, bool &writeProtect);
+    void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect);
 
     void step(bool direction);
     void selectSide(BYTE side);
@@ -39,7 +39,7 @@ public:
     void insertDisk(FloppyDisk *disk);
 
 
-private:
+  private:
 
     const unsigned int  maxTracks_c = 40;
     const unsigned char head_c      = 0;

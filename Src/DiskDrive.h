@@ -24,7 +24,7 @@ class DiskDrive
     virtual void ejectDisk(const char *name);
 
 
-    virtual void getControlInfo(unsigned int pos, bool &hole, bool &trackZero, bool &writeProtect) = 0;
+    virtual void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect) = 0;
 
     virtual void selectSide(BYTE side) = 0;
     virtual void step(bool direction) = 0;

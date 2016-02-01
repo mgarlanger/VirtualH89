@@ -20,7 +20,7 @@ class ParallelLink;
 class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnection
 
 {
-public:
+  public:
     Z47Controller();
     virtual ~Z47Controller();
 
@@ -38,7 +38,7 @@ public:
 
     void loadDisk(void);
 
-private:
+  private:
 
     ///   Format commands
     ///        CP/M
@@ -474,7 +474,7 @@ private:
     static const unsigned long coundDown_Default_c = 200;
 
     void processCmd(BYTE val);
-    const char* getStateStr(ControllerState state);
+    const char *getStateStr(ControllerState state);
 
     void reset();
 
@@ -514,7 +514,7 @@ private:
     void decodeTrack(BYTE val);
 
     static const BYTE trackMask_c = 0xFF;
-    static const BYTE trackShift_c =0;
+    static const BYTE trackShift_c = 0;
 
     void processReadControlStatus(void);
     void processReadReadyStatus(void);

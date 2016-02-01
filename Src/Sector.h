@@ -25,23 +25,23 @@ class Sector
 
   public:
     Sector();
-    Sector( BYTE headNum,
-            BYTE trackNum,
-            BYTE sectorNum,
-            WORD sectorLength,
-            BYTE *data);
+    Sector(BYTE headNum,
+           BYTE trackNum,
+           BYTE sectorNum,
+           WORD sectorLength,
+           BYTE *data);
 
-    Sector( BYTE headNum,
-            BYTE trackNum,
-            BYTE sectorNum,
-            WORD sectorLength,
-            BYTE data = 0xe5);
+    Sector(BYTE headNum,
+           BYTE trackNum,
+           BYTE sectorNum,
+           WORD sectorLength,
+           BYTE data = 0xe5);
 
     void initialize(BYTE headNum,
-            BYTE trackNum,
-            BYTE sectorNum,
-            WORD sectorLength,
-            BYTE *data);
+                    BYTE trackNum,
+                    BYTE sectorNum,
+                    WORD sectorLength,
+                    BYTE *data);
 
     virtual ~Sector();
 
@@ -49,7 +49,7 @@ class Sector
     void setReadError(bool val);
 
     BYTE getSectorNum();
-    bool readData(WORD pos, BYTE &data);
+    bool readData(WORD pos, BYTE& data);
     bool writeData(WORD pos, BYTE data);
 
     void dump();

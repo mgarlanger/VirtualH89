@@ -16,29 +16,29 @@
 #include <string.h>
 
 Z47Controller::Z47Controller(): curDisk(invalidDisk_c),
-                                curLinkState(st_Link_Undefined_c),
-                                curState(st_None_c),
-                                statePosition_m(0),
-                                countDown_m(0),
-                                linkToHost_m(0),
-                                readyState(0),
-                                sectorCount(1),
-                                driveNotReady_m(false),
-                                diskWriteProtected_m(false),
-                                deletedData_m(false),
-                                noRecordFound_m(false),
-                                crcError_m(false),
-                                lateData_m(false),
-                                invalidCommandReceived_m(false),
-                                badTrackOverflow_m(false),
-                                dataToTransmit_m(0),
-                                drive_m(0),
-                                side_m(0),
-                                track_m(0),
-                                sector_m(0),
-                                diskOffset(0),
-                                bytesToTransfer(0),
-                                sectorSize(128)
+    curLinkState(st_Link_Undefined_c),
+    curState(st_None_c),
+    statePosition_m(0),
+    countDown_m(0),
+    linkToHost_m(0),
+    readyState(0),
+    sectorCount(1),
+    driveNotReady_m(false),
+    diskWriteProtected_m(false),
+    deletedData_m(false),
+    noRecordFound_m(false),
+    crcError_m(false),
+    lateData_m(false),
+    invalidCommandReceived_m(false),
+    badTrackOverflow_m(false),
+    dataToTransmit_m(0),
+    drive_m(0),
+    side_m(0),
+    track_m(0),
+    sector_m(0),
+    diskOffset(0),
+    bytesToTransfer(0),
+    sectorSize(128)
 
 {
     // TODO Auto-generated constructor stub
@@ -59,15 +59,17 @@ void Z47Controller::loadDisk()
     FILE *file;
 
 
-    if ((file = fopen("8in.dsk","r")) != NULL)
+    if ((file = fopen("8in.dsk", "r")) != NULL)
     {
         int i = 0;
-        for (; i < 26*77; i++)
+
+        for (; i < 26 * 77; i++)
         {
-            if ((fread(&diskData[i*128], 128, 1, file)) != 1)
+            if ((fread(&diskData[i * 128], 128, 1, file)) != 1)
             {
                 debugss(ssH47, INFO, "%s: File ended early: %d\n", __FUNCTION__, i);
             }
+
             else
             {
                 debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
@@ -76,24 +78,29 @@ void Z47Controller::loadDisk()
 
         }
 
-        for (; i < 26*77; i++)
+        for (; i < 26 * 77; i++)
         {
-            memset(&diskData[i*128], 0, 128);
+            memset(&diskData[i * 128], 0, 128);
         }
+
         fclose(file);
 
 #if 0
-        if ((fread(&diskData[0], 128*26*77, 1, file)) != 1)
+
+        if ((fread(&diskData[0], 128 * 26 * 77, 1, file)) != 1)
         {
             debugss(ssH47, ERROR, "%s: Unable to read file\n", __FUNCTION__);
         }
+
         else
         {
             debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
         }
+
         fclose(file);
 #endif
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s: unable to open file\n", __FUNCTION__);
@@ -108,50 +115,69 @@ void Z47Controller::reset()
     linkToHost_m = 0;
 }
 
-const char* Z47Controller::getStateStr(ControllerState state)
+const char *Z47Controller::getStateStr(ControllerState state)
 {
     switch (curState)
     {
     case st_None_c:
-        return("None");
+        return ("None");
+
     case st_Boot_c:
-        return("Boot");
+        return ("Boot");
+
     case st_ReadCntrlStat_c:
-        return("ReadCntrlStat");
+        return ("ReadCntrlStat");
+
     case st_ReadAuxStat_c:
-        return("ReadAuxStat");
+        return ("ReadAuxStat");
+
     case st_LoadSectorCount_c:
-        return("LoadSectorCount");
+        return ("LoadSectorCount");
+
     case st_ReadLastAddr_c:
-        return("ReadLastAddr");
+        return ("ReadLastAddr");
+
     case st_ReadSectors_c:
-        return("ReadSectors");
+        return ("ReadSectors");
+
     case st_WriteSectors_c:
-        return("WriteSectors");
+        return ("WriteSectors");
+
     case st_ReadSectorsBuffered_c:
-        return("ReadSectorsBuffered");
+        return ("ReadSectorsBuffered");
+
     case st_WriteSectorsBuffered_c:
-        return("WriteSectorsBuffered");
+        return ("WriteSectorsBuffered");
+
     case st_WriteSectorsAndDelete_c:
-        return("WriteSectorsAndDelete");
+        return ("WriteSectorsAndDelete");
+
     case st_WriteSectorsBufferedAndDelete_c:
-        return("WriteSectorsBufferedAndDelete");
+        return ("WriteSectorsBufferedAndDelete");
+
     case st_Copy_c:
-        return("Copy");
+        return ("Copy");
+
     case st_FormatIBM_SD_c:
-        return("FormatIBM_SD");
+        return ("FormatIBM_SD");
+
     case st_Format_SD_c:
-        return("Format_SD");
+        return ("Format_SD");
+
     case st_FormatIBM_DD_c:
-        return("FormatIBM_DD");
+        return ("FormatIBM_DD");
+
     case st_Format_DD_c:
-        return("Format_DD");
+        return ("Format_DD");
+
     case st_ReadReadyStatus_c:
-        return("ReadReadyStatus");
+        return ("ReadReadyStatus");
+
     default:
         break;
     }
-    return("Unknown");
+
+    return ("Unknown");
 }
 
 
@@ -207,6 +233,7 @@ void Z47Controller::processReadControlStatus(void)
         debugss(ssH47, ERROR, "%s - Unexpected position\n", __FUNCTION__);
 
     }
+
     if (linkToHost_m)
     {
         dataToTransmit_m = 0;
@@ -271,6 +298,7 @@ void Z47Controller::processReadControlStatus(void)
 
         curLinkState = st_Link_AwaitingToTransmit_c;
     }
+
     else
     {
         /// \todo assert or make the top check an assert
@@ -289,6 +317,7 @@ void Z47Controller::processReadAuxStatus(BYTE val)
         commandComplete();
         return;
     }
+
     if (statePosition_m == 2)
     {
         // val passed in is drive and side.
@@ -304,6 +333,7 @@ void Z47Controller::processReadAuxStatus(BYTE val)
         return;
 
     }
+
     if (statePosition_m == 1)
     {
         // val invalid.
@@ -327,6 +357,7 @@ void Z47Controller::processLoadSectorCount(BYTE val)
         commandComplete();
         return;
     }
+
     if (statePosition_m == 2)
     {
         // val passed in is MSB of sector count.
@@ -337,6 +368,7 @@ void Z47Controller::processLoadSectorCount(BYTE val)
         return;
 
     }
+
     if (statePosition_m == 1)
     {
         // val invalid.
@@ -375,7 +407,7 @@ void Z47Controller::processReadSectorsBufffered(BYTE val)
         // val passed in is drive and side.
         decodeSideDriveSector(val);
 
-        diskOffset = track_m * (sectorSize * 26) + ((sector_m-1) * sectorSize);
+        diskOffset = track_m * (sectorSize * 26) + ((sector_m - 1) * sectorSize);
         bytesToTransfer = sectorCount * sectorSize - 1;
         // reset sector count
         sectorCount = 1;
@@ -439,7 +471,7 @@ void Z47Controller::processWriteSectorsBufffered(BYTE val)
         // val passed in is drive and side.
         decodeSideDriveSector(val);
 
-        diskOffset = track_m * (sectorSize * 26) + ((sector_m-1) * sectorSize);
+        diskOffset = track_m * (sectorSize * 26) + ((sector_m - 1) * sectorSize);
         bytesToTransfer = sectorCount * sectorSize - 1;
         // reset sector count
         sectorCount = 1;
@@ -496,6 +528,7 @@ void Z47Controller::processFormatSingleDensity(BYTE val)
         curLinkState =  st_Link_AwaitingControllerComplete_c;
         return;
     }
+
     if (statePosition_m == 1)
     {
         // val invalid.
@@ -530,6 +563,7 @@ void Z47Controller::processFormatIBMDoubleDensity(BYTE val)
         curLinkState =  st_Link_AwaitingControllerComplete_c;
         return;
     }
+
     if (statePosition_m == 1)
     {
         // val invalid.
@@ -564,6 +598,7 @@ void Z47Controller::processFormatDoubleDensity(BYTE val)
         curLinkState =  st_Link_AwaitingControllerComplete_c;
         return;
     }
+
     if (statePosition_m == 1)
     {
         // val invalid.
@@ -610,67 +645,85 @@ void Z47Controller::processTransmitted()
     {
         linkToHost_m->setDTR(false);
     }
+
     switch (curState)
     {
     case st_Boot_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_Boot_c\n", __FUNCTION__);
 
         break;
+
     case st_ReadCntrlStat_c:
         debugss(ssH47, INFO, "%s - st_ReadCntrlStat_c\n", __FUNCTION__);
         processReadControlStatus();
         break;
+
     case st_ReadAuxStat_c:
         debugss(ssH47, INFO, "%s - st_ReadAuxStat_c\n", __FUNCTION__);
         processReadAuxStatus();
         break;
+
     case st_LoadSectorCount_c:
         debugss(ssH47, ERROR, "%s - st_LoadSectorCount_c\n", __FUNCTION__);
         processLoadSectorCount();
         break;
+
     case st_ReadLastAddr_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_ReadLastAddr_c\n", __FUNCTION__);
         break;
+
     case st_ReadSectors_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_ReadSectors_c\n", __FUNCTION__);
         break;
+
     case st_WriteSectors_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectors_c\n", __FUNCTION__);
         break;
+
     case st_ReadSectorsBuffered_c:
         debugss(ssH47, INFO, "%s - st_ReadSectorsBuffered_c\n", __FUNCTION__);
         //bytesToTransfer = sectorSize;
         processReadSectorsBufffered();
         break;
+
     case st_WriteSectorsBuffered_c:
         debugss(ssH47, INFO, "%s - st_WriteSectorsBuffered_c\n", __FUNCTION__);
         processReadSectorsBufffered();
         break;
+
     case st_WriteSectorsAndDelete_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsAndDelete_c\n", __FUNCTION__);
         break;
+
     case st_WriteSectorsBufferedAndDelete_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsBufferedAndDelete_c\n", __FUNCTION__);
         break;
+
     case st_Copy_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_Copy_c\n", __FUNCTION__);
         break;
+
     case st_FormatIBM_SD_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_FormatIBM_SD_c\n", __FUNCTION__);
         break;
+
     case st_Format_SD_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_Format_SD_c\n", __FUNCTION__);
         break;
+
     case st_FormatIBM_DD_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_FormatIBM_DD_c\n", __FUNCTION__);
         break;
+
     case st_Format_DD_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_Format_DD_c\n", __FUNCTION__);
         break;
+
     case st_ReadReadyStatus_c:
         debugss(ssH47, INFO, "%s - st_ReadReadyStatus_c\n", __FUNCTION__);
         processReadReadyStatus();
         break;
+
     case st_WaitingToComplete_c:
         debugss(ssH47, ERROR, "%s - Unsupported - st_WaitingToComplete_c\n", __FUNCTION__);
         break;
@@ -844,25 +897,30 @@ void Z47Controller::processCmd(BYTE cmd)
     default:
         debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__, cmd);
         invalidCommandReceived_m = true;
+
         if (linkToHost_m)
         {
             linkToHost_m->setError(true);
         }
+
         commandComplete();
         break;
     }
 
-    switch(curLinkState)
+    switch (curLinkState)
     {
     case st_Link_Undefined_c:
         debugss(ssH47, ERROR, "%s - Unexpected Undefined link state\n", __FUNCTION__);
         break;
+
     case st_Link_Ready_c:
         debugss(ssH47, INFO, "%s - link ready state - do nothing\n", __FUNCTION__);
         break;
+
     case st_Link_AwaitingToReqReceive_c:
         debugss(ssH47, INFO, "%s - link awaiting receive state\n", __FUNCTION__);
         break;
+
     case st_Link_AwaitingToTransmit_c:
         debugss(ssH47, INFO, "%s - link transmit state\n", __FUNCTION__);
         break;
@@ -882,17 +940,20 @@ bool Z47Controller::connectDrive(BYTE unitNum, DiskDrive *drive)
         {
             drives_m[unitNum] = drive;
         }
+
         else
         {
             debugss(ssH47, ERROR, "%s - drive conflict - %d.\n", __FUNCTION__, unitNum);
             return false;
         }
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
         return false;
     }
+
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
     return true;
@@ -908,9 +969,11 @@ bool Z47Controller::removeDrive(BYTE unitNum)
         {
             debugss(ssH47, WARNING, "%s - no drive to remove - %d.\n", __FUNCTION__, unitNum);
         }
+
         drives_m[unitNum] = 0;
         debugss(ssH47, ERROR, "%s - disk already in use - %d.\n", __FUNCTION__, unitNum);
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
@@ -921,7 +984,7 @@ bool Z47Controller::removeDrive(BYTE unitNum)
 
 void Z47Controller::notification(unsigned int cycleCount)
 {
-    switch(curLinkState)
+    switch (curLinkState)
     {
     case st_Link_Undefined_c:
         //debugss(ssH47, ERROR, "%s - Unexpected Undefined link state\n", __FUNCTION__);
@@ -963,17 +1026,20 @@ void Z47Controller::notification(unsigned int cycleCount)
         countDown_m -= cycleCount;
         return;
     }
+
     countDown_m = 0;
 
-    switch(curLinkState)
+    switch (curLinkState)
     {
     case st_Link_AwaitingToReqReceive_c:
         debugss(ssH47, INFO, "%s - link awaiting receive state\n", __FUNCTION__);
+
         // just set the flags and wait for the host to send;
         if (linkToHost_m)
         {
             linkToHost_m->setDTR(true);
         }
+
         curLinkState = st_Link_AwaitingToReceive_c;
         return;
 
@@ -984,16 +1050,19 @@ void Z47Controller::notification(unsigned int cycleCount)
         {
             linkToHost_m->sendHostData(dataToTransmit_m);
         }
+
         curLinkState = st_Link_AwaitingTransmitComplete_c;
         return;
 
     case st_Link_AwaitingReadyState_c:
         debugss(ssH47, INFO, "%s - link awaiting ready state\n", __FUNCTION__);
+
         // just set the flags and wait for the host to send;
         if (linkToHost_m)
         {
             linkToHost_m->setDTR(true);
         }
+
         curLinkState = st_Link_AwaitingToReceive_c;
         return;
     }
@@ -1092,10 +1161,12 @@ void Z47Controller::connectHostLink(ParallelLink *link)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
     linkToHost_m = link;
+
     if (linkToHost_m)
     {
         linkToHost_m->registerDevice(this);
     }
+
     else
     {
         debugss(ssH47, ERROR, "%s - link invalid\n", __FUNCTION__);
@@ -1215,6 +1286,7 @@ void Z47Controller::raiseSignal(SignalType sigType)
             linkToHost_m->setBusy(false);
             linkToHost_m->setDTR(true);
         }
+
         // clear the errors
         driveNotReady_m          = false;
         diskWriteProtected_m     = false;
@@ -1227,15 +1299,18 @@ void Z47Controller::raiseSignal(SignalType sigType)
 
 
         break;
+
     // Data Acknowledge (Host to Disk System)
     case st_DTAK:
         // Handle data acknowledge.
         debugss(ssH47, INFO, "%s: DTAK received.\n", __FUNCTION__);
+
         if (curLinkState == st_Link_AwaitingTransmitComplete_c)
         {
             curLinkState = st_Link_HoldingDTR_c;
             countDown_m = 1;
         }
+
         else if (curLinkState == st_Link_AwaitingToReceive_c)
         {
             BYTE val = 0;
@@ -1244,26 +1319,33 @@ void Z47Controller::raiseSignal(SignalType sigType)
             {
                 linkToHost_m->readDataBusByDrive(val);
             }
+
             processData(val);
         }
+
         break;
+
     // Data Ready (Disk System to Host)
     case st_DTR:
         debugss(ssH47, ERROR, "%s: Invalid DTR received.\n", __FUNCTION__);
         break;
+
     // Disk Drive Out (Disk System to Host)
     case st_DDOUT:
         debugss(ssH47, ERROR, "%s: Invalid DDOUT received.\n", __FUNCTION__);
         break;
+
     // Busy (Disk System to Host)
     case st_Busy:
         // Not valid
         debugss(ssH47, ERROR, "%s: Invalid Busy received.\n", __FUNCTION__);
         break;
+
     // Error (Disk System to Host)
     case st_Error:
         debugss(ssH47, ERROR, "%s: Invalid error received.\n", __FUNCTION__);
         break;
+
     default:
         debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
         break;
@@ -1282,6 +1364,7 @@ void Z47Controller::lowerSignal(SignalType sigType)
         debugss(ssH47, INFO, "%s: Master Reset received.\n", __FUNCTION__);
 
         break;
+
     // Data Acknowledge (Host to Disk System)
     case st_DTAK:
         // Handle data acknowledge.
@@ -1290,26 +1373,31 @@ void Z47Controller::lowerSignal(SignalType sigType)
         debugss(ssH47, INFO, "%s: DTAK received.\n", __FUNCTION__);
 
         break;
+
     // Data Ready (Disk System to Host)
     case st_DTR:
         // This signal only goes to the host
         debugss(ssH47, ERROR, "%s: Invalid DTR received.\n", __FUNCTION__);
         break;
+
     // Disk Drive Out (Disk System to Host)
     case st_DDOUT:
         // This signal only goes to the host
         debugss(ssH47, ERROR, "%s: Invalid DDOUT received.\n", __FUNCTION__);
         break;
+
     // Busy (Disk System to Host)
     case st_Busy:
         // This signal only goes to the host
         debugss(ssH47, ERROR, "%s: Invalid Busy received.\n", __FUNCTION__);
         break;
+
     // Error (Disk System to Host)
     case st_Error:
         // This signal only goes to the host
         debugss(ssH47, ERROR, "%s: Invalid error received.\n", __FUNCTION__);
         break;
+
     default:
         debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
         break;
@@ -1337,6 +1425,7 @@ void Z47Controller::commandComplete(void)
         linkToHost_m->setBusy(false);
         //linkToHost_m->setDTR(true);
     }
+
     debugss(ssH47, ALL, "=============END of CMD============\n");
 
 }

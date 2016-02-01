@@ -25,7 +25,8 @@ SignalHandler *SignalHandler::instance(void)
     {
         _inst = new SignalHandler();
     }
-    return(_inst);
+
+    return (_inst);
 }
 
 EventHandler *SignalHandler::registerHandler(int signum, EventHandler *evtHandler)
@@ -39,7 +40,7 @@ EventHandler *SignalHandler::registerHandler(int signum, EventHandler *evtHandle
 
     sigaction(signum, &newact, 0);
 
-    return(orig_evtHandler);
+    return (orig_evtHandler);
 }
 
 int SignalHandler::removeHandler(int signum)
@@ -51,7 +52,7 @@ int SignalHandler::removeHandler(int signum)
 
     signalHandlers[signum] = 0;
 
-    return(signum);
+    return (signum);
 }
 
 

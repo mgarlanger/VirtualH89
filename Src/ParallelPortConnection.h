@@ -15,7 +15,7 @@ class ParallelLink;
 
 class ParallelPortConnection
 {
-public:
+  public:
     ParallelPortConnection();
     virtual ~ParallelPortConnection();
 
@@ -44,7 +44,7 @@ public:
 
     //virtual void receiveData(BYTE val) = 0;
 
-protected:
+  protected:
     ParallelLink *link_m;
 
 };

@@ -13,10 +13,10 @@
 class ClockUser
 {
   public:
-	ClockUser();
-	virtual ~ClockUser();
+    ClockUser();
+    virtual ~ClockUser();
 
-	virtual void notification(unsigned int cycleCount) = 0;
+    virtual void notification(unsigned int cycleCount) = 0;
 
   private:
 

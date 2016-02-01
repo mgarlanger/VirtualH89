@@ -48,15 +48,15 @@ class ParallelPortConnection;
 ///
 class ParallelLink
 {
-public:
+  public:
     ParallelLink();
     virtual ~ParallelLink();
 
     virtual void sendHostData(BYTE val);
     virtual void sendDriveData(BYTE val);
 
-    virtual void readDataBusByHost(BYTE &val);
-    virtual void readDataBusByDrive(BYTE &val);
+    virtual void readDataBusByHost(BYTE& val);
+    virtual void readDataBusByDrive(BYTE& val);
 
     virtual void setBusy(bool val);
     virtual bool readBusy();
@@ -78,7 +78,7 @@ public:
     virtual void registerDevice(ParallelPortConnection *device);
     virtual void registerHost(ParallelPortConnection *host);
 
-protected:
+  protected:
     BYTE data_m;
 
     bool dataFromHost_m;

@@ -33,7 +33,7 @@ void H_17_1::insertDisk(FloppyDisk *disk)
     }
 }
 
-void H_17_1::getControlInfo(unsigned int pos, bool &hole, bool &trackZero, bool &writeProtect)
+void H_17_1::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
 {
     // Track info comes from the drive, the hole and write-protect is determined
     // by the actual disk
@@ -45,6 +45,7 @@ void H_17_1::getControlInfo(unsigned int pos, bool &hole, bool &trackZero, bool 
     {
         disk_m->getControlInfo(pos, hole, writeProtect);
     }
+
     else
     {
         debugss(ssH17_1, INFO, "%s no disk_m\n", __FUNCTION__);
@@ -61,14 +62,17 @@ void H_17_1::step(bool direction)
         {
             ++track_m;
         }
+
         debugss(ssH17_1, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
+
     else
     {
         if (track_m)
         {
             --track_m;
         }
+
         debugss(ssH17_1, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
     }
 }
@@ -80,26 +84,27 @@ void H_17_1::selectSide(BYTE side)
 
 BYTE H_17_1::readData(unsigned int pos)
 {
-	BYTE data = 0;
+    BYTE data = 0;
 
-	if ((disk_m) && (disk_m->readData(head_c, track_m, pos, data)))
-	{
+    if ((disk_m) && (disk_m->readData(head_c, track_m, pos, data)))
+    {
         debugss(ssH17_1, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, pos, data);
-	}
-	else
-	{
-        debugss(ssH17_1, WARNING, "%s: read failed - pos(%d)\n", __FUNCTION__, pos);
-	}
+    }
 
-	return data;
+    else
+    {
+        debugss(ssH17_1, WARNING, "%s: read failed - pos(%d)\n", __FUNCTION__, pos);
+    }
+
+    return data;
 }
 
 void H_17_1::writeData(unsigned int pos, BYTE data)
 {
-	if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
-	{
-	    debugss(ssH17_1, WARNING, "%s: pos(%d)\n", __FUNCTION__, pos);
-	}
+    if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
+    {
+        debugss(ssH17_1, WARNING, "%s: pos(%d)\n", __FUNCTION__, pos);
+    }
 }
 
 BYTE H_17_1::readSectorData(BYTE sector, unsigned int pos)
@@ -110,6 +115,7 @@ BYTE H_17_1::readSectorData(BYTE sector, unsigned int pos)
     {
         debugss(ssH17_1, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, pos, data);
     }
+
     else
     {
         debugss(ssH17_1, WARNING, "%s: read failed - pos(%d)\n", __FUNCTION__, pos);

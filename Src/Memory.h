@@ -17,7 +17,8 @@
 ///
 /// This is the abstract parent class to handle both RAM and ROM.
 ///
-class Memory {
+class Memory
+{
   protected:
     WORD baseAddress_m;
     int size_m;

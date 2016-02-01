@@ -56,13 +56,13 @@ class logger
                 else                                          \
                 { __val = 32; }          /* Green */          \
                 fprintf(log_out,"\x1b[37m");                  \
-		        WallClock::instance()->printTime(log_out);    \
+                WallClock::instance()->printTime(log_out);    \
                 fprintf(log_out,"\x1b[36m%s: \x1b[%dm",       \
                         __PRETTY_FUNCTION__, __val);          \
                 fprintf(log_out, args);                       \
                 fprintf(log_out,"\x1b[0m");                   \
             }                                                 \
-	    }
+        }
 
 
 // nts - No TimeStamp
@@ -72,7 +72,7 @@ class logger
         {                                             \
            fprintf(log_out, args);                    \
         }                                             \
-	}
+    }
 
 #define chkdebuglevel(subsys, level)  ((level <= debugLevel[subsys]))
 

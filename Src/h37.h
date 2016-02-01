@@ -86,58 +86,58 @@ class Z_89_37 : public IODevice, ClockUser
     bool verifyTrack_m;
 
     /// type II parameters.
-	bool multiple_m;
-	bool delay_m;
-	bool sectorLength_m;
-	BYTE side_m;
-	bool deleteDAM_m;
+    bool multiple_m;
+    bool delay_m;
+    bool sectorLength_m;
+    BYTE side_m;
+    bool deleteDAM_m;
 
-	/// type III parameters
-	//bool delay_m;
-	//BYTE side_m;
+    /// type III parameters
+    //bool delay_m;
+    //BYTE side_m;
 
     enum Encoding
     {
-    	FM  = 0,
-    	MFM = 1
+        FM  = 0,
+        MFM = 1
     };
 
     enum Direction
     {
-    	dir_out = -1,
-    	dir_in  = 1
+        dir_out = -1,
+        dir_in  = 1
     };
 
     enum Disks
     {
-    	ds0        = 0,
-    	ds1        = 1,
-    	ds2        = 2,
-    	ds3        = 3,
-    	numDisks_c = 4
+        ds0        = 0,
+        ds1        = 1,
+        ds2        = 2,
+        ds3        = 3,
+        numDisks_c = 4
     };
 
     enum State
     {
-    	idleState,
-    	seekingSyncState,
-    	readingState,
-    	writingState
+        idleState,
+        seekingSyncState,
+        readingState,
+        writingState
     };
     State state_m;
 
     enum Command
     {
-    	restoreCmd,
-    	seekCmd,
-    	stepCmd,        /// shared with step in/step out.
-    	readSectorCmd,
-    	writeSectorCmd,
-    	readAddressCmd,
-    	readTrackCmd,
-    	writeTrackCmd,
-    	forceInterruptCmd,
-    	noneCmd
+        restoreCmd,
+        seekCmd,
+        stepCmd,        /// shared with step in/step out.
+        readSectorCmd,
+        writeSectorCmd,
+        readAddressCmd,
+        readTrackCmd,
+        writeTrackCmd,
+        forceInterruptCmd,
+        noneCmd
     };
     Command curCommand_m;
 

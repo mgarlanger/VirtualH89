@@ -18,27 +18,28 @@
 
 
 H17::H17(int baseAddr): IODevice(baseAddr, H17_NumPorts_c),
-                        state_m(idleState),
-                        spinCycles_m(0),
-                        curCharPos_m(0),
-                        motorOn_m(false),
-                        writeGate_m(false),
-                        direction_m(false),
-                        syncCharacterReceived_m(false),
-                        receiveDataAvail_m(false),
-                        receiverOverrun_m(false),
-                        fillCharTransmitted_m(false),
-                        transmitterBufferEmpty_m(true),
-                        receiverOutputRegister_m(0),
-                        transmitterHoldingRegister_m(0),
-                        curDrive_m(maxDiskDrive_c),
-                        fillChar_m(0),
-                        syncChar_m(0xfd)
+    state_m(idleState),
+    spinCycles_m(0),
+    curCharPos_m(0),
+    motorOn_m(false),
+    writeGate_m(false),
+    direction_m(false),
+    syncCharacterReceived_m(false),
+    receiveDataAvail_m(false),
+    receiverOverrun_m(false),
+    fillCharTransmitted_m(false),
+    transmitterBufferEmpty_m(true),
+    receiverOutputRegister_m(0),
+    transmitterHoldingRegister_m(0),
+    curDrive_m(maxDiskDrive_c),
+    fillChar_m(0),
+    syncChar_m(0xfd)
 {
     for (int i = 0; i < maxDiskDrive_c; ++i)
     {
         drives_m[i] = nullptr;
     }
+
     WallClock::instance()->registerUser(this);
 }
 
@@ -55,31 +56,35 @@ BYTE H17::in(BYTE addr)
     switch (offset)
     {
     case DataPortOffset_c:
-    	/// \todo determine if checking receiveDataAvail_m should be done.
-    	val = receiverOutputRegister_m;
-    	receiveDataAvail_m = false;
+        /// \todo determine if checking receiveDataAvail_m should be done.
+        val = receiverOutputRegister_m;
+        receiveDataAvail_m = false;
         debugss(ssH17, INFO, " h17.in(Data) - 0x%02x\n", val);
         break;
 
     case StatusPortOffset_c:
-    	if (transmitterBufferEmpty_m)
-    	{
+        if (transmitterBufferEmpty_m)
+        {
             val |= TransmitterBufferEmpty_Flag;
-    	}
-    	if (fillCharTransmitted_m)
-    	{
+        }
+
+        if (fillCharTransmitted_m)
+        {
             val |= FillCharTransmitted_Flag;
             fillCharTransmitted_m = false;
-    	}
-    	if (receiverOverrun_m)
-    	{
-    	    // \todo determine flag should be set to false after the read
+        }
+
+        if (receiverOverrun_m)
+        {
+            // \todo determine flag should be set to false after the read
             val |= ReceiverOverrun_Flag;
-    	}
-    	if (receiveDataAvail_m)
-    	{
+        }
+
+        if (receiveDataAvail_m)
+        {
             val |= ReceiveDataAvail_Flag;
-    	}
+        }
+
         debugss(ssH17, INFO, " h17.in(Status) - 0x%02x\n", val);
         break;
 
@@ -95,19 +100,21 @@ BYTE H17::in(BYTE addr)
         break;
 
     case ControlPortOffset_c:
-        // Majority of ControlPort is related to the Disk Drive, only sync detect is specific
-    	// to the controller.
 
-    	if (curDrive_m < maxDiskDrive_c)
-    	{
-    		// get info from the drive - if no drive attached, the auto-detection will
-    		// correctly detect no drive.
-    		if (drives_m[curDrive_m])
-    		{
-    		    bool hole, trackZero, writeProtect;
+        // Majority of ControlPort is related to the Disk Drive, only sync detect is specific
+        // to the controller.
+
+        if (curDrive_m < maxDiskDrive_c)
+        {
+            // get info from the drive - if no drive attached, the auto-detection will
+            // correctly detect no drive.
+            if (drives_m[curDrive_m])
+            {
+                bool hole, trackZero, writeProtect;
 
                 drives_m[curDrive_m]->getControlInfo(spinCycles_m / CPUCyclesPerByte_c,
-                                                   hole, trackZero, writeProtect);
+                                                     hole, trackZero, writeProtect);
+
                 if (hole)
                 {
                     val |= H17::ctrlHoleDetect_Flag;
@@ -123,32 +130,35 @@ BYTE H17::in(BYTE addr)
                     // disk is write protected.
                     val |= H17::ctrlWriteProtect_Flag;
                 }
-    		}
-    		else
-    		{
-    	        debugss(ssH17, INFO, " h17.in(Control) - No drive [%d]\n", curDrive_m);
-    		}
-        }
-    	else
-    	{
-            debugss(ssH17, INFO, " h17.in(Control) - Invalid drive [%d]\n", curDrive_m);
-    	}
+            }
 
-    	// Get the sync info directly from the controller.
-    	if (syncCharacterReceived_m)
-    	{
-    		val |= ctrlSyncDetect_Flag;
+            else
+            {
+                debugss(ssH17, INFO, " h17.in(Control) - No drive [%d]\n", curDrive_m);
+            }
+        }
+
+        else
+        {
+            debugss(ssH17, INFO, " h17.in(Control) - Invalid drive [%d]\n", curDrive_m);
+        }
+
+        // Get the sync info directly from the controller.
+        if (syncCharacterReceived_m)
+        {
+            val |= ctrlSyncDetect_Flag;
             syncCharacterReceived_m = false;
-    	}
+        }
+
         debugss(ssH17, INFO, " h17.in(Control) - 0x%02x\n", val);
         break;
 
     default:
-        debugss(ssH17,ERROR, "h17.in(0x%02x) - invalid port\n", addr);
+        debugss(ssH17, ERROR, "h17.in(0x%02x) - invalid port\n", addr);
         break;
     }
 
-    return(val);
+    return (val);
 }
 
 void H17::out(BYTE addr, BYTE val)
@@ -160,18 +170,19 @@ void H17::out(BYTE addr, BYTE val)
     case DataPortOffset_c:
         debugss(ssH17, INFO, " h17.out(Data) - 0x%02x\n", val);
 
-    	if (!(curDrive_m < maxDiskDrive_c))
+        if (!(curDrive_m < maxDiskDrive_c))
         {
-    		debugss(ssH17, WARNING, " h17.out(Data) - No drive selected\n");
+            debugss(ssH17, WARNING, " h17.out(Data) - No drive selected\n");
         }
+
         if (!transmitterBufferEmpty_m)
         {
-    		debugss(ssH17, ERROR, "Overwriting Transmitter Holding Register\n");
-    	}
+            debugss(ssH17, ERROR, "Overwriting Transmitter Holding Register\n");
+        }
 
-    	/// No error status to indicate that the THR was overwritten.
-    	transmitterHoldingRegister_m = val;
-    	transmitterBufferEmpty_m = false;
+        /// No error status to indicate that the THR was overwritten.
+        transmitterHoldingRegister_m = val;
+        transmitterBufferEmpty_m = false;
         break;
 
     case FillPortOffset_c:
@@ -195,6 +206,7 @@ void H17::out(BYTE addr, BYTE val)
             writeGate_m = true;
             state_m = writingState;
         }
+
         else
         {
             writeGate_m = false;
@@ -209,23 +221,26 @@ void H17::out(BYTE addr, BYTE val)
         {
             debugss_nts(ssH17, INFO, " DS0");
             curDrive_m = ds0;
-			transmitterBufferEmpty_m = false;
-			fillCharTransmitted_m = false;
+            transmitterBufferEmpty_m = false;
+            fillCharTransmitted_m = false;
         }
+
         else if (val & DriveSelect1_Ctrl)
         {
             debugss_nts(ssH17, INFO, " DS1");
             curDrive_m = ds1;
-			transmitterBufferEmpty_m = false;
-			fillCharTransmitted_m = false;
+            transmitterBufferEmpty_m = false;
+            fillCharTransmitted_m = false;
         }
+
         else if (val & DriveSelect2_Ctrl)
         {
             debugss_nts(ssH17, INFO, " DS2");
             curDrive_m = ds2;
-			transmitterBufferEmpty_m = false;
-			fillCharTransmitted_m = false;
+            transmitterBufferEmpty_m = false;
+            fillCharTransmitted_m = false;
         }
+
         else
         {
             debugss_nts(ssH17, INFO, " DS-");
@@ -238,6 +253,7 @@ void H17::out(BYTE addr, BYTE val)
             debugss_nts(ssH17, INFO, " Dir-in");
             direction_m = true;
         }
+
         else
         {
             debugss_nts(ssH17, INFO, " Dir-out");
@@ -252,6 +268,7 @@ void H17::out(BYTE addr, BYTE val)
             motorOn_m = true;
             /// \todo Register with the cpu clock for notification.
         }
+
         else
         {
             debugss_nts(ssH17, INFO, " MtrOff");
@@ -270,6 +287,7 @@ void H17::out(BYTE addr, BYTE val)
         {
             h89.writeEnableH17RAM();
         }
+
         else
         {
             h89.writeProtectH17RAM();
@@ -277,20 +295,22 @@ void H17::out(BYTE addr, BYTE val)
 
         if (val & StepCommand_Ctrl)
         {
-        	if ((curDrive_m < maxDiskDrive_c) && (drives_m[curDrive_m]))
+            if ((curDrive_m < maxDiskDrive_c) && (drives_m[curDrive_m]))
             {
                 drives_m[curDrive_m]->step(direction_m);
             }
+
             else
             {
                 // all drives have been unselected...
                 debugss(ssH17, WARNING, " h17.out(Control) - No drive selected\n");
             }
         }
+
         break;
 
     default:
-        debugss(ssH17,ERROR, "h17.out(0x%02x, 0x%02x) - invalid port\n", addr, val);
+        debugss(ssH17, ERROR, "h17.out(0x%02x, 0x%02x) - invalid port\n", addr, val);
         break;
 
     }
@@ -298,9 +318,10 @@ void H17::out(BYTE addr, BYTE val)
 
 bool H17::connectDrive(BYTE unitNum, DiskDrive *drive)
 {
-	bool retVal = false;
+    bool retVal = false;
 
     debugss(ssH17, INFO, "%s: unit (%d), drive (%p)\n", __FUNCTION__, unitNum, drive);
+
     if (unitNum < maxDiskDrive_c)
     {
         if (drives_m[unitNum] == 0)
@@ -308,187 +329,207 @@ bool H17::connectDrive(BYTE unitNum, DiskDrive *drive)
             drives_m[unitNum] = drive;
             retVal = true;
         }
+
         else
         {
             debugss(ssH17, ERROR, "%s: drive already connect\n", __FUNCTION__);
         }
     }
+
     else
     {
         debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
     }
 
-    return(retVal);
+    return (retVal);
 }
 
 bool H17::removeDrive(BYTE unitNum)
 {
-	bool retVal = false;
+    bool retVal = false;
 
     debugss(ssH17, INFO, "%s: unit (%d)\n", __FUNCTION__, unitNum);
-	if (curDrive_m < maxDiskDrive_c)
+
+    if (curDrive_m < maxDiskDrive_c)
     {
         if (drives_m[unitNum] != 0)
         {
             drives_m[unitNum] = 0;
             retVal = true;
         }
+
         else
         {
             debugss(ssH17, WARNING, "%s: no unit to remove (%d)\n", __FUNCTION__, unitNum);
         }
     }
+
     else
     {
         debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
     }
 
-    return(retVal);
+    return (retVal);
 }
 
 void H17::selectSide(BYTE side)
 {
-	for (int i = 0; i < maxDiskDrive_c; i++)
-	{
-		if (drives_m[i])
-		{
-			drives_m[i]->selectSide(side);
-		}
-	}
+    for (int i = 0; i < maxDiskDrive_c; i++)
+    {
+        if (drives_m[i])
+        {
+            drives_m[i]->selectSide(side);
+        }
+    }
 }
 
 void H17::notification(unsigned int cycleCount)
 {
-	unsigned long charPos = 0;
-	BYTE data = 0;
+    unsigned long charPos = 0;
+    BYTE data = 0;
 
-	if (motorOn_m)
-	{
-		spinCycles_m += cycleCount;
-		spinCycles_m %= (BytesPerTrack_c * CPUCyclesPerByte_c);
-		charPos = spinCycles_m / CPUCyclesPerByte_c;
-		if (charPos == curCharPos_m)
-		{
-			// Position hasn't changed just return
-			return;
-		}
-		debugss(ssH17, ALL, "New character Pos - old: %ld, new: %ld\n", curCharPos_m,
-		        charPos);
-		curCharPos_m = charPos;
-	}
-	else
-	{
-		// Drive motor is not turned on. Nothing to do.
-		/// \todo determine if we need to use clock to determine when these occur.
-		// These are needed for drive detection.
-		if ((curDrive_m < maxDiskDrive_c ) && (drives_m[curDrive_m]))
-		{
-			transmitterBufferEmpty_m = true;
-			fillCharTransmitted_m    = true;
-		}
-		else
-		{
-			transmitterBufferEmpty_m = false;
-			fillCharTransmitted_m    = false;
-		}
-		return;
-	}
+    if (motorOn_m)
+    {
+        spinCycles_m += cycleCount;
+        spinCycles_m %= (BytesPerTrack_c * CPUCyclesPerByte_c);
+        charPos = spinCycles_m / CPUCyclesPerByte_c;
 
-	if (!(curDrive_m < maxDiskDrive_c))
-	{
-	    /// Idle case, this will happen when no drive activity is expected.
-	    /// \todo don't call this and make this an warning again
-		debugss(ssH17, ALL, "%s: Invalid Drive: %d\n", __FUNCTION__, curDrive_m);
-		return;
-	}
+        if (charPos == curCharPos_m)
+        {
+            // Position hasn't changed just return
+            return;
+        }
 
-	switch (state_m)
-	{
-	case idleState:
-		debugss(ssH17, INFO, "%s: Idle State\n", __FUNCTION__);
-		/// do nothing
-		break;
+        debugss(ssH17, ALL, "New character Pos - old: %ld, new: %ld\n", curCharPos_m,
+                charPos);
+        curCharPos_m = charPos;
+    }
 
-	case seekingSyncState:
-		// check to see if character matches sync, -> set set sync found
-		// also load data buffer.
-		if (drives_m[curDrive_m])
-		{
-		    data = drives_m[curDrive_m]->readData(curCharPos_m);
-			debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
-					curDrive_m, data);
-		}
-		else
-		{
-			debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
-					__FUNCTION__, curDrive_m);
-			// should we return here...
-		}
+    else
+    {
+        // Drive motor is not turned on. Nothing to do.
+        /// \todo determine if we need to use clock to determine when these occur.
+        // These are needed for drive detection.
+        if ((curDrive_m < maxDiskDrive_c) && (drives_m[curDrive_m]))
+        {
+            transmitterBufferEmpty_m = true;
+            fillCharTransmitted_m    = true;
+        }
 
-		if (data == syncChar_m)
-		{
-			debugss(ssH17, INFO, "%s: found sync\n",__FUNCTION__);
-			receiverOutputRegister_m = data;
-			syncCharacterReceived_m = true;
-			receiveDataAvail_m = true; /// \todo determine if this should be set.
-			state_m = readingState;
-		}
-		break;
+        else
+        {
+            transmitterBufferEmpty_m = false;
+            fillCharTransmitted_m    = false;
+        }
 
-	case readingState:
-		// determine if new character is to be moved into receive buffer,
-		//   if so, determine if receive buffer is empty.
-		//     if not, set ReceiverOverrun_Flag
-		//   store new character in receiver buffer
-		//
-		if (receiveDataAvail_m)
-		{
-		    /// \todo determine why this is coming out when idle - set back to info
-			debugss(ssH17, ALL, "%s: Receiver Overrun\n",__FUNCTION__);
-			// last data byte was not read, set overrun
-			receiverOverrun_m = true;
-		}
-		if (drives_m[curDrive_m])
-		{
-		    data = drives_m[curDrive_m]->readData(curCharPos_m);
-		}
-		debugss(ssH17, ALL, "%s: Reading - Pos: %ld Data: %d\n",
-		        __FUNCTION__, curCharPos_m, data);
-		receiverOutputRegister_m = data;
-		receiveDataAvail_m = true;
-		break;
+        return;
+    }
 
-	case writingState:
-		// Determine if transmitter Holding is empty,
-		//    if so,
+    if (!(curDrive_m < maxDiskDrive_c))
+    {
+        /// Idle case, this will happen when no drive activity is expected.
+        /// \todo don't call this and make this an warning again
+        debugss(ssH17, ALL, "%s: Invalid Drive: %d\n", __FUNCTION__, curDrive_m);
+        return;
+    }
+
+    switch (state_m)
+    {
+    case idleState:
+        debugss(ssH17, INFO, "%s: Idle State\n", __FUNCTION__);
+        /// do nothing
+        break;
+
+    case seekingSyncState:
+
+        // check to see if character matches sync, -> set set sync found
+        // also load data buffer.
+        if (drives_m[curDrive_m])
+        {
+            data = drives_m[curDrive_m]->readData(curCharPos_m);
+            debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
+                    curDrive_m, data);
+        }
+
+        else
+        {
+            debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
+                    __FUNCTION__, curDrive_m);
+            // should we return here...
+        }
+
+        if (data == syncChar_m)
+        {
+            debugss(ssH17, INFO, "%s: found sync\n", __FUNCTION__);
+            receiverOutputRegister_m = data;
+            syncCharacterReceived_m = true;
+            receiveDataAvail_m = true; /// \todo determine if this should be set.
+            state_m = readingState;
+        }
+
+        break;
+
+    case readingState:
+
+        // determine if new character is to be moved into receive buffer,
+        //   if so, determine if receive buffer is empty.
+        //     if not, set ReceiverOverrun_Flag
+        //   store new character in receiver buffer
+        //
+        if (receiveDataAvail_m)
+        {
+            /// \todo determine why this is coming out when idle - set back to info
+            debugss(ssH17, ALL, "%s: Receiver Overrun\n", __FUNCTION__);
+            // last data byte was not read, set overrun
+            receiverOverrun_m = true;
+        }
+
+        if (drives_m[curDrive_m])
+        {
+            data = drives_m[curDrive_m]->readData(curCharPos_m);
+        }
+
+        debugss(ssH17, ALL, "%s: Reading - Pos: %ld Data: %d\n",
+                __FUNCTION__, curCharPos_m, data);
+        receiverOutputRegister_m = data;
+        receiveDataAvail_m = true;
+        break;
+
+    case writingState:
+
+        // Determine if transmitter Holding is empty,
+        //    if so,
         //         write fill character.
-		//         set fill character transmitted flag.
-		//    else
-		//         transmit from buffer, empty buffer.
-		if (transmitterBufferEmpty_m)
-		{
-			data = fillChar_m;
-			fillCharTransmitted_m = true;
-			debugss(ssH17, ERROR, "%s: fill char sent Pos: %ld\n",
-			        __FUNCTION__, curCharPos_m);
-		}
-		else
-		{
-			data = transmitterHoldingRegister_m;
-			transmitterBufferEmpty_m = true;
-			debugss(ssH17, ALL, "%s: Writing - Pos: %ld Data: %d\n", __FUNCTION__,
-			        curCharPos_m, data);
-		}
+        //         set fill character transmitted flag.
+        //    else
+        //         transmit from buffer, empty buffer.
+        if (transmitterBufferEmpty_m)
+        {
+            data = fillChar_m;
+            fillCharTransmitted_m = true;
+            debugss(ssH17, ERROR, "%s: fill char sent Pos: %ld\n",
+                    __FUNCTION__, curCharPos_m);
+        }
 
-		if (drives_m[curDrive_m])
-		{
-		    drives_m[curDrive_m]->writeData(curCharPos_m, data);
-		}
-		else
-		{
+        else
+        {
+            data = transmitterHoldingRegister_m;
+            transmitterBufferEmpty_m = true;
+            debugss(ssH17, ALL, "%s: Writing - Pos: %ld Data: %d\n", __FUNCTION__,
+                    curCharPos_m, data);
+        }
+
+        if (drives_m[curDrive_m])
+        {
+            drives_m[curDrive_m]->writeData(curCharPos_m, data);
+        }
+
+        else
+        {
             debugss(ssH17, INFO, "%s: No Valid Drive - Pos: %ld\n", __FUNCTION__,
                     curCharPos_m);
-		}
-		break;
-	}
+        }
+
+        break;
+    }
 }

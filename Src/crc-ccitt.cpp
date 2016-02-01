@@ -64,7 +64,7 @@ const WORD CRC_CCITT::crctable[256] =
 
 CRC_CCITT::CRC_CCITT()
 {
-	initCRC();
+    initCRC();
 }
 
 CRC_CCITT::~CRC_CCITT()
@@ -74,7 +74,7 @@ CRC_CCITT::~CRC_CCITT()
 
 void CRC_CCITT::initCRC()
 {
-	crc_m = initValue_c;
+    crc_m = initValue_c;
 }
 
 void CRC_CCITT::updateCRC(BYTE val)
@@ -84,5 +84,5 @@ void CRC_CCITT::updateCRC(BYTE val)
 
 WORD CRC_CCITT::getCRC()
 {
-	return crc_m;
+    return crc_m;
 }
