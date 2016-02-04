@@ -52,6 +52,10 @@ void setDebugLevel()
     debugLevel[ssGpp]        = defaultLevel;  // General Purpose Port
     debugLevel[ssParallel]   = defaultLevel;  // Parallel Port Interface (Z47)
     debugLevel[ssStdioConsole] = defaultLevel;
+    debugLevel[ssMMS77316]   = defaultLevel;
+    debugLevel[ssWD1797]   = defaultLevel;
+    debugLevel[ssGenericFloppyDrive]   = defaultLevel;
+    debugLevel[ssRawFloppyImage]   = defaultLevel;
 }
 
 void setDebug(subSystems ss, logLevel level)

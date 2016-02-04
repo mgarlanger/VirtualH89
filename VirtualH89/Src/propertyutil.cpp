@@ -282,3 +282,17 @@ void PropertyUtil::print(std::ostream& os, PropertyMapT& map)
         os << (*it).first << "=" << (*it).second << std::endl;
     }
 }
+
+std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
+{
+    std::vector<std::string> args;
+    std::istringstream ss(prop);
+    std::string arg;
+
+    while (ss >> arg)
+    {
+        args.push_back(arg);
+    }
+
+    return args;
+}

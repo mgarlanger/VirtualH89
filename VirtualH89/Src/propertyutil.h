@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
 
 class PropertyUtil
 {
@@ -26,6 +27,7 @@ class PropertyUtil
     static void write(const char *filename, PropertyMapT& map, const char *header = NULL);
     static void write(std::ostream& os, PropertyMapT& map, const char *header = NULL);
     static void print(std::ostream& os, PropertyMapT& map);
+    static std::vector<std::string> splitArgs(std::string prop);
 
   private:
 

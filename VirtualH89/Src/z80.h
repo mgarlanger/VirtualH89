@@ -16,6 +16,7 @@
 #include "config.h"
 
 #include <csignal>
+#include <vector>
 
 #include "AddressBus.h"
 
@@ -32,9 +33,11 @@ typedef void (Z80::*xd_cbMethod)(BYTE&);
 /// to C++ and more of the undocumented opcodes have been implemented. Also, fixed
 /// a few of the flags for opcodes like DAA.
 ///
-class Z80: public virtual CPU
+class Z80: public CPU
 {
   private:
+    std::vector<intrHook *> intrHooks;
+    unsigned long checkInter();
     // data
 
     // Registers
@@ -151,7 +154,10 @@ class Z80: public virtual CPU
     Z80(int clockRate, int ticksPerSecond);
     virtual ~Z80();
 
+    virtual void registerInter(intrCheck *func, void *data);
+    virtual void unregisterInter(intrCheck *func);
     virtual void continueRunning(void);
+    virtual void waitState(void);
 
     virtual void reset(void);
 

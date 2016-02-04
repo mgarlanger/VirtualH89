@@ -20,6 +20,8 @@
 #include "h37.h"
 #include "Z47Interface.h"
 #include "Z47Controller.h"
+#include "mms77316.h"
+#include "RawFloppyImage.h"
 #include "ParallelLink.h"
 #include "h-17-1.h"
 #include "h-17-4.h"
@@ -32,8 +34,13 @@
 #include "propertyutil.h"
 
 #include <stdlib.h>
+#include <vector>
 
-H89::H89()
+H89::H89(): Computer()
+{
+}
+
+void H89::buildSystem()
 {
 }
 
@@ -79,8 +86,12 @@ void H89::buildSystem(Console *console)
     cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
     interruptController = new InterruptController(cpu);
     ab    = new AddressBus(interruptController);
-    h17   = new H17(H17_BaseAddress_c);
+    cpu->setAddressBus(ab);
+    cpu->setSpeed(false);
+    timer       = new H89Timer(cpu, interruptController);
+    h19 = new H19;
 
+    h17   = new H17(H17_BaseAddress_c);
     // create the floppy drives for the hard-sectored controller.
     driveUnitH0 = new H_17_1;
     driveUnitH1 = new H_17_4;
@@ -138,11 +149,45 @@ void H89::buildSystem(Console *console)
     eight1      = nullptr;
 #endif
 
-    timer       = new H89Timer(cpu, interruptController);
+    MMS77316 *m316 = NULL;
+    // TODO: not all slots are identical, handle restrictions...
+    // Could have a Slot object with more details...
+    std::vector<std::string> devslots = { "slot_p504", "slot_p505", "slot_p506" };
+
+    for (int x = 0; x < devslots.size(); ++x)
+    {
+        s = props[devslots[x]];
+
+        if (s.compare("MMS77316"))
+        {
+            m316 = MMS77316::install_MMS77316(props, devslots[x]);
+        }
+
+        else if (s.compare("H17"))
+        {
+        }
+        else if (s.compare("H37"))
+        {
+        }
+        else if (s.compare("H47"))
+        {
+        }
+    }
+
     h89io       = new H89_IO;
     nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
     nmi2        = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
-    gpp         = new GeneralPurposePort;
+    s = props["sw501"];
+
+    if (!s.empty())
+    {
+        gpp = new GeneralPurposePort(s);
+    }
+
+    else
+    {
+        gpp = new GeneralPurposePort();
+    }
 
     // Serial Ports.
     consolePort = new INS8250(Serial_Console_c, Serial_Console_Interrupt_c);
@@ -262,9 +307,6 @@ void H89::buildSystem(Console *console)
 
     consolePort->attachDevice(console);
 
-    cpu->setAddressBus(ab);
-    cpu->setSpeed(false);
-
     h89io->addDevice(gpp);
     h89io->addDevice(nmi1);
     h89io->addDevice(nmi2);
@@ -278,6 +320,11 @@ void H89::buildSystem(Console *console)
 #else
     h89io->addDevice(z47If);
 #endif
+
+    if (m316 != NULL)
+    {
+        h89io->addDevice(m316);
+    }
 
     // Connect all the floppy drives for the hard-sectored controller.
     h17->connectDrive(0, driveUnitH0);
@@ -394,6 +441,16 @@ void H89::raiseNMI(void)
     cpu->raiseNMI();
 }
 
+void H89::registerInter(Z80::intrCheck *func, void *data)
+{
+    cpu->registerInter(func, data);
+}
+
+void H89::unregisterInter(Z80::intrCheck *func)
+{
+    cpu->unregisterInter(func);
+}
+
 void H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
@@ -409,6 +466,11 @@ void H89::lowerINT(int level)
 void H89::continueCPU(void)
 {
     cpu->continueRunning();
+}
+
+void H89::waitCPU(void)
+{
+    cpu->waitState();
 }
 
 H89_IO& H89::getIO()

@@ -150,6 +150,8 @@ class H89 : public Computer
     virtual ~H89();
     void buildSystem(Console *console);
 
+    void buildSystem();
+
     virtual void reset();
     virtual BYTE run();
     virtual H89Timer& getTimer();
@@ -159,10 +161,13 @@ class H89 : public Computer
     virtual void keypress(BYTE ch);
     virtual void display();
 
+    virtual void registerInter(CPU::intrCheck *func, void *data);
+    virtual void unregisterInter(CPU::intrCheck *func);
     virtual void raiseINT(int level);
     virtual void lowerINT(int level);
     virtual void raiseNMI(void);
     virtual void continueCPU(void);
+    virtual void waitCPU(void);
 
     virtual void disableROM();
     virtual void enableROM();

@@ -19,9 +19,25 @@ class AddressBus;
 ///
 class CPU
 {
+  public:
+    static const unsigned long NO_INTR_INST = ((unsigned long) - 1);
+    typedef unsigned long intrCheck(void *arg, int level);
+  protected:
+    struct intrHook
+    {
+        intrCheck *func;
+        void *data;
+        intrHook(intrCheck *func, void *data)
+        {
+            this->func = func;
+            this->data = data;
+        }
+    };
+
   private:
 
   public:
+
     CPU();
     virtual ~CPU();
 
@@ -35,6 +51,7 @@ class CPU
     virtual void setAddressBus(AddressBus *ab) = 0;
     virtual void setSpeed(bool fast) = 0;
     virtual void continueRunning(void) = 0;
+    virtual void waitState(void) = 0;
 
 };
 

@@ -32,7 +32,7 @@ INS8250::INS8250(BYTE base, int intLevel): IODevice(base, 8),
     saveLCR(0),
     saveMCR(0),
     saveLSR(0),
-    saveMSR(0)
+    saveMSR(MSB_ClearToSend | MSB_DataSetReady)
 
 {
     intLevel_m = intLevel;

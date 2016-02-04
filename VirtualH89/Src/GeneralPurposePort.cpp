@@ -10,6 +10,7 @@
 #include "logger.h"
 #include "h89-timer.h"
 #include "IODevice.h"
+#include <stdlib.h>
 
 const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Count_c] =
 {
@@ -28,7 +29,19 @@ GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPor
     curSide_m(-1),
     fast_m(false)
 {
+    dipsw_m = (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
 
+}
+
+GeneralPurposePort::GeneralPurposePort(std::string settings):
+    IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
+    mms128k_Unlocked(false),
+    mms128k_Unlock_Pos(0),
+    curSide_m(-1),
+    fast_m(false)
+{
+    // TODO: verify a binary string and/or handle other formats/nmenonics.
+    dipsw_m = strtol(settings.c_str(), NULL, 2);
 }
 
 GeneralPurposePort::~GeneralPurposePort()
@@ -118,9 +131,7 @@ BYTE GeneralPurposePort::in(BYTE addr)
 
     if (verifyPort(addr))
     {
-        //return(Mtr89_MemoryTest_Off_c);
-
-        return (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
+        return dipsw_m;
     }
 
     return (0);

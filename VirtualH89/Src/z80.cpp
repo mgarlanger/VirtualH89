@@ -9,6 +9,7 @@
 
 #include <ctime>
 #include <cassert>
+#include <strings.h>
 #include "H89.h"
 #include "WallClock.h"
 #include "disasm.h"
@@ -1335,7 +1336,8 @@ inline void Z80::SET_ZSP_FLAGS(BYTE val)
 /// @param clockRate Speed of the Z80 in cycles per second.
 /// @param ticksPerSecond Number of interrupts per second for the clock
 ///
-Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
+Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
+    A(af.hi),
     sA(af.shi),
     F(af.lo),
     AF(af.val),
@@ -1547,9 +1549,66 @@ void Z80::lowerINT()
 
 }
 
+void Z80::registerInter(intrCheck *func, void *data)
+{
+    intrHook *hook = new intrHook(func, data);
+    intrHooks.push_back(hook);
+}
+
+void Z80::unregisterInter(intrCheck *func)
+{
+    for (std::vector<intrHook *>::iterator iter = intrHooks.begin();
+            iter != intrHooks.end(); ++iter)
+    {
+        if (func == (*iter)->func)
+        {
+            intrHook *hook = (*iter);
+            intrHooks.erase(iter);
+            delete hook;
+            break;
+        }
+    }
+}
+
+unsigned long Z80::checkInter()
+{
+    unsigned long intr = NO_INTR_INST;
+
+    // only highest priority interrupt is serviced...
+    int level = ffs(intLevel_m & 0x0ff);
+
+    if (level == 0)
+    {
+        // should not happen.
+        return intr;
+    }
+
+    --level;
+
+    for (std::vector<intrHook *>::iterator iter = intrHooks.begin();
+            iter != intrHooks.end(); ++iter)
+    {
+        intr = (*iter)->func((*iter)->data, level);
+
+        if (intr != NO_INTR_INST)
+        {
+            intLevel_m &= ~(1 << level);
+            return intr;
+        }
+    }
+
+    return intr;
+}
+
 void Z80::continueRunning(void)
 {
     mode = cm_running;
+}
+
+void Z80::waitState(void)
+{
+    WallClock::instance()->addTicks(1);
+    // TODO: anything else needs to make progress?
 }
 
 ///
@@ -1781,6 +1840,15 @@ BYTE Z80::execute(WORD numInst)
             continue;
         }
 
+        // If in halt, we just do a NOP, without any PC changes.
+        if (mode == cm_halt)
+        {
+            ticks -= 4;
+            lastInstTicks = ticks; // don't double-bill next instruction
+            WallClock::instance()->addTicks(4);
+            continue;
+        }
+
         //traceInstructions();
         lastInstByte = curInst[0] = readInst();
         (this->*op_code[curInst[0]])();
@@ -1796,11 +1864,6 @@ BYTE Z80::execute(WORD numInst)
 #else
         R++;            /* increment refresh register */
 #endif
-
-        if (mode == cm_halt)
-        {
-            --PC;
-        }
 
 #ifdef WANT_GUI
         check_gui_break();
