@@ -50,6 +50,8 @@ void RawFloppyImage::getAddrMark(BYTE *tp, int nbytes,
 
 void RawFloppyImage::eject(char const *file)
 {
+    // flush data...
+    cacheTrack(-1, -1);
 }
 
 void RawFloppyImage::dump()
@@ -62,7 +64,8 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
     imageFd_m(-1),
     bufferedTrack_m(-1),
     bufferedSide_m(-1),
-    bufferDirty_m(false)
+    bufferDirty_m(false),
+    writePos_m(-1)
 {
     if (argv.size() < 1)
     {
@@ -80,47 +83,47 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
 
     for (int x = 1; x < argv.size(); ++x)
     {
-        if (argv[x].compare("sd"))
+        if (argv[x].compare("sd") == 0)
         {
             sd = true;
         }
 
-        else if (argv[x].compare("dd"))
+        else if (argv[x].compare("dd") == 0)
         {
             dd = true;
         }
 
-        else if (argv[x].compare("ss"))
+        else if (argv[x].compare("ss") == 0)
         {
             ss = true;
         }
 
-        else if (argv[x].compare("ds"))
+        else if (argv[x].compare("ds") == 0)
         {
             ds = true;
         }
 
-        else if (argv[x].compare("st"))
+        else if (argv[x].compare("st") == 0)
         {
             st = true;
         }
 
-        else if (argv[x].compare("dt"))
+        else if (argv[x].compare("dt") == 0)
         {
             dt = true;
         }
 
-        else if (argv[x].compare("5"))
+        else if (argv[x].compare("5") == 0)
         {
             media = 5;
         }
 
-        else if (argv[x].compare("8"))
+        else if (argv[x].compare("8") == 0)
         {
             media = 8;
         }
 
-        else if (argv[x].compare("rw"))
+        else if (argv[x].compare("rw") == 0)
         {
             writeProtect_m = false;
         }
@@ -331,11 +334,13 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
         if (est_trks > 80)
         {
             numSides_m = 2;
+            numTracks_m = 80;
         }
 
         else if (est_trks < 80)
         {
             numSides_m = 1;
+            numTracks_m = 40;
         }
     }
 
@@ -464,8 +469,8 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
     bufferedTrack_m = -1;
     bufferedSide_m = -1;
     bufferDirty_m = false;
-    debugss(ssRawFloppyImage, INFO, "%s: mounted floppy %s: side=%d tracks=%d spt=%d DD=%s\n",
-            __FUNCTION__, imageName_m, numSides_m, numTracks_m, numSectors_m, doubleDensity_m ? "yes" : "no");
+    debugss(ssRawFloppyImage, ERROR, "mounted %d\" floppy %s: sides=%d tracks=%d spt=%d DD=%s R%s\n",
+            mediaSize_m, imageName_m, numSides_m, numTracks_m, numSectors_m, doubleDensity_m ? "yes" : "no", writeProtect_m ? "O" : "W");
 }
 
 RawFloppyImage::~RawFloppyImage()
@@ -589,6 +594,21 @@ bool RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data
     return true;
 }
 
+bool RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
+{
+    // 'pos' is position of DATA_AM, so start writing data at next byte.
+    writePos_m = pos + 1;
+    debugss(ssRawFloppyImage, INFO, "startWrite pos=%d writePos=%d\n", pos, writePos_m);
+    return true;
+}
+
+bool RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned int pos)
+{
+    debugss(ssRawFloppyImage, INFO, "stopWrite pos=%d writePos=%d\n", pos, writePos_m);
+    writePos_m = -1;
+    return true;
+}
+
 bool RawFloppyImage::writeData(BYTE         side,
                                BYTE         track,
                                unsigned int pos,
@@ -605,6 +625,15 @@ bool RawFloppyImage::writeData(BYTE         side,
         return false;
     }
 
+    if (pos != writePos_m)
+    {
+        // fallen behind, don't trash entire track...
+        return false;
+    }
+
+    ++writePos_m;
+
+    debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", pos, data);
     // TODO: limit or control access to non-sector bytes?
     trackBuffer_m[pos] = data;
     bufferDirty_m = true;

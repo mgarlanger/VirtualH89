@@ -58,7 +58,6 @@ class WD1797 : public ClockUser
     bool dataReady_m;
     bool intrqRaised_m;
     bool drqRaised_m;
-    bool lostDataStatus_m;
     bool headLoaded_m;
     int sectorLength_m;
     bool lastIndexStatus_m;
@@ -103,8 +102,10 @@ class WD1797 : public ClockUser
         readTrackCmd,
         writeTrackCmd,
         forceInterruptCmd,
+        // pseudo-commands/states used internally
         stepDoneCmd,
         completedCmd,
+        writingSectorCmd,
         noneCmd
     };
     Command curCommand_m;
@@ -119,19 +120,19 @@ class WD1797 : public ClockUser
 
     void waitForData();
     void processCmd(BYTE cmd);
-    void processCmdTypeI(BYTE cmd, GenericFloppyDrive *drive);
-    void processCmdTypeII(BYTE cmd, GenericFloppyDrive *drive);
-    void processCmdTypeIII(BYTE cmd, GenericFloppyDrive *drive);
-    void processCmdTypeIV(BYTE cmd, GenericFloppyDrive *drive);
+    void processCmdTypeI(BYTE cmd);
+    void processCmdTypeII(BYTE cmd);
+    void processCmdTypeIII(BYTE cmd);
+    void processCmdTypeIV(BYTE cmd);
 
     void abortCmd();
     unsigned long millisecToTicks(unsigned long ms);
 
     // Controller may need to override/trap these.
-    virtual void raiseIntrq();
-    virtual void raiseDrq();
-    virtual void lowerIntrq();
-    virtual void lowerDrq();
+    virtual void raiseIntrq() = 0;
+    virtual void raiseDrq() = 0;
+    virtual void lowerIntrq() = 0;
+    virtual void lowerDrq() = 0;
     virtual void loadHead(bool load);
     virtual bool doubleDensity() = 0;
 

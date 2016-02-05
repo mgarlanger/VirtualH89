@@ -29,6 +29,8 @@ class RawFloppyImage: public GenericFloppyDisk
     ~RawFloppyImage();
 
     bool readData(BYTE side, BYTE track, unsigned int pos, int& data);
+    bool startWrite(BYTE side, BYTE track, unsigned int pos);
+    bool stopWrite(BYTE side, BYTE track, unsigned int pos);
     bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
     bool isReady();
     void eject(const char *name);
@@ -47,6 +49,7 @@ class RawFloppyImage: public GenericFloppyDisk
     bool interlaced_m;
     int gapLen_m;
     int indexGapLen_m;
+    unsigned long writePos_m;
 
     void getAddrMark(BYTE *tp, int nbytes, int& id_tk, int& id_sd, int& id_sc, int& id_sl);
     bool cacheTrack(int side, int track);

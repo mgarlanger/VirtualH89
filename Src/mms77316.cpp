@@ -135,7 +135,7 @@ BYTE MMS77316::in(BYTE addr)
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
             // might need to simulate WAIT states...
-            while (burstMode() && !dataReady_m && !intrqRaised_m)
+            while (burstMode() && !drqRaised_m && !intrqRaised_m)
             {
                 waitForData();
             }
@@ -164,7 +164,7 @@ void MMS77316::out(BYTE addr, BYTE val)
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
             // might need to simulate WAIT states...
-            while (burstMode() && !dataReady_m && !intrqRaised_m)
+            while (burstMode() && !drqRaised_m && !intrqRaised_m)
             {
                 waitForData();
             }
@@ -268,15 +268,17 @@ void MMS77316::raiseDrq()
 void MMS77316::lowerIntrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
-    h89.lowerINT(MMS77316_Intr_c);
     WD1797::lowerIntrq();
+    // TODO: only lower if !drqRaised_m, but Z80 is not handling that correctly anyway.
+    h89.lowerINT(MMS77316_Intr_c);
 }
 
 void MMS77316::lowerDrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
-    h89.lowerINT(MMS77316_Intr_c);
     WD1797::lowerDrq();
+    // TODO: only lower if !intrqRaised_m, but Z80 is not handling that correctly anyway.
+    h89.lowerINT(MMS77316_Intr_c);
 }
 
 void MMS77316::loadHead(bool load)

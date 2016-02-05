@@ -35,6 +35,8 @@ class GenericFloppyDisk
     }
 
     virtual bool readData(BYTE side, BYTE track, unsigned int pos, int& data) = 0;
+    virtual bool startWrite(BYTE side, BYTE track, unsigned int pos) = 0;
+    virtual bool stopWrite(BYTE side, BYTE track, unsigned int pos) = 0;
     virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data) = 0;
     virtual bool isReady() = 0;
     virtual void eject(const char *name) = 0;

@@ -51,7 +51,6 @@ WD1797::WD1797(int baseAddr): ClockUser(),
     statusReg_m(0),
     intrqRaised_m(false),
     dataReady_m(false),
-    lostDataStatus_m(false),
     seekSpeed_m(0),
     verifyTrack_m(false),
     multiple_m(false),
@@ -97,7 +96,6 @@ void WD1797::reset(void)
 
     intrqRaised_m       = false;
     dataReady_m         = false;
-    lostDataStatus_m    = false;
 }
 
 BYTE WD1797::in(BYTE addr)
@@ -160,6 +158,8 @@ void WD1797::out(BYTE addr, BYTE val)
     {
     case CommandPort_Offset_c:
         debugss(ssWD1797, INFO, "WD1797::out(CommandPort): %02x\n", val);
+        // MUST tolerate changing of selected disk *after* setting command...
+        // timing is tricky...
         indexCount_m = 0;
         cmdReg_m = val;
         processCmd(val);
@@ -176,12 +176,12 @@ void WD1797::out(BYTE addr, BYTE val)
         break;
 
     case DataPort_Offset_c:
-        debugss(ssWD1797, INFO, "WD1797::out(DataPort): %d\n", val);
+        debugss(ssWD1797, INFO, "WD1797::out(DataPort): %02x\n", val);
 
         // unpredictable results if !dataReady_m... (data changed while being written).
-        // other mechanisms detect lostDataStatus_m, which is different.
+        // other mechanisms detect lostData, which is different.
         dataReg_m = val;
-        dataReady_m = false;
+        dataReady_m = true;
         lowerDrq();
         break;
 
@@ -209,20 +209,13 @@ void WD1797::processCmd(BYTE cmd)
         //return;
     }
 
-    GenericFloppyDrive *drive = getCurDrive();
+    // Can't reference drive here... it could be about to change.
+    //GenericFloppyDrive *drive = getCurDrive();
 
     // First check for the Force Interrupt command
     if ((cmd & cmd_Mask_c) == cmd_ForceInterrupt_c)
     {
-        processCmdTypeIV(cmd, drive); // 'drive' might be NULL...
-        return;
-    }
-
-    if (!drive)
-    {
-        // TODO: set some status indicator.
-        statusReg_m |= stat_NotReady_c;
-        raiseIntrq();
+        processCmdTypeIV(cmd);
         return;
     }
 
@@ -234,26 +227,28 @@ void WD1797::processCmd(BYTE cmd)
     if ((cmd & 0x80) == 0x00)
     {
         // Type I commands
-        processCmdTypeI(cmd, drive);
+        processCmdTypeI(cmd);
     }
 
     else if ((cmd & 0x40) == 0x00)
     {
         // Type II commands
-        processCmdTypeII(cmd, drive);
+        processCmdTypeII(cmd);
     }
 
     else
     {
         // must be Type III command
-        processCmdTypeIII(cmd, drive);
+        processCmdTypeIII(cmd);
     }
 }
 
-void WD1797::processCmdTypeI(BYTE cmd, GenericFloppyDrive *drive)
+void WD1797::processCmdTypeI(BYTE cmd)
 {
     verifyTrack_m = ((cmd & cmdop_VerifyTrack_c) != 0);
     seekSpeed_m = speeds[cmd & cmdop_StepMask_c];
+    lowerDrq();
+    dataReady_m = false;
 
     if (getClockPeriod() > 500)
     {
@@ -308,21 +303,26 @@ void WD1797::processCmdTypeI(BYTE cmd, GenericFloppyDrive *drive)
         }
     }
 
+    // Drive selection might change, need to delay start of command...
+    stepSettle_m = 50;
+
     // TODO: detect track0
     // statusReg_m |= stat_TrackZero_c;
 
 }
 
-void WD1797::processCmdTypeII(BYTE cmd, GenericFloppyDrive *drive)
+void WD1797::processCmdTypeII(BYTE cmd)
 {
     multiple_m     = ((cmd & cmdop_MultipleRecord_c) != 0);
     delay_m        = ((cmd & cmdop_Delay_15ms_c) != 0);
     sectorLength_m = ((cmd & cmdop_SectorLength_c) != 0 ? 1 : 0);
     side_m         = ((cmd & cmdop_UpdateSSO_c) >> cmdop_UpdateSSO_Shift_c);
     loadHead(true);
-    drive->selectSide(side_m);
 
     debugss(ssWD1797, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
+    lowerDrq();
+    dataReady_m = false;
+    sectorPos_m = -11;
 
     if ((cmd & 0x20) == 0x20)
     {
@@ -336,9 +336,6 @@ void WD1797::processCmdTypeII(BYTE cmd, GenericFloppyDrive *drive)
 
         debugss(ssWD1797, INFO, "%s - Write Sector - \n", __FUNCTION__);
         curCommand_m = writeSectorCmd;
-        lostDataStatus_m = false;
-        dataReady_m = false;
-        sectorPos_m = -11;
     }
 
     else
@@ -347,20 +344,17 @@ void WD1797::processCmdTypeII(BYTE cmd, GenericFloppyDrive *drive)
         debugss(ssWD1797, INFO, "%s - Read Sector: %d - multi: %d delay: %d sector: %d side: %d\n",
                 __FUNCTION__, sectorReg_m, multiple_m, delay_m, sectorLength_m, side_m);
         curCommand_m = readSectorCmd;
-        lostDataStatus_m = false;
-        dataReady_m = false;
-        sectorPos_m = -11;
     }
-
-    updateReady(drive);
 }
 
-void WD1797::processCmdTypeIII(BYTE cmd, GenericFloppyDrive *drive)
+void WD1797::processCmdTypeIII(BYTE cmd)
 {
     delay_m = ((cmd & cmdop_Delay_15ms_c) != 0);
     side_m = ((cmd & cmdop_UpdateSSO_c) >> cmdop_UpdateSSO_Shift_c);
     loadHead(true);
-    drive->selectSide(side_m);
+    lowerDrq();
+    dataReady_m = false;
+    sectorPos_m = -11;
 
     debugss(ssWD1797, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
 
@@ -393,15 +387,15 @@ void WD1797::processCmdTypeIII(BYTE cmd, GenericFloppyDrive *drive)
         debugss(ssWD1797, ERROR, "%s - Invalid type-III cmd: %x\n", __FUNCTION__, cmd);
         statusReg_m &= ~stat_Busy_c;
     }
-
-    updateReady(drive);
 }
 
 // 'drive' might be NULL.
-void WD1797::processCmdTypeIV(BYTE cmd, GenericFloppyDrive *drive)
+void WD1797::processCmdTypeIV(BYTE cmd)
 {
     debugss(ssWD1797, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
     loadHead(false);
+    // we assume drive won't change for Type IV commands...
+    GenericFloppyDrive *drive = getCurDrive();
 
     curCommand_m = forceInterruptCmd;
 
@@ -506,7 +500,6 @@ void WD1797::transferData(int data)
     if (dataReady_m)
     {
         statusReg_m |= stat_LostData_c;
-        lostDataStatus_m = true;
     }
 
     dataReady_m = true;
@@ -533,8 +526,13 @@ void WD1797::notification(unsigned int cycleCount)
 
     if (!drive)
     {
+        // TODO: set some status indicator.
+        statusReg_m |= stat_NotReady_c;
+        // TODO: abort command?
         return;
     }
+
+    statusReg_m &= ~stat_NotReady_c;
 
     drive->notification(cycleCount);
 
@@ -584,7 +582,7 @@ void WD1797::notification(unsigned int cycleCount)
             if (!drive->getTrackZero())
             {
                 drive->step(false);
-                stepSettle_m = millisecToTicks(seekSpeed_m);
+                stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
             }
 
             else
@@ -605,7 +603,7 @@ void WD1797::notification(unsigned int cycleCount)
             bool dir = (dataReg_m > trackReg_m);
             drive->step(dir);
             trackReg_m += (dir ? 1 : -1);
-            stepSettle_m = millisecToTicks(seekSpeed_m);
+            stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
         }
 
         else
@@ -651,7 +649,7 @@ void WD1797::notification(unsigned int cycleCount)
             if (!drive->getTrackZero())
             {
                 drive->step(false);
-                stepSettle_m = millisecToTicks(seekSpeed_m);
+                stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
 
                 if (stepUpdate_m)
                 {
@@ -665,7 +663,7 @@ void WD1797::notification(unsigned int cycleCount)
             debugss(ssWD1797, INFO, "%s - step in\n", __FUNCTION__);
 
             drive->step(true);
-            stepSettle_m = millisecToTicks(seekSpeed_m);
+            stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
 
             if (stepUpdate_m)
             {
@@ -715,9 +713,11 @@ void WD1797::notification(unsigned int cycleCount)
 
     case readAddressCmd:
     case readSectorCmd:
+    case writeSectorCmd:
         {
             debugss(ssWD1797, ALL, "%s: sectorPos_m: %d\n", __FUNCTION__,
                     sectorPos_m);
+            drive->selectSide(side_m);
 
             if (indexCount_m > 2)
             {
@@ -768,6 +768,11 @@ void WD1797::notification(unsigned int cycleCount)
                     {
                         sectorPos_m = -11;
                     }
+
+                    else if (curCommand_m == writeSectorCmd)
+                    {
+                        raiseDrq();
+                    }
                 }
             }
 
@@ -786,6 +791,12 @@ void WD1797::notification(unsigned int cycleCount)
                 {
                     // At DATA AM, start getting sector data...
                     sectorPos_m = 0;
+
+                    if (curCommand_m == writeSectorCmd)
+                    {
+                        drive->startWrite(doubleDensity(), curPos_m);
+                        curCommand_m = writingSectorCmd;
+                    }
                 }
             }
 
@@ -804,20 +815,54 @@ void WD1797::notification(unsigned int cycleCount)
             break;
         }
 
-    case writeSectorCmd:
+    case writingSectorCmd:
+        {
+            BYTE data = dataReg_m;
 
-        break;
+            if (!dataReady_m)
+            {
+                statusReg_m |= stat_LostData_c;
+                data = 0;
+            }
+
+            dataReady_m = false;
+
+            if (!drive->writeData(doubleDensity(), curPos_m, data))
+            {
+                // what to do here.
+            }
+
+            ++sectorPos_m;
+
+            if (sectorPos_m >= sectorLen(addr_m))
+            {
+                drive->stopWrite(doubleDensity(), curPos_m);
+                sectorPos_m = -11;
+                curCommand_m = noneCmd;
+                statusReg_m &= ~stat_Busy_c;
+                raiseIntrq();
+            }
+
+            else
+            {
+                raiseDrq();
+            }
+
+            break;
+        }
 
     case readTrackCmd:
-
+        drive->selectSide(side_m);
+        // TODO: implement this
         break;
 
     case writeTrackCmd:
-
+        drive->selectSide(side_m);
+        // TODO: implement this
         break;
 
     case forceInterruptCmd:
-
+        // TODO: watch for event(s) and raise interrupt when seen...
         break;
     }
 

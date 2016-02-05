@@ -158,18 +158,18 @@ void H89::buildSystem(Console *console)
     {
         s = props[devslots[x]];
 
-        if (s.compare("MMS77316"))
+        if (s.compare("MMS77316") == 0)
         {
             m316 = MMS77316::install_MMS77316(props, devslots[x]);
         }
 
-        else if (s.compare("H17"))
+        else if (s.compare("H17") == 0)
         {
         }
-        else if (s.compare("H37"))
+        else if (s.compare("H37") == 0)
         {
         }
-        else if (s.compare("H47"))
+        else if (s.compare("H47") == 0)
         {
         }
     }

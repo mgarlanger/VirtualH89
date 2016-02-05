@@ -64,32 +64,32 @@ GenericFloppyDrive *GenericFloppyDrive::getInstance(std::string type)
 {
     DriveType etype;
 
-    if (type.compare("FDD_5_25_SS_ST"))
+    if (type.compare("FDD_5_25_SS_ST") == 0)
     {
         etype = FDD_5_25_SS_ST;
     }
 
-    else if (type.compare("FDD_5_25_SS_DT"))
+    else if (type.compare("FDD_5_25_SS_DT") == 0)
     {
         etype = FDD_5_25_SS_DT;
     }
 
-    else if (type.compare("FDD_5_25_DS_ST"))
+    else if (type.compare("FDD_5_25_DS_ST") == 0)
     {
         etype = FDD_5_25_DS_ST;
     }
 
-    else if (type.compare("FDD_5_25_DS_DT"))
+    else if (type.compare("FDD_5_25_DS_DT") == 0)
     {
         etype = FDD_5_25_DS_DT;
     }
 
-    else if (type.compare("FDD_8_SS"))
+    else if (type.compare("FDD_8_SS") == 0)
     {
         etype = FDD_8_SS;
     }
 
-    else if (type.compare("FDD_8_DS"))
+    else if (type.compare("FDD_8_DS") == 0)
     {
         etype = FDD_8_DS;
     }
@@ -167,6 +167,36 @@ int GenericFloppyDrive::readData(bool dd, unsigned long pos)
     }
 
     return data;
+}
+
+bool GenericFloppyDrive::startWrite(bool dd, unsigned long pos)
+{
+    if (!disk_m)
+    {
+        return false;
+    }
+
+    if (dd != disk_m->doubleDensity())
+    {
+        return false;
+    }
+
+    return disk_m->startWrite(headSel_m, track_m, pos);
+}
+
+bool GenericFloppyDrive::stopWrite(bool dd, unsigned long pos)
+{
+    if (!disk_m)
+    {
+        return false;
+    }
+
+    if (dd != disk_m->doubleDensity())
+    {
+        return false;
+    }
+
+    return disk_m->stopWrite(headSel_m, track_m, pos);
 }
 
 bool GenericFloppyDrive::writeData(bool dd, unsigned long pos, BYTE data)

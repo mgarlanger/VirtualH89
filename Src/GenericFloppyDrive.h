@@ -43,6 +43,8 @@ class GenericFloppyDrive
     void selectSide(BYTE side);
 
     int readData(bool doubleDensity, unsigned long pos);
+    bool startWrite(bool doubleDensity, unsigned long pos);
+    bool stopWrite(bool doubleDensity, unsigned long pos);
     bool writeData(bool doubleDensity, unsigned long pos, BYTE data);
 
     void insertDisk(GenericFloppyDisk *disk);
