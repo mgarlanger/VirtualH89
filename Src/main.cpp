@@ -17,32 +17,15 @@
 #include <iostream>
 #include <signal.h>
 #include <stdlib.h>
-
-#if OGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glut.h>
-#endif
-#else
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#include <wx/wx.h>
-
-#endif
+#include <string>
+#include <unistd.h>
 
 #include "main.h"
 #include "H89.h"
+#include "Console.h"
+#include "h19.h"
+#include "StdioConsole.h"
 #include "logger.h"
-
-const unsigned int screenRefresh_c = 1000 / 60;
-unsigned int screenRefresh;
 
 using namespace std;
 
@@ -54,6 +37,7 @@ const char *usage_str = " -b -s -l";
 
 /// \todo - make H89 into a singleton.
 H89 h89;
+Console *console = NULL;
 
 FILE *log_out = 0;
 FILE *console_out = 0;
@@ -113,122 +97,10 @@ static void *cpuThreadFunc(void *v)
 }
 #endif
 
-#if OGL
-
-void display(void)
-{
-    h89.display();
-}
-
-void reshape(int w, int h)
-{
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, w, 0.0, h, -1.0, 1.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void timer(int i)
-{
-    static int count = 0;
-
-    if ((++count % 60) == 0)
-    {
-        fflush(console_out);
-    }
-
-    // Tell glut to redisplay the scene:
-    if (h89.checkUpdated())
-    {
-        glutPostRedisplay();
-    }
-
-    // Need to call this method again after the desired amount of time has passed:
-    glutTimerFunc(screenRefresh, timer, i);
-}
-
-void keyboard(unsigned char key, int x, int y)
-{
-    h89.keypress(key);
-}
-
-void special(int key, int x, int y)
-{
-    // NOTE: GLUT has already differentiated exact keystrokes
-    // based on modern keyboard standards. Here we just encode
-    // the modern key codes into something convenient to use
-    // in the H19 class.
-    switch (key)
-    {
-    case GLUT_KEY_F1:
-        h89.keypress('S' | 0x80);
-        break;
-
-    case GLUT_KEY_F2:
-        h89.keypress('T' | 0x80);
-        break;
-
-    case GLUT_KEY_F3:
-        h89.keypress('U' | 0x80);
-        break;
-
-    case GLUT_KEY_F4:
-        h89.keypress('V' | 0x80);
-        break;
-
-    case GLUT_KEY_F5:
-        h89.keypress('W' | 0x80);
-        break;
-
-    case GLUT_KEY_F6:
-        h89.keypress('P' | 0x80);
-        break;
-
-    case GLUT_KEY_F7:
-        h89.keypress('Q' | 0x80);
-        break;
-
-    case GLUT_KEY_F8:
-        h89.keypress('R' | 0x80);
-        break;
-
-    case GLUT_KEY_HOME:
-        h89.keypress('H' | 0x80);
-        break;
-
-    case GLUT_KEY_UP:
-        h89.keypress('A' | 0x80);
-        break;
-
-    case GLUT_KEY_DOWN:
-        h89.keypress('B' | 0x80);
-        break;
-
-    case GLUT_KEY_LEFT:
-        h89.keypress('D' | 0x80);
-        break;
-
-    case GLUT_KEY_RIGHT:
-        h89.keypress('C' | 0x80);
-        break;
-
-    default:
-        break;
-    }
-}
-#endif
-
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int main(int argc, char *argv[])
 {
     setDebugLevel();
-
-    screenRefresh = screenRefresh_c;
 
     cout << "Virtual H89" << endl << endl;
 
@@ -244,6 +116,9 @@ int main(int argc, char *argv[])
     cout << "Virtual H89 - " << H89COPYRIGHT << endl << endl;
     cout << "CPU speed is 2.048 MHz" << endl << endl;
 
+    int c;
+    extern char *optarg;
+    std::string gui("H19");
 
 #if USE_PTHREAD
 
@@ -269,38 +144,34 @@ int main(int argc, char *argv[])
         cout << "Successfully opened console.out" << endl;
     }
 
+    while ((c = getopt(argc, argv, "g:")) != EOF)
+    {
+        switch (c)
+        {
+        case 'g':
+            gui = optarg;
+            break;
+        }
+    }
+
+    if (gui.compare("stdio") == 0)
+    {
+        console = new StdioConsole(argc, argv);
+        h89.buildSystem(console);
+    }
+
+    else
+    {
+        console = new H19();
+        h89.buildSystem(console);
+    }
+
     pthread_t thread;
     pthread_create(&thread, NULL, cpuThreadFunc, &h89);
-
-#if OGL
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(640, 500);
-    glutInitWindowPosition(500, 100);
-    glutCreateWindow((char *) "Virtual Heathkit H-89 All-in-One Computer");
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-    //glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glBlendFunc(GL_ONE, GL_ONE);
-    //glBlendEquation(GL_FUNC_ADD);
-    glBlendColor(0.5, 0.5, 0.5, 0.9);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-
-    glShadeModel(GL_FLAT);
-
     h89.init();
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(special);
-    glutDisplayFunc(display);
-    glutTimerFunc(screenRefresh, timer, 1);
-    glutIgnoreKeyRepeat(1);
 
-    glutMainLoop();
-
-#endif  // OGL
+    console->run();
+    // TODO: call destructors...
 #endif  // USE_PTHREAD
 
     fclose(log_out);

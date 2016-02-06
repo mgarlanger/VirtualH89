@@ -19,14 +19,14 @@
 #include <assert.h>
 
 #include "config.h"
-#include "Terminal.h"
+#include "Console.h"
 
 /// \brief Virtual %H19 %Terminal
 ///
 /// Virtual Heathkit H19 Terminal that utilizes the GLUT framework to
 /// render a pixel accurate emulation of the terminal.
 ///
-class H19 : public Terminal//, public BaseThread
+class H19 : public Console //, public BaseThread
 {
   public:
     H19();
@@ -35,9 +35,9 @@ class H19 : public Terminal//, public BaseThread
     virtual void init();
     virtual void reset();
 
+    virtual void display();
     virtual void processCharacter(char ch);
 
-    virtual void display();
     virtual void keypress(char ch);
 
     virtual void receiveData(BYTE);
@@ -49,6 +49,15 @@ class H19 : public Terminal//, public BaseThread
     virtual void run();
 
   private:
+    static void glDisplay();
+    static void reshape(int w, int h);
+    static void timer(int i);
+    static void keyboard(unsigned char key, int x, int y);
+    static void special(int key, int x, int y);
+    static H19 *h19; // for static callback funcs
+    static const unsigned int screenRefresh_c = 1000 / 60;
+    static unsigned int screenRefresh;
+    void initGl();
 
     // screen size
     static const unsigned int cols = 80;
