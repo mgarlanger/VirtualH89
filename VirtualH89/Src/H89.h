@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "computer.h"
+#include "cpu.h"
 #include "Console.h"
 
 // Forward declare classes to avoid a tangled mess of includes.

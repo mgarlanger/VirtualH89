@@ -61,7 +61,7 @@ class logger
                         __PRETTY_FUNCTION__, __val);          \
                 fprintf(log_out, args);                       \
                 fprintf(log_out,"\x1b[0m");                   \
-                fflush(log_out);                          \
+                fflush(log_out);                              \
             }                                                 \
         }
 
@@ -121,6 +121,7 @@ enum subSystems
     ssWD1797,
     ssGenericFloppyDrive,
     ssRawFloppyImage,
+    ssStdioConsole,
     ssMax
 };
 
