@@ -159,22 +159,62 @@ void keyboard(unsigned char key, int x, int y)
 
 void special(int key, int x, int y)
 {
+    // NOTE: GLUT has already differentiated exact keystrokes
+    // based on modern keyboard standards. Here we just encode
+    // the modern key codes into something convenient to use
+    // in the H19 class.
     switch (key)
     {
+    case GLUT_KEY_F1:
+        h89.keypress('S' | 0x80);
+        break;
+
+    case GLUT_KEY_F2:
+        h89.keypress('T' | 0x80);
+        break;
+
+    case GLUT_KEY_F3:
+        h89.keypress('U' | 0x80);
+        break;
+
+    case GLUT_KEY_F4:
+        h89.keypress('V' | 0x80);
+        break;
+
+    case GLUT_KEY_F5:
+        h89.keypress('W' | 0x80);
+        break;
+
+    case GLUT_KEY_F6:
+        h89.keypress('P' | 0x80);
+        break;
+
+    case GLUT_KEY_F7:
+        h89.keypress('Q' | 0x80);
+        break;
+
+    case GLUT_KEY_F8:
+        h89.keypress('R' | 0x80);
+        break;
+
+    case GLUT_KEY_HOME:
+        h89.keypress('H' | 0x80);
+        break;
+
     case GLUT_KEY_UP:
-        h89.keypress('8');
+        h89.keypress('A' | 0x80);
         break;
 
     case GLUT_KEY_DOWN:
-        h89.keypress('2');
+        h89.keypress('B' | 0x80);
         break;
 
     case GLUT_KEY_LEFT:
-        h89.keypress('4');
+        h89.keypress('D' | 0x80);
         break;
 
     case GLUT_KEY_RIGHT:
-        h89.keypress('6');
+        h89.keypress('C' | 0x80);
         break;
 
     default:

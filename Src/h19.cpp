@@ -9,6 +9,7 @@
 #include "logger.h"
 
 #include <pthread.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -150,7 +151,22 @@ void H19::keypress(char ch)
 
     else
     {
-        sendData(ch);
+        if ((ch & 0x80) != 0)
+        {
+            // TODO: modify keycode based on current terminal mode,
+            // e.g. convert to ZDS or ANSI codes.
+            // Note difference from H19 keyboard: a modern keyboard
+            // has separate cursor keys that are always active,
+            // so it is as if the user pressed SHIFT to get the code.
+            sendData(ascii::ESC);
+            usleep(2000);
+            sendData(ch & 0x7f);
+        }
+
+        else
+        {
+            sendData(ch);
+        }
     }
 
     pthread_mutex_unlock(&h19_mutex);
