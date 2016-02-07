@@ -106,6 +106,7 @@ class WD1797 : public ClockUser
         stepDoneCmd,
         completedCmd,
         writingSectorCmd,
+        writingTrackCmd,
         noneCmd
     };
     Command curCommand_m;

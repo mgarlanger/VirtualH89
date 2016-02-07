@@ -599,8 +599,20 @@ bool RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data
 
 bool RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
 {
-    // 'pos' is position of DATA_AM, so start writing data at next byte.
-    writePos_m = pos + 1;
+    if (pos < indexGapLen_m)
+    {
+        debugss(ssRawFloppyImage, WARNING, "TrackWrite not supported by RawFloppyImage\n");
+        trackWrite_m = true;
+        writePos_m = pos;
+        return false; // Not supported
+    }
+
+    else
+    {
+        // 'pos' is position of DATA_AM, so start writing data at next byte.
+        writePos_m = pos + 1;
+    }
+
     debugss(ssRawFloppyImage, INFO, "startWrite pos=%d writePos=%d\n", pos, writePos_m);
     return true;
 }
@@ -618,6 +630,11 @@ bool RawFloppyImage::writeData(BYTE         side,
                                BYTE         data)
 {
     if (checkWriteProtect())
+    {
+        return false;
+    }
+
+    if (trackWrite_m)
     {
         return false;
     }

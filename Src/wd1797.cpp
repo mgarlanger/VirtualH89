@@ -371,6 +371,7 @@ void WD1797::processCmdTypeIII(BYTE cmd)
         // write Track
         debugss(ssWD1797, INFO, "%s - Write Track: %d\n", __FUNCTION__, trackReg_m);
         curCommand_m = writeTrackCmd;
+        raiseDrq();
 
     }
 
@@ -523,6 +524,7 @@ void WD1797::notification(unsigned int cycleCount)
 {
     unsigned long charPos = 0;
     GenericFloppyDrive *drive = getCurDrive();
+    bool indexEdge = false;
 
     if (!drive)
     {
@@ -540,6 +542,7 @@ void WD1797::notification(unsigned int cycleCount)
     {
         if (!lastIndexStatus_m)
         {
+            indexEdge = true;
             ++indexCount_m;
         }
 
@@ -740,6 +743,7 @@ void WD1797::notification(unsigned int cycleCount)
                 statusReg_m &= ~stat_Busy_c;
                 statusReg_m |= stat_CRCError_c; // a likely error
                 raiseIntrq();
+                return;
             }
 
             if (sectorPos_m < -10)
@@ -852,14 +856,89 @@ void WD1797::notification(unsigned int cycleCount)
         }
 
     case readTrackCmd:
-        drive->selectSide(side_m);
-        // TODO: implement this
-        break;
-
     case writeTrackCmd:
-        drive->selectSide(side_m);
-        // TODO: implement this
-        break;
+        {
+            drive->selectSide(side_m);
+
+            if (sectorPos_m < -10)
+            {
+                if (indexEdge)
+                {
+                    sectorPos_m = 0;
+
+                    if (curCommand_m == writeTrackCmd)
+                    {
+                        drive->startWrite(doubleDensity(), curPos_m);
+                        curCommand_m = writingTrackCmd;
+                        goto startWritingTrackNow;
+                    }
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+
+            int data = drive->readData(doubleDensity(), curPos_m);
+
+            if (data == GenericFloppyFormat::ERROR)
+            {
+                // probably density mis-match.
+                sectorPos_m = -11;
+                curCommand_m = noneCmd;
+                statusReg_m &= ~stat_Busy_c;
+                statusReg_m |= stat_CRCError_c; // a likely error
+                raiseIntrq();
+                break;
+            }
+
+            transferData(data);
+            ++sectorPos_m;
+
+            if (indexEdge)
+            {
+                sectorPos_m = -11;
+                curCommand_m = completedCmd;
+            }
+
+            break;
+        }
+
+    case writingTrackCmd:
+        if (indexEdge)
+        {
+            drive->stopWrite(doubleDensity(), curPos_m);
+            sectorPos_m = -11;
+            curCommand_m = noneCmd;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            break;
+        }
+
+startWritingTrackNow:
+        {
+
+            BYTE data = dataReg_m;
+
+            if (!dataReady_m)
+            {
+                statusReg_m |= stat_LostData_c;
+                data = 0;
+            }
+
+            dataReady_m = false;
+            raiseDrq();
+
+            if (!drive->writeData(doubleDensity(), curPos_m, data))
+            {
+                // what to do here.
+                statusReg_m |= stat_CRCError_c; // a likely error
+            }
+
+            ++sectorPos_m;
+            break;
+        }
 
     case forceInterruptCmd:
         // TODO: watch for event(s) and raise interrupt when seen...

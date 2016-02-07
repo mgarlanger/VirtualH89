@@ -50,6 +50,7 @@ class RawFloppyImage: public GenericFloppyDisk
     int gapLen_m;
     int indexGapLen_m;
     unsigned long writePos_m;
+    bool trackWrite_m;
 
     void getAddrMark(BYTE *tp, int nbytes, int& id_tk, int& id_sd, int& id_sc, int& id_sl);
     bool cacheTrack(int side, int track);
