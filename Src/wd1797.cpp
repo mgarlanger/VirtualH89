@@ -420,6 +420,12 @@ void WD1797::processCmdTypeIV(BYTE cmd)
         debugss(ssWD1797, INFO, "%s - updating statusReg: %d\n", __FUNCTION__, statusReg_m);
     }
 
+    else
+    {
+        debugss(ssWD1797, ERROR, "Type IV with no drive\n");
+        statusReg_m |= stat_NotReady_c;
+    }
+
     if ((cmd & 0x0f) != 0x00)
     {
         // TODO: Fix this, must setup background "task" waiting for event...
@@ -530,7 +536,15 @@ void WD1797::notification(unsigned int cycleCount)
     {
         // TODO: set some status indicator.
         statusReg_m |= stat_NotReady_c;
-        // TODO: abort command?
+
+        if (curCommand_m != noneCmd)
+        {
+            abortCmd();
+            // TODO: shouldn't abortCmd() do all this?
+            raiseIntrq();
+            statusReg_m &= ~stat_Busy_c;
+        }
+
         return;
     }
 
