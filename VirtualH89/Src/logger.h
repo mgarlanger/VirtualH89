@@ -121,7 +121,6 @@ enum subSystems
     ssWD1797,
     ssGenericFloppyDrive,
     ssRawFloppyImage,
-    ssStdioConsole,
     ssMax
 };
 
