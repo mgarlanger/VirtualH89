@@ -11,6 +11,7 @@
 #include "h89Types.h"
 
 #include "IODevice.h"
+#include <vector>
 
 ///
 /// \brief %H89 IO Bus
@@ -23,6 +24,8 @@ class H89_IO
     H89_IO();
     ~H89_IO();
 
+    std::vector<IODevice *>& getDiskDevices();
+    bool addDiskDevice(IODevice *device);
     bool addDevice(IODevice *device);
     bool removeDevice(IODevice *device);
 
@@ -31,6 +34,7 @@ class H89_IO
 
   private:
     IODevice *iodevices[256];
+    std::vector<IODevice *> dsk_devs;
 };
 
 #endif // H89_IO_H_

@@ -159,24 +159,27 @@ int main(int argc, char *argv[])
     if (gui.compare("stdio") == 0)
     {
         console = new StdioConsole(argc, argv);
-        h89.buildSystem(console);
     }
 
     else
     {
         console = new H19();
-        h89.buildSystem(console);
     }
+
+    h89.buildSystem(console);
 
     pthread_t thread;
     pthread_create(&thread, NULL, cpuThreadFunc, &h89);
     h89.init();
 
     console->run();
+
     // TODO: call destructors...
 #endif  // USE_PTHREAD
 
-    fclose(log_out);
-    fclose(console_out);
+    // Leave open so destructors can log messages.
+    // exit() always closes files anyway.
+    //fclose(log_out);
+    //fclose(console_out);
     return (0);
 }

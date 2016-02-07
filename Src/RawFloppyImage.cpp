@@ -52,6 +52,8 @@ void RawFloppyImage::eject(char const *file)
 {
     // flush data...
     cacheTrack(-1, -1);
+    close(imageFd_m);
+    imageFd_m = -1;
 }
 
 void RawFloppyImage::dump()
@@ -480,6 +482,7 @@ RawFloppyImage::~RawFloppyImage()
         return;
     }
 
+    debugss(ssRawFloppyImage, INFO, "unmounted %s\n", imageName_m);
     // flush data...
     cacheTrack(-1, -1);
     close(imageFd_m); // check errors?

@@ -109,8 +109,12 @@ GenericFloppyDrive::~GenericFloppyDrive()
 
 void GenericFloppyDrive::insertDisk(GenericFloppyDisk *disk)
 {
+    if (disk_m != NULL)
+    {
+        delete disk_m;
+    }
+
     disk_m = disk;
-    // anything special for removal of diskette?
 }
 
 bool GenericFloppyDrive::getTrackZero()

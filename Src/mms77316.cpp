@@ -106,6 +106,13 @@ unsigned long MMS77316::interResponder(void *data, int level)
 
 MMS77316::~MMS77316()
 {
+    for (int x = 0; x < numDisks_c; ++x)
+    {
+        if (drives_m[x] != NULL)
+        {
+            drives_m[x]->insertDisk(NULL);
+        }
+    }
 }
 
 void MMS77316::reset(void)

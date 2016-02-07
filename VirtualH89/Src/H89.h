@@ -151,8 +151,6 @@ class H89 : public Computer
     virtual ~H89();
     void buildSystem(Console *console);
 
-    void buildSystem();
-
     virtual void reset();
     virtual BYTE run();
     virtual H89Timer& getTimer();
@@ -188,6 +186,5 @@ class H89 : public Computer
 };
 
 extern H89 h89;
-
 
 #endif // H89_H_

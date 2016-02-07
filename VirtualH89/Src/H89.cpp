@@ -40,10 +40,6 @@ H89::H89(): Computer()
 {
 }
 
-void H89::buildSystem()
-{
-}
-
 void H89::buildSystem(Console *console)
 {
     PropertyUtil::PropertyMapT props;
@@ -122,7 +118,7 @@ void H89::buildSystem(Console *console)
 
     driveUnitE0 = new H47Drive;
     driveUnitE1 = new H47Drive;
-    s = props["z47_drive0"];
+    s = props["z47_disk1"];
 
     if (s.empty())
     {
@@ -130,7 +126,7 @@ void H89::buildSystem(Console *console)
     }
 
     eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-    s = props["z47_drive1"];
+    s = props["z47_disk2"];
 
     if (s.empty())
     {
@@ -195,7 +191,7 @@ void H89::buildSystem(Console *console)
     modemPort   = new INS8250(Serial_ModemPort_c);
     auxPort     = new INS8250(Serial_AuxPort_c);
 
-    s = props["z17_drive0"];
+    s = props["z17_disk1"];
 
     if (s.empty())
     {
@@ -203,7 +199,7 @@ void H89::buildSystem(Console *console)
     }
 
     hard0       = new HardSectoredDisk(s.c_str());
-    s = props["z17_drive1"];
+    s = props["z17_disk2"];
 
     if (s.empty())
     {
@@ -211,7 +207,7 @@ void H89::buildSystem(Console *console)
     }
 
     hard1       = new HardSectoredDisk(s.c_str());
-    s = props["z17_drive2"];
+    s = props["z17_disk3"];
 
     if (s.empty())
     {
@@ -221,7 +217,7 @@ void H89::buildSystem(Console *console)
     hard2       = new HardSectoredDisk(s.c_str());
 
 #if Z37
-    s = props["z37_drive0"];
+    s = props["z37_disk1"];
 
     if (s.empty())
     {
@@ -229,7 +225,7 @@ void H89::buildSystem(Console *console)
     }
 
     soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-    s = props["z37_drive1"];
+    s = props["z37_disk2"];
 
     if (s.empty())
     {
@@ -237,7 +233,7 @@ void H89::buildSystem(Console *console)
     }
 
     soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-    s = props["z37_drive2"];
+    s = props["z37_disk3"];
 
     if (s.empty())
     {
@@ -246,7 +242,7 @@ void H89::buildSystem(Console *console)
 
     soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
     soft3 = 0;
-//    s = props["z37_drive3"];
+//    s = props["z37_disk4"];
 //    if (s.empty()) s = "diskD.softdisk";
 //    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
 
@@ -314,16 +310,16 @@ void H89::buildSystem(Console *console)
     h89io->addDevice(lpPort);
     h89io->addDevice(auxPort);
     h89io->addDevice(modemPort);
-    h89io->addDevice(h17);
+    h89io->addDiskDevice(h17);
 #if Z37
-    h89io->addDevice(h37);
+    h89io->addDiskDevice(h37);
 #else
-    h89io->addDevice(z47If);
+    h89io->addDiskDevice(z47If);
 #endif
 
     if (m316 != NULL)
     {
-        h89io->addDevice(m316);
+        h89io->addDiskDevice(m316);
     }
 
     // Connect all the floppy drives for the hard-sectored controller.
@@ -375,10 +371,21 @@ void H89::buildSystem(Console *console)
 H89::~H89()
 {
     // eject all the disk files
+    std::vector<IODevice *> dsks = h89io->getDiskDevices();
 
-    driveUnitH0->ejectDisk("saveA.tmpdisk");
-    driveUnitH1->ejectDisk("saveB.tmpdisk");
-    driveUnitH2->ejectDisk("saveC.tmpdisk");
+    for (int x = 0; x < dsks.size(); ++x)
+    {
+        IODevice *dev = dsks[x];
+
+        if (dev != NULL)
+        {
+            dev->~IODevice();
+        }
+    }
+
+//  driveUnitH0->ejectDisk("saveA.tmpdisk");
+//  driveUnitH1->ejectDisk("saveB.tmpdisk");
+//  driveUnitH2->ejectDisk("saveC.tmpdisk");
 
 //    driveUnitS0->ejectDisk("saveS0.tmpdisk");
 //    driveUnitS1->ejectDisk("saveS1.tmpdisk");

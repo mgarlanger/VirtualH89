@@ -26,6 +26,16 @@ H89_IO::~H89_IO()
     debugss(ssIO, INFO, "%s\n", __FUNCTION__);
 }
 
+std::vector<IODevice *>& H89_IO::getDiskDevices()
+{
+    return dsk_devs;
+}
+bool H89_IO::addDiskDevice(IODevice *device)
+{
+    dsk_devs.push_back(device);
+    return addDevice(device);
+}
+
 bool H89_IO::addDevice(IODevice *device)
 {
     debugss(ssIO, INFO, "%s\n", __FUNCTION__);
