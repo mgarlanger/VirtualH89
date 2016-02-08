@@ -189,6 +189,20 @@ int main(int argc, char *argv[])
     setDebugLevel();
 
     screenRefresh = screenRefresh_c;
+    if ((log_out = fopen("op.out", "w")) == 0)
+    {
+        cerr << endl << "Unable to open op.out" << endl;
+    }
+
+    if ((console_out = fopen("console.out", "w")) == 0)
+    {
+        cerr << endl << "Unable to open console.out" << endl;
+    }
+
+    else
+    {
+        cout << "Successfully opened console.out" << endl;
+    }
 
     cout << "Virtual H89" << endl << endl;
 
@@ -204,7 +218,6 @@ int main(int argc, char *argv[])
     cout << "Virtual H89 - " << H89COPYRIGHT << endl << endl;
     cout << "CPU speed is 2.048 MHz" << endl << endl;
 
-
 #if USE_PTHREAD
 
     sigset_t set;
@@ -214,20 +227,6 @@ int main(int argc, char *argv[])
     sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &set, 0);
 
-    if ((log_out = fopen("op.out", "w")) == 0)
-    {
-        cerr << endl << "Unable to open op.out" << endl;
-    }
-
-    if ((console_out = fopen("console.out", "w")) == 0)
-    {
-        cerr << endl << "Unable to open console.out" << endl;
-    }
-
-    else
-    {
-        cout << "Successfully opened console.out" << endl;
-    }
 
     pthread_t thread;
     pthread_create(&thread, NULL, cpuThreadFunc, &h89);

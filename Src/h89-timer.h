@@ -10,6 +10,7 @@
 #include "EventHandler.h"
 
 class CPU;
+class InterruptController;
 
 ///
 /// \class H89Timer
@@ -20,10 +21,11 @@ class CPU;
 class H89Timer: public EventHandler
 {
   public:
-    H89Timer(CPU *cpu, unsigned char intlvl = 1);
+    H89Timer(CPU *cpu, InterruptController *ic, unsigned char intlvl = 1);
     H89Timer(unsigned char intlvl = 1);
     virtual ~H89Timer();
     virtual void setCPU(CPU *cpu);
+    virtual void setInterruptController(InterruptController *cpu);
     virtual int handleSignal(int signum);
 
     virtual void enableINT();
@@ -31,6 +33,7 @@ class H89Timer: public EventHandler
 
   private:
     CPU *cpu_m;
+    InterruptController *ic_m;
     bool intEnabled_m;
 
     int count_m;

@@ -7,11 +7,12 @@
 #include "logger.h"
 #include "AddressBus.h"
 #include "Memory.h"
+#include "InterruptController.h"
 
 /// \todo  - allow both RAM and ROM in the first 8k and support reading ROM and writing to
 ///         RAM at the same time.
 
-AddressBus::AddressBus()
+AddressBus::AddressBus(InterruptController* ic): ic_m(ic)
 {
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 
@@ -27,8 +28,16 @@ AddressBus::~AddressBus()
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 }
 
-BYTE AddressBus::readByte(WORD addr)
+BYTE AddressBus::readByte(WORD addr, bool interruptAck)
 {
+
+    if (interruptAck)
+    {
+        debugss(ssAddressBus, ALL, "%s interrupt\n", __FUNCTION__);
+
+        return ic_m->readDataBus();
+    }
+
     BYTE index = addr >> pageSizeBits_c;
 
     debugss(ssAddressBus, ALL, "%s: addr(%d), index(%d)\n", __FUNCTION__, addr, index);
@@ -69,12 +78,14 @@ void AddressBus::writeByte(WORD addr, BYTE val)
     }
 }
 
+
+
 void AddressBus::installMemory(Memory *memory)
 {
     WORD base = memory->getBaseAddress();
     int  size = memory->getSize();
 
-    debugss(ssAddressBus, INFO, "%s: Base = %d  size = %d", __FUNCTION__, base, size);
+    debugss(ssAddressBus, INFO, "%s: Base = %d  size = %d\n", __FUNCTION__, base, size);
 
     BYTE index = base >> pageSizeBits_c;
     BYTE numIndex = (size >> pageSizeBits_c);
@@ -84,7 +95,7 @@ void AddressBus::installMemory(Memory *memory)
     for (int i = 0; i < numIndex; i++)
     {
         int pos = (index + i) % numOfPages_c;
-        debugss(ssAddressBus, VERBOSE, "%s: mem[%d] = 0x%llx", __FUNCTION__, pos,
+        debugss(ssAddressBus, VERBOSE, "%s: mem[%d] = 0x%llx\n", __FUNCTION__, pos,
                 (unsigned long long int) memory);
 
         if (mem[pos])
@@ -96,7 +107,7 @@ void AddressBus::installMemory(Memory *memory)
 
             debugss(ssAddressBus, VERBOSE, "%s: overriding , orig base: 0x%x orig size: %d\n",
                     __FUNCTION__, mem[pos]->getBaseAddress(), mem[pos]->getSize());
-            debugss(ssAddressBus, VERBOSE, "%s: Base = %d  size = %d", __FUNCTION__, base,
+            debugss(ssAddressBus, VERBOSE, "%s: Base = %d  size = %d\n", __FUNCTION__, base,
                     size);
         }
 

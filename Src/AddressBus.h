@@ -20,6 +20,7 @@ const int pageSize_c     = 1L << pageSizeBits_c;
 const int numOfPages_c   = memorySize_c / pageSize_c;
 
 class Memory;
+class InterruptController;
 
 /// \class AddressBus
 ///
@@ -34,9 +35,10 @@ class AddressBus
     ///         8k RAM/ROM, so that writes get written out to memory... but how do
     ///         I handle less than 64k of memory... ?? start at 8k and have it wrap around???
     Memory *mem[numOfPages_c];
+    InterruptController* ic_m;
 
   public:
-    AddressBus();
+    AddressBus(InterruptController* ic);
     virtual ~AddressBus();
 
     // setup memory
@@ -45,8 +47,9 @@ class AddressBus
 
     // Wanted to use the [] operator, but unfortunately it can't be used since the
     // emulated CPU may need to handle writing and reading differently.
-    BYTE readByte(WORD addr);
+    BYTE readByte(WORD addr, bool interruptAck = false);
     void writeByte(WORD addr, BYTE val);
+
 };
 
 #endif // ADDRESSBUS_H_

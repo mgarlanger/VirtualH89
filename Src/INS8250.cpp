@@ -69,7 +69,8 @@ BYTE INS8250::in(BYTE addr)
                 {
                     rxByteAvail = false;
                     receiveInterruptPending = false;
-                    return (RecvBuf);
+                    lowerInterrupt();
+                    val = RecvBuf;
                 }
             }
 
@@ -330,9 +331,26 @@ void INS8250::receiveData(BYTE data)
     {
         receiveInterruptPending = true;
 
-        if (intLevel_m >= 0)
-        {
-            h89.raiseINT(intLevel_m);
-        }
+        raiseInterrupt();
     }
+}
+
+/// \todo many more areas in this file that can raise and lower the interrupt.
+void INS8250::raiseInterrupt()
+{
+    if (intLevel_m >= 0)
+    {
+        h89.raiseINT(intLevel_m);
+    }
+
+}
+
+
+void INS8250::lowerInterrupt()
+{
+    if (intLevel_m >= 0)
+    {
+        h89.lowerINT(intLevel_m);
+    }
+
 }

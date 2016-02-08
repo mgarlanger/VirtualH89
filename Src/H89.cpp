@@ -11,6 +11,7 @@
 #include "z80.h"
 #include "h19.h"
 #include "AddressBus.h"
+#include "InterruptController.h"
 #include "h89-timer.h"
 #include "h89-io.h"
 #include "NMIPort.h"
@@ -49,7 +50,7 @@ H89::H89()
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception e) {}
+        catch (std::exception &e) {}
     }
     else
     {
@@ -61,15 +62,17 @@ H89::H89()
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception e) {}
+        catch (std::exception &e) {}
     }
 
     std::string s; // for general property queries.
 
     // TODO: use properties to configure rest of hardware.
     // Possibly set defaults and write/create file.
-    ab    = new AddressBus;
+
     cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
+    interruptController = new InterruptController(cpu);
+    ab    = new AddressBus(interruptController);
     h19   = new H19;
     h17   = new H17(H17_BaseAddress_c);
 
@@ -130,7 +133,7 @@ H89::H89()
     eight1      = nullptr;
 #endif
 
-    timer       = new H89Timer;
+    timer       = new H89Timer(cpu, interruptController);
     h89io       = new H89_IO;
     nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
     nmi2        = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
@@ -207,8 +210,6 @@ H89::H89()
     soft2 = nullptr;
     soft3 = nullptr;
 #endif
-
-    timer->setCPU(cpu);
 
     monitorROM = NULL;
     s = props["monitor_rom"];
@@ -405,12 +406,14 @@ void H89::raiseNMI(void)
 
 void H89::raiseINT(int level)
 {
-    cpu->raiseINT(level);
+    debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
+    interruptController->raiseInterrupt(level);
 }
 
 void H89::lowerINT(int level)
 {
-    cpu->lowerINT(level);
+    debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
+    interruptController->lowerInterrupt(level);
 }
 
 void H89::continueCPU(void)

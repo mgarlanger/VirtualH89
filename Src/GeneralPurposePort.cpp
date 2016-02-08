@@ -130,6 +130,9 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
 {
     if (verifyPort(addr))
     {
+        // from the manual, writing to this port clears the interrupt.
+        h89.lowerINT(1);
+
         if (val & gpp_EnableTimer_c)
         {
             // enable timer interrupt.

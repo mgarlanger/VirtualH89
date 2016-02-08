@@ -1362,13 +1362,14 @@ Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
     SP(sp.val),
     INT_Line(false),
     intLevel_m(0),
+    processingIntr(false),
     ticks(0),
     lastInstTicks(0),
     curInstByte(0),
     mode(cm_reset),
     prefix(ip_none),
     resetReq(false),
-    curIntrMethod(&Z80::processIntrIM0)
+    IM(0)
 
 {
     debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,
@@ -1423,11 +1424,11 @@ void Z80::reset(void)
     AF            = SP = 0xffff;
     R             = 0;
     I             = 0;
-    IFF1          = IFF2 = false;
+    IFF0          = IFF1 = IFF2 = false;
     prefix        = ip_none;
     curInstByte   = 0;
     resetReq      = false;
-    curIntrMethod = &Z80::processIntrIM0;
+    IM            = 0;
 }
 
 ///
@@ -1524,19 +1525,11 @@ void Z80::raiseNMI(void)
 ///
 /// @param level The interrupt level to raise.
 ///
-void Z80::raiseINT(int level)
+void Z80::raiseINT()
 {
-    debugss(ssZ80, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
-
-    // verify level - only 0-7 are valid
-    if ((level < 0) || (level > 7))
-    {
-        debugss(ssZ80, ERROR, "%s: invalid level(%d)\n", __FUNCTION__, level);
-        return;
-    }
+    debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
 
     INT_Line    = true;
-    intLevel_m |= (1 << level);
     int_type   |= Intr_INT;
 }
 
@@ -1545,26 +1538,12 @@ void Z80::raiseINT(int level)
 ///
 /// @param level The interrupt level to lower.
 ///
-void Z80::lowerINT(int level)
+void Z80::lowerINT()
 {
-    debugss(ssZ80, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
+    debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
 
-    // verify level - only 0-7 are valid
-    if ((level < 0) || (level > 7))
-    {
-        // INT level out-of-range.
-        debugss(ssZ80, ERROR, "%s: invalid level(%d)\n", __FUNCTION__, level);
-        return;
-    }
-
-    intLevel_m &= ~(1 << level);
-
-    // ONLY clear int_type if no other interrupts are pending.
-    if (!intLevel_m)
-    {
-        int_type &= ~Intr_INT;
-        INT_Line = false;
-    }
+    int_type &= ~Intr_INT;
+    INT_Line = false;
 
 }
 
@@ -1670,102 +1649,6 @@ BYTE Z80::step(void)
     return (execute(1));
 }
 
-void Z80::processIntrIM0(void)
-{
-    // mode zero currently just supports the RST instructions based on the level
-    // passed in - this is all that is needed on an Heathkit H89.
-    /// \todo But it should be enhance to support any instruction placed on the
-    /// data bus. - do so, by reading all 4 possible bytes of the instruction
-    /// and process it from 'curInst[]' instead of reading each byte.
-
-    debugss(ssZ80, VERBOSE, "Processing Interrupt - %d\n", intLevel_m);
-
-    if (intLevel_m & 0x80)
-    {
-        intLevel_m &= ~(0x80);
-        op_rst38();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x40)
-    {
-        intLevel_m &= ~(0x40);
-        op_rst30();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x20)
-    {
-        intLevel_m &= ~(0x20);
-        op_rst28();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x10)
-    {
-        intLevel_m &= ~(0x10);
-        op_rst20();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x08)
-    {
-        intLevel_m &= ~(0x08);
-        op_rst18();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x04)
-    {
-        intLevel_m &= ~(0x04);
-        op_rst10();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x02)
-    {
-        intLevel_m &= ~(0x02);
-        op_rst08();
-        ticks -= 4;
-    }
-
-    else if (intLevel_m & 0x01)
-    {
-        intLevel_m &= ~(0x01);
-        op_rst00();
-        ticks -= 4;
-    }
-
-    else
-    {
-        // invalid interrupt level.
-        debugss(ssZ80, ERROR, "%s: Invalid interrupt level: %d\n",
-                __FUNCTION__, intLevel_m);
-    }
-
-    // Only if that was the last interrupt do we reset the type.
-    if (intLevel_m == 0)
-    {
-        int_type &= ~Intr_INT;
-    }
-}
-
-void Z80::processIntrIM1(void)
-{
-    debugss(ssZ80, VERBOSE, "Processing interrupt mode 1\n");
-    int_type &= ~Intr_INT;
-    op_rst38();
-    ticks -= 4;
-}
-
-void Z80::processIntrIM2(void)
-{
-    // mode 2 not currently supported.
-    debugss(ssZ80, FATAL, "%s: Interrupt mode 2 not supported\n", __FUNCTION__);
-
-    /// \todo assert
-}
-
 ///
 ///  This function builds the Z80 central processing unit.
 ///  The opcode where PC points to is fetched from the memory
@@ -1788,6 +1671,7 @@ BYTE Z80::execute(WORD numInst)
     do
     {
         prefix = ip_none;
+        processingIntr = false;
         curInstByte = 0;
         lastInstByte = 0;
 
@@ -1825,31 +1709,48 @@ BYTE Z80::execute(WORD numInst)
         {
             debugss(ssZ80, VERBOSE, "NMI Raised\n");
             int_type &= ~Intr_NMI;
-            IFF1 = false;
+            IFF0 = IFF1 = false;
             PUSH(PC);
             PC = 0x66;
             mode = cm_running;
         }
 
-        else if ((int_type & Intr_INT) && (IFF1) && (!lastEI))
+        else if ((int_type & Intr_INT) && (IFF1))
         {
             // ISR required to enable interrupts (EI).
-            IFF2 = IFF1 = false;
+            IFF2 = IFF1 = IFF0 = false;
             mode = cm_running;
 
-            (this->*curIntrMethod)();
+            switch (IM)
+            {
+            case 0:
+                // mode zero currently just supports the RST instructions based on the level
+                // passed in - this is all that is needed on an Heathkit H89.
+                /// \todo But it should be enhance to support any instruction placed on the
+                /// data bus. -
+                debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
+                processingIntr = true;
+                break;
+            case 1:
+                debugss(ssZ80, VERBOSE, "Processing interrupt mode 1\n");
+                int_type &= ~Intr_INT;
+                op_rst38();
+                ticks -= 4;
+                break;
+            case 2:
+                // mode 2 not currently supported.
+                debugss(ssZ80, FATAL, "%s: Interrupt mode 2 not supported\n", __FUNCTION__);
+
+                /// \todo assert
+                break;
+            default:
+                debugss(ssZ80, FATAL, "%s: Invalid Interrupt Mode: %d\n", __FUNCTION__, IM);
+
+                /// \todo assert
+            }
         }
 
-#if 0
-
-        else if (int_type & Intr_INT)
-        {
-            debugss(ssZ80, ERROR, "Interrupt, but can't process - %d %d\n", IFF1, lastEI);
-        }
-
-#endif
-
-        lastEI = false;
+        IFF1 = IFF0;
 
 #if NOTNOW
         debug("%04o.%04o", (PC >> 8), PC & 0xff);
@@ -2234,8 +2135,9 @@ void Z80::op_daa(void)
 ///
 void Z80::op_ei(void)
 {
-    IFF1 = IFF2 = true;
-    lastEI = true;
+    /*IFF1 = */ IFF2 = true;
+    IFF0 = true;
+
 }
 
 ///
@@ -2264,7 +2166,7 @@ void Z80::op_ei(void)
 ///
 void Z80::op_di(void)
 {
-    IFF1 = IFF2 = false;
+    IFF0 = IFF1 = IFF2 = false;
 }
 
 ///
@@ -5270,7 +5172,7 @@ void Z80::op_ed_nop(void)
 ///
 void Z80::op_im0(void)
 {
-    curIntrMethod = &Z80::processIntrIM0;
+    IM = 0;
 }
 
 ///
@@ -5302,7 +5204,7 @@ void Z80::op_im0(void)
 ///
 void Z80::op_im1(void)
 {
-    curIntrMethod = &Z80::processIntrIM1;
+    IM = 1;
 }
 
 ///
@@ -5338,7 +5240,7 @@ void Z80::op_im1(void)
 ///
 void Z80::op_im2(void)
 {
-    curIntrMethod = &Z80::processIntrIM2;
+    IM = 2;
 }
 
 ///
@@ -5414,7 +5316,7 @@ void Z80::op_reti(void)
 void Z80::op_retn(void)
 {
     POP(PC);
-    IFF1 = IFF2;
+    IFF0 = IFF1 = IFF2;
 }
 
 

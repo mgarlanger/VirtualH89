@@ -54,7 +54,7 @@ Z47Controller::~Z47Controller()
 
 void Z47Controller::loadDisk()
 {
-    debugss(ssH47, ERROR, "%s: Entering\n", __FUNCTION__);
+    debugss(ssH47, VERBOSE, "%s: Entering\n", __FUNCTION__);
 
     FILE *file;
 

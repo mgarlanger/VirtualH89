@@ -31,6 +31,7 @@ void setDebugLevel()
     debugLevel[ssRAM]        = defaultLevel;  // RAM accesses
     debugLevel[ssROM]        = defaultLevel;  // ROM accesses
     debugLevel[ssZ80]        = defaultLevel;  // Z80 CPU
+    debugLevel[ssInterruptController] = defaultLevel;  // Interrupt Controller
     debugLevel[ssAddressBus] = defaultLevel;  // Address Bus
     debugLevel[ssIO]         = defaultLevel;  // I/O ports
     debugLevel[ssH17]        = defaultLevel;  // H17 controller

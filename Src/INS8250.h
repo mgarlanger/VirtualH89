@@ -38,6 +38,9 @@ class INS8250 : public IODevice
   private:
     int intLevel_m;
 
+    void raiseInterrupt();
+    void lowerInterrupt();
+
     /// Line Control variables:
     bool DLAB_m;    // Divisor Latch Access bit
     BYTE bits_m;

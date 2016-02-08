@@ -29,8 +29,8 @@ class CPU
     virtual BYTE execute(WORD numInst = 0) = 0;
     virtual void reset(void) = 0;
     virtual BYTE step(void) = 0;
-    virtual void raiseINT(int level) = 0;
-    virtual void lowerINT(int level) = 0;
+    virtual void raiseINT(void) = 0;
+    virtual void lowerINT(void) = 0;
     virtual void raiseNMI(void) = 0;
     virtual void setAddressBus(AddressBus *ab) = 0;
     virtual void setSpeed(bool fast) = 0;

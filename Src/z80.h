@@ -24,8 +24,6 @@ class Z80;
 typedef void (Z80::*opCodeMethod)(void);
 typedef void (Z80::*xd_cbMethod)(BYTE&);
 
-typedef void (Z80::*intrMethod)(void);
-
 
 ///
 /// \brief  Zilog %Z80 %CPU simulator.
@@ -103,9 +101,8 @@ class Z80: public virtual CPU
 
     WORD  xxcb_effectiveAddress;
     BYTE  I;                          // Z80 interrupt register
-    bool  IFF1, IFF2;
-    bool  lastEI;
-    unsigned int   R;                          // Z80 refresh register
+    bool  IFF0, IFF1, IFF2;           // Use a new flag - IFF0 - to easily handle the one instruction before EI takes effect
+    unsigned int   R;                 // Z80 refresh register
 
     unsigned long int   ClockRate_m;
     unsigned long int   ticksPerSecond_m;
@@ -113,6 +110,7 @@ class Z80: public virtual CPU
 
     bool  INT_Line;
     BYTE  intLevel_m;
+    bool  processingIntr;
 
     volatile sig_atomic_t ticks;
 
@@ -142,12 +140,12 @@ class Z80: public virtual CPU
     instructionPrefix prefix;
     bool resetReq;
 
+    BYTE IM;
+
     static const opCodeMethod op_code[256];
     static const opCodeMethod op_cb[256];
     static const opCodeMethod op_ed[256];
     static const opCodeMethod op_xxcb[32];
-
-    intrMethod curIntrMethod;
 
   public:
     Z80(int clockRate, int ticksPerSecond);
@@ -166,8 +164,8 @@ class Z80: public virtual CPU
     virtual void setSpeed(bool fast);
 
     /// \todo - fix this for general case with any instruction on the address bus
-    virtual void raiseINT(int level);
-    virtual void lowerINT(int level);
+    virtual void raiseINT();
+    virtual void lowerINT();
 
     /// \todo - remove these vvvvvvvv
 //  virtual void setCPUStates(BYTE error, BYTE state);
@@ -266,11 +264,15 @@ class Z80: public virtual CPU
     /// \todo - determine which way to keep.
     inline void SET_ZSP_FLAGS(BYTE val);
 
-    /// \brief read next instruction byte and increment PC
+    /// \brief read next instruction byte and increment PC, if not processing interrupt
     inline BYTE readInst(void)
     {
         ticks -= 4;
-        return (ab_m->readByte(PC++));
+        BYTE val = ab_m->readByte(PC, processingIntr);
+        if (!processingIntr) {
+            ++PC;
+        }
+        return val;
     };
     inline BYTE readMEM(WORD addr)
     {
@@ -544,10 +546,6 @@ class Z80: public virtual CPU
     void op_srl_xx_d(void);
 
     void op_xxx_xx_d(xd_cbMethod operation);
-
-    void processIntrIM0(void);
-    void processIntrIM1(void);
-    void processIntrIM2(void);
 
 };
 

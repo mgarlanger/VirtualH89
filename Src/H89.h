@@ -26,6 +26,7 @@
 class ROM;
 class RAM;
 class AddressBus;
+class InterruptController;
 class H89Timer;
 class H89_IO;
 class NMIPort;
@@ -50,6 +51,7 @@ class H89 : public Computer
 {
   private:
     AddressBus          *ab;
+    InterruptController *interruptController;
     H89Timer            *timer;
 
     H89_IO              *h89io;
