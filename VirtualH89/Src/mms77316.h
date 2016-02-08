@@ -55,8 +55,11 @@ class MMS77316 : public DiskController, WD1797
     GenericDiskDrive *findDrive(std::string ident);
     std::string dumpDebug();
 
+    bool interResponder(BYTE& opCode);
+
   protected:
     static const char *MMS77316_Name_c;
+
   private:
     void raiseIntrq();
     void raiseDrq();
@@ -75,8 +78,6 @@ class MMS77316 : public DiskController, WD1797
     GenericFloppyDrive *drives_m[numDisks_c];
 
     unsigned char     intLevel_m;
-
-    static unsigned long interResponder(void *data, int level);
 
     /// Bits set in cmd_ControlPort_c
     static const BYTE ctrl_EnableIntReq_c       = 0x08;

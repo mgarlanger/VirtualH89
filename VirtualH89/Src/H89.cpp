@@ -59,7 +59,7 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception &e) {}
+        catch (std::exception& e) {}
     }
     else
     {
@@ -71,7 +71,7 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception &e) {}
+        catch (std::exception& e) {}
     }
 
     std::string s; // for general property queries.
@@ -84,8 +84,8 @@ void H89::buildSystem(Console *console)
     ab    = new AddressBus(interruptController);
     cpu->setAddressBus(ab);
     cpu->setSpeed(false);
-    timer       = new H89Timer(cpu, interruptController);
-    h19 = new H19;
+    timer = new H89Timer(cpu, getAddressBus().getIntrCtrlr());
+    h89io = new H89_IO;
 
     h17   = new H17(H17_BaseAddress_c);
     // create the floppy drives for the hard-sectored controller.
@@ -450,16 +450,6 @@ void H89::raiseNMI(void)
     cpu->raiseNMI();
 }
 
-void H89::registerInter(Z80::intrCheck *func, void *data)
-{
-    cpu->registerInter(func, data);
-}
-
-void H89::unregisterInter(Z80::intrCheck *func)
-{
-    cpu->unregisterInter(func);
-}
-
 void H89::assertBUSREQ()
 {
     cpu->assertBUSREQ();
@@ -473,13 +463,13 @@ void H89::deassertBUSREQ()
 void H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
-    interruptController->raiseInterrupt(level);
+    getAddressBus().getIntrCtrlr()->raiseInterrupt(level);
 }
 
 void H89::lowerINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
-    interruptController->lowerInterrupt(level);
+    getAddressBus().getIntrCtrlr()->lowerInterrupt(level);
 }
 
 void H89::continueCPU(void)

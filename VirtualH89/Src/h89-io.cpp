@@ -136,13 +136,13 @@ bool H89_IO::removeDevice(IODevice *device)
 
 void H89_IO::reset()
 {
-            for (int port = 0; port < 256; ++port)
-            {
-                if (iodevices[port] != NULL)
-                {
-                    iodevices[port]->reset();
-                }
-            }
+    for (int port = 0; port < 256; ++port)
+    {
+        if (iodevices[port] != NULL)
+        {
+            iodevices[port]->reset();
+        }
+    }
 }
 
 BYTE H89_IO::in(BYTE addr)

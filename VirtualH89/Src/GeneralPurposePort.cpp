@@ -173,22 +173,22 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             h89.getTimer().disableINT();
         }
 
-	if (diffs & gpp_DisableROM_c)
-	{
-	// This is a big thing to do every time we write the port...
-        if (val & gpp_DisableROM_c)
+        if (diffs & gpp_DisableROM_c)
         {
-            // ORG "0" Mod - disable the ROM and use RAM for the lower 8K
-            debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
-            h89.disableROM();
-        }
+            // This is a big thing to do every time we write the port...
+            if (val & gpp_DisableROM_c)
+            {
+                // ORG "0" Mod - disable the ROM and use RAM for the lower 8K
+                debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
+                h89.disableROM();
+            }
 
-        else
-        {
-            // re-enable the ROM
-            debugss(ssGpp, ALL, "%s: Disable ORG 0.\n", __FUNCTION__);
-            h89.enableROM();
-        }
+            else
+            {
+                // re-enable the ROM
+                debugss(ssGpp, ALL, "%s: Disable ORG 0.\n", __FUNCTION__);
+                h89.enableROM();
+            }
         }
 
         if (val & gpp_SingleStepInterrupt_c)
@@ -200,7 +200,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
 
         if (val & gpp_SideSelect_c)
         {
-	    // TODO: H17 should pick up this from GPP...
+            // TODO: H17 should pick up this from GPP...
             debugss(ssGpp, ALL, "%s: H17 Set Side 1.\n", __FUNCTION__);
             h89.selectSideH17(1);
         }
@@ -212,28 +212,28 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
         }
 
         /// Speed changes, may need to change to support MMS 128k expansion.
-	if (diffs & gpp_4MHz_2MHz_Select_c)
-	{
-        if (val & gpp_4MHz_2MHz_Select_c)
+        if (diffs & gpp_4MHz_2MHz_Select_c)
         {
-            /// \todo this needs to be put in the H89 class...
-            if (!fast_m)
+            if (val & gpp_4MHz_2MHz_Select_c)
             {
-                debugss(ssGpp, ALL, "%s: Set Fast speed.\n", __FUNCTION__);
-                h89.setSpeed(true);
-                fast_m = true;
+                /// \todo this needs to be put in the H89 class...
+                if (!fast_m)
+                {
+                    debugss(ssGpp, ALL, "%s: Set Fast speed.\n", __FUNCTION__);
+                    h89.setSpeed(true);
+                    fast_m = true;
+                }
             }
-        }
 
-        else
-        {
-            if (fast_m)
+            else
             {
-                debugss(ssGpp, ALL, "%s: Set Standard speed.\n", __FUNCTION__);
-                h89.setSpeed(false);
-                fast_m = false;
+                if (fast_m)
+                {
+                    debugss(ssGpp, ALL, "%s: Set Standard speed.\n", __FUNCTION__);
+                    h89.setSpeed(false);
+                    fast_m = false;
+                }
             }
-        }
         }
     }
 }

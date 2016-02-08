@@ -12,7 +12,7 @@
 /// \todo  - allow both RAM and ROM in the first 8k and support reading ROM and writing to
 ///         RAM at the same time.
 
-AddressBus::AddressBus(InterruptController* ic): ic_m(ic)
+AddressBus::AddressBus(InterruptController *ic): ic_m(ic)
 {
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 
@@ -123,4 +123,14 @@ void AddressBus::clearMemory(BYTE data)
     {
         writeByte(i, data);
     }
+}
+
+InterruptController *AddressBus::getIntrCtrlr()
+{
+    return ic_m;
+}
+
+void AddressBus::setIntrCtrlr(InterruptController *ic)
+{
+    ic_m = ic;
 }

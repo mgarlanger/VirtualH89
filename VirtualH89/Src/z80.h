@@ -39,8 +39,6 @@ class Z80: public CPU
   private:
     void checkBUSREQ();
     pthread_mutex_t z80_mutex;
-    std::vector<intrHook *> intrHooks;
-    unsigned long checkInter();
     // data
 
     // Registers
@@ -161,8 +159,6 @@ class Z80: public CPU
     void deassertBUSREQ();
     std::string dumpDebug();
 
-    virtual void registerInter(intrCheck *func, void *data);
-    virtual void unregisterInter(intrCheck *func);
     virtual void continueRunning(void);
     virtual void waitState(void);
 
@@ -282,9 +278,12 @@ class Z80: public CPU
     {
         ticks -= 4;
         BYTE val = ab_m->readByte(PC, processingIntr);
-        if (!processingIntr) {
+
+        if (!processingIntr)
+        {
             ++PC;
         }
+
         return val;
     };
     inline BYTE readMEM(WORD addr)

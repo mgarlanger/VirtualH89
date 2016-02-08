@@ -676,8 +676,10 @@ bool RawFloppyImage::isReady()
 
 std::string RawFloppyImage::getMediaName()
 {
-    if (imageName_m == NULL) {
-	return "BAD";
+    if (imageName_m == NULL)
+    {
+        return "BAD";
     }
+
     return imageName_m;
 }

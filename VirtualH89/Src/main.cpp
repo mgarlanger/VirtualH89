@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
     if ((log_out = fopen("op.out", "w")) == 0 && !quiet)
     {
         cerr << endl << "Unable to open op.out" << endl;

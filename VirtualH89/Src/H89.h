@@ -160,8 +160,6 @@ class H89 : public Computer
     virtual void keypress(BYTE ch);
     virtual void display();
 
-    virtual void registerInter(CPU::intrCheck *func, void *data);
-    virtual void unregisterInter(CPU::intrCheck *func);
     virtual void assertBUSREQ();
     virtual void deassertBUSREQ();
     virtual void raiseINT(int level);

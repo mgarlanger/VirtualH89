@@ -9,6 +9,8 @@
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
+#include "InterruptController.h"
+#include "MMS316IntrCtrlr.h"
 #include <string.h>
 
 const char *MMS77316::MMS77316_Name_c = "MMS77316";
@@ -35,7 +37,8 @@ MMS77316::MMS77316(int baseAddr):
         drives_m[x] = nullptr;
     }
 
-    h89.registerInter(interResponder, this);
+    InterruptController *ic = h89.getAddressBus().getIntrCtrlr();
+    h89.getAddressBus().setIntrCtrlr(new MMS316IntrCtrlr(ic, this));
 }
 
 std::vector<GenericDiskDrive *> MMS77316::getDiskDrives()
@@ -136,19 +139,20 @@ MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::str
     return m316;
 }
 
-unsigned long MMS77316::interResponder(void *data, int level)
+bool MMS77316::interResponder(BYTE& opCode)
 {
-    MMS77316 *thus = (MMS77316 *)data;
-    unsigned long intr = CPU::NO_INTR_INST;
-
-    if (level == MMS77316_Intr_c && thus->intrqAllowed())
+    // The MMS77316 controller assumes it is the highest priority interrupt,
+    // so if we have an interrupt asserted then we take control.
+    if (intrqAllowed() && (intrqRaised_m || drqRaised_m))
     {
         // TODO: generate op-codes without knowing Z80CPU?
-        intr = (thus->intrqRaised_m ? 0xf7 : 0xfb);
+        opCode = (intrqRaised_m ? 0xf7 : 0xfb);
+        // TODO: should anything be reset here?
+        intrqRaised_m = false;
+        return true;
     }
 
-    thus->intrqRaised_m = false;
-    return intr;
+    return false;
 }
 
 MMS77316::~MMS77316()
@@ -182,18 +186,19 @@ BYTE MMS77316::in(BYTE addr)
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
             // might need to simulate WAIT states...
-	    // Must NOT wait too long - this blocks all other progress.
-	    // TODO: redesign this to return to execute() loop and
-	    // stall there... requires in() to return a status or
-	    // some other way inform the CPU to stall. The MMS77316
-	    // has a built-in timeout on the WAIT hardware anyway,
-	    // so, insure we don't stay here forever. The hardware
-	    // timed out after 16 busclk (2MHz, i.e. CPU clock) cycles,
-	    // really should count those but this is probably close enough.
-	    int timeout = 0;
+            // Must NOT wait too long - this blocks all other progress.
+            // TODO: redesign this to return to execute() loop and
+            // stall there... requires in() to return a status or
+            // some other way inform the CPU to stall. The MMS77316
+            // has a built-in timeout on the WAIT hardware anyway,
+            // so, insure we don't stay here forever. The hardware
+            // timed out after 16 busclk (2MHz, i.e. CPU clock) cycles,
+            // really should count those but this is probably close enough.
+            int timeout = 0;
+
             while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
-		// TODO: this stalls
+                // TODO: this stalls
                 waitForData();
             }
         }
@@ -220,8 +225,9 @@ void MMS77316::out(BYTE addr, BYTE val)
     {
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
-	    // See notes for MMS77316::in()...
-	    int timeout = 0;
+            // See notes for MMS77316::in()...
+            int timeout = 0;
+
             while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
                 waitForData();

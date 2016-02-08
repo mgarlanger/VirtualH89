@@ -5,7 +5,7 @@
 ///
 
 #include "h89-timer.h"
-#include "CPU.h"
+#include "cpu.h"
 #include "InterruptController.h"
 #include "SignalHandler.h"
 #include "WallClock.h"
@@ -109,7 +109,8 @@ H89Timer::~H89Timer()
     setitimer(ITIMER_REAL, &tim, NULL);
 }
 
-void H89Timer::reset() {
+void H89Timer::reset()
+{
     intEnabled_m = false;
     count_m = 0;
 }

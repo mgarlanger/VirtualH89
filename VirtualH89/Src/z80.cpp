@@ -1363,15 +1363,15 @@ Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
     IYh(iy.hi),
     IY(iy.val),
     SP(sp.val),
-    INT_Line(false),	// never used
-    intLevel_m(0),	// never used
+    INT_Line(false),    // never used
+    intLevel_m(0),  // never used
     processingIntr(false),
     ticks(0),
     lastInstTicks(0),
     curInstByte(0),
     mode(cm_reset),
     prefix(ip_none),
-    resetReq(false),	// never used
+    resetReq(false),    // never used
     IM(0)
 
 {
@@ -1438,7 +1438,6 @@ void Z80::reset(void)
     resetReq      = true; // never used
     int_type = 0;
     mode = cm_reset;
-    curIntrMethod = &Z80::processIntrIM0;
     ticks = 0;
     addClockTicks();
 }
@@ -1557,57 +1556,6 @@ void Z80::lowerINT()
     int_type &= ~Intr_INT;
     INT_Line = false;
 
-}
-
-void Z80::registerInter(intrCheck *func, void *data)
-{
-    intrHook *hook = new intrHook(func, data);
-    intrHooks.push_back(hook);
-}
-
-void Z80::unregisterInter(intrCheck *func)
-{
-    for (std::vector<intrHook *>::iterator iter = intrHooks.begin();
-            iter != intrHooks.end(); ++iter)
-    {
-        if (func == (*iter)->func)
-        {
-            intrHook *hook = (*iter);
-            intrHooks.erase(iter);
-            delete hook;
-            break;
-        }
-    }
-}
-
-unsigned long Z80::checkInter()
-{
-    unsigned long intr = NO_INTR_INST;
-
-    // only highest priority interrupt is serviced...
-    int level = ffs(intLevel_m & 0x0ff);
-
-    if (level == 0)
-    {
-        // should not happen.
-        return intr;
-    }
-
-    --level;
-
-    for (std::vector<intrHook *>::iterator iter = intrHooks.begin();
-            iter != intrHooks.end(); ++iter)
-    {
-        intr = (*iter)->func((*iter)->data, level);
-
-        if (intr != NO_INTR_INST)
-        {
-            intLevel_m &= ~(1 << level);
-            return intr;
-        }
-    }
-
-    return intr;
 }
 
 void Z80::continueRunning(void)
@@ -1755,8 +1703,8 @@ std::string Z80::dumpDebug()
                           "HL=%04x    HL'=%04x\n"
                           "PC=%04x SP=%04x\n"
                           "    executing: %02x %02x %02x %02x\n"
-                          "IX=%04x IY=%04x\n"
-                          "R=%02x I=%02x lastEI=%d IFF1=%d IFF2=%d INT=%d NMI=%d\n",
+                          "IX=%04x IY=%04x mode=%s\n"
+                          "R=%02x I=%02x IFF0=%d IFF1=%d IFF2=%d INT=%d NMI=%d\n",
                           A,
                           (F & S_FLAG) ? "S" : "s",
                           (F & Z_FLAG) ? "Z" : "z",
@@ -1774,7 +1722,11 @@ std::string Z80::dumpDebug()
                           ab_m->readByte(PC + 2),
                           ab_m->readByte(PC + 3),
                           IX, IY,
-                          R & 0xff, I, lastEI, IFF1, IFF2,
+                          (mode == cm_halt ? "halt" :
+                           (mode == cm_running ? "run" :
+                            (mode == cm_reset ? "reset" :
+                             (mode == cm_singleStep ? "sstep" : "?")))),
+                          R & 0xff, I, IFF0, IFF1, IFF2,
                           ((int_type & Intr_INT) != 0),
                           ((int_type & Intr_NMI) != 0));
     return ret;
@@ -1803,10 +1755,12 @@ BYTE Z80::execute(WORD numInst)
     do
     {
         checkBUSREQ();
-        if (mode == cm_reset) {
-		// any local variables need resetting?
-		mode = cm_running;
-	}
+
+        if (mode == cm_reset)
+        {
+            // any local variables need resetting?
+            mode = cm_running;
+        }
 
         prefix = ip_none;
         curInstByte = 0;
@@ -1838,7 +1792,6 @@ BYTE Z80::execute(WORD numInst)
 
 #endif
 
-
         /// \todo fix interrupt timings see http://www.z80.info/interrup.htm
         // CPU interrupt handling
         //
@@ -1868,18 +1821,21 @@ BYTE Z80::execute(WORD numInst)
                 debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
                 processingIntr = true;
                 break;
+
             case 1:
                 debugss(ssZ80, VERBOSE, "Processing interrupt mode 1\n");
                 int_type &= ~Intr_INT;
                 op_rst38();
                 ticks -= 4;
                 break;
+
             case 2:
                 // mode 2 not currently supported.
                 debugss(ssZ80, FATAL, "%s: Interrupt mode 2 not supported\n", __FUNCTION__);
 
                 /// \todo assert
                 break;
+
             default:
                 debugss(ssZ80, FATAL, "%s: Invalid Interrupt Mode: %d\n", __FUNCTION__, IM);
 
@@ -1916,7 +1872,8 @@ BYTE Z80::execute(WORD numInst)
             sp.tv_sec = 1;
             sp.tv_nsec = 0;
             nanosleep(&sp, &act);
-            continue;
+            // looping back here clears processingIntr and causes hangs...
+            //continue;
         }
 
         // If in halt, we just do a NOP, without any PC changes.
