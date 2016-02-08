@@ -9,7 +9,6 @@
 #include "ROM.h"
 #include "RAM.h"
 #include "z80.h"
-#include "h19.h"
 #include "AddressBus.h"
 #include "InterruptController.h"
 #include "h89-timer.h"
@@ -28,6 +27,7 @@
 #include "HardSectoredDisk.h"
 #include "SoftSectoredDisk.h"
 #include "EightInchDisk.h"
+#include "Console.h"
 #include "logger.h"
 #include "propertyutil.h"
 
@@ -35,10 +35,16 @@
 
 H89::H89()
 {
+}
+
+void H89::buildSystem(Console *console)
+{
     PropertyUtil::PropertyMapT props;
     // TODO: allow specification of config file via cmdline args.
     std::string cfg;
     char *env = getenv("V89_CONFIG");
+
+    this->console = console;
 
     if (env)
     {
@@ -73,7 +79,6 @@ H89::H89()
     cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
     interruptController = new InterruptController(cpu);
     ab    = new AddressBus(interruptController);
-    h19   = new H19;
     h17   = new H17(H17_BaseAddress_c);
 
     // create the floppy drives for the hard-sectored controller.
@@ -255,7 +260,7 @@ H89::H89()
     ab->installMemory(h17ROM);
     ab->installMemory(memory);
 
-    consolePort->attachDevice(h19);
+    consolePort->attachDevice(console);
 
     cpu->setAddressBus(ab);
     cpu->setSpeed(false);
@@ -337,24 +342,14 @@ H89::~H89()
 void H89::reset()
 {
     cpu->reset();
-    h19->reset();
+    console->reset(); // TODO: does H89 reset really also reset H19?
     /// \todo reset everything, like the H17, H37, etc.
 }
 
 void H89::init()
 {
-    h19->init();
+    console->init();
     z47Cntrl->loadDisk();
-}
-
-void H89::keypress(BYTE ch)
-{
-    h19->keypress(ch);
-}
-
-void H89::display()
-{
-    h19->display();
 }
 
 void H89::enableROM()
@@ -387,11 +382,6 @@ void H89::selectSideH17(BYTE side)
 void H89::setSpeed(bool fast)
 {
     cpu->setSpeed(fast);
-}
-
-bool H89::checkUpdated()
-{
-    return (h19->checkUpdated());
 }
 
 H89Timer& H89::getTimer()
@@ -443,3 +433,6 @@ AddressBus& H89::getAddressBus()
     return (*ab);
 }
 
+// DEPRECATED
+void H89::keypress(BYTE ch) {}
+void H89::display() {}

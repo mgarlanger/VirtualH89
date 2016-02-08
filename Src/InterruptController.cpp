@@ -15,7 +15,6 @@
 InterruptController::InterruptController(CPU *cpu) :intLevel_m(0), cpu_m(cpu)
 {
     debugss(ssInterruptController, ERROR, "%s: Entering\n", __FUNCTION__);
-    printf("In %s\n", __FUNCTION__);
 
 }
 

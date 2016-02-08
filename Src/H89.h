@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "computer.h"
+#include "Console.h"
 
 // Forward declare classes to avoid a tangled mess of includes.
 
@@ -65,7 +66,7 @@ class H89 : public Computer
     INS8250             *lpPort, *modemPort, *auxPort;
 
     H17                 *h17;
-    Terminal            *h19;
+    Console             *console;
     Z_89_37             *h37;
     Z47Interface        *z47If;
     Z47Controller       *z47Cntrl;
@@ -147,6 +148,7 @@ class H89 : public Computer
   public:
     H89();
     virtual ~H89();
+    void buildSystem(Console *console);
 
     virtual void reset();
     virtual BYTE run();
@@ -161,8 +163,6 @@ class H89 : public Computer
     virtual void lowerINT(int level);
     virtual void raiseNMI(void);
     virtual void continueCPU(void);
-
-    virtual bool checkUpdated();
 
     virtual void disableROM();
     virtual void enableROM();

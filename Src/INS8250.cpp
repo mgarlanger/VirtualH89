@@ -299,6 +299,11 @@ void INS8250::receiveData(BYTE data)
 
     unsigned int baud = device_m->getBaudRate();
 
+    if (baud == SerialPortDevice::DISABLE_BAUD_CHECK)
+    {
+        baud = baud_m;
+    }
+
     if (baud == baud_m)
     {
         debugss(ss8250, ALL, "%s: Baud matches\n", __FUNCTION__);
