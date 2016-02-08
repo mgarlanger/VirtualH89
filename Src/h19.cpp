@@ -3,12 +3,36 @@
 /// \date Apr 12, 2009
 /// \author Mark Garlanger
 ///
+#include "config.h"
+#include <iostream>
+#include <signal.h>
+#include <stdlib.h>
+
+#if OGL
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#else
+#include <GL/gl.h>
+#include <GL/glut.h>
+#endif
+#else
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+#include <wx/wx.h>
+
+#endif
 
 #include "h19.h"
 #include "h19-font.h"
 #include "logger.h"
 
 #include <pthread.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -20,11 +44,15 @@
 
 static  pthread_mutex_t h19_mutex;
 
+H19 *H19::h19;
+unsigned int H19::screenRefresh = screenRefresh_c;
 
-H19::H19(): updated(true),
+H19::H19(): Console(0, NULL),
+    updated(true),
     offline(false),
     curCursor(false)
 {
+    h19 = this;
     pthread_mutex_init(&h19_mutex, NULL);
     reset();
 }
@@ -56,6 +84,10 @@ bool H19::checkUpdated()
 }
 
 void H19::init()
+{
+}
+
+void H19::initGl()
 {
     GLuint i;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -98,7 +130,7 @@ void H19::display()
     glRasterPos2i(0, 24 * 20);
 
     glPushAttrib(GL_LIST_BIT);
-    glListBase(fontOffset);
+    glListBase(h19->fontOffset);
     glCallLists(26 * cols, GL_UNSIGNED_INT, (GLuint *) screen);
     glPopAttrib();
     glEnable(GL_COLOR_LOGIC_OP);
@@ -150,7 +182,22 @@ void H19::keypress(char ch)
 
     else
     {
-        sendData(ch);
+        if ((ch & 0x80) != 0)
+        {
+            // TODO: modify keycode based on current terminal mode,
+            // e.g. convert to ZDS or ANSI codes.
+            // Note difference from H19 keyboard: a modern keyboard
+            // has separate cursor keys that are always active,
+            // so it is as if the user pressed SHIFT to get the code.
+            sendData(ascii::ESC);
+            usleep(2000);
+            sendData(ch & 0x7f);
+        }
+
+        else
+        {
+            sendData(ch);
+        }
     }
 
     pthread_mutex_unlock(&h19_mutex);
@@ -1258,7 +1305,144 @@ unsigned int H19::getBaudRate()
     return (9600);
 }
 
+#if OGL
+
+void H19::reshape(int w, int h)
+{
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, w, 0.0, h, -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void H19::timer(int i)
+{
+    static int count = 0;
+
+    if ((++count % 60) == 0)
+    {
+        fflush(console_out);
+    }
+
+    // Tell glut to redisplay the scene:
+    if (h19->checkUpdated())
+    {
+        glutPostRedisplay();
+    }
+
+    // Need to call this method again after the desired amount of time has passed:
+    glutTimerFunc(screenRefresh, timer, i);
+}
+
+void H19::keyboard(unsigned char key, int x, int y)
+{
+    h19->keypress(key);
+}
+
+void H19::special(int key, int x, int y)
+{
+    // NOTE: GLUT has already differentiated exact keystrokes
+    // based on modern keyboard standards. Here we just encode
+    // the modern key codes into something convenient to use
+    // in the H19 class.
+    switch (key)
+    {
+    case GLUT_KEY_F1:
+        h19->keypress('S' | 0x80);
+        break;
+
+    case GLUT_KEY_F2:
+        h19->keypress('T' | 0x80);
+        break;
+
+    case GLUT_KEY_F3:
+        h19->keypress('U' | 0x80);
+        break;
+
+    case GLUT_KEY_F4:
+        h19->keypress('V' | 0x80);
+        break;
+
+    case GLUT_KEY_F5:
+        h19->keypress('W' | 0x80);
+        break;
+
+    case GLUT_KEY_F6:
+        h19->keypress('P' | 0x80);
+        break;
+
+    case GLUT_KEY_F7:
+        h19->keypress('Q' | 0x80);
+        break;
+
+    case GLUT_KEY_F8:
+        h19->keypress('R' | 0x80);
+        break;
+
+    case GLUT_KEY_HOME:
+        h19->keypress('H' | 0x80);
+        break;
+
+    case GLUT_KEY_UP:
+        h19->keypress('A' | 0x80);
+        break;
+
+    case GLUT_KEY_DOWN:
+        h19->keypress('B' | 0x80);
+        break;
+
+    case GLUT_KEY_LEFT:
+        h19->keypress('D' | 0x80);
+        break;
+
+    case GLUT_KEY_RIGHT:
+        h19->keypress('C' | 0x80);
+        break;
+
+    default:
+        break;
+    }
+}
+
+void H19::glDisplay()
+{
+    h19->display();
+}
+#endif
+
 void H19::run()
 {
+    int dummy_argc = 1;
+    char *dummy_argv = (char *)"dummy";
+#if OGL
+    glutInit(&dummy_argc, &dummy_argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowSize(640, 500);
+    glutInitWindowPosition(500, 100);
+    glutCreateWindow((char *) "Virtual Heathkit H-89 All-in-One Computer");
 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
+    //glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendEquation(GL_FUNC_ADD);
+    glBlendColor(0.5, 0.5, 0.5, 0.9);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    glShadeModel(GL_FLAT);
+    initGl();
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(special);
+    glutDisplayFunc(glDisplay);
+    glutTimerFunc(screenRefresh, timer, 1);
+    glutIgnoreKeyRepeat(1);
+
+    glutMainLoop();
+#endif  // OGL
 }
