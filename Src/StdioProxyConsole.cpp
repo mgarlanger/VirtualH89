@@ -62,7 +62,7 @@ bool StdioProxyConsole::checkUpdated()
 
 unsigned int StdioProxyConsole::getBaudRate()
 {
-    return 0;
+    return SerialPortDevice::DISABLE_BAUD_CHECK;
 }
 
 void StdioProxyConsole::run()

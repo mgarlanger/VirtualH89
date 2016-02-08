@@ -56,7 +56,6 @@ void setDebugLevel()
     debugLevel[ssWD1797]   = defaultLevel;
     debugLevel[ssGenericFloppyDrive]   = defaultLevel;
     debugLevel[ssRawFloppyImage]   = defaultLevel;
-    debugLevel[ssStdioConsole] = defaultLevel;
 }
 
 void setDebug(subSystems ss, logLevel level)

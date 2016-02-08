@@ -318,8 +318,7 @@ void INS8250::receiveData(BYTE data)
         PE_m = true;
         FE_m = false;
         // a full character will not be received, so we must exit and not set rxByteAvail
-        // TODO: need option to avoid this check, it breaks non-H19 cases.
-        //return;
+        return;
     }
 
     else

@@ -90,11 +90,14 @@ void StdioConsole::run()
     fflush(stdout);
 
     setbuf(stdin, NULL);
-    tcgetattr(0, &termios);
-    memcpy(&termios0, &termios, sizeof(termios0));
-    termios.c_lflag &= ~ICANON;
-    termios.c_lflag &= ~ECHO;
-    tcsetattr(0, 0, &termios);
+    ret = tcgetattr(0, &termios);
+    if (ret == 0)
+    {
+        memcpy(&termios0, &termios, sizeof(termios0));
+        termios.c_lflag &= ~ICANON;
+        termios.c_lflag &= ~ECHO;
+        ret = tcsetattr(0, 0, &termios);
+    }
 
     while ((c = fgetc(stdin)) != EOF)
     {
@@ -106,5 +109,8 @@ void StdioConsole::run()
         keypress(c);
     }
 
-    tcsetattr(0, 0, &termios0);
+    if (ret == 0)
+    {
+        tcsetattr(0, 0, &termios0);
+    }
 }
