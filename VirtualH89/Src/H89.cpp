@@ -371,15 +371,15 @@ void H89::buildSystem(Console *console)
 H89::~H89()
 {
     // eject all the disk files
-    std::vector<IODevice *> dsks = h89io->getDiskDevices();
+    std::vector<DiskController *> dsks = h89io->getDiskDevices();
 
     for (int x = 0; x < dsks.size(); ++x)
     {
-        IODevice *dev = dsks[x];
+        DiskController *dev = dsks[x];
 
         if (dev != NULL)
         {
-            dev->~IODevice();
+            dev->~DiskController();
         }
     }
 

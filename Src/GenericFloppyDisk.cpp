@@ -6,7 +6,6 @@
 
 #include "GenericFloppyDisk.h"
 
-
 GenericFloppyDisk::GenericFloppyDisk():
     writeProtect_m(true),
     doubleDensity_m(false),

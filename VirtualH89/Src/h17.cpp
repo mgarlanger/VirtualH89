@@ -17,7 +17,7 @@
 #include "DiskDrive.h"
 
 
-H17::H17(int baseAddr): IODevice(baseAddr, H17_NumPorts_c),
+H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
     state_m(idleState),
     spinCycles_m(0),
     curCharPos_m(0),

@@ -11,8 +11,10 @@
 
 #include "config.h"
 #include "h89Types.h"
-#include "IODevice.h"
+#include "DiskController.h"
 #include "ClockUser.h"
+#include <vector>
+#include <string>
 
 class DiskDrive;
 
@@ -23,7 +25,7 @@ class DiskDrive;
 /// at 102k per disk. Later (third-party) software upgrades supported disks up to 408k per
 /// disk, by using a double-sided 96 tpi drive (H-17-4 or H-17-5).
 ///
-class H17 : public IODevice, public ClockUser
+class H17 : public DiskController, public ClockUser
 {
   public:
     H17(int BaseAddr);
@@ -38,6 +40,16 @@ class H17 : public IODevice, public ClockUser
     virtual void selectSide(BYTE side);
 
     virtual void notification(unsigned int cycleCount);
+
+    // TODO: implement this
+    std::vector<GenericDiskDrive *> getDiskDrives()
+    {
+        return *(new std::vector<GenericDiskDrive *>());
+    }
+    std::string getDeviceName()
+    {
+        return "H17";
+    }
 
   private:
 

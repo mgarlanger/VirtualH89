@@ -292,3 +292,8 @@ bool GenericFloppyDrive::isWriteProtect()
 {
     return (disk_m == NULL || disk_m->checkWriteProtect());
 }
+
+std::string GenericFloppyDrive::getMediaName()
+{
+    return (disk_m != NULL ? disk_m->getMediaName() : "");
+}

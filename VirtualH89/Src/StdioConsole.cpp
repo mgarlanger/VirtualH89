@@ -91,6 +91,7 @@ void StdioConsole::run()
 
     setbuf(stdin, NULL);
     ret = tcgetattr(0, &termios);
+
     if (ret == 0)
     {
         memcpy(&termios0, &termios, sizeof(termios0));

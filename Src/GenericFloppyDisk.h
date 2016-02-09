@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "h89Types.h"
+#include <string>
 
 class DiskData;
 
@@ -41,6 +42,7 @@ class GenericFloppyDisk
     virtual bool isReady() = 0;
     virtual void eject(const char *name) = 0;
     virtual void dump(void) = 0;
+    virtual std::string getMediaName() = 0;
 
   private:
 

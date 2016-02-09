@@ -22,7 +22,7 @@ int MMS77316::getClockPeriod()
 }
 
 MMS77316::MMS77316(int baseAddr):
-    IODevice(baseAddr, MMS77316_NumPorts_c),
+    DiskController(baseAddr, MMS77316_NumPorts_c),
     WD1797(baseAddr + Wd1797_Offset_c),
     controlReg_m(0),
     intLevel_m(MMS77316_Intr_c)
@@ -33,6 +33,18 @@ MMS77316::MMS77316(int baseAddr):
     }
 
     h89.registerInter(interResponder, this);
+}
+
+std::vector<GenericDiskDrive *> MMS77316::getDiskDrives()
+{
+    std::vector<GenericDiskDrive *> drives;
+
+    for (int x = 0; x < numDisks_c; ++x)
+    {
+        drives.push_back(drives_m[x]); // might be null, but must preserve number.
+    }
+
+    return drives;
 }
 
 MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot)

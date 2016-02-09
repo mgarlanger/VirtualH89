@@ -9,8 +9,10 @@
 
 #include "config.h"
 #include "h89Types.h"
-#include "IODevice.h"
+#include "DiskController.h"
 #include "ClockUser.h"
+#include <vector>
+#include <string>
 
 class DiskDrive;
 
@@ -22,7 +24,7 @@ class DiskDrive;
 ///
 /// The Z-89-37 uses the 1797-02 controller.
 ///
-class Z_89_37 : public IODevice, ClockUser
+class Z_89_37 : public DiskController, ClockUser
 {
   public:
     Z_89_37(int baseAddr);
@@ -38,6 +40,16 @@ class Z_89_37 : public IODevice, ClockUser
     void notification(unsigned int cycleCount);
 
     static const BYTE z_89_37_Intr_c = 4;
+
+    // TODO: implement this
+    std::vector<GenericDiskDrive *> getDiskDrives()
+    {
+        return *(new std::vector<GenericDiskDrive *>());
+    }
+    std::string getDeviceName()
+    {
+        return "H37";
+    }
 
   private:
     static const BYTE H37_NumPorts_c       = 4;

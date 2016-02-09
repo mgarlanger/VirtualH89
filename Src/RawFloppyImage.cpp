@@ -664,3 +664,8 @@ bool RawFloppyImage::isReady()
 {
     return (imageFd_m >= 0);
 }
+
+std::string RawFloppyImage::getMediaName()
+{
+    return imageName_m;
+}

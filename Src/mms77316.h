@@ -11,8 +11,10 @@
 #include "h89Types.h"
 #include "wd1797.h"
 #include "GenericFloppyDrive.h"
-#include "IODevice.h"
+#include "DiskController.h"
 #include "propertyutil.h"
+#include <vector>
+#include <string>
 
 ///
 /// \brief Virtual soft-sectored disk controller
@@ -22,7 +24,7 @@
 ///
 /// The MMS77316 uses the 1797-02 controller.
 ///
-class MMS77316 : public IODevice, WD1797
+class MMS77316 : public DiskController, WD1797
 {
   public:
     static const int numDisks_c = 8;
@@ -42,6 +44,13 @@ class MMS77316 : public IODevice, WD1797
     virtual void reset(void);
 
     static const BYTE MMS77316_Intr_c = 5; // INT5N
+
+    // TODO: implement this
+    std::vector<GenericDiskDrive *> getDiskDrives();
+    std::string getDeviceName()
+    {
+        return "MMS77316";
+    }
 
   private:
     void raiseIntrq();

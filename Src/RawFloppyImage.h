@@ -35,6 +35,7 @@ class RawFloppyImage: public GenericFloppyDisk
     bool isReady();
     void eject(const char *name);
     void dump(void);
+    std::string getMediaName();
 
   private:
     const char *imageName_m;

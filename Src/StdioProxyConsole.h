@@ -32,6 +32,7 @@ class StdioProxyConsole : public Console
     virtual void run();
 
   private:
+    std::string handleCommand(std::string cmd);
 };
 
 #endif // STDIOPROXYCONSOLE_H_

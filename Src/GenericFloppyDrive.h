@@ -10,6 +10,7 @@
 #include "config.h"
 #include "h89Types.h"
 #include "GenericFloppyDisk.h"
+#include "GenericDiskDrive.h"
 #include <string>
 
 ///
@@ -18,7 +19,7 @@
 /// Implements a virtual floppy disk drive. Supports 48/96 tpi 5.25",
 /// 48 tpi 8", either can be SS or DS. Note, the media determines density.
 ///
-class GenericFloppyDrive
+class GenericFloppyDrive : public GenericDiskDrive
 {
   public:
     enum DriveType
@@ -68,6 +69,8 @@ class GenericFloppyDrive
     }
     bool isReady();
     bool isWriteProtect();
+
+    std::string getMediaName();
 
   private:
     unsigned int numTracks_m;

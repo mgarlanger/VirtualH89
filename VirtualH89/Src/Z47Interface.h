@@ -10,11 +10,13 @@
 #ifndef Z47INTERFACE_H_
 #define Z47INTERFACE_H_
 
-#include "IODevice.h"
+#include "DiskController.h"
 #include "ClockUser.h"
 #include "ParallelPortConnection.h"
+#include <vector>
+#include <string>
 
-class Z47Interface: public virtual IODevice,
+class Z47Interface: public virtual DiskController,
     public virtual ClockUser,
     public virtual ParallelPortConnection
 {
@@ -32,6 +34,16 @@ class Z47Interface: public virtual IODevice,
     virtual void raiseSignal(SignalType sigType);
     virtual void lowerSignal(SignalType sigType);
     virtual void pulseSignal(SignalType sigType);
+
+    // TODO: implement this
+    std::vector<GenericDiskDrive *> getDiskDrives()
+    {
+        return *(new std::vector<GenericDiskDrive *>());
+    }
+    std::string getDeviceName()
+    {
+        return "Z47";
+    }
 
   private:
     static const BYTE H47_NumPorts_c             = 2;
