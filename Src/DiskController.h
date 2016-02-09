@@ -39,6 +39,16 @@ class DiskController : public IODevice
     // For example "H17" or "MMS77316".
     virtual std::string getDeviceName() = 0;
 
+    // Return the disk drive associated with identifer,
+    // in the form of <deviceName>"-"<driveNumber>.
+    // Drive numbers start at "1".
+    virtual GenericDiskDrive *findDrive(std::string ident) = 0;
+
+    // Return the "standard" name for disk drive 'index' (0-n).
+    // This is the same name as will match in findDrive().
+    // Default if not overriden is getDeviceName()+"-"+<index+1>.
+    virtual std::string getDriveName(int index);
+
   protected:
 
   private:

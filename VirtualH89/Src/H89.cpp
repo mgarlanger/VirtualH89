@@ -458,6 +458,16 @@ void H89::unregisterInter(Z80::intrCheck *func)
     cpu->unregisterInter(func);
 }
 
+void H89::assertBUSREQ()
+{
+    cpu->assertBUSREQ();
+}
+
+void H89::deassertBUSREQ()
+{
+    cpu->deassertBUSREQ();
+}
+
 void H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);

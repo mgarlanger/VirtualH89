@@ -47,11 +47,15 @@ class MMS77316 : public DiskController, WD1797
 
     // TODO: implement this
     std::vector<GenericDiskDrive *> getDiskDrives();
+    std::string getDriveName(int index);
     std::string getDeviceName()
     {
-        return "MMS77316";
+        return MMS77316_Name_c;
     }
+    GenericDiskDrive *findDrive(std::string ident);
 
+  protected:
+    static const char *MMS77316_Name_c;
   private:
     void raiseIntrq();
     void raiseDrq();

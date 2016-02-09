@@ -47,6 +47,8 @@ class CPU
     virtual BYTE step(void) = 0;
     virtual void raiseINT(void) = 0;
     virtual void lowerINT(void) = 0;
+    virtual void assertBUSREQ() = 0;
+    virtual void deassertBUSREQ() = 0;
     virtual void raiseNMI(void) = 0;
     virtual void setAddressBus(AddressBus *ab) = 0;
     virtual void setSpeed(bool fast) = 0;

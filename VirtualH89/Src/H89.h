@@ -162,6 +162,8 @@ class H89 : public Computer
 
     virtual void registerInter(CPU::intrCheck *func, void *data);
     virtual void unregisterInter(CPU::intrCheck *func);
+    virtual void assertBUSREQ();
+    virtual void deassertBUSREQ();
     virtual void raiseINT(int level);
     virtual void lowerINT(int level);
     virtual void raiseNMI(void);

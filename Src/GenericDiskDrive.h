@@ -10,6 +10,7 @@
 #include "config.h"
 #include "h89Types.h"
 #include "GenericDiskDrive.h"
+#include "GenericFloppyDisk.h"
 #include <string>
 
 ///
@@ -27,6 +28,10 @@ class GenericDiskDrive
     virtual ~GenericDiskDrive();
 
     virtual std::string getMediaName() = 0;
+    virtual void insertDisk(GenericFloppyDisk *disk) = 0;
+
+    // Returns the number of raw bytes per track, lowest density.
+    virtual int getRawBytesPerTrack() = 0;
 
   private:
 };

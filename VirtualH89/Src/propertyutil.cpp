@@ -296,3 +296,32 @@ std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
 
     return args;
 }
+
+std::string PropertyUtil::combineArgs(std::vector<std::string> args, int start)
+{
+    std::string str;
+
+    for (int x = start; x < args.size(); ++x)
+    {
+        if (x > start)
+        {
+            str += ' ';
+        }
+
+        str += args[x];
+    }
+
+    return str;
+}
+
+std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args, int start)
+{
+    std::vector<std::string> oargs;
+
+    for (int x = start; x < args.size(); ++x)
+    {
+        oargs.push_back(args[x]);
+    }
+
+    return oargs;
+}

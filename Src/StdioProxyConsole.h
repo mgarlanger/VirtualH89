@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "Console.h"
+#include "H89Operator.h"
 
 /// \brief StdioProxyConsole
 ///
@@ -32,7 +33,7 @@ class StdioProxyConsole : public Console
     virtual void run();
 
   private:
-    std::string handleCommand(std::string cmd);
+    H89Operator *op_m;
 };
 
 #endif // STDIOPROXYCONSOLE_H_

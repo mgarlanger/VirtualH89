@@ -17,6 +17,7 @@
 
 #include <csignal>
 #include <vector>
+#include <pthread.h>
 
 #include "AddressBus.h"
 
@@ -36,6 +37,8 @@ typedef void (Z80::*xd_cbMethod)(BYTE&);
 class Z80: public CPU
 {
   private:
+    void checkBUSREQ();
+    pthread_mutex_t z80_mutex;
     std::vector<intrHook *> intrHooks;
     unsigned long checkInter();
     // data
@@ -153,6 +156,9 @@ class Z80: public CPU
   public:
     Z80(int clockRate, int ticksPerSecond);
     virtual ~Z80();
+
+    void assertBUSREQ();
+    void deassertBUSREQ();
 
     virtual void registerInter(intrCheck *func, void *data);
     virtual void unregisterInter(intrCheck *func);

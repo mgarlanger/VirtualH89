@@ -25,7 +25,7 @@
 class RawFloppyImage: public GenericFloppyDisk
 {
   public:
-    RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::string> argv);
+    RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string> argv);
     ~RawFloppyImage();
 
     bool readData(BYTE side, BYTE track, unsigned int pos, int& data);

@@ -9,6 +9,9 @@
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
+#include <string.h>
+
+const char *MMS77316::MMS77316_Name_c = "MMS77316";
 
 GenericFloppyDrive *MMS77316::getCurDrive()
 {
@@ -45,6 +48,38 @@ std::vector<GenericDiskDrive *> MMS77316::getDiskDrives()
     }
 
     return drives;
+}
+
+std::string MMS77316::getDriveName(int index)
+{
+    if (index < 0 || index >= numDisks_c)
+    {
+        return NULL;
+    }
+
+    char buf[32];
+    sprintf(buf, "%s-%d", MMS77316_Name_c, index + 1);
+    std::string str(buf);
+    return str;
+}
+
+GenericDiskDrive *MMS77316::findDrive(std::string ident)
+{
+
+    if (ident.find(MMS77316_Name_c) != 0 || ident[strlen(MMS77316_Name_c)] != '-')
+    {
+        return NULL;
+    }
+
+    char *e;
+    int x = strtoul(ident.c_str() + strlen(MMS77316_Name_c) + 1, &e, 10);
+
+    if (*e != '\0' || x == 0 || x > numDisks_c)
+    {
+        return NULL;
+    }
+
+    return drives_m[x - 1];
 }
 
 MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot)

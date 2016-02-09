@@ -44,6 +44,10 @@ class Z47Interface: public virtual DiskController,
     {
         return "Z47";
     }
+    GenericDiskDrive *findDrive(std::string ident)
+    {
+        return NULL;
+    }
 
   private:
     static const BYTE H47_NumPorts_c             = 2;

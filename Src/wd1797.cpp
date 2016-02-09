@@ -108,7 +108,7 @@ BYTE WD1797::in(BYTE addr)
     switch (offset)
     {
     case StatusPort_Offset_c:
-        debugss(ssWD1797, INFO, "WD1797::in(StatusPort) (%02x)\n", statusReg_m);
+        debugss(ssWD1797, INFO, "WD1797::in(StatusPort) (%02x) trk=%02x sec=%02x dat=%02x\n", statusReg_m, trackReg_m, sectorReg_m, dataReg_m);
         val = statusReg_m;
         lowerIntrq();
         break;
@@ -157,7 +157,7 @@ void WD1797::out(BYTE addr, BYTE val)
     switch (offset)
     {
     case CommandPort_Offset_c:
-        debugss(ssWD1797, INFO, "WD1797::out(CommandPort): %02x\n", val);
+        debugss(ssWD1797, INFO, "WD1797::out(CommandPort): %02x trk=%02x sec=%02x dat=%02x\n", val, trackReg_m, sectorReg_m, dataReg_m);
         // MUST tolerate changing of selected disk *after* setting command...
         // timing is tricky...
         indexCount_m = 0;

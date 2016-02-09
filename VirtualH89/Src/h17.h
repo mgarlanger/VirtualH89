@@ -50,6 +50,10 @@ class H17 : public DiskController, public ClockUser
     {
         return "H17";
     }
+    GenericDiskDrive *findDrive(std::string ident)
+    {
+        return NULL;
+    }
 
   private:
 

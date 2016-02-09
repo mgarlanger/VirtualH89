@@ -63,7 +63,7 @@ class GenericFloppyDrive : public GenericDiskDrive
     {
         return numTracks_m;
     }
-    int getRawSDBytesPerTrack()
+    int getRawBytesPerTrack()
     {
         return rawSDBytesPerTrack_m;
     }

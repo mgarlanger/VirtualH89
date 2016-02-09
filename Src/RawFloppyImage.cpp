@@ -60,14 +60,22 @@ void RawFloppyImage::dump()
 {
 }
 
-RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::string> argv):
+RawFloppyImage::RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string> argv):
     GenericFloppyDisk(),
     imageName_m(NULL),
     imageFd_m(-1),
+    trackBuffer_m(NULL),
     bufferedTrack_m(-1),
     bufferedSide_m(-1),
+    bufferOffset_m(0),
     bufferDirty_m(false),
-    writePos_m(-1)
+    hypoTrack_m(false),
+    hyperTrack_m(false),
+    interlaced_m(false),
+    gapLen_m(0),
+    indexGapLen_m(0),
+    writePos_m(-1),
+    trackWrite_m(false)
 {
     if (argv.size() < 1)
     {
@@ -152,7 +160,7 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
 
     // First examine at least one track, but we don't know the format...
     // So get enough data for 1.5 DD tracks on this drive...
-    int nbytes = drive->getRawSDBytesPerTrack() * 2;
+    int nbytes = drive->getRawBytesPerTrack() * 2;
     nbytes += nbytes / 2;
     trackBuffer_m = (BYTE *)malloc(nbytes);
 
@@ -310,7 +318,7 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
     struct stat stb;
     fstat(fd, &stb);
     int est_trks = stb.st_size / trackLen_m;
-    debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %d\n", __FUNCTION__, est_trks);
+    debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %d, trklen=%d\n", __FUNCTION__, est_trks, trackLen_m);
 
     if (est_trks == 77 || est_trks == 154)
     {
@@ -397,7 +405,7 @@ RawFloppyImage::RawFloppyImage(GenericFloppyDrive *drive, std::vector<std::strin
     gapLen_m = gaplen;
     indexGapLen_m = idxgap;
     secSize_m = seclen;
-    nbytes = drive->getRawSDBytesPerTrack();
+    nbytes = drive->getRawBytesPerTrack();
 
     if (nbytes == trackLen_m)
     {
@@ -599,7 +607,7 @@ bool RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data
 
 bool RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
 {
-    if (pos < indexGapLen_m)
+    if (pos < indexGapLen_m / 2)
     {
         debugss(ssRawFloppyImage, WARNING, "TrackWrite not supported by RawFloppyImage\n");
         trackWrite_m = true;

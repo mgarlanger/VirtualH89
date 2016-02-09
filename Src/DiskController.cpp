@@ -5,6 +5,7 @@
 ///
 
 #include "DiskController.h"
+#include <sstream>
 
 DiskController::DiskController(BYTE base, BYTE numPorts): IODevice(base, numPorts)
 {
@@ -14,4 +15,11 @@ DiskController::DiskController(BYTE base, BYTE numPorts): IODevice(base, numPort
 DiskController::~DiskController()
 {
 
+}
+
+std::string DiskController::getDriveName(int index)
+{
+    std::ostringstream name;
+    name << getDeviceName() << '-' << (index + 1);
+    return name.str();
 }
