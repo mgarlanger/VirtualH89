@@ -54,6 +54,10 @@ class Z_89_37 : public DiskController, ClockUser
     {
         return NULL;
     }
+    std::string getDriveName(int index)
+    {
+        return "";
+    }
     std::string dumpDebug()
     {
         return "";

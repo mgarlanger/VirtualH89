@@ -1746,8 +1746,9 @@ std::string Z80::dumpDebug()
                           "DE=%04x    DE'=%04x\n"
                           "HL=%04x    HL'=%04x\n"
                           "PC=%04x SP=%04x\n"
+                          "    executing: %02x %02x %02x %02x\n"
                           "IX=%04x IY=%04x\n"
-                          "I=%02x IFF1=%d IFF2=%d lastEI=%d R=%02x\n",
+                          "R=%02x I=%02x lastEI=%d IFF1=%d IFF2=%d INT=%d NMI=%d\n",
                           A,
                           (F & S_FLAG) ? "S" : "s",
                           (F & Z_FLAG) ? "Z" : "z",
@@ -1759,8 +1760,15 @@ std::string Z80::dumpDebug()
                           (F & C_FLAG) ? "C" : "c",
                           _af,
                           BC, _bc, DE, _de, HL, _hl,
-                          PC, SP, IX, IY,
-                          I, IFF1, IFF2, lastEI, R & 0xff);
+                          PC, SP,
+                          ab_m->readByte(PC + 0),
+                          ab_m->readByte(PC + 1),
+                          ab_m->readByte(PC + 2),
+                          ab_m->readByte(PC + 3),
+                          IX, IY,
+                          R & 0xff, I, lastEI, IFF1, IFF2,
+                          ((int_type & Intr_INT) != 0),
+                          ((int_type & Intr_NMI) != 0));
     return ret;
 }
 

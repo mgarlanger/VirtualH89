@@ -354,9 +354,11 @@ std::string MMS77316::dumpDebug()
     std::string ret = PropertyUtil::sprintf(
                           "CTRL=%02x\n"
                           "FDC-STS=%02x FDC-CMD=%02x\n"
-                          "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n",
+                          "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n"
+                          "DRQ=%d INTRQ=%d\n",
                           controlReg_m,
                           statusReg_m, cmdReg_m,
-                          trackReg_m, sectorReg_m, dataReg_m);
+                          trackReg_m, sectorReg_m, dataReg_m,
+                          drqRaised_m, intrqRaised_m);
     return ret;
 }

@@ -48,6 +48,10 @@ class Z47Interface: public virtual DiskController,
     {
         return NULL;
     }
+    std::string getDriveName(int index)
+    {
+        return "";
+    }
 
     std::string dumpDebug()
     {

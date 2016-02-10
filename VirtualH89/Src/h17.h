@@ -54,6 +54,10 @@ class H17 : public DiskController, public ClockUser
     {
         return NULL;
     }
+    std::string getDriveName(int index)
+    {
+        return "";
+    }
     std::string dumpDebug()
     {
         return "";

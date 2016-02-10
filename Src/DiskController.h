@@ -47,9 +47,9 @@ class DiskController : public IODevice
     // Return the "standard" name for disk drive 'index' (0-n).
     // This is the same name as will match in findDrive().
     // Default if not overriden is getDeviceName()+"-"+<index+1>.
-    virtual std::string getDriveName(int index);
+    virtual std::string getDriveName(int index) = 0;
 
-    virtual std::string dumpDebug();
+    virtual std::string dumpDebug() = 0;
 
   protected:
 

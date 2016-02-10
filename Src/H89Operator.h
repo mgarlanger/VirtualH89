@@ -8,9 +8,11 @@
 #define H89OPERATOR_H_
 
 #include <assert.h>
+#include <string>
 
 #include "config.h"
 #include "GenericDiskDrive.h"
+#include "DiskController.h"
 
 /// \brief H89Operator
 ///
