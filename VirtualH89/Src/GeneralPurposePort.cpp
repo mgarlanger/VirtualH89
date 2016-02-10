@@ -10,6 +10,7 @@
 #include "logger.h"
 #include "h89-timer.h"
 #include "IODevice.h"
+#include "propertyutil.h"
 #include <stdlib.h>
 
 const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Count_c] =
@@ -143,6 +144,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
     {
         // from the manual, writing to this port clears the interrupt.
         h89.lowerINT(1);
+        portBits_m = val;
 
         if (val & gpp_EnableTimer_c)
         {
@@ -212,4 +214,11 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             }
         }
     }
+}
+
+std::string GeneralPurposePort::dumpDebug()
+{
+    std::string ret = PropertyUtil::sprintf("GP-OUT=%02x GP-IN=%02x\n",
+                                            portBits_m, dipsw_m);
+    return ret;
 }

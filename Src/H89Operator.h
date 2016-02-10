@@ -25,6 +25,8 @@ class H89Operator
   private:
     std::string executeCommand(std::string cmd);
     GenericDiskDrive *findDrive(std::string name);
+    DiskController *findDiskCtrlr(std::string name);
+    std::string cleanse(std::string resp);
 };
 
 #endif // H89OPERATOR_H_

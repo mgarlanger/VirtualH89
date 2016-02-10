@@ -30,6 +30,7 @@ class PropertyUtil
     static std::vector<std::string> splitArgs(std::string prop);
     static std::string combineArgs(std::vector<std::string> args, int start = 0);
     static std::vector<std::string> shiftArgs(std::vector<std::string> args, int start);
+    static std::string sprintf(const char *fmt...);
 
   private:
 

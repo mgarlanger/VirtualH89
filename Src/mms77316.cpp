@@ -348,3 +348,15 @@ void MMS77316::loadHead(bool load)
         // TODO: start timer for motor-off (if was on...)
     }
 }
+
+std::string MMS77316::dumpDebug()
+{
+    std::string ret = PropertyUtil::sprintf(
+                          "CTRL=%02x\n"
+                          "FDC-STS=%02x FDC-CMD=%02x\n"
+                          "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n",
+                          controlReg_m,
+                          statusReg_m, cmdReg_m,
+                          trackReg_m, sectorReg_m, dataReg_m);
+    return ret;
+}

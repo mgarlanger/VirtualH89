@@ -31,8 +31,11 @@ class GeneralPurposePort: public virtual IODevice
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
+    virtual std::string dumpDebug();
+
   private:
     BYTE dipsw_m;
+    BYTE portBits_m;
 
     /// Address for General Purpose Port
     /// Octal 362

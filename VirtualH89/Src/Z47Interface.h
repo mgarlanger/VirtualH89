@@ -49,6 +49,11 @@ class Z47Interface: public virtual DiskController,
         return NULL;
     }
 
+    std::string dumpDebug()
+    {
+        return "";
+    }
+
   private:
     static const BYTE H47_NumPorts_c             = 2;
 

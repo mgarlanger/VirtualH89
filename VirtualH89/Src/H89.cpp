@@ -512,6 +512,22 @@ AddressBus& H89::getAddressBus()
     return (*ab);
 }
 
+CPU& H89::getCPU()
+{
+    return (*cpu);
+}
+
+std::string H89::dumpDebug()
+{
+    std::string ret = gpp->dumpDebug();
+    // Note: INT should be part of H89 (or InterruptController), not CPU...
+    // And... the signals are not actually latched on motherboard, only in
+    // respective I/O adapters. But for convenience they should be latched
+    // somewhere, or else we need to ask every device whether it has an interrupt.
+    ret += PropertyUtil::sprintf("INT=%02x\n", 0);
+    return ret;
+}
+
 // DEPRECATED
 void H89::keypress(BYTE ch) {}
 void H89::display() {}

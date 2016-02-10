@@ -50,6 +50,36 @@ GenericDiskDrive *H89Operator::findDrive(std::string name)
     return NULL;
 }
 
+DiskController *H89Operator::findDiskCtrlr(std::string name)
+{
+    std::vector<DiskController *> devs = h89.getIO().getDiskDevices();
+
+    for (int x = 0; x < devs.size(); ++x)
+    {
+        DiskController *dev = devs[x];
+
+        if (dev != NULL && name.compare(dev->getDeviceName()) == 0)
+        {
+            return dev;
+        }
+    }
+
+    return NULL;
+}
+
+std::string H89Operator::cleanse(std::string resp)
+{
+    size_t pos = 0;
+
+    while ((pos = resp.find('\n', pos)) != std::string::npos)
+    {
+        resp.replace(pos, 1, ";");
+        pos += 1;
+    }
+
+    return resp;
+}
+
 std::string H89Operator::executeCommand(std::string cmd)
 {
     std::string resp;
@@ -64,6 +94,11 @@ std::string H89Operator::executeCommand(std::string cmd)
     if (args[0].compare("echo") == 0)
     {
         return "ok " + PropertyUtil::combineArgs(args, 1);
+    }
+
+    if (args[0].compare("reset") == 0)
+    {
+        return "error RESET not implemented";
     }
 
     if (args[0].compare("mount") == 0)
@@ -121,10 +156,35 @@ std::string H89Operator::executeCommand(std::string cmd)
         return resp.str();
     }
 
-    else
+    if (args[0].compare("dump") == 0 && args.size() > 1)
     {
-        return "error badcmd: " + cmd;
+        if (args[1].compare("cpu") == 0)
+        {
+            std::string dump = "ok " + h89.getCPU().dumpDebug();
+            return cleanse(dump);
+        }
+
+        if (args[1].compare("mach") == 0)
+        {
+            std::string dump = "ok " + h89.dumpDebug();
+            return cleanse(dump);
+        }
+
+        if (args[1].compare("disk") == 0 && args.size() > 2)
+        {
+            DiskController *dev = findDiskCtrlr(args[2]);
+
+            if (dev == NULL)
+            {
+                return "error no device " + args[2];
+            }
+
+            std::string dump = "ok " + dev->dumpDebug();
+            return cleanse(dump);
+        }
     }
+
+    return "error badcmd: " + cmd;
 }
 
 std::string H89Operator::handleCommand(std::string cmd)

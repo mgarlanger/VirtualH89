@@ -169,6 +169,7 @@ class H89 : public Computer
     virtual void raiseNMI(void);
     virtual void continueCPU(void);
     virtual void waitCPU(void);
+    std::string dumpDebug();
 
     virtual void disableROM();
     virtual void enableROM();
@@ -185,6 +186,7 @@ class H89 : public Computer
     virtual void clearMemory(BYTE data = 0);
 
     virtual AddressBus& getAddressBus();
+    virtual CPU& getCPU();
 };
 
 extern H89 h89;

@@ -49,6 +49,8 @@ class DiskController : public IODevice
     // Default if not overriden is getDeviceName()+"-"+<index+1>.
     virtual std::string getDriveName(int index);
 
+    virtual std::string dumpDebug();
+
   protected:
 
   private:

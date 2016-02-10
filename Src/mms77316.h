@@ -53,6 +53,7 @@ class MMS77316 : public DiskController, WD1797
         return MMS77316_Name_c;
     }
     GenericDiskDrive *findDrive(std::string ident);
+    std::string dumpDebug();
 
   protected:
     static const char *MMS77316_Name_c;

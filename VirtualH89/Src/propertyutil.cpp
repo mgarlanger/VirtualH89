@@ -9,6 +9,8 @@
 #include <sstream>
 #include <fstream>
 #include <exception>
+#include <cstdarg>
+#include <memory>
 
 void PropertyUtil::read(const char *filename, PropertyMapT& map)
 {
@@ -324,4 +326,17 @@ std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args, 
     }
 
     return oargs;
+}
+
+std::string PropertyUtil::sprintf(const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    size_t size = vsnprintf(nullptr, 0, fmt, vl) + 1;
+    va_end(vl);
+    std::unique_ptr<char[]> buf(new char[size]);
+    va_start(vl, fmt);
+    vsnprintf(buf.get(), size, fmt, vl);
+    va_end(vl);
+    return std::string(buf.get(), buf.get() + size - 1);
 }

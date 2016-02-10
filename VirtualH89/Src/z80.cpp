@@ -17,7 +17,7 @@
 #include "AddressBus.h"
 #include "h89-io.h"
 #include "z80.h"
-
+#include "propertyutil.h"
 #include "logger.h"
 
 //typedef int (Z80::*opCodeMethod)(void);
@@ -1736,6 +1736,32 @@ void Z80::checkBUSREQ()
     nanosleep(&sp, &act);
 #endif
     pthread_mutex_lock(&z80_mutex);
+}
+
+std::string Z80::dumpDebug()
+{
+    std::string ret = PropertyUtil::sprintf(
+                          "A=%02x PSW=%s %s %s %s %s %s %s %s    AF'=%04x\n"
+                          "BC=%04x    BC'=%04x\n"
+                          "DE=%04x    DE'=%04x\n"
+                          "HL=%04x    HL'=%04x\n"
+                          "PC=%04x SP=%04x\n"
+                          "IX=%04x IY=%04x\n"
+                          "I=%02x IFF1=%d IFF2=%d lastEI=%d R=%02x\n",
+                          A,
+                          (F & S_FLAG) ? "S" : "s",
+                          (F & Z_FLAG) ? "Z" : "z",
+                          (F & N2_FLAG) ? "N2" : "n2",
+                          (F & H_FLAG) ? "H" : "h",
+                          (F & N1_FLAG) ? "N1" : "n1",
+                          (F & P_FLAG) ? "P" : "p",
+                          (F & N_FLAG) ? "N" : "n",
+                          (F & C_FLAG) ? "C" : "c",
+                          _af,
+                          BC, _bc, DE, _de, HL, _hl,
+                          PC, SP, IX, IY,
+                          I, IFF1, IFF2, lastEI, R & 0xff);
+    return ret;
 }
 
 ///

@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "h89Types.h"
+#include <string>
 
 class AddressBus;
 
@@ -54,6 +55,7 @@ class CPU
     virtual void setSpeed(bool fast) = 0;
     virtual void continueRunning(void) = 0;
     virtual void waitState(void) = 0;
+    virtual std::string dumpDebug() = 0;
 
 };
 

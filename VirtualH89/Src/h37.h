@@ -54,6 +54,10 @@ class Z_89_37 : public DiskController, ClockUser
     {
         return NULL;
     }
+    std::string dumpDebug()
+    {
+        return "";
+    }
 
   private:
     static const BYTE H37_NumPorts_c       = 4;

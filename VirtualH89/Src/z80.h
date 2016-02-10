@@ -159,6 +159,7 @@ class Z80: public CPU
 
     void assertBUSREQ();
     void deassertBUSREQ();
+    std::string dumpDebug();
 
     virtual void registerInter(intrCheck *func, void *data);
     virtual void unregisterInter(intrCheck *func);
