@@ -60,6 +60,7 @@ void RawFloppyImage::dump()
 {
 }
 
+// TODO: If constructor fails, the drive should not mount this disk!
 RawFloppyImage::RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string> argv):
     GenericFloppyDisk(),
     imageName_m(NULL),
@@ -675,5 +676,8 @@ bool RawFloppyImage::isReady()
 
 std::string RawFloppyImage::getMediaName()
 {
+    if (imageName_m == NULL) {
+	return "BAD";
+    }
     return imageName_m;
 }
