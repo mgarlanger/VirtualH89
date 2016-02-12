@@ -28,6 +28,7 @@ class NMIPort: public virtual IODevice
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
+    void reset() {}
   private:
 
 };

@@ -100,6 +100,7 @@ bool H89_IO::removeDevice(IODevice *device)
             {
                 if (iodevices[port] == device)
                 {
+                    // TODO: call destructor? (i.e. "delete iodevices[port];"?)
                     iodevices[port] = 0;
                 }
 
@@ -131,6 +132,17 @@ bool H89_IO::removeDevice(IODevice *device)
     }
 
     return (retVal);
+}
+
+void H89_IO::reset()
+{
+            for (int port = 0; port < 256; ++port)
+            {
+                if (iodevices[port] != NULL)
+                {
+                    iodevices[port]->reset();
+                }
+            }
 }
 
 BYTE H89_IO::in(BYTE addr)

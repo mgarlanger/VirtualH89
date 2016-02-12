@@ -109,7 +109,10 @@ H89Timer::~H89Timer()
     setitimer(ITIMER_REAL, &tim, NULL);
 }
 
-
+void H89Timer::reset() {
+    intEnabled_m = false;
+    count_m = 0;
+}
 
 int H89Timer::handleSignal(int signum)
 {

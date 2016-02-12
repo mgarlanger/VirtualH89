@@ -45,6 +45,28 @@ INS8250::~INS8250()
 
 }
 
+void INS8250::reset()
+{
+    DLAB_m = false;
+    ERBFI_m = false;
+    receiveInterruptPending = false;
+    OE_m = false;
+    PE_m = false;
+    FE_m = false;
+    rxByteAvail = false;
+    txByteAvail = false;
+    lsBaudDiv = 0;
+    msBaudDiv = 0;
+    baud_m = 0;
+    lastTransmit = 0;
+    saveIER = 0;
+    saveIIR = 0;
+    saveLCR = 0;
+    saveMCR = 0;
+    saveLSR = 0;
+    saveMSR = MSB_ClearToSend | MSB_DataSetReady;
+}
+
 BYTE INS8250::in(BYTE addr)
 {
     BYTE val = 0x00;

@@ -32,6 +32,7 @@ class GeneralPurposePort: public virtual IODevice
     virtual void out(BYTE addr, BYTE val);
 
     virtual std::string dumpDebug();
+    void reset();
 
   private:
     BYTE dipsw_m;

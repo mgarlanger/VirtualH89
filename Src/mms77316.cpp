@@ -164,16 +164,9 @@ MMS77316::~MMS77316()
 
 void MMS77316::reset(void)
 {
+    controlReg_m = 0;
+    h89.lowerINT(MMS77316_Intr_c);
     WD1797::reset();
-    // TBD: Is this "system reset" (RSTN)? orr something else?
-    // because system reset should not disconnect drives...
-    controlReg_m        = 0;
-    intLevel_m          = MMS77316_Intr_c;
-
-    for (int x = 0; x < numDisks_c; ++x)
-    {
-        drives_m[x] = nullptr;
-    }
 }
 
 BYTE MMS77316::in(BYTE addr)
@@ -189,8 +182,18 @@ BYTE MMS77316::in(BYTE addr)
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
             // might need to simulate WAIT states...
-            while (burstMode() && !drqRaised_m && !intrqRaised_m)
+	    // Must NOT wait too long - this blocks all other progress.
+	    // TODO: redesign this to return to execute() loop and
+	    // stall there... requires in() to return a status or
+	    // some other way inform the CPU to stall. The MMS77316
+	    // has a built-in timeout on the WAIT hardware anyway,
+	    // so, insure we don't stay here forever. The hardware
+	    // timed out after 16 busclk (2MHz, i.e. CPU clock) cycles,
+	    // really should count those but this is probably close enough.
+	    int timeout = 0;
+            while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
+		// TODO: this stalls
                 waitForData();
             }
         }
@@ -217,8 +220,9 @@ void MMS77316::out(BYTE addr, BYTE val)
     {
         if (offset - Wd1797_Offset_c == DataPort_Offset_c)
         {
-            // might need to simulate WAIT states...
-            while (burstMode() && !drqRaised_m && !intrqRaised_m)
+	    // See notes for MMS77316::in()...
+	    int timeout = 0;
+            while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
                 waitForData();
             }

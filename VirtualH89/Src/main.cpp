@@ -73,8 +73,8 @@ static void *cpuThreadFunc(void *v)
     }
 
 #else
-    h89->clearMemory(0);
-    h89->reset();
+    //h89->clearMemory(0);
+    //h89->reset();
 #endif
 #if 0
     powerUp();

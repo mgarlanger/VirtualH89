@@ -62,6 +62,7 @@ class H17 : public DiskController, public ClockUser
     {
         return "";
     }
+    void reset() {}
 
   private:
 

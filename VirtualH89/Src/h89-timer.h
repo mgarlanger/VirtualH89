@@ -30,6 +30,7 @@ class H89Timer: public EventHandler
 
     virtual void enableINT();
     virtual void disableINT();
+    void reset();
 
   private:
     CPU *cpu_m;

@@ -98,7 +98,8 @@ std::string H89Operator::executeCommand(std::string cmd)
 
     if (args[0].compare("reset") == 0)
     {
-        return "error RESET not implemented";
+        h89.reset();
+        return "ok";
     }
 
     if (args[0].compare("mount") == 0)

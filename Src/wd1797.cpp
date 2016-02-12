@@ -64,7 +64,7 @@ WD1797::WD1797(int baseAddr): ClockUser(),
     curCommand_m(noneCmd),
     stepDirection_m(dir_out),
     curPos_m(0),
-    sectorPos_m(-10)
+    sectorPos_m(-11)
 {
     WallClock::instance()->registerUser(this);
 }
@@ -76,26 +76,32 @@ WD1797::~WD1797()
 
 void WD1797::reset(void)
 {
-    // TBD: Is this "system reset" (RSTN)? orr something else?
-    // because system reset should not disconnect drives...
-    trackReg_m          = 0;
-    sectorReg_m         = 0;
-    dataReg_m           = 0;
-    cmdReg_m            = 0;
-    statusReg_m         = 0;
-    seekSpeed_m         = 0;
-    verifyTrack_m       = false;
-    multiple_m          = false;
-    delay_m             = false;
-    sectorLength_m      = 0;
-    side_m              = 0;
-    deleteDAM_m         = false;
-    state_m             = idleState;
-    curCommand_m        = noneCmd;
-    stepDirection_m     = dir_out;
+    trackReg_m = 0;
+    sectorReg_m = 0;
+    dataReg_m = 0;
+    cmdReg_m = 0;
+    statusReg_m = 0;
+    seekSpeed_m = 0;
+    verifyTrack_m = false;
+    multiple_m = false;
+    delay_m = false;
+    sectorLength_m = 0;
+    side_m = 0;
+    deleteDAM_m = false;
+    state_m = idleState;
+    curCommand_m = noneCmd;
+    stepDirection_m = dir_out;
+    headLoaded_m = false;
+    lastIndexStatus_m = false;
+    indexCount_m = 0;
+    stepUpdate_m = false;
+    stepSettle_m = 0;
+    sectorPos_m = -11;
+    // leave curPos_m alone, diskette is still spinning...
 
-    intrqRaised_m       = false;
-    dataReady_m         = false;
+    intrqRaised_m = false;
+    drqRaised_m = false;
+    dataReady_m = false;
 }
 
 BYTE WD1797::in(BYTE addr)

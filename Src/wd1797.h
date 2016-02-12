@@ -117,8 +117,6 @@ class WD1797 : public ClockUser
 
     int  sectorPos_m;
 
-    unsigned long long cycleCount_m;
-
     void waitForData();
     void processCmd(BYTE cmd);
     void processCmdTypeI(BYTE cmd);

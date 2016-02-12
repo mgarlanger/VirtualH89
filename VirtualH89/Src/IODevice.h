@@ -77,6 +77,9 @@ class IODevice
     ///
     virtual BYTE getPortOffset(BYTE addr);
 
+    // System RESET, may be ignored by device - if appropiate
+    virtual void reset() = 0;
+
   protected:
 
     ///

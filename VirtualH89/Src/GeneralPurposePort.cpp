@@ -28,6 +28,7 @@ GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPor
     mms128k_Unlocked(false),
     mms128k_Unlock_Pos(0),
     curSide_m(-1),
+    portBits_m(0),
     fast_m(false)
 {
     dipsw_m = (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
@@ -39,6 +40,7 @@ GeneralPurposePort::GeneralPurposePort(std::string settings):
     mms128k_Unlocked(false),
     mms128k_Unlock_Pos(0),
     curSide_m(-1),
+    portBits_m(0),
     fast_m(false)
 {
     // TODO: verify a binary string and/or handle other formats/nmenonics.
@@ -48,6 +50,17 @@ GeneralPurposePort::GeneralPurposePort(std::string settings):
 GeneralPurposePort::~GeneralPurposePort()
 {
 
+}
+
+void GeneralPurposePort::reset()
+{
+    mms128k_Unlocked = false;
+    mms128k_Unlock_Pos = 0;
+    curSide_m = -1;
+    fast_m = false;
+    // do not change 'dispsw_m'!
+    // portBits_m = 0; // must actually call out()... side-effects...
+    out(GPP_BaseAddress_c, 0);
 }
 
 BYTE GeneralPurposePort::in(BYTE addr)
@@ -144,6 +157,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
     {
         // from the manual, writing to this port clears the interrupt.
         h89.lowerINT(1);
+	BYTE diffs = portBits_m ^ val;
         portBits_m = val;
 
         if (val & gpp_EnableTimer_c)
@@ -159,6 +173,9 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             h89.getTimer().disableINT();
         }
 
+	if (diffs & gpp_DisableROM_c)
+	{
+	// This is a big thing to do every time we write the port...
         if (val & gpp_DisableROM_c)
         {
             // ORG "0" Mod - disable the ROM and use RAM for the lower 8K
@@ -172,6 +189,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: Disable ORG 0.\n", __FUNCTION__);
             h89.enableROM();
         }
+        }
 
         if (val & gpp_SingleStepInterrupt_c)
         {
@@ -182,6 +200,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
 
         if (val & gpp_SideSelect_c)
         {
+	    // TODO: H17 should pick up this from GPP...
             debugss(ssGpp, ALL, "%s: H17 Set Side 1.\n", __FUNCTION__);
             h89.selectSideH17(1);
         }
@@ -193,6 +212,8 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
         }
 
         /// Speed changes, may need to change to support MMS 128k expansion.
+	if (diffs & gpp_4MHz_2MHz_Select_c)
+	{
         if (val & gpp_4MHz_2MHz_Select_c)
         {
             /// \todo this needs to be put in the H89 class...
@@ -212,6 +233,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
                 h89.setSpeed(false);
                 fast_m = false;
             }
+        }
         }
     }
 }

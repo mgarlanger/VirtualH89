@@ -1363,15 +1363,15 @@ Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
     IYh(iy.hi),
     IY(iy.val),
     SP(sp.val),
-    INT_Line(false),
-    intLevel_m(0),
+    INT_Line(false),	// never used
+    intLevel_m(0),	// never used
     processingIntr(false),
     ticks(0),
     lastInstTicks(0),
     curInstByte(0),
     mode(cm_reset),
     prefix(ip_none),
-    resetReq(false),
+    resetReq(false),	// never used
     IM(0)
 
 {
@@ -1404,7 +1404,7 @@ Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
 
     // Give it ticks to get started.
 
-    addClockTicks();
+    // addClockTicks(); // done by reset()
 }
 
 ///
@@ -1425,14 +1425,22 @@ void Z80::reset(void)
     debugss(ssZ80, INFO, "%s\n", __FUNCTION__);
 
     PC            = 0;
-    AF            = SP = 0xffff;
     R             = 0;
     I             = 0;
     IFF0          = IFF1 = IFF2 = false;
+    IM            = 0;
+    // according to (modern) Z80 documentation, only the above registers
+    // are affected by RESET.
+    AF            = SP = 0xffff;
     prefix        = ip_none;
     curInstByte   = 0;
-    resetReq      = false;
-    IM            = 0;
+    lastInstTicks = 0;
+    resetReq      = true; // never used
+    int_type = 0;
+    mode = cm_reset;
+    curIntrMethod = &Z80::processIntrIM0;
+    ticks = 0;
+    addClockTicks();
 }
 
 ///
@@ -1795,6 +1803,10 @@ BYTE Z80::execute(WORD numInst)
     do
     {
         checkBUSREQ();
+        if (mode == cm_reset) {
+		// any local variables need resetting?
+		mode = cm_running;
+	}
 
         prefix = ip_none;
         curInstByte = 0;

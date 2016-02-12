@@ -395,9 +395,11 @@ H89::~H89()
 
 void H89::reset()
 {
+    enableROM(); // resetting GPP does (may do) this...
     cpu->reset();
     console->reset(); // TODO: does H89 reset really also reset H19?
-    /// \todo reset everything, like the H17, H37, etc.
+    h89io->reset();
+    timer->reset();
 }
 
 void H89::init()

@@ -54,7 +54,7 @@ BYTE AddressBus::readByte(WORD addr, bool interruptAck)
         // the data bus whenever you attempt to read from non-existent memory.
 
         debugss(ssAddressBus, INFO, "%s: Non-existent memory\n", __FUNCTION__);
-        return 0x00;
+        return 0x00; // typically, data bus tends to float high...
     }
 }
 

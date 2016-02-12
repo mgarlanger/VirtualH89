@@ -29,6 +29,7 @@ class H89_IO
     bool addDiskDevice(DiskController *device);
     bool addDevice(IODevice *device);
     bool removeDevice(IODevice *device);
+    void reset();
 
     BYTE in(BYTE addr);
     void out(BYTE addr, BYTE val);
