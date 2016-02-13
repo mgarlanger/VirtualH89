@@ -21,6 +21,7 @@
 #include "Z47Interface.h"
 #include "Z47Controller.h"
 #include "mms77316.h"
+#include "mms77320.h"
 #include "RawFloppyImage.h"
 #include "ParallelLink.h"
 #include "h-17-1.h"
@@ -107,7 +108,7 @@ void H89::buildSystem(Console *console)
     z47Cntrl    = nullptr;
     z47Link     = nullptr;
     MMS77316 *m316 = NULL;
-    //MMS77320 *m320 = NULL;
+    MMS77320 *m320 = NULL;
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
     std::vector<std::string> devslots = { "slot_p504", "slot_p505", "slot_p506" };
@@ -127,8 +128,9 @@ void H89::buildSystem(Console *console)
         else if (s.compare("MMS77320") == 0)
         {
             // Also includes (auxiliary) serial ports... TODO
-            // m320 = MMS77320::install_MMS77320(props, devslots[x]);
+            m320 = MMS77320::install_MMS77320(props, devslots[x]);
         }
+
         else if (s.compare("H17") == 0)
         {
         }
@@ -340,6 +342,11 @@ void H89::buildSystem(Console *console)
     if (m316 != NULL)
     {
         h89io->addDiskDevice(m316);
+    }
+
+    if (m320 != NULL)
+    {
+        h89io->addDiskDevice(m320);
     }
 
     if (!dev_slots)

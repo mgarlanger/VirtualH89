@@ -1872,8 +1872,7 @@ BYTE Z80::execute(WORD numInst)
             sp.tv_sec = 1;
             sp.tv_nsec = 0;
             nanosleep(&sp, &act);
-            // looping back here clears processingIntr and causes hangs...
-            //continue;
+            continue;
         }
 
         // If in halt, we just do a NOP, without any PC changes.

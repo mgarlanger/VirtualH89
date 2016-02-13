@@ -252,6 +252,13 @@ void MMS77316::out(BYTE addr, BYTE val)
             }
         }
 
+        if ((controlReg_m & ctrl_EnableIntReq_c) != 0 && (intrqRaised_m || drqRaised_m))
+        {
+            // Interrupt still pending, but now un-masked. Raise it.
+            h89.raiseINT(MMS77316_Intr_c);
+            h89.continueCPU();
+        }
+
         debugss_nts(ssMMS77316, INFO, "\n");
     }
 
@@ -308,10 +315,11 @@ void MMS77316::raiseIntrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
 
+    WD1797::raiseIntrq();
+
     if (intrqAllowed())
     {
         h89.raiseINT(MMS77316_Intr_c);
-        WD1797::raiseIntrq();
         h89.continueCPU();
         return;
     }
@@ -321,10 +329,11 @@ void MMS77316::raiseDrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
 
+    WD1797::raiseDrq();
+
     if (intrqAllowed() && !burstMode())
     {
         h89.raiseINT(MMS77316_Intr_c);
-        WD1797::raiseDrq();
         h89.continueCPU();
     }
 }
@@ -341,8 +350,12 @@ void MMS77316::lowerDrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
     WD1797::lowerDrq();
+
     // TODO: only lower if !intrqRaised_m, but Z80 is not handling that correctly anyway.
-    h89.lowerINT(MMS77316_Intr_c);
+    if (!intrqRaised_m)
+    {
+        h89.lowerINT(MMS77316_Intr_c);
+    }
 }
 
 void MMS77316::loadHead(bool load)

@@ -120,12 +120,12 @@ BYTE WD1797::in(BYTE addr)
         break;
 
     case TrackPort_Offset_c:
-        debugss(ssWD1797, INFO, "WD1797::in(DataPort)\n");
+        debugss(ssWD1797, INFO, "WD1797::in(TrackPort)\n");
         val = trackReg_m;
         break;
 
     case SectorPort_Offset_c:
-        debugss(ssWD1797, INFO, "WD1797::in(DataPort)\n");
+        debugss(ssWD1797, INFO, "WD1797::in(SectorPort)\n");
         val = sectorReg_m;
         break;
 
