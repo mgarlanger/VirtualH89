@@ -91,6 +91,11 @@ std::string H89Operator::executeCommand(std::string cmd)
         return "ok";
     }
 
+    if (args[0].compare("quit") == 0)
+    {
+        exit(0);
+    }
+
     if (args[0].compare("echo") == 0)
     {
         return "ok " + PropertyUtil::combineArgs(args, 1);
