@@ -163,7 +163,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string>
     // So get enough data for 1.5 DD tracks on this drive...
     int nbytes = drive->getRawBytesPerTrack() * 2;
     nbytes += nbytes / 2;
-    trackBuffer_m = (BYTE *)malloc(nbytes);
+    trackBuffer_m = new BYTE[nbytes];
 
     if (trackBuffer_m == NULL)
     {
