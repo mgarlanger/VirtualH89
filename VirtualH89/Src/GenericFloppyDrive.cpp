@@ -32,7 +32,7 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
         numTracks_m = 77;
         mediaSize_m = 8;
         driveRpm_m = 360;
-        rawSDBytesPerTrack_m = 6650;
+        rawSDBytesPerTrack_m = 6400;
     }
 
     else

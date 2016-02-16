@@ -78,6 +78,7 @@ class MMS77316 : public DiskController, WD1797
     GenericFloppyDrive *drives_m[numDisks_c];
 
     unsigned char     intLevel_m;
+    int drqCount_m;
 
     /// Bits set in cmd_ControlPort_c
     static const BYTE ctrl_EnableIntReq_c       = 0x08;
@@ -96,7 +97,8 @@ class MMS77316 : public DiskController, WD1797
     }
     bool drqAllowed()
     {
-        return (controlReg_m & ctrl_EnableBurstN_c) != 0;
+        return (controlReg_m & ctrl_EnableIntReq_c) != 0 &&
+               ((controlReg_m & ctrl_EnableBurstN_c) != 0 || drqCount_m < 1);
     }
     // These are virtual in wd1797 so it can use it.
     bool doubleDensity()

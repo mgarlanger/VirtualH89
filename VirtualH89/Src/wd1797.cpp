@@ -672,12 +672,28 @@ void WD1797::notification(unsigned int cycleCount)
             if (!drive->getTrackZero())
             {
                 drive->step(false);
+
+                if (drive->getTrackZero())
+                {
+                    statusReg_m |= stat_TrackZero_c;
+                }
+
+                else
+                {
+                    statusReg_m &= ~stat_TrackZero_c;
+                }
+
                 stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
 
                 if (stepUpdate_m)
                 {
                     trackReg_m--;
                 }
+            }
+
+            else
+            {
+                statusReg_m |= stat_TrackZero_c;
             }
         }
 
@@ -686,6 +702,7 @@ void WD1797::notification(unsigned int cycleCount)
             debugss(ssWD1797, INFO, "%s - step in\n", __FUNCTION__);
 
             drive->step(true);
+            statusReg_m &= ~stat_TrackZero_c;
             stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
 
             if (stepUpdate_m)

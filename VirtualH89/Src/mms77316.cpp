@@ -241,6 +241,7 @@ void MMS77316::out(BYTE addr, BYTE val)
     {
         debugss(ssMMS77316, INFO, "MMS77316::out(ControlPort) %02x\n", val);
         controlReg_m = val;
+        drqCount_m = 0;
 
         if ((controlReg_m & ctrl_525DriveSel_c) != 0)
         {
@@ -316,6 +317,7 @@ void MMS77316::raiseIntrq()
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
 
     WD1797::raiseIntrq();
+    drqCount_m = 0;
 
     if (intrqAllowed())
     {
@@ -331,8 +333,9 @@ void MMS77316::raiseDrq()
 
     WD1797::raiseDrq();
 
-    if (intrqAllowed() && !burstMode())
+    if (drqAllowed())
     {
+        ++drqCount_m;
         h89.raiseINT(MMS77316_Intr_c);
         h89.continueCPU();
     }
