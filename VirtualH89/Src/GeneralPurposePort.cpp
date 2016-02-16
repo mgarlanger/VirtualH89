@@ -157,7 +157,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
     {
         // from the manual, writing to this port clears the interrupt.
         h89.lowerINT(1);
-	BYTE diffs = portBits_m ^ val;
+        BYTE diffs = portBits_m ^ val;
         portBits_m = val;
 
         if (val & gpp_EnableTimer_c)
