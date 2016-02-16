@@ -23,6 +23,11 @@ void SerialPortDevice::attachPort(INS8250 *port)
     port_m = port;
 }
 
+bool SerialPortDevice::sendReady()
+{
+    return port_m != NULL && port_m->receiveReady();
+}
+
 bool SerialPortDevice::sendData(BYTE data)
 {
     if (port_m)

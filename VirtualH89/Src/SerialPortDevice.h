@@ -23,6 +23,7 @@ class SerialPortDevice
     virtual ~SerialPortDevice();
 
     virtual void receiveData(BYTE data) = 0;
+    virtual bool sendReady();
     virtual bool sendData(BYTE data);
 
     virtual void attachPort(INS8250 *port);

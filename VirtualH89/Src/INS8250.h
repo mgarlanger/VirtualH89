@@ -30,6 +30,7 @@ class INS8250 : public IODevice
 
     virtual bool attachDevice(SerialPortDevice *dev);
 
+    virtual bool receiveReady();
     virtual void receiveData(BYTE data);
 
     void reset();

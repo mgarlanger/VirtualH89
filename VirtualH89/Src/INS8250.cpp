@@ -315,6 +315,11 @@ bool INS8250::attachDevice(SerialPortDevice *dev)
 }
 
 
+bool INS8250::receiveReady()
+{
+    return !rxByteAvail;
+}
+
 void INS8250::receiveData(BYTE data)
 {
     debugss(ss8250, ALL, "%s - %d\n", __FUNCTION__, data);
