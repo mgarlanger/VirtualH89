@@ -1,0 +1,583 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 47;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1A434361C7060430015F838 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = A1A433CD1C7060430015F838 /* README.md */; };
+		A1A434371C7060430015F838 /* AddressBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D01C7060430015F838 /* AddressBus.cpp */; };
+		A1A434381C7060430015F838 /* ClockUser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D41C7060430015F838 /* ClockUser.cpp */; };
+		A1A434391C7060430015F838 /* computer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D61C7060430015F838 /* computer.cpp */; };
+		A1A4343A1C7060430015F838 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D91C7060430015F838 /* Console.cpp */; };
+		A1A4343B1C7060430015F838 /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433DB1C7060430015F838 /* cpu.cpp */; };
+		A1A4343C1C7060430015F838 /* crc-ccitt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433DD1C7060430015F838 /* crc-ccitt.cpp */; };
+		A1A4343D1C7060430015F838 /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433DF1C7060430015F838 /* disasm.cpp */; };
+		A1A4343E1C7060430015F838 /* DiskData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433E11C7060430015F838 /* DiskData.cpp */; };
+		A1A4343F1C7060430015F838 /* DiskDrive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433E31C7060430015F838 /* DiskDrive.cpp */; };
+		A1A434401C7060430015F838 /* EightInchDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433E51C7060430015F838 /* EightInchDisk.cpp */; };
+		A1A434411C7060430015F838 /* EventHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433E71C7060430015F838 /* EventHandler.cpp */; };
+		A1A434421C7060430015F838 /* FloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433E91C7060430015F838 /* FloppyDisk.cpp */; };
+		A1A434431C7060430015F838 /* GeneralPurposePort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433EB1C7060430015F838 /* GeneralPurposePort.cpp */; };
+		A1A434441C7060430015F838 /* h-17-1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433F01C7060430015F838 /* h-17-1.cpp */; };
+		A1A434451C7060430015F838 /* h-17-4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433F21C7060430015F838 /* h-17-4.cpp */; };
+		A1A434461C7060430015F838 /* h17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433F41C7060430015F838 /* h17.cpp */; };
+		A1A434471C7060430015F838 /* h19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433F71C7060430015F838 /* h19.cpp */; };
+		A1A434481C7060430015F838 /* h37.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433F91C7060430015F838 /* h37.cpp */; };
+		A1A434491C7060430015F838 /* H47Drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433FB1C7060430015F838 /* H47Drive.cpp */; };
+		A1A4344A1C7060430015F838 /* h89-io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433FD1C7060430015F838 /* h89-io.cpp */; };
+		A1A4344B1C7060430015F838 /* h89-timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434001C7060430015F838 /* h89-timer.cpp */; };
+		A1A4344C1C7060430015F838 /* H89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434021C7060430015F838 /* H89.cpp */; };
+		A1A4344D1C7060430015F838 /* HardSectoredDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434051C7060430015F838 /* HardSectoredDisk.cpp */; };
+		A1A4344E1C7060430015F838 /* INS8250.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434071C7060430015F838 /* INS8250.cpp */; };
+		A1A4344F1C7060430015F838 /* InterruptController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434091C7060430015F838 /* InterruptController.cpp */; };
+		A1A434501C7060430015F838 /* IODevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4340B1C7060430015F838 /* IODevice.cpp */; };
+		A1A434511C7060430015F838 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4340E1C7060430015F838 /* logger.cpp */; };
+		A1A434521C7060430015F838 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434101C7060430015F838 /* main.cpp */; };
+		A1A434531C7060430015F838 /* Memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434121C7060430015F838 /* Memory.cpp */; };
+		A1A434541C7060430015F838 /* NMIPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434141C7060430015F838 /* NMIPort.cpp */; };
+		A1A434551C7060430015F838 /* ParallelLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434161C7060430015F838 /* ParallelLink.cpp */; };
+		A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434181C7060430015F838 /* ParallelPortConnection.cpp */; };
+		A1A434571C7060430015F838 /* propertyutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341A1C7060430015F838 /* propertyutil.cpp */; };
+		A1A434581C7060430015F838 /* RAM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341C1C7060430015F838 /* RAM.cpp */; };
+		A1A434591C7060430015F838 /* ROM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341E1C7060430015F838 /* ROM.cpp */; };
+		A1A4345A1C7060430015F838 /* Sector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434201C7060430015F838 /* Sector.cpp */; };
+		A1A4345B1C7060430015F838 /* SerialPortDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434221C7060430015F838 /* SerialPortDevice.cpp */; };
+		A1A4345C1C7060430015F838 /* SignalHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434241C7060430015F838 /* SignalHandler.cpp */; };
+		A1A4345D1C7060430015F838 /* SoftSectoredDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434261C7060430015F838 /* SoftSectoredDisk.cpp */; };
+		A1A4345E1C7060430015F838 /* StdioConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434281C7060430015F838 /* StdioConsole.cpp */; };
+		A1A4345F1C7060430015F838 /* Terminal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4342A1C7060430015F838 /* Terminal.cpp */; };
+		A1A434601C7060430015F838 /* Track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4342C1C7060430015F838 /* Track.cpp */; };
+		A1A434611C7060430015F838 /* WallClock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4342E1C7060430015F838 /* WallClock.cpp */; };
+		A1A434621C7060430015F838 /* Z47Controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434301C7060430015F838 /* Z47Controller.cpp */; };
+		A1A434631C7060430015F838 /* Z47Interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434321C7060430015F838 /* Z47Interface.cpp */; };
+		A1A434641C7060430015F838 /* z80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434341C7060430015F838 /* z80.cpp */; };
+		A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434651C7063C40015F838 /* OpenGL.framework */; };
+		A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434671C7063CF0015F838 /* GLUT.framework */; };
+		A1A4346D1C719B560015F838 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A4346C1C719B560015F838 /* SDL2.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A1A433BE1C705D310015F838 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A1A433C01C705D310015F838 /* VirtualH89 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VirtualH89; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1A433CB1C7060430015F838 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = doxygen.conf; sourceTree = "<group>"; };
+		A1A433CC1C7060430015F838 /* generateDoxy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = generateDoxy; sourceTree = "<group>"; };
+		A1A433CD1C7060430015F838 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A1A433CF1C7060430015F838 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		A1A433D01C7060430015F838 /* AddressBus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AddressBus.cpp; sourceTree = "<group>"; };
+		A1A433D11C7060430015F838 /* AddressBus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressBus.h; sourceTree = "<group>"; };
+		A1A433D21C7060430015F838 /* ascii.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ascii.h; sourceTree = "<group>"; };
+		A1A433D31C7060430015F838 /* astyle.opts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = astyle.opts; sourceTree = "<group>"; };
+		A1A433D41C7060430015F838 /* ClockUser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClockUser.cpp; sourceTree = "<group>"; };
+		A1A433D51C7060430015F838 /* ClockUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClockUser.h; sourceTree = "<group>"; };
+		A1A433D61C7060430015F838 /* computer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = computer.cpp; sourceTree = "<group>"; };
+		A1A433D71C7060430015F838 /* computer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = computer.h; sourceTree = "<group>"; };
+		A1A433D81C7060430015F838 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		A1A433D91C7060430015F838 /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Console.cpp; sourceTree = "<group>"; };
+		A1A433DA1C7060430015F838 /* Console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Console.h; sourceTree = "<group>"; };
+		A1A433DB1C7060430015F838 /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpu.cpp; sourceTree = "<group>"; };
+		A1A433DC1C7060430015F838 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
+		A1A433DD1C7060430015F838 /* crc-ccitt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "crc-ccitt.cpp"; sourceTree = "<group>"; };
+		A1A433DE1C7060430015F838 /* crc-ccitt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "crc-ccitt.h"; sourceTree = "<group>"; };
+		A1A433DF1C7060430015F838 /* disasm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = disasm.cpp; sourceTree = "<group>"; };
+		A1A433E01C7060430015F838 /* disasm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disasm.h; sourceTree = "<group>"; };
+		A1A433E11C7060430015F838 /* DiskData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskData.cpp; sourceTree = "<group>"; };
+		A1A433E21C7060430015F838 /* DiskData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskData.h; sourceTree = "<group>"; };
+		A1A433E31C7060430015F838 /* DiskDrive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskDrive.cpp; sourceTree = "<group>"; };
+		A1A433E41C7060430015F838 /* DiskDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskDrive.h; sourceTree = "<group>"; };
+		A1A433E51C7060430015F838 /* EightInchDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EightInchDisk.cpp; sourceTree = "<group>"; };
+		A1A433E61C7060430015F838 /* EightInchDisk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EightInchDisk.h; sourceTree = "<group>"; };
+		A1A433E71C7060430015F838 /* EventHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventHandler.cpp; sourceTree = "<group>"; };
+		A1A433E81C7060430015F838 /* EventHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventHandler.h; sourceTree = "<group>"; };
+		A1A433E91C7060430015F838 /* FloppyDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FloppyDisk.cpp; sourceTree = "<group>"; };
+		A1A433EA1C7060430015F838 /* FloppyDisk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloppyDisk.h; sourceTree = "<group>"; };
+		A1A433EB1C7060430015F838 /* GeneralPurposePort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeneralPurposePort.cpp; sourceTree = "<group>"; };
+		A1A433EC1C7060430015F838 /* GeneralPurposePort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeneralPurposePort.h; sourceTree = "<group>"; };
+		A1A433ED1C7060430015F838 /* GPATH */ = {isa = PBXFileReference; lastKnownFileType = file; path = GPATH; sourceTree = "<group>"; };
+		A1A433EE1C7060430015F838 /* GRTAGS */ = {isa = PBXFileReference; lastKnownFileType = file; path = GRTAGS; sourceTree = "<group>"; };
+		A1A433EF1C7060430015F838 /* GTAGS */ = {isa = PBXFileReference; lastKnownFileType = file; path = GTAGS; sourceTree = "<group>"; };
+		A1A433F01C7060430015F838 /* h-17-1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "h-17-1.cpp"; sourceTree = "<group>"; };
+		A1A433F11C7060430015F838 /* h-17-1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "h-17-1.h"; sourceTree = "<group>"; };
+		A1A433F21C7060430015F838 /* h-17-4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "h-17-4.cpp"; sourceTree = "<group>"; };
+		A1A433F31C7060430015F838 /* h-17-4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "h-17-4.h"; sourceTree = "<group>"; };
+		A1A433F41C7060430015F838 /* h17.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h17.cpp; sourceTree = "<group>"; };
+		A1A433F51C7060430015F838 /* h17.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = h17.h; sourceTree = "<group>"; };
+		A1A433F61C7060430015F838 /* h19-font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "h19-font.h"; sourceTree = "<group>"; };
+		A1A433F71C7060430015F838 /* h19.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h19.cpp; sourceTree = "<group>"; };
+		A1A433F81C7060430015F838 /* h19.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = h19.h; sourceTree = "<group>"; };
+		A1A433F91C7060430015F838 /* h37.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h37.cpp; sourceTree = "<group>"; };
+		A1A433FA1C7060430015F838 /* h37.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = h37.h; sourceTree = "<group>"; };
+		A1A433FB1C7060430015F838 /* H47Drive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H47Drive.cpp; sourceTree = "<group>"; };
+		A1A433FC1C7060430015F838 /* H47Drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H47Drive.h; sourceTree = "<group>"; };
+		A1A433FD1C7060430015F838 /* h89-io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "h89-io.cpp"; sourceTree = "<group>"; };
+		A1A433FE1C7060430015F838 /* h89-io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "h89-io.h"; sourceTree = "<group>"; };
+		A1A433FF1C7060430015F838 /* H89-roms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "H89-roms.h"; sourceTree = "<group>"; };
+		A1A434001C7060430015F838 /* h89-timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "h89-timer.cpp"; sourceTree = "<group>"; };
+		A1A434011C7060430015F838 /* h89-timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "h89-timer.h"; sourceTree = "<group>"; };
+		A1A434021C7060430015F838 /* H89.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H89.cpp; sourceTree = "<group>"; };
+		A1A434031C7060430015F838 /* H89.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H89.h; sourceTree = "<group>"; };
+		A1A434041C7060430015F838 /* h89Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = h89Types.h; sourceTree = "<group>"; };
+		A1A434051C7060430015F838 /* HardSectoredDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardSectoredDisk.cpp; sourceTree = "<group>"; };
+		A1A434061C7060430015F838 /* HardSectoredDisk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HardSectoredDisk.h; sourceTree = "<group>"; };
+		A1A434071C7060430015F838 /* INS8250.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = INS8250.cpp; sourceTree = "<group>"; };
+		A1A434081C7060430015F838 /* INS8250.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = INS8250.h; sourceTree = "<group>"; };
+		A1A434091C7060430015F838 /* InterruptController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InterruptController.cpp; sourceTree = "<group>"; };
+		A1A4340A1C7060430015F838 /* InterruptController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterruptController.h; sourceTree = "<group>"; };
+		A1A4340B1C7060430015F838 /* IODevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IODevice.cpp; sourceTree = "<group>"; };
+		A1A4340C1C7060430015F838 /* IODevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IODevice.h; sourceTree = "<group>"; };
+		A1A4340D1C7060430015F838 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A1A4340E1C7060430015F838 /* logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = logger.cpp; sourceTree = "<group>"; };
+		A1A4340F1C7060430015F838 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logger.h; sourceTree = "<group>"; };
+		A1A434101C7060430015F838 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		A1A434111C7060430015F838 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		A1A434121C7060430015F838 /* Memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory.cpp; sourceTree = "<group>"; };
+		A1A434131C7060430015F838 /* Memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory.h; sourceTree = "<group>"; };
+		A1A434141C7060430015F838 /* NMIPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NMIPort.cpp; sourceTree = "<group>"; };
+		A1A434151C7060430015F838 /* NMIPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMIPort.h; sourceTree = "<group>"; };
+		A1A434161C7060430015F838 /* ParallelLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParallelLink.cpp; sourceTree = "<group>"; };
+		A1A434171C7060430015F838 /* ParallelLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParallelLink.h; sourceTree = "<group>"; };
+		A1A434181C7060430015F838 /* ParallelPortConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParallelPortConnection.cpp; sourceTree = "<group>"; };
+		A1A434191C7060430015F838 /* ParallelPortConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParallelPortConnection.h; sourceTree = "<group>"; };
+		A1A4341A1C7060430015F838 /* propertyutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = propertyutil.cpp; sourceTree = "<group>"; };
+		A1A4341B1C7060430015F838 /* propertyutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = propertyutil.h; sourceTree = "<group>"; };
+		A1A4341C1C7060430015F838 /* RAM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAM.cpp; sourceTree = "<group>"; };
+		A1A4341D1C7060430015F838 /* RAM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAM.h; sourceTree = "<group>"; };
+		A1A4341E1C7060430015F838 /* ROM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ROM.cpp; sourceTree = "<group>"; };
+		A1A4341F1C7060430015F838 /* ROM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ROM.h; sourceTree = "<group>"; };
+		A1A434201C7060430015F838 /* Sector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sector.cpp; sourceTree = "<group>"; };
+		A1A434211C7060430015F838 /* Sector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sector.h; sourceTree = "<group>"; };
+		A1A434221C7060430015F838 /* SerialPortDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialPortDevice.cpp; sourceTree = "<group>"; };
+		A1A434231C7060430015F838 /* SerialPortDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerialPortDevice.h; sourceTree = "<group>"; };
+		A1A434241C7060430015F838 /* SignalHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SignalHandler.cpp; sourceTree = "<group>"; };
+		A1A434251C7060430015F838 /* SignalHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalHandler.h; sourceTree = "<group>"; };
+		A1A434261C7060430015F838 /* SoftSectoredDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftSectoredDisk.cpp; sourceTree = "<group>"; };
+		A1A434271C7060430015F838 /* SoftSectoredDisk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftSectoredDisk.h; sourceTree = "<group>"; };
+		A1A434281C7060430015F838 /* StdioConsole.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StdioConsole.cpp; sourceTree = "<group>"; };
+		A1A434291C7060430015F838 /* StdioConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StdioConsole.h; sourceTree = "<group>"; };
+		A1A4342A1C7060430015F838 /* Terminal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terminal.cpp; sourceTree = "<group>"; };
+		A1A4342B1C7060430015F838 /* Terminal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terminal.h; sourceTree = "<group>"; };
+		A1A4342C1C7060430015F838 /* Track.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Track.cpp; sourceTree = "<group>"; };
+		A1A4342D1C7060430015F838 /* Track.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Track.h; sourceTree = "<group>"; };
+		A1A4342E1C7060430015F838 /* WallClock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WallClock.cpp; sourceTree = "<group>"; };
+		A1A4342F1C7060430015F838 /* WallClock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallClock.h; sourceTree = "<group>"; };
+		A1A434301C7060430015F838 /* Z47Controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Z47Controller.cpp; sourceTree = "<group>"; };
+		A1A434311C7060430015F838 /* Z47Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z47Controller.h; sourceTree = "<group>"; };
+		A1A434321C7060430015F838 /* Z47Interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Z47Interface.cpp; sourceTree = "<group>"; };
+		A1A434331C7060430015F838 /* Z47Interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z47Interface.h; sourceTree = "<group>"; };
+		A1A434341C7060430015F838 /* z80.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z80.cpp; sourceTree = "<group>"; };
+		A1A434351C7060430015F838 /* z80.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z80.h; sourceTree = "<group>"; };
+		A1A434651C7063C40015F838 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		A1A434671C7063CF0015F838 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		A1A4346C1C719B560015F838 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1A433BD1C705D310015F838 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1A4346D1C719B560015F838 /* SDL2.framework in Frameworks */,
+				A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */,
+				A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1A433B71C705D310015F838 = {
+			isa = PBXGroup;
+			children = (
+				A1A4346C1C719B560015F838 /* SDL2.framework */,
+				A1A434671C7063CF0015F838 /* GLUT.framework */,
+				A1A434651C7063C40015F838 /* OpenGL.framework */,
+				A1A433C21C705D310015F838 /* VirtualH89 */,
+				A1A433C11C705D310015F838 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1A433C11C705D310015F838 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1A433C01C705D310015F838 /* VirtualH89 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1A433C21C705D310015F838 /* VirtualH89 */ = {
+			isa = PBXGroup;
+			children = (
+				A1A433CA1C7060430015F838 /* Doxygen */,
+				A1A433CD1C7060430015F838 /* README.md */,
+				A1A433CE1C7060430015F838 /* Src */,
+			);
+			path = VirtualH89;
+			sourceTree = "<group>";
+		};
+		A1A433CA1C7060430015F838 /* Doxygen */ = {
+			isa = PBXGroup;
+			children = (
+				A1A433CB1C7060430015F838 /* doxygen.conf */,
+				A1A433CC1C7060430015F838 /* generateDoxy */,
+			);
+			path = Doxygen;
+			sourceTree = "<group>";
+		};
+		A1A433CE1C7060430015F838 /* Src */ = {
+			isa = PBXGroup;
+			children = (
+				A1A433CF1C7060430015F838 /* .gitignore */,
+				A1A433D01C7060430015F838 /* AddressBus.cpp */,
+				A1A433D11C7060430015F838 /* AddressBus.h */,
+				A1A433D21C7060430015F838 /* ascii.h */,
+				A1A433D31C7060430015F838 /* astyle.opts */,
+				A1A433D41C7060430015F838 /* ClockUser.cpp */,
+				A1A433D51C7060430015F838 /* ClockUser.h */,
+				A1A433D61C7060430015F838 /* computer.cpp */,
+				A1A433D71C7060430015F838 /* computer.h */,
+				A1A433D81C7060430015F838 /* config.h */,
+				A1A433D91C7060430015F838 /* Console.cpp */,
+				A1A433DA1C7060430015F838 /* Console.h */,
+				A1A433DB1C7060430015F838 /* cpu.cpp */,
+				A1A433DC1C7060430015F838 /* cpu.h */,
+				A1A433DD1C7060430015F838 /* crc-ccitt.cpp */,
+				A1A433DE1C7060430015F838 /* crc-ccitt.h */,
+				A1A433DF1C7060430015F838 /* disasm.cpp */,
+				A1A433E01C7060430015F838 /* disasm.h */,
+				A1A433E11C7060430015F838 /* DiskData.cpp */,
+				A1A433E21C7060430015F838 /* DiskData.h */,
+				A1A433E31C7060430015F838 /* DiskDrive.cpp */,
+				A1A433E41C7060430015F838 /* DiskDrive.h */,
+				A1A433E51C7060430015F838 /* EightInchDisk.cpp */,
+				A1A433E61C7060430015F838 /* EightInchDisk.h */,
+				A1A433E71C7060430015F838 /* EventHandler.cpp */,
+				A1A433E81C7060430015F838 /* EventHandler.h */,
+				A1A433E91C7060430015F838 /* FloppyDisk.cpp */,
+				A1A433EA1C7060430015F838 /* FloppyDisk.h */,
+				A1A433EB1C7060430015F838 /* GeneralPurposePort.cpp */,
+				A1A433EC1C7060430015F838 /* GeneralPurposePort.h */,
+				A1A433ED1C7060430015F838 /* GPATH */,
+				A1A433EE1C7060430015F838 /* GRTAGS */,
+				A1A433EF1C7060430015F838 /* GTAGS */,
+				A1A433F01C7060430015F838 /* h-17-1.cpp */,
+				A1A433F11C7060430015F838 /* h-17-1.h */,
+				A1A433F21C7060430015F838 /* h-17-4.cpp */,
+				A1A433F31C7060430015F838 /* h-17-4.h */,
+				A1A433F41C7060430015F838 /* h17.cpp */,
+				A1A433F51C7060430015F838 /* h17.h */,
+				A1A433F61C7060430015F838 /* h19-font.h */,
+				A1A433F71C7060430015F838 /* h19.cpp */,
+				A1A433F81C7060430015F838 /* h19.h */,
+				A1A433F91C7060430015F838 /* h37.cpp */,
+				A1A433FA1C7060430015F838 /* h37.h */,
+				A1A433FB1C7060430015F838 /* H47Drive.cpp */,
+				A1A433FC1C7060430015F838 /* H47Drive.h */,
+				A1A433FD1C7060430015F838 /* h89-io.cpp */,
+				A1A433FE1C7060430015F838 /* h89-io.h */,
+				A1A433FF1C7060430015F838 /* H89-roms.h */,
+				A1A434001C7060430015F838 /* h89-timer.cpp */,
+				A1A434011C7060430015F838 /* h89-timer.h */,
+				A1A434021C7060430015F838 /* H89.cpp */,
+				A1A434031C7060430015F838 /* H89.h */,
+				A1A434041C7060430015F838 /* h89Types.h */,
+				A1A434051C7060430015F838 /* HardSectoredDisk.cpp */,
+				A1A434061C7060430015F838 /* HardSectoredDisk.h */,
+				A1A434071C7060430015F838 /* INS8250.cpp */,
+				A1A434081C7060430015F838 /* INS8250.h */,
+				A1A434091C7060430015F838 /* InterruptController.cpp */,
+				A1A4340A1C7060430015F838 /* InterruptController.h */,
+				A1A4340B1C7060430015F838 /* IODevice.cpp */,
+				A1A4340C1C7060430015F838 /* IODevice.h */,
+				A1A4340D1C7060430015F838 /* LICENSE */,
+				A1A4340E1C7060430015F838 /* logger.cpp */,
+				A1A4340F1C7060430015F838 /* logger.h */,
+				A1A434101C7060430015F838 /* main.cpp */,
+				A1A434111C7060430015F838 /* main.h */,
+				A1A434121C7060430015F838 /* Memory.cpp */,
+				A1A434131C7060430015F838 /* Memory.h */,
+				A1A434141C7060430015F838 /* NMIPort.cpp */,
+				A1A434151C7060430015F838 /* NMIPort.h */,
+				A1A434161C7060430015F838 /* ParallelLink.cpp */,
+				A1A434171C7060430015F838 /* ParallelLink.h */,
+				A1A434181C7060430015F838 /* ParallelPortConnection.cpp */,
+				A1A434191C7060430015F838 /* ParallelPortConnection.h */,
+				A1A4341A1C7060430015F838 /* propertyutil.cpp */,
+				A1A4341B1C7060430015F838 /* propertyutil.h */,
+				A1A4341C1C7060430015F838 /* RAM.cpp */,
+				A1A4341D1C7060430015F838 /* RAM.h */,
+				A1A4341E1C7060430015F838 /* ROM.cpp */,
+				A1A4341F1C7060430015F838 /* ROM.h */,
+				A1A434201C7060430015F838 /* Sector.cpp */,
+				A1A434211C7060430015F838 /* Sector.h */,
+				A1A434221C7060430015F838 /* SerialPortDevice.cpp */,
+				A1A434231C7060430015F838 /* SerialPortDevice.h */,
+				A1A434241C7060430015F838 /* SignalHandler.cpp */,
+				A1A434251C7060430015F838 /* SignalHandler.h */,
+				A1A434261C7060430015F838 /* SoftSectoredDisk.cpp */,
+				A1A434271C7060430015F838 /* SoftSectoredDisk.h */,
+				A1A434281C7060430015F838 /* StdioConsole.cpp */,
+				A1A434291C7060430015F838 /* StdioConsole.h */,
+				A1A4342A1C7060430015F838 /* Terminal.cpp */,
+				A1A4342B1C7060430015F838 /* Terminal.h */,
+				A1A4342C1C7060430015F838 /* Track.cpp */,
+				A1A4342D1C7060430015F838 /* Track.h */,
+				A1A4342E1C7060430015F838 /* WallClock.cpp */,
+				A1A4342F1C7060430015F838 /* WallClock.h */,
+				A1A434301C7060430015F838 /* Z47Controller.cpp */,
+				A1A434311C7060430015F838 /* Z47Controller.h */,
+				A1A434321C7060430015F838 /* Z47Interface.cpp */,
+				A1A434331C7060430015F838 /* Z47Interface.h */,
+				A1A434341C7060430015F838 /* z80.cpp */,
+				A1A434351C7060430015F838 /* z80.h */,
+			);
+			path = Src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1A433BF1C705D310015F838 /* VirtualH89 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1A433C71C705D310015F838 /* Build configuration list for PBXNativeTarget "VirtualH89" */;
+			buildPhases = (
+				A1A433BC1C705D310015F838 /* Sources */,
+				A1A433BD1C705D310015F838 /* Frameworks */,
+				A1A433BE1C705D310015F838 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VirtualH89;
+			productName = VirtualH89;
+			productReference = A1A433C01C705D310015F838 /* VirtualH89 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1A433B81C705D310015F838 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "Mark Garlanger";
+				TargetAttributes = {
+					A1A433BF1C705D310015F838 = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
+				};
+			};
+			buildConfigurationList = A1A433BB1C705D310015F838 /* Build configuration list for PBXProject "VirtualH89" */;
+			compatibilityVersion = "Xcode 6.3";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A1A433B71C705D310015F838;
+			productRefGroup = A1A433C11C705D310015F838 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1A433BF1C705D310015F838 /* VirtualH89 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1A433BC1C705D310015F838 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1A434581C7060430015F838 /* RAM.cpp in Sources */,
+				A1A4345E1C7060430015F838 /* StdioConsole.cpp in Sources */,
+				A1A434531C7060430015F838 /* Memory.cpp in Sources */,
+				A1A434371C7060430015F838 /* AddressBus.cpp in Sources */,
+				A1A434611C7060430015F838 /* WallClock.cpp in Sources */,
+				A1A4345A1C7060430015F838 /* Sector.cpp in Sources */,
+				A1A434391C7060430015F838 /* computer.cpp in Sources */,
+				A1A434481C7060430015F838 /* h37.cpp in Sources */,
+				A1A4343E1C7060430015F838 /* DiskData.cpp in Sources */,
+				A1A4345B1C7060430015F838 /* SerialPortDevice.cpp in Sources */,
+				A1A434541C7060430015F838 /* NMIPort.cpp in Sources */,
+				A1A4344F1C7060430015F838 /* InterruptController.cpp in Sources */,
+				A1A434411C7060430015F838 /* EventHandler.cpp in Sources */,
+				A1A4343C1C7060430015F838 /* crc-ccitt.cpp in Sources */,
+				A1A4344B1C7060430015F838 /* h89-timer.cpp in Sources */,
+				A1A434571C7060430015F838 /* propertyutil.cpp in Sources */,
+				A1A434521C7060430015F838 /* main.cpp in Sources */,
+				A1A4344E1C7060430015F838 /* INS8250.cpp in Sources */,
+				A1A434401C7060430015F838 /* EightInchDisk.cpp in Sources */,
+				A1A434551C7060430015F838 /* ParallelLink.cpp in Sources */,
+				A1A4345F1C7060430015F838 /* Terminal.cpp in Sources */,
+				A1A434441C7060430015F838 /* h-17-1.cpp in Sources */,
+				A1A4344C1C7060430015F838 /* H89.cpp in Sources */,
+				A1A434511C7060430015F838 /* logger.cpp in Sources */,
+				A1A434381C7060430015F838 /* ClockUser.cpp in Sources */,
+				A1A434591C7060430015F838 /* ROM.cpp in Sources */,
+				A1A434501C7060430015F838 /* IODevice.cpp in Sources */,
+				A1A4344D1C7060430015F838 /* HardSectoredDisk.cpp in Sources */,
+				A1A434471C7060430015F838 /* h19.cpp in Sources */,
+				A1A434621C7060430015F838 /* Z47Controller.cpp in Sources */,
+				A1A4343A1C7060430015F838 /* Console.cpp in Sources */,
+				A1A434361C7060430015F838 /* README.md in Sources */,
+				A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */,
+				A1A434601C7060430015F838 /* Track.cpp in Sources */,
+				A1A4343D1C7060430015F838 /* disasm.cpp in Sources */,
+				A1A434421C7060430015F838 /* FloppyDisk.cpp in Sources */,
+				A1A434461C7060430015F838 /* h17.cpp in Sources */,
+				A1A4344A1C7060430015F838 /* h89-io.cpp in Sources */,
+				A1A434451C7060430015F838 /* h-17-4.cpp in Sources */,
+				A1A4343B1C7060430015F838 /* cpu.cpp in Sources */,
+				A1A434631C7060430015F838 /* Z47Interface.cpp in Sources */,
+				A1A434431C7060430015F838 /* GeneralPurposePort.cpp in Sources */,
+				A1A434641C7060430015F838 /* z80.cpp in Sources */,
+				A1A434491C7060430015F838 /* H47Drive.cpp in Sources */,
+				A1A4343F1C7060430015F838 /* DiskDrive.cpp in Sources */,
+				A1A4345D1C7060430015F838 /* SoftSectoredDisk.cpp in Sources */,
+				A1A4345C1C7060430015F838 /* SignalHandler.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1A433C51C705D310015F838 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A1A433C61C705D310015F838 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		A1A433C81C705D310015F838 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A1A433C91C705D310015F838 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1A433BB1C705D310015F838 /* Build configuration list for PBXProject "VirtualH89" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A433C51C705D310015F838 /* Debug */,
+				A1A433C61C705D310015F838 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1A433C71C705D310015F838 /* Build configuration list for PBXNativeTarget "VirtualH89" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A433C81C705D310015F838 /* Debug */,
+				A1A433C91C705D310015F838 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1A433B81C705D310015F838 /* Project object */;
+}

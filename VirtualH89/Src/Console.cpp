@@ -21,4 +21,7 @@ std::string Console::command(std::string cmd)
 {
     // TODO: develop protocol of commands,
     // e.g. "list all disk drives and media" and "mount new media".
+    
+    // placeholder to fix error under mac os x and xcode.
+    return "";
 }
