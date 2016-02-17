@@ -1671,7 +1671,6 @@ BYTE Z80::execute(WORD numInst)
     do
     {
         prefix = ip_none;
-        processingIntr = false;
         curInstByte = 0;
         lastInstByte = 0;
 
@@ -1766,7 +1765,6 @@ BYTE Z80::execute(WORD numInst)
         }
 
 #endif
-#if NEW_TICKS
 
         // check to see if the clock has any ticks left
         if (ticks <= 0)
@@ -1782,36 +1780,6 @@ BYTE Z80::execute(WORD numInst)
             nanosleep(&sp, &act);
             continue;
         }
-
-#else
-
-        // check to see if the clock has any ticks left
-        if (ticks <= 0)
-        {
-            // No virtual time left in this timer tick, wait for the next one.
-            static struct timespec sp;
-            static struct timespec act;
-
-            // Can over-shoot the time to sleep, the timer interrupt will wake
-            // CPU at the correct time.
-            sp.tv_sec = 1;
-            sp.tv_nsec = 0;
-            nanosleep(&sp, &act);
-        }
-
-#endif
-#if 0
-
-        // If in halt, we just do a NOP, without any PC changes.
-        if (mode == cm_halt)
-        {
-            ticks -= 4;
-            ticks -= 4;
-            WallClock::instance()->addTicks(4);
-            continue;
-        }
-
-#endif
 
         //traceInstructions();
         lastInstByte = curInst[0] = readInst();
@@ -1842,6 +1810,8 @@ BYTE Z80::execute(WORD numInst)
         {
             cpu_state = SINGLE_STEP_C;
         }
+        
+        processingIntr = false;
     }
     while (cpu_state == RUN_C);
 
