@@ -31,6 +31,7 @@ class InterruptController
 
   public:
     InterruptController(CPU *cpu);
+    InterruptController(InterruptController *ic);
     virtual ~InterruptController();
     CPU *getCpu()
     {

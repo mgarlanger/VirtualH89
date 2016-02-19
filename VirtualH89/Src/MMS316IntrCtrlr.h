@@ -23,7 +23,6 @@
 class MMS316IntrCtrlr: public InterruptController
 {
   private:
-    InterruptController *ic_m;
     MMS77316 *m316_m;
 
   public:

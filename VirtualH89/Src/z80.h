@@ -37,8 +37,7 @@ typedef void (Z80::*xd_cbMethod)(BYTE&);
 class Z80: public CPU
 {
   private:
-    void checkBUSREQ();
-    pthread_mutex_t z80_mutex;
+    void systemMutexCycle();
     // data
 
     // Registers
@@ -155,8 +154,6 @@ class Z80: public CPU
     Z80(int clockRate, int ticksPerSecond);
     virtual ~Z80();
 
-    void assertBUSREQ();
-    void deassertBUSREQ();
     std::string dumpDebug();
 
     virtual void continueRunning(void);

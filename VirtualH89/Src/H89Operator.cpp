@@ -195,8 +195,8 @@ std::string H89Operator::executeCommand(std::string cmd)
 
 std::string H89Operator::handleCommand(std::string cmd)
 {
-    h89.assertBUSREQ();
+    h89.systemMutexAcquire();
     std::string resp = executeCommand(cmd);
-    h89.deassertBUSREQ();
+    h89.systemMutexRelease();
     return resp;
 }

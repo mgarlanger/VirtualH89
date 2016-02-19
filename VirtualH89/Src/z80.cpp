@@ -1378,7 +1378,6 @@ Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
     debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,
             clockRate,
             ticksPerSecond);
-    pthread_mutex_init(&z80_mutex, NULL);
 
     if ((clockRate) && (ticksPerSecond))
     {
@@ -1666,32 +1665,12 @@ BYTE Z80::step(void)
     return (execute(1));
 }
 
-// These are called from outside threads, to suspend the execute() thread.
-void Z80::assertBUSREQ()
-{
-    pthread_mutex_lock(&z80_mutex);
-}
-void Z80::deassertBUSREQ()
-{
-    pthread_mutex_unlock(&z80_mutex);
-}
-
 // This is only used by the execute() thread.
-void Z80::checkBUSREQ()
+void Z80::systemMutexCycle()
 {
-    pthread_mutex_unlock(&z80_mutex);
-    // Need to guarantee we don't steal the lock from existing waiters...
-#if 0   // for some reason, this disturbs execution and the ROM hangs in init...
-    // even though it is still executing instructions...
-    // appears to be looping with 2MS Clock INT stuck ON
-    struct timespec sp;
-    struct timespec act;
-
-    sp.tv_sec = 0;
-    sp.tv_nsec = 1;
-    nanosleep(&sp, &act);
-#endif
-    pthread_mutex_lock(&z80_mutex);
+    h89.systemMutexRelease();
+    // If someone else is waiting, they should get the mutex now.
+    h89.systemMutexAcquire();
 }
 
 std::string Z80::dumpDebug()
@@ -1750,11 +1729,11 @@ BYTE Z80::execute(WORD numInst)
     bool limited = (numInst != 0);
 
     cpu_state = RUN_C;
-    pthread_mutex_lock(&z80_mutex);
+    h89.systemMutexAcquire();
 
     do
     {
-        checkBUSREQ();
+        systemMutexCycle();
 
         if (mode == cm_reset)
         {
@@ -1908,12 +1887,12 @@ BYTE Z80::execute(WORD numInst)
         {
             cpu_state = SINGLE_STEP_C;
         }
-        
+
         processingIntr = false;
     }
     while (cpu_state == RUN_C);
 
-    pthread_mutex_unlock(&z80_mutex);
+    h89.systemMutexRelease();
 
     return (0);
 }

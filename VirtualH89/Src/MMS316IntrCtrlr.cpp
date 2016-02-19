@@ -12,10 +12,10 @@
 #include "z80.h"
 
 MMS316IntrCtrlr::MMS316IntrCtrlr(InterruptController *ic, MMS77316 *m316):
-    InterruptController(ic->getCpu()),
-    ic_m(ic),
+    InterruptController(ic),
     m316_m(m316)
 {
+    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr(InterruptController *, MMS77316 *)\n");
 }
 
 MMS316IntrCtrlr::~MMS316IntrCtrlr()
@@ -24,13 +24,14 @@ MMS316IntrCtrlr::~MMS316IntrCtrlr()
 
 void MMS316IntrCtrlr::raiseInterrupt(BYTE level)
 {
-    ic_m->raiseInterrupt(level);
+    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr::raiseInterrupt(%d)\n", level);
+    InterruptController::raiseInterrupt(level);
 }
 
 void MMS316IntrCtrlr::lowerInterrupt(BYTE level)
 {
+    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr::lowerInterrupt(%d)\n", level);
     InterruptController::lowerInterrupt(level);
-    ic_m->lowerInterrupt(level);
 }
 
 // reading instructions for interrupts
@@ -40,9 +41,9 @@ BYTE MMS316IntrCtrlr::readDataBus()
 
     if (!m316_m->interResponder(opCode))
     {
-        opCode = ic_m->readDataBus();
+        opCode = InterruptController::readDataBus();
     }
 
-    debugss(ssMMS77316, INFO, "readDataBus in interrupt... returning %02x\n", opCode);
+    debugss(ssMMS77316, VERBOSE, "readDataBus in interrupt... returning %02x\n", opCode);
     return opCode;
 }

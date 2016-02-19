@@ -39,6 +39,7 @@
 
 H89::H89(): Computer()
 {
+    pthread_mutex_init(&h89_mutex, NULL);
 }
 
 void H89::buildSystem(Console *console)
@@ -85,7 +86,7 @@ void H89::buildSystem(Console *console)
     ab    = new AddressBus(interruptController);
     cpu->setAddressBus(ab);
     cpu->setSpeed(false);
-    timer = new H89Timer(cpu, getAddressBus().getIntrCtrlr());
+    timer = new H89Timer(cpu);
     h89io = new H89_IO;
 
     nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
@@ -494,14 +495,14 @@ void H89::raiseNMI(void)
     cpu->raiseNMI();
 }
 
-void H89::assertBUSREQ()
+void H89::systemMutexAcquire()
 {
-    cpu->assertBUSREQ();
+    pthread_mutex_lock(&h89_mutex);
 }
 
-void H89::deassertBUSREQ()
+void H89::systemMutexRelease()
 {
-    cpu->deassertBUSREQ();
+    pthread_mutex_unlock(&h89_mutex);
 }
 
 void H89::raiseINT(int level)
