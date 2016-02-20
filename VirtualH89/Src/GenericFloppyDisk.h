@@ -10,9 +10,10 @@
 #ifndef GENERICFLOPPYDISK_H_
 #define GENERICFLOPPYDISK_H_
 
+#include <string>
+
 #include "config.h"
 #include "h89Types.h"
-#include <string>
 
 class DiskData;
 

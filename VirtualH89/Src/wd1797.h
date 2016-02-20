@@ -1,4 +1,4 @@
-/// \file mms77316.h
+/// \file wd1797.h
 ///
 /// Implementation of the WD1797 FDC (floppy disk controller) chip.
 ///

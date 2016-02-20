@@ -10,10 +10,6 @@
 /// \author Douglas Miller
 ///
 
-#include "H89.h"
-#include "h89-io.h"
-#include "StdioProxyConsole.h"
-#include "logger.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -22,6 +18,11 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sstream>
+
+#include "H89.h"
+#include "h89-io.h"
+#include "StdioProxyConsole.h"
+#include "logger.h"
 
 /// \brief StdioProxyConsole
 ///

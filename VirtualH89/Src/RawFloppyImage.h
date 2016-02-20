@@ -21,13 +21,14 @@
 #ifndef RAWFLOPPYIMAGE_H_
 #define RAWFLOPPYIMAGE_H_
 
+#include <sys/types.h>
+#include <string>
+#include <vector>
+
 #include "config.h"
 #include "h89Types.h"
 #include "GenericFloppyDrive.h"
 #include "GenericFloppyFormat.h"
-#include <sys/types.h>
-#include <string>
-#include <vector>
 
 /// \class RawFloppyImage
 ///

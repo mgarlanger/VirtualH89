@@ -1,4 +1,4 @@
-/// \file GenericFloppyDrive.h
+/// \file GenericDiskDrive.h
 ///
 /// Interface for a floppy disk drive, supporting methods for handling
 /// mounted media.
@@ -10,11 +10,11 @@
 #ifndef GENERICDISKDRIVE_H_
 #define GENERICDISKDRIVE_H_
 
+#include <string>
+
 #include "config.h"
 #include "h89Types.h"
-#include "GenericDiskDrive.h"
 #include "GenericFloppyDisk.h"
-#include <string>
 
 ///
 /// \brief Virtual Generic Disk Drive

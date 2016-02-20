@@ -6,10 +6,11 @@
 /// \author Douglas Miller
 ///
 
-#include "H89.h"
-#include "mms77320.h"
 #include "logger.h"
 #include <string.h>
+
+#include "H89.h"
+#include "mms77320.h"
 
 const char *MMS77320::MMS77320_Name_c = "MMS77320";
 

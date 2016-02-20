@@ -10,11 +10,12 @@
 #ifndef GENERICFLOPPYDRIVE_H_
 #define GENERICFLOPPYDRIVE_H_
 
+#include <string>
+
 #include "config.h"
 #include "h89Types.h"
 #include "GenericFloppyDisk.h"
 #include "GenericDiskDrive.h"
-#include <string>
 
 ///
 /// \brief Virtual Generic Floppy Drive

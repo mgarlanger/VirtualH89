@@ -10,7 +10,6 @@
 #define GENERICFLOPPYFORMAT_H_
 
 #include "config.h"
-
 #include "h89Types.h"
 
 ///

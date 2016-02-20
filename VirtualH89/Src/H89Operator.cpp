@@ -8,9 +8,6 @@
 /// \author Douglas Miller
 ///
 
-#include "H89.h"
-#include "h89-io.h"
-#include "logger.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -20,8 +17,10 @@
 #include <unistd.h>
 #include <sstream>
 
+#include "H89.h"
+#include "h89-io.h"
+#include "logger.h"
 #include "H89Operator.h"
-
 #include "DiskController.h"
 #include "GenericDiskDrive.h"
 #include "RawFloppyImage.h"

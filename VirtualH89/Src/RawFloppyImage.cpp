@@ -7,14 +7,15 @@
 /// \author Douglas Miller
 ///
 
-#include "RawFloppyImage.h"
-#include "logger.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+
+#include "RawFloppyImage.h"
+#include "logger.h"
 
 void RawFloppyImage::getAddrMark(BYTE *tp, int nbytes,
                                  int& id_tk, int& id_sd, int& id_sc, int& id_sl)

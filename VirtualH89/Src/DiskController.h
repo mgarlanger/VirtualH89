@@ -10,11 +10,12 @@
 #ifndef DISKCONTROLLER_H_
 #define DISKCONTROLLER_H_
 
+#include <vector>
+#include <string>
+
 #include "h89Types.h"
 #include "IODevice.h"
 #include "GenericDiskDrive.h"
-#include <vector>
-#include <string>
 
 /// \todo - determine if interrupt level for the device should be here, or if we subclass
 ///         this to a IOIntrDevice.
