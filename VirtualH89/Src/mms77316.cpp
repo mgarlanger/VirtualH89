@@ -1,5 +1,7 @@
 /// \file mms77316.cpp
 ///
+/// Implementation of the MMS 77316 floppy disk controller.
+///
 /// \date Jan 30, 2016
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///

@@ -1,5 +1,8 @@
 /// \file DiskController.cpp
 ///
+/// A wrapper for an IODevice that allows it to be distinguished from other,
+/// non-storage, I/O Devices. Requires some methods for handling mounted media.
+///
 /// \date Feb 8, 2016
 /// \author Douglas Miller
 ///

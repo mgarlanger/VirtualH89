@@ -1,5 +1,8 @@
 /// \file RawFloppyImage.cpp
 ///
+/// \brief virtual Floppy Disk implementation for soft-sectored media.
+/// Supports media image files that have a simplified raw-track format.
+///
 /// \date Feb 2, 2016
 /// \author Douglas Miller
 ///

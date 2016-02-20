@@ -1,5 +1,7 @@
 /// \file wd1797.cpp
 ///
+/// Implementation of the WD1797 FDC (floppy disk controller) chip.
+///
 /// \date Feb 1, 2016
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///

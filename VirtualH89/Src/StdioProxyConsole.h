@@ -1,5 +1,10 @@
 /// \file StdioProxyConsole.h
 ///
+/// A console replacement that supports an external process as the H19.
+/// Also supports a out-of-band channel for command/control messages.
+/// Typically, this is selected by commandline options for main(),
+/// with the parent process as the H19 emulation.
+///
 /// \date Feb 6, 2016
 /// \author Douglas Miller
 ///

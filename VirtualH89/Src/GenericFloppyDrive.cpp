@@ -1,5 +1,8 @@
 /// \file GenericFloppyDrive.cpp
 ///
+/// Implementation of a generic floppy disk drive, should be capable of
+/// supporting any type of floppy drive, 8", 5.25", DS, DT, etc.
+///
 /// \date Feb 2, 2016
 /// \author Douglas Miller
 ///

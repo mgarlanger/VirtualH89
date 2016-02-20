@@ -1,5 +1,7 @@
 /// \file mms77316.h
 ///
+/// Implementation of the MMS 77316 floppy disk controller.
+///
 /// \date Jan 30, 2016
 /// \author Douglas Miller, cloned from h37.h by Mark Garlanger
 ///
@@ -20,7 +22,6 @@
 /// \brief Virtual soft-sectored disk controller
 ///
 /// A virtual Magnolia Microsystems soft-sectored disk controller (MMS77316).
-/// Note: this is NOT complete or even marginally functional.
 ///
 /// The MMS77316 uses the 1797-02 controller.
 ///

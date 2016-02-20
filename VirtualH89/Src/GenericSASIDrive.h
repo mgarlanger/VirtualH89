@@ -1,5 +1,8 @@
 /// \file GenericSASIDrive.h
 ///
+/// Implementation of a generic SASI disk drive and controller. Media is separate.
+/// Currently based on a XEBEC controller (only documentation available).
+///
 /// \date  Feb 1, 2016
 /// \author Douglas Miller
 ///

@@ -1,6 +1,17 @@
 /// \file RawFloppyImage.h
 ///
-/// \brief virtual Floppy Disk
+/// \brief virtual Floppy Disk implementation for soft-sectored media.
+/// Supports media image files that have a simplified raw-track format.
+/// See GenericFloppyFormat for special format marks INDEX_AM, ID_AM, and
+/// DATA_AM which are used to mark the start of respective sections of the media.
+/// Gaps are typically zeroes, as opposed to other patterns used in real media.
+/// NOTE: On real soft-sectored media the special marks are recorded using a
+/// missing-clock method and so the real controller can easily distinguish
+/// the marks from actualy data, which could otherwise match the bit pattern.
+/// This implemetnation cannot do that in the image file, so it must be able to
+/// determine precisely where data and address blocks beging, which means
+/// each track must be identically formatted. Real images taken from real media
+/// will not conform to that restriction.
 ///
 /// \date Feb 2, 2016
 ///

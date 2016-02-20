@@ -1,5 +1,11 @@
 /// \file StdioProxyConsole.cpp
 ///
+/// A console replacement that supports an external process as the H19.
+/// Also supports a out-of-band channel for command/control messages.
+/// Uses the process stdin and stout for communication with the virtual H19.
+/// H19 traffic has the high bit set, while oob traffic has the high bit clear.
+/// Thus, only 7-bit ASSCII is supported for each channel.
+///
 /// \date Feb 6, 2016
 /// \author Douglas Miller
 ///

@@ -1,7 +1,9 @@
 /// \file mms77320.cpp
 ///
-/// \date Jan 30, 2016
-/// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
+/// Implementation of the MMS 77320 SASI adapter.
+///
+/// \date Feb 13, 2016
+/// \author Douglas Miller
 ///
 
 #include "H89.h"

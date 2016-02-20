@@ -1,7 +1,10 @@
 /// \file mms77320.h
 ///
-/// \date Jan 30, 2016
-/// \author Douglas Miller, cloned from h37.h by Mark Garlanger
+/// Implementation of the MMS 77320 SASI adapter. Does not implement the SASI controller
+/// or disk drive (or media), see GenericSASIDrive et al.
+///
+/// \date Feb 13, 2016
+/// \author Douglas Miller
 ///
 
 #ifndef MMS77320_H_

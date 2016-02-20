@@ -1,6 +1,8 @@
 ///
 /// \name MMS316IntrCtrlr.h
 ///
+/// Implementation of the H89 interrupt controller circuits, when augmented by the
+/// MMS 77316 floppy disk controller. Used only if the MMS77316 is installed.
 ///
 /// \date Feb 8, 2016
 /// \author Douglas Miller

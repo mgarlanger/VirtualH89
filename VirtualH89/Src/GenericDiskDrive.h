@@ -1,5 +1,8 @@
 /// \file GenericFloppyDrive.h
 ///
+/// Interface for a floppy disk drive, supporting methods for handling
+/// mounted media.
+///
 /// \date  Feb 1, 2016
 /// \author Douglas Miller
 ///

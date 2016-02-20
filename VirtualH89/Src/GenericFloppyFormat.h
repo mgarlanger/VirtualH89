@@ -1,5 +1,7 @@
 /// \file GenericFloppyFormat.h
 ///
+/// Some constants and conventions used to represent floppy diskette formats.
+///
 /// \date  Feb 1, 2016
 /// \author Douglas Miller
 ///

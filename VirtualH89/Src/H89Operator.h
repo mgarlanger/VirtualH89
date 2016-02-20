@@ -1,5 +1,9 @@
 /// \file H89Operator.h
 ///
+/// The VirtualH89-side implementation of the H89 Operator's interface, for
+/// standard functions such as RESET and diskette muont/unmount, but also
+/// providing virtual features like debugging.
+///
 /// \date Feb 9, 2016
 /// \author Douglas Miller
 ///

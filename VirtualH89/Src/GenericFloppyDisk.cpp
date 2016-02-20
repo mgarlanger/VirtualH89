@@ -1,5 +1,7 @@
 /// \file GenericFloppyDisk.cpp
 ///
+/// \brief virtual Floppy Disk interface.
+///
 /// \date Feb 2, 2016
 /// \author Douglas Miller
 ///

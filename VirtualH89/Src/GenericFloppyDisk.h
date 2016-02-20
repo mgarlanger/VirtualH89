@@ -1,6 +1,6 @@
 /// \file GenericFloppyDisk.h
 ///
-/// \brief virtual Floppy Disk
+/// \brief virtual Floppy Disk interface.
 ///
 /// \date Feb 2, 2016
 ///
