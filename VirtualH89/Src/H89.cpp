@@ -30,6 +30,7 @@
 #include "HardSectoredDisk.h"
 #include "SoftSectoredDisk.h"
 #include "EightInchDisk.h"
+#include "CPNetDevice.h"
 #include "Console.h"
 #include "logger.h"
 #include "propertyutil.h"
@@ -110,6 +111,7 @@ void H89::buildSystem(Console *console)
     z47Link     = nullptr;
     MMS77316 *m316 = NULL;
     MMS77320 *m320 = NULL;
+    CPNetDevice *cpn = CPNetDevice::install_CPNetDevice(props);
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
     std::vector<std::string> devslots = { "slot_p504", "slot_p505", "slot_p506" };
@@ -338,6 +340,11 @@ void H89::buildSystem(Console *console)
         h89io->addDevice(lpPort);
         h89io->addDevice(auxPort);
         h89io->addDevice(modemPort);
+    }
+
+    if (cpn != NULL)
+    {
+        h89io->addDevice(cpn);
     }
 
     if (m316 != NULL)

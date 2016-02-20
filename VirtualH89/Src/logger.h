@@ -123,6 +123,8 @@ enum subSystems
     ssRawFloppyImage,
     ssMMS77320,
     ssGenericSASIDrive,
+    ssHostFileBdos,
+    ssCPNetDevice,
     ssMax
 };
 
