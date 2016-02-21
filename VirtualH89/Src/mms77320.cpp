@@ -175,7 +175,11 @@ MMS77320::~MMS77320()
 void MMS77320::reset(void)
 {
     control0Reg_m = 0;
-    control1Reg_m = 0;
+    control1Reg_m = -1;
+    dataOutReg_m = 0;
+    dataInReg_m = 0;
+    statusReg_m = 0;
+    ctrlBus_m = 0;
     h89.lowerINT(intLevel_m);
     // TODO: reset all drives?
 }
