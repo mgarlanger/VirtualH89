@@ -5,7 +5,8 @@
 ///
 
 #include "h89-timer.h"
-#include "CPU.h"
+#include "H89.h"
+#include "cpu.h"
 #include "InterruptController.h"
 #include "SignalHandler.h"
 #include "WallClock.h"
@@ -30,8 +31,7 @@ static const int TimerInterval_c = 2000;
 static const int TimerInterval_c = 10000;
 #endif
 
-H89Timer::H89Timer(CPU *cpu, InterruptController *ic, unsigned char intlvl): cpu_m(cpu),
-    ic_m(ic),
+H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
     intEnabled_m(false),
     count_m(0),
     intLevel(intlvl)
@@ -57,14 +57,13 @@ H89Timer::H89Timer(CPU *cpu, InterruptController *ic, unsigned char intlvl): cpu
 
 
 H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
-    ic_m(0),
     intEnabled_m(false),
     count_m(0),
     intLevel(intlvl)
 {
     static struct itimerval tim;
 
-    debugss(ssTimer, INFO, "%s: ic_m(NULL)\n", __FUNCTION__);
+    debugss(ssTimer, INFO, "%s: cpu_m(NULL)\n", __FUNCTION__);
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
 
@@ -80,13 +79,6 @@ H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
 #endif
 
     setitimer(ITIMER_REAL, &tim, NULL);
-}
-
-void H89Timer::setInterruptController(InterruptController *ic)
-{
-    debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
-
-    ic_m = ic;
 }
 
 void H89Timer::setCPU(CPU *cpu)
@@ -109,7 +101,11 @@ H89Timer::~H89Timer()
     setitimer(ITIMER_REAL, &tim, NULL);
 }
 
-
+void H89Timer::reset()
+{
+    intEnabled_m = false;
+    count_m = 0;
+}
 
 int H89Timer::handleSignal(int signum)
 {
@@ -138,12 +134,12 @@ int H89Timer::handleSignal(int signum)
 
         if ((intEnabled_m) && ((count_m & 0x01) == 0x00))
 #else
-        if (intEnabled_m && ic_m)
+        if (intEnabled_m)
 #endif
         {
             debugss(ssTimer, VERBOSE, "%s: raising Interrupt\n", __FUNCTION__);
 
-            ic_m->raiseInterrupt(intLevel);
+            h89.raiseINT(intLevel);
         }
     }
 
@@ -168,9 +164,6 @@ void H89Timer::disableINT()
 
     intEnabled_m = false;
 
-    if (ic_m)
-    {
-        ic_m->lowerInterrupt(intLevel);
-    }
+    h89.lowerINT(intLevel);
 }
 

@@ -83,16 +83,35 @@ void StdioConsole::run()
 {
     int ret;
     int c;
+    struct termios termios0;
     struct termios termios;
 
+    fprintf(stdout, "Press ESC to quit.\n");
+    fflush(stdout);
+
     setbuf(stdin, NULL);
-    tcgetattr(0, &termios);
-    termios.c_lflag &= ~ICANON;
-    termios.c_lflag &= ~ECHO;
-    tcsetattr(0, 0, &termios);
+    ret = tcgetattr(0, &termios);
+
+    if (ret == 0)
+    {
+        memcpy(&termios0, &termios, sizeof(termios0));
+        termios.c_lflag &= ~ICANON;
+        termios.c_lflag &= ~ECHO;
+        ret = tcsetattr(0, 0, &termios);
+    }
 
     while ((c = fgetc(stdin)) != EOF)
     {
+        if (c == 0x1b)
+        {
+            break;
+        }
+
         keypress(c);
+    }
+
+    if (ret == 0)
+    {
+        tcsetattr(0, 0, &termios0);
     }
 }

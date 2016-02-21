@@ -10,6 +10,8 @@
 #include "logger.h"
 #include "h89-timer.h"
 #include "IODevice.h"
+#include "propertyutil.h"
+#include <stdlib.h>
 
 const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Count_c] =
 {
@@ -26,14 +28,39 @@ GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPor
     mms128k_Unlocked(false),
     mms128k_Unlock_Pos(0),
     curSide_m(-1),
+    portBits_m(0),
     fast_m(false)
 {
+    dipsw_m = (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
 
+}
+
+GeneralPurposePort::GeneralPurposePort(std::string settings):
+    IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
+    mms128k_Unlocked(false),
+    mms128k_Unlock_Pos(0),
+    curSide_m(-1),
+    portBits_m(0),
+    fast_m(false)
+{
+    // TODO: verify a binary string and/or handle other formats/nmenonics.
+    dipsw_m = strtol(settings.c_str(), NULL, 2);
 }
 
 GeneralPurposePort::~GeneralPurposePort()
 {
 
+}
+
+void GeneralPurposePort::reset()
+{
+    mms128k_Unlocked = false;
+    mms128k_Unlock_Pos = 0;
+    curSide_m = -1;
+    fast_m = false;
+    // do not change 'dispsw_m'!
+    // portBits_m = 0; // must actually call out()... side-effects...
+    out(GPP_BaseAddress_c, 0);
 }
 
 BYTE GeneralPurposePort::in(BYTE addr)
@@ -118,9 +145,7 @@ BYTE GeneralPurposePort::in(BYTE addr)
 
     if (verifyPort(addr))
     {
-        //return(Mtr89_MemoryTest_Off_c);
-
-        return (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
+        return dipsw_m;
     }
 
     return (0);
@@ -132,6 +157,8 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
     {
         // from the manual, writing to this port clears the interrupt.
         h89.lowerINT(1);
+        BYTE diffs = portBits_m ^ val;
+        portBits_m = val;
 
         if (val & gpp_EnableTimer_c)
         {
@@ -146,18 +173,22 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
             h89.getTimer().disableINT();
         }
 
-        if (val & gpp_DisableROM_c)
+        if (diffs & gpp_DisableROM_c)
         {
-            // ORG "0" Mod - disable the ROM and use RAM for the lower 8K
-            debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
-            h89.disableROM();
-        }
+            // This is a big thing to do every time we write the port...
+            if (val & gpp_DisableROM_c)
+            {
+                // ORG "0" Mod - disable the ROM and use RAM for the lower 8K
+                debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
+                h89.disableROM();
+            }
 
-        else
-        {
-            // re-enable the ROM
-            debugss(ssGpp, ALL, "%s: Disable ORG 0.\n", __FUNCTION__);
-            h89.enableROM();
+            else
+            {
+                // re-enable the ROM
+                debugss(ssGpp, ALL, "%s: Disable ORG 0.\n", __FUNCTION__);
+                h89.enableROM();
+            }
         }
 
         if (val & gpp_SingleStepInterrupt_c)
@@ -169,6 +200,7 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
 
         if (val & gpp_SideSelect_c)
         {
+            // TODO: H17 should pick up this from GPP...
             debugss(ssGpp, ALL, "%s: H17 Set Side 1.\n", __FUNCTION__);
             h89.selectSideH17(1);
         }
@@ -180,25 +212,35 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
         }
 
         /// Speed changes, may need to change to support MMS 128k expansion.
-        if (val & gpp_4MHz_2MHz_Select_c)
+        if (diffs & gpp_4MHz_2MHz_Select_c)
         {
-            /// \todo this needs to be put in the H89 class...
-            if (!fast_m)
+            if (val & gpp_4MHz_2MHz_Select_c)
             {
-                debugss(ssGpp, ALL, "%s: Set Fast speed.\n", __FUNCTION__);
-                h89.setSpeed(true);
-                fast_m = true;
+                /// \todo this needs to be put in the H89 class...
+                if (!fast_m)
+                {
+                    debugss(ssGpp, ALL, "%s: Set Fast speed.\n", __FUNCTION__);
+                    h89.setSpeed(true);
+                    fast_m = true;
+                }
             }
-        }
 
-        else
-        {
-            if (fast_m)
+            else
             {
-                debugss(ssGpp, ALL, "%s: Set Standard speed.\n", __FUNCTION__);
-                h89.setSpeed(false);
-                fast_m = false;
+                if (fast_m)
+                {
+                    debugss(ssGpp, ALL, "%s: Set Standard speed.\n", __FUNCTION__);
+                    h89.setSpeed(false);
+                    fast_m = false;
+                }
             }
         }
     }
+}
+
+std::string GeneralPurposePort::dumpDebug()
+{
+    std::string ret = PropertyUtil::sprintf("GP-OUT=%02x GP-IN=%02x\n",
+                                            portBits_m, dipsw_m);
+    return ret;
 }

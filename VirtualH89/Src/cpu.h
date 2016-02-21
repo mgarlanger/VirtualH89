@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "h89Types.h"
+#include <string>
 
 class AddressBus;
 
@@ -19,9 +20,13 @@ class AddressBus;
 ///
 class CPU
 {
+  public:
+    static const unsigned long NO_INTR_INST = ((unsigned long) - 1);
+    typedef unsigned long intrCheck(void *arg, int level);
   private:
 
   public:
+
     CPU();
     virtual ~CPU();
 
@@ -35,6 +40,8 @@ class CPU
     virtual void setAddressBus(AddressBus *ab) = 0;
     virtual void setSpeed(bool fast) = 0;
     virtual void continueRunning(void) = 0;
+    virtual void waitState(void) = 0;
+    virtual std::string dumpDebug() = 0;
 
 };
 

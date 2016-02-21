@@ -1,109 +1,71 @@
-/// \file h37.h
+/// \file wd1797.h
 ///
-/// \date May 13, 2009
-/// \author Mark Garlanger
+/// Implementation of the WD1797 FDC (floppy disk controller) chip.
+///
+/// \date Jan 30, 2016
+/// \author Douglas Miller, cloned from h37.h by Mark Garlanger
 ///
 
-#ifndef Z_89_37_H_
-#define Z_89_37_H_
+#ifndef WD1797_H_
+#define WD1797_H_
 
 #include "config.h"
 #include "h89Types.h"
-#include "DiskController.h"
+#include "IODevice.h"
 #include "ClockUser.h"
-#include <vector>
-#include <string>
-
-class DiskDrive;
+#include "GenericFloppyDrive.h"
 
 ///
 /// \brief Virtual soft-sectored disk controller
 ///
-/// A virtual Heathkit soft-sectored disk controller (Z-89-37).
+/// A virtual Magnolia Microsystems soft-sectored disk controller (MMS77316).
 /// Note: this is NOT complete or even marginally functional.
 ///
-/// The Z-89-37 uses the 1797-02 controller.
+/// The MMS77316 uses the 1797-02 controller.
 ///
-class Z_89_37 : public DiskController, ClockUser
+class WD1797 : public ClockUser
 {
   public:
-    Z_89_37(int baseAddr);
-    virtual ~Z_89_37();
+    WD1797(int baseAddr);
+    virtual ~WD1797();
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, DiskDrive *drive);
-    virtual bool removeDrive(BYTE unitNum);
-
     virtual void reset(void);
     void notification(unsigned int cycleCount);
 
-    static const BYTE z_89_37_Intr_c = 4;
+    void eject(char const *file);
+    void dump();
 
-    // TODO: implement this
-    std::vector<GenericDiskDrive *> getDiskDrives()
-    {
-        return *(new std::vector<GenericDiskDrive *>());
-    }
-    std::string getDeviceName()
-    {
-        return "H37";
-    }
-    GenericDiskDrive *findDrive(std::string ident)
-    {
-        return NULL;
-    }
-    std::string getDriveName(int index)
-    {
-        return "";
-    }
-    std::string dumpDebug()
-    {
-        return "";
-    }
+  protected:
+    virtual GenericFloppyDrive *getCurDrive() = 0;
+    virtual int getClockPeriod() = 0;
+    BYTE basePort_m;
 
-  private:
-    static const BYTE H37_NumPorts_c       = 4;
+    static const BYTE WD1797_NumPorts_c       = 4;
 
-    ///
-    /// DK.PORT  - 0170 (0x78) base port.
-    ///
-    // DK.PORT
-    static const BYTE BasePort_c                = 0x78;
-
-    // DK.CON
-    static const BYTE ControlPort_Offset_c      = 0;
-
-    // DK.INT
-    static const BYTE InterfaceControl_Offset_c = 1;
-
-    // FD.STAT
-    static const BYTE StatusPort_Offset_c       = 2;
-
-    // FD.CMD
-    static const BYTE CommandPort_Offset_c      = 2;
-
-    // FD.DAT
-    static const BYTE DataPort_Offset_c         = 3;
-
-    // FD.SEC
+    static const BYTE StatusPort_Offset_c       = 0;
+    static const BYTE CommandPort_Offset_c      = 0;
+    static const BYTE TrackPort_Offset_c        = 1;
     static const BYTE SectorPort_Offset_c       = 2;
-
-    // FD.TRK
-    static const BYTE TrackPort_Offset_c        = 3;
+    static const BYTE DataPort_Offset_c         = 3;
 
     BYTE trackReg_m;
     BYTE sectorReg_m;
     BYTE dataReg_m;
     BYTE cmdReg_m;
     BYTE statusReg_m;
-    BYTE interfaceReg_m;
-    BYTE controlReg_m;
-    bool motorOn_m;
 
     bool dataReady_m;
-    bool lostDataStatus_m;
+    bool intrqRaised_m;
+    bool drqRaised_m;
+    bool headLoaded_m;
+    int sectorLength_m;
+    bool lastIndexStatus_m;
+    int indexCount_m;
+    bool stepUpdate_m;
+    unsigned long stepSettle_m;
 
     /// type I parameters.
     BYTE seekSpeed_m;
@@ -112,33 +74,14 @@ class Z_89_37 : public DiskController, ClockUser
     /// type II parameters.
     bool multiple_m;
     bool delay_m;
-    bool sectorLength_m;
     BYTE side_m;
     bool deleteDAM_m;
-
-    /// type III parameters
-    //bool delay_m;
-    //BYTE side_m;
-
-    enum Encoding
-    {
-        FM  = 0,
-        MFM = 1
-    };
+    BYTE addr_m[6];
 
     enum Direction
     {
         dir_out = -1,
         dir_in  = 1
-    };
-
-    enum Disks
-    {
-        ds0        = 0,
-        ds1        = 1,
-        ds2        = 2,
-        ds3        = 3,
-        numDisks_c = 4
     };
 
     enum State
@@ -161,45 +104,38 @@ class Z_89_37 : public DiskController, ClockUser
         readTrackCmd,
         writeTrackCmd,
         forceInterruptCmd,
+        // pseudo-commands/states used internally
+        stepDoneCmd,
+        completedCmd,
+        writingSectorCmd,
+        writingTrackCmd,
         noneCmd
     };
     Command curCommand_m;
 
-    bool       sectorTrackAccess_m;
-
-    Encoding   dataEncoding_m;
     Direction  stepDirection_m;
-    DiskDrive *drives_m[numDisks_c];
-    Disks      curDiskDrive_m;
 
-    unsigned char     intLevel_m;
     unsigned long int curPos_m;
 
     int  sectorPos_m;
 
-    bool intrqAllowed_m;
-    bool drqAllowed_m;
-
-    unsigned long long cycleCount_m;
-
+    void waitForData();
     void processCmd(BYTE cmd);
     void processCmdTypeI(BYTE cmd);
     void processCmdTypeII(BYTE cmd);
     void processCmdTypeIII(BYTE cmd);
     void processCmdTypeIV(BYTE cmd);
 
-    void seekTo();
-    void step(void);
-
     void abortCmd();
+    unsigned long millisecToTicks(unsigned long ms);
 
-    void raiseIntrq();
-    void raiseDrq();
-    void lowerIntrq();
-    void lowerDrq();
-
-    void loadHead();
-    void unloadHead();
+    // Controller may need to override/trap these.
+    virtual void raiseIntrq() = 0;
+    virtual void raiseDrq() = 0;
+    virtual void lowerIntrq() = 0;
+    virtual void lowerDrq() = 0;
+    virtual void loadHead(bool load);
+    virtual bool doubleDensity() = 0;
 
     ///
     /// Commands sent to CommandPort_c
@@ -274,20 +210,13 @@ class Z_89_37 : public DiskController, ClockUser
     static const BYTE cmdop_DataAddressMark_c    = 0x01;
 
     ///
-    /// C - Side Compare Flag
-    /// ===============================================
-    /// 0 - Disable side compare
-    /// 1 - Enable side compare
-    ///
-    static const BYTE cmdop_SideCheck_c          = 0x02;
-
-    ///
     /// U - Update SSO
     /// ===============================================
     /// 0 - Update SSO to 0
     /// 1 - Update SSO to 1
     ///
     static const BYTE cmdop_UpdateSSO_c          = 0x02;
+    static const BYTE cmdop_UpdateSSO_Shift_c    = 1;
 
     ///
     /// E - 15 mSec Delay
@@ -296,15 +225,6 @@ class Z_89_37 : public DiskController, ClockUser
     /// 1 - 15 mSec Delay
     ///
     static const BYTE cmdop_Delay_15ms_c         = 0x04;
-
-    ///
-    /// S - Side Compare Flag
-    /// ===============================================
-    /// 0 - Compare for side 0
-    /// 1 - Compare for side 1
-    ///
-    static const BYTE cmdop_CompareSide_c        = 0x08;
-    static const BYTE cmdop_CompareSide_Shift_c  = 3;
 
     ///
     /// L - Sector Length Flag
@@ -402,24 +322,12 @@ class Z_89_37 : public DiskController, ClockUser
     /// stat_DataRequest_c    - 0x02;
     /// stat_Busy_c           - 0x01;
 
-
-    /// Bits set in cmd_ControlPort_c - DK.CON
-    static const BYTE ctrl_EnableIntReq_c       = 0x01;
-    static const BYTE ctrl_EnableDrqInt_c       = 0x02;
-    static const BYTE ctrl_SetMFMRecording_c    = 0x04;
-    static const BYTE ctrl_MotorsOn_c           = 0x08;
-    static const BYTE ctrl_Drive_0_c            = 0x10;
-    static const BYTE ctrl_Drive_1_c            = 0x20;
-    static const BYTE ctrl_Drive_2_c            = 0x40;
-    static const BYTE ctrl_Drive_3_c            = 0x80;
-
-    /// Bits to set alternate registers on InterfaceControl_c - DK.INT
-    static const BYTE if_SelectCommandData_c    = 0x00;
-    static const BYTE if_SelectSectorTrack_c    = 0x01;
-
-    /// Floppy disk related items
-    static const int bytesPerTrack_c = 6400;
-    static const int clocksPerByte_c = 64;
+    static const int sectorLengths[2][4];
+  private:
+    void transferData(int data);
+    bool checkAddr(BYTE addr[6]);
+    int sectorLen(BYTE addr[6]);
+    void updateReady(GenericFloppyDrive *drive);
 };
 
-#endif // Z_89_37_H_
+#endif // WD1797_H_

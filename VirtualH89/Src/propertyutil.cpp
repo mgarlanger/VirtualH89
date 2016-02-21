@@ -9,6 +9,8 @@
 #include <sstream>
 #include <fstream>
 #include <exception>
+#include <cstdarg>
+#include <memory>
 
 void PropertyUtil::read(const char *filename, PropertyMapT& map)
 {
@@ -281,4 +283,60 @@ void PropertyUtil::print(std::ostream& os, PropertyMapT& map)
     {
         os << (*it).first << "=" << (*it).second << std::endl;
     }
+}
+
+std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
+{
+    std::vector<std::string> args;
+    std::istringstream ss(prop);
+    std::string arg;
+
+    while (ss >> arg)
+    {
+        args.push_back(arg);
+    }
+
+    return args;
+}
+
+std::string PropertyUtil::combineArgs(std::vector<std::string> args, int start)
+{
+    std::string str;
+
+    for (int x = start; x < args.size(); ++x)
+    {
+        if (x > start)
+        {
+            str += ' ';
+        }
+
+        str += args[x];
+    }
+
+    return str;
+}
+
+std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args, int start)
+{
+    std::vector<std::string> oargs;
+
+    for (int x = start; x < args.size(); ++x)
+    {
+        oargs.push_back(args[x]);
+    }
+
+    return oargs;
+}
+
+std::string PropertyUtil::sprintf(const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    size_t size = vsnprintf(nullptr, 0, fmt, vl) + 1;
+    va_end(vl);
+    std::unique_ptr<char[]> buf(new char[size]);
+    va_start(vl, fmt);
+    vsnprintf(buf.get(), size, fmt, vl);
+    va_end(vl);
+    return std::string(buf.get(), buf.get() + size - 1);
 }

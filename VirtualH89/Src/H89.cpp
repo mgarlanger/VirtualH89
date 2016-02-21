@@ -20,6 +20,9 @@
 #include "h37.h"
 #include "Z47Interface.h"
 #include "Z47Controller.h"
+#include "mms77316.h"
+#include "mms77320.h"
+#include "RawFloppyImage.h"
 #include "ParallelLink.h"
 #include "h-17-1.h"
 #include "h-17-4.h"
@@ -32,9 +35,11 @@
 #include "propertyutil.h"
 
 #include <stdlib.h>
+#include <vector>
 
-H89::H89()
+H89::H89(): Computer()
 {
+    pthread_mutex_init(&h89_mutex, NULL);
 }
 
 void H89::buildSystem(Console *console)
@@ -56,7 +61,7 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception &e) {}
+        catch (std::exception& e) {}
     }
     else
     {
@@ -68,7 +73,7 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception &e) {}
+        catch (std::exception& e) {}
     }
 
     std::string s; // for general property queries.
@@ -79,129 +84,189 @@ void H89::buildSystem(Console *console)
     cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
     interruptController = new InterruptController(cpu);
     ab    = new AddressBus(interruptController);
-    h17   = new H17(H17_BaseAddress_c);
+    cpu->setAddressBus(ab);
+    cpu->setSpeed(false);
+    timer = new H89Timer(cpu);
+    h89io = new H89_IO;
 
-    // create the floppy drives for the hard-sectored controller.
-    driveUnitH0 = new H_17_1;
-    driveUnitH1 = new H_17_4;
-    driveUnitH2 = new H_17_4;
+    nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
+    nmi2        = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
+    s = props["sw501"];
 
-#if Z37
-    h37   = new Z_89_37(H37_BasePort_c);
-    // create the floppy drives for the soft-sectored controller.
-    driveUnitS0 = new H_17_1;
-    driveUnitS1 = new H_17_1;
-    driveUnitS2 = new H_17_1;
-    driveUnitS3 = new H_17_1;
-#else
+    if (!s.empty())
+    {
+        gpp = new GeneralPurposePort(s);
+    }
+
+    else
+    {
+        gpp = new GeneralPurposePort();
+    }
+
+    h17   = nullptr;
     h37         = nullptr;
-    driveUnitS0 = nullptr;
-    driveUnitS1 = nullptr;
-    driveUnitS2 = nullptr;
-    driveUnitS3 = nullptr;
-#endif
-
-#if Z47
-    z47If       = new Z47Interface(Z47_BasePort1_c);
-    z47Cntrl    = new Z47Controller();
-    z47Link     = new ParallelLink();
-
-    z47If->connectDriveLink(z47Link);
-    z47Cntrl->connectHostLink(z47Link);
-
-    driveUnitE0 = new H47Drive;
-    driveUnitE1 = new H47Drive;
-    s = props["z47_drive0"];
-
-    if (s.empty())
-    {
-        s = "diskA.eightdisk";
-    }
-
-    eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-    s = props["z47_drive1"];
-
-    if (s.empty())
-    {
-        s = "diskB.eightdisk";
-    }
-
-    eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-#else
     z47If       = nullptr;
     z47Cntrl    = nullptr;
     z47Link     = nullptr;
+    MMS77316 *m316 = NULL;
+    MMS77320 *m320 = NULL;
+    // TODO: not all slots are identical, handle restrictions...
+    // Could have a Slot object with more details...
+    std::vector<std::string> devslots = { "slot_p504", "slot_p505", "slot_p506" };
+    bool dev_slots = false;
+    bool ser_slots = true;
 
-    driveUnitE0 = nullptr;
-    driveUnitE1 = nullptr;
-    eight0      = nullptr;
-    eight1      = nullptr;
+    for (int x = 0; x < devslots.size(); ++x)
+    {
+        s = props[devslots[x]];
+
+        if (s.compare("MMS77316") == 0)
+        {
+            m316 = MMS77316::install_MMS77316(props, devslots[x]);
+            dev_slots = true;
+        }
+
+        else if (s.compare("MMS77320") == 0)
+        {
+            // Also includes (auxiliary) serial ports... TODO
+            m320 = MMS77320::install_MMS77320(props, devslots[x]);
+        }
+
+        else if (s.compare("H17") == 0)
+        {
+        }
+        else if (s.compare("H37") == 0)
+        {
+        }
+        else if (s.compare("H47") == 0)
+        {
+        }
+    }
+
+    if (!dev_slots)
+    {
+        h17   = new H17(H17_BaseAddress_c);
+        // create the floppy drives for the hard-sectored controller.
+        driveUnitH0 = new H_17_1;
+        driveUnitH1 = new H_17_4;
+        driveUnitH2 = new H_17_4;
+
+#if Z37
+        h37   = new Z_89_37(H37_BasePort_c);
+        // create the floppy drives for the soft-sectored controller.
+        driveUnitS0 = new H_17_1;
+        driveUnitS1 = new H_17_1;
+        driveUnitS2 = new H_17_1;
+        driveUnitS3 = new H_17_1;
+#else
+        driveUnitS0 = nullptr;
+        driveUnitS1 = nullptr;
+        driveUnitS2 = nullptr;
+        driveUnitS3 = nullptr;
 #endif
 
-    timer       = new H89Timer(cpu, interruptController);
-    h89io       = new H89_IO;
-    nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
-    nmi2        = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
-    gpp         = new GeneralPurposePort;
+#if Z47
+        z47If       = new Z47Interface(Z47_BasePort1_c);
+        z47Cntrl    = new Z47Controller();
+        z47Link     = new ParallelLink();
+
+        z47If->connectDriveLink(z47Link);
+        z47Cntrl->connectHostLink(z47Link);
+
+        driveUnitE0 = new H47Drive;
+        driveUnitE1 = new H47Drive;
+        s = props["z47_disk1"];
+
+        if (s.empty())
+        {
+            s = "diskA.eightdisk";
+        }
+
+        eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+        s = props["z47_disk2"];
+
+        if (s.empty())
+        {
+            s = "diskB.eightdisk";
+        }
+
+        eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+#else
+        z47If       = nullptr;
+        z47Cntrl    = nullptr;
+        z47Link     = nullptr;
+
+        driveUnitE0 = nullptr;
+        driveUnitE1 = nullptr;
+        eight0      = nullptr;
+        eight1      = nullptr;
+#endif
+    }
 
     // Serial Ports.
     consolePort = new INS8250(Serial_Console_c, Serial_Console_Interrupt_c);
-    lpPort      = new INS8250(Serial_LpPort_c);
-    modemPort   = new INS8250(Serial_ModemPort_c);
-    auxPort     = new INS8250(Serial_AuxPort_c);
 
-    s = props["z17_drive0"];
-
-    if (s.empty())
+    if (!ser_slots)
     {
-        s = "diskA.tmpdisk";
+        lpPort      = new INS8250(Serial_LpPort_c);
+        modemPort   = new INS8250(Serial_ModemPort_c);
+        auxPort     = new INS8250(Serial_AuxPort_c);
     }
 
-    hard0       = new HardSectoredDisk(s.c_str());
-    s = props["z17_drive1"];
-
-    if (s.empty())
+    if (!dev_slots)
     {
-        s = "diskB.tmpdisk";
-    }
+        s = props["z17_disk1"];
 
-    hard1       = new HardSectoredDisk(s.c_str());
-    s = props["z17_drive2"];
+        if (s.empty())
+        {
+            s = "diskA.tmpdisk";
+        }
 
-    if (s.empty())
-    {
-        s = "diskC.tmpdisk";
-    }
+        hard0       = new HardSectoredDisk(s.c_str());
+        s = props["z17_disk2"];
 
-    hard2       = new HardSectoredDisk(s.c_str());
+        if (s.empty())
+        {
+            s = "diskB.tmpdisk";
+        }
+
+        hard1       = new HardSectoredDisk(s.c_str());
+        s = props["z17_disk3"];
+
+        if (s.empty())
+        {
+            s = "diskC.tmpdisk";
+        }
+
+        hard2       = new HardSectoredDisk(s.c_str());
 
 #if Z37
-    s = props["z37_drive0"];
+        s = props["z37_disk1"];
 
-    if (s.empty())
-    {
-        s = "diskA.softdisk";
-    }
+        if (s.empty())
+        {
+            s = "diskA.softdisk";
+        }
 
-    soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-    s = props["z37_drive1"];
+        soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+        s = props["z37_disk2"];
 
-    if (s.empty())
-    {
-        s = "diskB.softdisk";
-    }
+        if (s.empty())
+        {
+            s = "diskB.softdisk";
+        }
 
-    soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-    s = props["z37_drive2"];
+        soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+        s = props["z37_disk3"];
 
-    if (s.empty())
-    {
-        s = "diskC.softdisk";
-    }
+        if (s.empty())
+        {
+            s = "diskC.softdisk";
+        }
 
-    soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-    soft3 = 0;
-//    s = props["z37_drive3"];
+        soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+        soft3 = 0;
+//    s = props["z37_disk4"];
 //    if (s.empty()) s = "diskD.softdisk";
 //    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
 
@@ -210,11 +275,12 @@ void H89::buildSystem(Console *console)
 //    soft2->dump();
 //    soft3->dump();
 #else
-    soft0 = nullptr;
-    soft1 = nullptr;
-    soft2 = nullptr;
-    soft3 = nullptr;
+        soft0 = nullptr;
+        soft1 = nullptr;
+        soft2 = nullptr;
+        soft3 = nullptr;
 #endif
+    }
 
     monitorROM = NULL;
     s = props["monitor_rom"];
@@ -262,76 +328,102 @@ void H89::buildSystem(Console *console)
 
     consolePort->attachDevice(console);
 
-    cpu->setAddressBus(ab);
-    cpu->setSpeed(false);
-
     h89io->addDevice(gpp);
     h89io->addDevice(nmi1);
     h89io->addDevice(nmi2);
     h89io->addDevice(consolePort);
-    h89io->addDevice(lpPort);
-    h89io->addDevice(auxPort);
-    h89io->addDevice(modemPort);
-    h89io->addDevice(h17);
+
+    if (!ser_slots)
+    {
+        h89io->addDevice(lpPort);
+        h89io->addDevice(auxPort);
+        h89io->addDevice(modemPort);
+    }
+
+    if (m316 != NULL)
+    {
+        h89io->addDiskDevice(m316);
+    }
+
+    if (m320 != NULL)
+    {
+        h89io->addDiskDevice(m320);
+    }
+
+    if (!dev_slots)
+    {
+        h89io->addDiskDevice(h17);
 #if Z37
-    h89io->addDevice(h37);
+        h89io->addDiskDevice(h37);
 #else
-    h89io->addDevice(z47If);
+        h89io->addDiskDevice(z47If);
 #endif
 
-    // Connect all the floppy drives for the hard-sectored controller.
-    h17->connectDrive(0, driveUnitH0);
-    h17->connectDrive(1, driveUnitH1);
-    h17->connectDrive(2, driveUnitH2);
+        // Connect all the floppy drives for the hard-sectored controller.
+        h17->connectDrive(0, driveUnitH0);
+        h17->connectDrive(1, driveUnitH1);
+        h17->connectDrive(2, driveUnitH2);
 
-    // Insert all the the disks into the drives.
-    driveUnitH0->insertDisk(hard0);
-    driveUnitH1->insertDisk(hard1);
-    driveUnitH2->insertDisk(hard2);
+        // Insert all the the disks into the drives.
+        driveUnitH0->insertDisk(hard0);
+        driveUnitH1->insertDisk(hard1);
+        driveUnitH2->insertDisk(hard2);
 
 #if Z37
-    // connect all the drives to the soft-sectored controller.
-    h37->connectDrive(0, driveUnitS0);
-    h37->connectDrive(1, driveUnitS1);
-    h37->connectDrive(2, driveUnitS2);
-    h37->connectDrive(3, driveUnitS3);
+        // connect all the drives to the soft-sectored controller.
+        h37->connectDrive(0, driveUnitS0);
+        h37->connectDrive(1, driveUnitS1);
+        h37->connectDrive(2, driveUnitS2);
+        h37->connectDrive(3, driveUnitS3);
 #endif
 
 #if Z47
-    //
-    z47Cntrl->connectDrive(0, driveUnitE0);
-    z47Cntrl->connectDrive(1, driveUnitE1);
+        //
+        z47Cntrl->connectDrive(0, driveUnitE0);
+        z47Cntrl->connectDrive(1, driveUnitE1);
 #endif
 
 #if Z37
-    // Insert all the disks into the drives.
-    driveUnitS0->insertDisk(soft0);
-    driveUnitS1->insertDisk(soft1);
-    driveUnitS2->insertDisk(soft2);
-    driveUnitS3->insertDisk(soft3);
+        // Insert all the disks into the drives.
+        driveUnitS0->insertDisk(soft0);
+        driveUnitS1->insertDisk(soft1);
+        driveUnitS2->insertDisk(soft2);
+        driveUnitS3->insertDisk(soft3);
 #endif
 
 #if Z47
-    driveUnitE0->insertDisk(eight0);
-    driveUnitE1->insertDisk(eight1);
+        driveUnitE0->insertDisk(eight0);
+        driveUnitE1->insertDisk(eight1);
 #endif
-    // driveUnitH0.insertBlankDisk();
-    // driveUnitH1.insertBlankDisk();
-    // driveUnitH2.insertBlankDisk();
+        // driveUnitH0.insertBlankDisk();
+        // driveUnitH1.insertBlankDisk();
+        // driveUnitH2.insertBlankDisk();
 
-    // driveUnitS0.insertBlankDisk();
-    // driveUnitS1.insertBlankDisk();
-    // driveUnitS2.insertBlankDisk();
-    // driveUnitS3.insertBlankDisk();
+        // driveUnitS0.insertBlankDisk();
+        // driveUnitS1.insertBlankDisk();
+        // driveUnitS2.insertBlankDisk();
+        // driveUnitS3.insertBlankDisk();
+    }
 }
 
 H89::~H89()
 {
     // eject all the disk files
+    std::vector<DiskController *> dsks = h89io->getDiskDevices();
 
-    driveUnitH0->ejectDisk("saveA.tmpdisk");
-    driveUnitH1->ejectDisk("saveB.tmpdisk");
-    driveUnitH2->ejectDisk("saveC.tmpdisk");
+    for (int x = 0; x < dsks.size(); ++x)
+    {
+        DiskController *dev = dsks[x];
+
+        if (dev != NULL)
+        {
+            dev->~DiskController();
+        }
+    }
+
+//  driveUnitH0->ejectDisk("saveA.tmpdisk");
+//  driveUnitH1->ejectDisk("saveB.tmpdisk");
+//  driveUnitH2->ejectDisk("saveC.tmpdisk");
 
 //    driveUnitS0->ejectDisk("saveS0.tmpdisk");
 //    driveUnitS1->ejectDisk("saveS1.tmpdisk");
@@ -341,15 +433,21 @@ H89::~H89()
 
 void H89::reset()
 {
+    enableROM(); // resetting GPP does (may do) this...
     cpu->reset();
     console->reset(); // TODO: does H89 reset really also reset H19?
-    /// \todo reset everything, like the H17, H37, etc.
+    h89io->reset();
+    timer->reset();
 }
 
 void H89::init()
 {
     console->init();
-    z47Cntrl->loadDisk();
+
+    if (z47Cntrl != NULL)
+    {
+        z47Cntrl->loadDisk();
+    }
 }
 
 void H89::enableROM()
@@ -376,7 +474,10 @@ void H89::writeEnableH17RAM()
 
 void H89::selectSideH17(BYTE side)
 {
-    h17->selectSide(side);
+    if (h17 != NULL)
+    {
+        h17->selectSide(side);
+    }
 }
 
 void H89::setSpeed(bool fast)
@@ -394,21 +495,36 @@ void H89::raiseNMI(void)
     cpu->raiseNMI();
 }
 
+void H89::systemMutexAcquire()
+{
+    pthread_mutex_lock(&h89_mutex);
+}
+
+void H89::systemMutexRelease()
+{
+    pthread_mutex_unlock(&h89_mutex);
+}
+
 void H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
-    interruptController->raiseInterrupt(level);
+    getAddressBus().getIntrCtrlr()->raiseInterrupt(level);
 }
 
 void H89::lowerINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
-    interruptController->lowerInterrupt(level);
+    getAddressBus().getIntrCtrlr()->lowerInterrupt(level);
 }
 
 void H89::continueCPU(void)
 {
     cpu->continueRunning();
+}
+
+void H89::waitCPU(void)
+{
+    cpu->waitState();
 }
 
 H89_IO& H89::getIO()
@@ -431,6 +547,22 @@ void H89::clearMemory(BYTE data)
 AddressBus& H89::getAddressBus()
 {
     return (*ab);
+}
+
+CPU& H89::getCPU()
+{
+    return (*cpu);
+}
+
+std::string H89::dumpDebug()
+{
+    std::string ret = gpp->dumpDebug();
+    // Note: INT should be part of H89 (or InterruptController), not CPU...
+    // And... the signals are not actually latched on motherboard, only in
+    // respective I/O adapters. But for convenience they should be latched
+    // somewhere, or else we need to ask every device whether it has an interrupt.
+    ret += PropertyUtil::sprintf("INT=%02x\n", 0);
+    return ret;
 }
 
 // DEPRECATED

@@ -12,9 +12,17 @@
 #include "z80.h"
 
 
-InterruptController::InterruptController(CPU *cpu) :intLevel_m(0), cpu_m(cpu)
+InterruptController::InterruptController(CPU *cpu) : intLevel_m(0), cpu_m(cpu)
 {
-    debugss(ssInterruptController, ERROR, "%s: Entering\n", __FUNCTION__);
+    debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
+
+}
+
+InterruptController::InterruptController(InterruptController *ic) :
+    intLevel_m(ic->intLevel_m),
+    cpu_m(ic->cpu_m)
+{
+    debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
 
 }
 

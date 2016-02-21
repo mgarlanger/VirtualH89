@@ -9,13 +9,15 @@
 
 #include <ctime>
 #include <cassert>
+#include <strings.h>
+#include <unistd.h>
 #include "H89.h"
 #include "WallClock.h"
 #include "disasm.h"
 #include "AddressBus.h"
 #include "h89-io.h"
 #include "z80.h"
-
+#include "propertyutil.h"
 #include "logger.h"
 
 //typedef int (Z80::*opCodeMethod)(void);
@@ -1335,7 +1337,8 @@ inline void Z80::SET_ZSP_FLAGS(BYTE val)
 /// @param clockRate Speed of the Z80 in cycles per second.
 /// @param ticksPerSecond Number of interrupts per second for the clock
 ///
-Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
+Z80::Z80(int clockRate, int ticksPerSecond) : CPU(),
+    A(af.hi),
     sA(af.shi),
     F(af.lo),
     AF(af.val),
@@ -1360,15 +1363,15 @@ Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
     IYh(iy.hi),
     IY(iy.val),
     SP(sp.val),
-    INT_Line(false),
-    intLevel_m(0),
+    INT_Line(false),    // never used
+    intLevel_m(0),  // never used
     processingIntr(false),
     ticks(0),
     lastInstTicks(0),
     curInstByte(0),
     mode(cm_reset),
     prefix(ip_none),
-    resetReq(false),
+    resetReq(false),    // never used
     IM(0)
 
 {
@@ -1400,7 +1403,7 @@ Z80::Z80(int clockRate, int ticksPerSecond) : A(af.hi),
 
     // Give it ticks to get started.
 
-    addClockTicks();
+    // addClockTicks(); // done by reset()
 }
 
 ///
@@ -1421,14 +1424,21 @@ void Z80::reset(void)
     debugss(ssZ80, INFO, "%s\n", __FUNCTION__);
 
     PC            = 0;
-    AF            = SP = 0xffff;
     R             = 0;
     I             = 0;
     IFF0          = IFF1 = IFF2 = false;
+    IM            = 0;
+    // according to (modern) Z80 documentation, only the above registers
+    // are affected by RESET.
+    AF            = SP = 0xffff;
     prefix        = ip_none;
     curInstByte   = 0;
-    resetReq      = false;
-    IM            = 0;
+    lastInstTicks = 0;
+    resetReq      = true; // never used
+    int_type = 0;
+    mode = cm_reset;
+    ticks = 0;
+    addClockTicks();
 }
 
 ///
@@ -1552,6 +1562,12 @@ void Z80::continueRunning(void)
     mode = cm_running;
 }
 
+void Z80::waitState(void)
+{
+    WallClock::instance()->addTicks(1);
+    // TODO: anything else needs to make progress?
+}
+
 ///
 /// Links the address bus object to the virtual CPU.
 ///
@@ -1649,6 +1665,52 @@ BYTE Z80::step(void)
     return (execute(1));
 }
 
+// This is only used by the execute() thread.
+void Z80::systemMutexCycle()
+{
+    h89.systemMutexRelease();
+    // If someone else is waiting, they should get the mutex now.
+    h89.systemMutexAcquire();
+}
+
+std::string Z80::dumpDebug()
+{
+    std::string ret = PropertyUtil::sprintf(
+                          "A=%02x PSW=%s %s %s %s %s %s %s %s    AF'=%04x\n"
+                          "BC=%04x    BC'=%04x\n"
+                          "DE=%04x    DE'=%04x\n"
+                          "HL=%04x    HL'=%04x\n"
+                          "PC=%04x SP=%04x\n"
+                          "    executing: %02x %02x %02x %02x\n"
+                          "IX=%04x IY=%04x mode=%s\n"
+                          "R=%02x I=%02x IFF0=%d IFF1=%d IFF2=%d INT=%d NMI=%d\n",
+                          A,
+                          (F & S_FLAG) ? "S" : "s",
+                          (F & Z_FLAG) ? "Z" : "z",
+                          (F & N2_FLAG) ? "N2" : "n2",
+                          (F & H_FLAG) ? "H" : "h",
+                          (F & N1_FLAG) ? "N1" : "n1",
+                          (F & P_FLAG) ? "P" : "p",
+                          (F & N_FLAG) ? "N" : "n",
+                          (F & C_FLAG) ? "C" : "c",
+                          _af,
+                          BC, _bc, DE, _de, HL, _hl,
+                          PC, SP,
+                          ab_m->readByte(PC + 0),
+                          ab_m->readByte(PC + 1),
+                          ab_m->readByte(PC + 2),
+                          ab_m->readByte(PC + 3),
+                          IX, IY,
+                          (mode == cm_halt ? "halt" :
+                           (mode == cm_running ? "run" :
+                            (mode == cm_reset ? "reset" :
+                             (mode == cm_singleStep ? "sstep" : "?")))),
+                          R & 0xff, I, IFF0, IFF1, IFF2,
+                          ((int_type & Intr_INT) != 0),
+                          ((int_type & Intr_NMI) != 0));
+    return ret;
+}
+
 ///
 ///  This function builds the Z80 central processing unit.
 ///  The opcode where PC points to is fetched from the memory
@@ -1667,9 +1729,18 @@ BYTE Z80::execute(WORD numInst)
     bool limited = (numInst != 0);
 
     cpu_state = RUN_C;
+    h89.systemMutexAcquire();
 
     do
     {
+        systemMutexCycle();
+
+        if (mode == cm_reset)
+        {
+            // any local variables need resetting?
+            mode = cm_running;
+        }
+
         prefix = ip_none;
         curInstByte = 0;
         lastInstByte = 0;
@@ -1700,7 +1771,6 @@ BYTE Z80::execute(WORD numInst)
 
 #endif
 
-
         /// \todo fix interrupt timings see http://www.z80.info/interrup.htm
         // CPU interrupt handling
         //
@@ -1730,18 +1800,21 @@ BYTE Z80::execute(WORD numInst)
                 debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
                 processingIntr = true;
                 break;
+
             case 1:
                 debugss(ssZ80, VERBOSE, "Processing interrupt mode 1\n");
                 int_type &= ~Intr_INT;
                 op_rst38();
                 ticks -= 4;
                 break;
+
             case 2:
                 // mode 2 not currently supported.
                 debugss(ssZ80, FATAL, "%s: Interrupt mode 2 not supported\n", __FUNCTION__);
 
                 /// \todo assert
                 break;
+
             default:
                 debugss(ssZ80, FATAL, "%s: Invalid Interrupt Mode: %d\n", __FUNCTION__, IM);
 
@@ -1781,6 +1854,15 @@ BYTE Z80::execute(WORD numInst)
             continue;
         }
 
+        // If in halt, we just do a NOP, without any PC changes.
+        if (mode == cm_halt)
+        {
+            ticks -= 4;
+            lastInstTicks = ticks; // don't double-bill next instruction
+            WallClock::instance()->addTicks(4);
+            continue;
+        }
+
         //traceInstructions();
         lastInstByte = curInst[0] = readInst();
         (this->*op_code[curInst[0]])();
@@ -1797,11 +1879,6 @@ BYTE Z80::execute(WORD numInst)
         R++;            /* increment refresh register */
 #endif
 
-        if (mode == cm_halt)
-        {
-            --PC;
-        }
-
 #ifdef WANT_GUI
         check_gui_break();
 #endif
@@ -1810,10 +1887,12 @@ BYTE Z80::execute(WORD numInst)
         {
             cpu_state = SINGLE_STEP_C;
         }
-        
+
         processingIntr = false;
     }
     while (cpu_state == RUN_C);
+
+    h89.systemMutexRelease();
 
     return (0);
 }

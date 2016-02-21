@@ -10,6 +10,7 @@
 #ifndef GENERALPURPOSEPORT_H_
 #define GENERALPURPOSEPORT_H_
 
+#include <string>
 #include "config.h"
 #include "IODevice.h"
 
@@ -24,12 +25,18 @@ class GeneralPurposePort: public virtual IODevice
 {
   public:
     GeneralPurposePort();
+    GeneralPurposePort(std::string settings);
     virtual ~GeneralPurposePort();
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
+    virtual std::string dumpDebug();
+    void reset();
+
   private:
+    BYTE dipsw_m;
+    BYTE portBits_m;
 
     /// Address for General Purpose Port
     /// Octal 362

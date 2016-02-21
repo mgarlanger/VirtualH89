@@ -32,7 +32,7 @@ INS8250::INS8250(BYTE base, int intLevel): IODevice(base, 8),
     saveLCR(0),
     saveMCR(0),
     saveLSR(0),
-    saveMSR(0)
+    saveMSR(MSB_ClearToSend | MSB_DataSetReady)
 
 {
     intLevel_m = intLevel;
@@ -43,6 +43,28 @@ INS8250::INS8250(BYTE base, int intLevel): IODevice(base, 8),
 INS8250::~INS8250()
 {
 
+}
+
+void INS8250::reset()
+{
+    DLAB_m = false;
+    ERBFI_m = false;
+    receiveInterruptPending = false;
+    OE_m = false;
+    PE_m = false;
+    FE_m = false;
+    rxByteAvail = false;
+    txByteAvail = false;
+    lsBaudDiv = 0;
+    msBaudDiv = 0;
+    baud_m = 0;
+    lastTransmit = 0;
+    saveIER = 0;
+    saveIIR = 0;
+    saveLCR = 0;
+    saveMCR = 0;
+    saveLSR = 0;
+    saveMSR = MSB_ClearToSend | MSB_DataSetReady;
 }
 
 BYTE INS8250::in(BYTE addr)
@@ -292,6 +314,11 @@ bool INS8250::attachDevice(SerialPortDevice *dev)
     return false;
 }
 
+
+bool INS8250::receiveReady()
+{
+    return !rxByteAvail;
+}
 
 void INS8250::receiveData(BYTE data)
 {

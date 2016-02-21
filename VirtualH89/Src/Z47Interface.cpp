@@ -12,7 +12,7 @@
 
 #include "ParallelLink.h"
 
-Z47Interface::Z47Interface(int baseAddr): IODevice(baseAddr, H47_NumPorts_c),
+Z47Interface::Z47Interface(int baseAddr): DiskController(baseAddr, H47_NumPorts_c),
     interruptsEnabled_m(false),
     DTR_m(false),
     DDOut_m(false),

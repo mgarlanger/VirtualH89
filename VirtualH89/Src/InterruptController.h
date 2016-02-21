@@ -25,13 +25,18 @@ class CPU;
 
 class InterruptController
 {
-  private:
+  protected:
     BYTE  intLevel_m;
-    CPU*   cpu_m;
+    CPU   *cpu_m;
 
   public:
     InterruptController(CPU *cpu);
+    InterruptController(InterruptController *ic);
     virtual ~InterruptController();
+    CPU *getCpu()
+    {
+        return cpu_m;
+    }
 
     virtual void raiseInterrupt(BYTE level);
     virtual void lowerInterrupt(BYTE level);

@@ -54,6 +54,10 @@ class WallClock
     void addTimerEvent();
 
     void updateTicksPerSecond(unsigned long ticks);
+    unsigned long getTicksPerSecond()
+    {
+        return ticksPerSecond;
+    }
 
     void addTicks(unsigned ticks);
 

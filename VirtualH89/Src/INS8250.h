@@ -30,7 +30,10 @@ class INS8250 : public IODevice
 
     virtual bool attachDevice(SerialPortDevice *dev);
 
+    virtual bool receiveReady();
     virtual void receiveData(BYTE data);
+
+    void reset();
 
     // TODO - add all the status, both for the device to set it's status
     //        and for the port to set the status.

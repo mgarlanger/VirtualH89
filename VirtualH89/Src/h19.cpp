@@ -34,12 +34,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "ascii.h"
 
 static  pthread_mutex_t h19_mutex;

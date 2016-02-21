@@ -12,7 +12,7 @@
 /// \todo  - allow both RAM and ROM in the first 8k and support reading ROM and writing to
 ///         RAM at the same time.
 
-AddressBus::AddressBus(InterruptController* ic): ic_m(ic)
+AddressBus::AddressBus(InterruptController *ic): ic_m(ic)
 {
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 
@@ -54,7 +54,7 @@ BYTE AddressBus::readByte(WORD addr, bool interruptAck)
         // the data bus whenever you attempt to read from non-existent memory.
 
         debugss(ssAddressBus, INFO, "%s: Non-existent memory\n", __FUNCTION__);
-        return 0x00;
+        return 0x00; // typically, data bus tends to float high...
     }
 }
 
@@ -123,4 +123,14 @@ void AddressBus::clearMemory(BYTE data)
     {
         writeByte(i, data);
     }
+}
+
+InterruptController *AddressBus::getIntrCtrlr()
+{
+    return ic_m;
+}
+
+void AddressBus::setIntrCtrlr(InterruptController *ic)
+{
+    ic_m = ic;
 }

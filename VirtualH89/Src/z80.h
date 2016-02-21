@@ -16,6 +16,8 @@
 #include "config.h"
 
 #include <csignal>
+#include <vector>
+#include <pthread.h>
 
 #include "AddressBus.h"
 
@@ -32,9 +34,10 @@ typedef void (Z80::*xd_cbMethod)(BYTE&);
 /// to C++ and more of the undocumented opcodes have been implemented. Also, fixed
 /// a few of the flags for opcodes like DAA.
 ///
-class Z80: public virtual CPU
+class Z80: public CPU
 {
   private:
+    void systemMutexCycle();
     // data
 
     // Registers
@@ -151,7 +154,10 @@ class Z80: public virtual CPU
     Z80(int clockRate, int ticksPerSecond);
     virtual ~Z80();
 
+    std::string dumpDebug();
+
     virtual void continueRunning(void);
+    virtual void waitState(void);
 
     virtual void reset(void);
 
@@ -269,9 +275,12 @@ class Z80: public virtual CPU
     {
         ticks -= 4;
         BYTE val = ab_m->readByte(PC, processingIntr);
-        if (!processingIntr) {
+
+        if (!processingIntr)
+        {
             ++PC;
         }
+
         return val;
     };
     inline BYTE readMEM(WORD addr)

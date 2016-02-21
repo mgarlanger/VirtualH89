@@ -11,7 +11,7 @@
 
 const BYTE Z_89_37::speeds[maxStepSpeeds_c] = { 6, 12, 20, 30};
 
-Z_89_37::Z_89_37(int baseAddr): IODevice(baseAddr, H37_NumPorts_c),
+Z_89_37::Z_89_37(int baseAddr): DiskController(baseAddr, H37_NumPorts_c),
     trackReg_m(0),
     sectorReg_m(0),
     dataReg_m(0),
