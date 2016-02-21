@@ -74,6 +74,55 @@ int GenericSASIDrive::params[NUM_DRV_TYPE][4]
     /*[XEBEC_RO204]*/  { 321, 8, 132,   0 },
 };
 
+bool GenericSASIDrive::checkHeader(BYTE *buf, int n)
+{
+    BYTE *b = buf;
+    int m = 0;
+
+    while (*b != '\n' && *b != '\0' && b - buf < n)
+    {
+        BYTE *e;
+        int p = strtoul((char *)b, (char **)&e, 0);
+
+        // TODO: removable flag, others?
+        // NOTE: removable media requires many more changes.
+        switch (tolower(*e))
+        {
+        case 'c':
+            m |= 0x01;
+            mediaCyl = p;
+            break;
+
+        case 'h':
+            m |= 0x02;
+            mediaHead = p;
+            break;
+
+        case 'z':
+            m |= 0x04;
+            mediaSsz = p;
+            break;
+
+        case 'p':
+            m |= 0x08;
+            mediaSpt = p;
+            break;
+
+        case 'l':
+            m |= 0x10;
+            mediaLat = p;
+            break;
+
+        default:
+            return false;
+        }
+
+        b = e + 1;
+    }
+
+    return (m == 0x1f);
+}
+
 GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, int sectorSize)
 {
     driveType = type;
@@ -117,19 +166,12 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         return;
     }
 
+    dataOffset = 0;
     BYTE buf[128];
-    int x = read(driveFd, buf, sizeof(buf));
+    off_t end = lseek(driveFd, (off_t)0, SEEK_END);
 
     // special case: 0 (EOF) means new media - initialize it.
-    if (x != 0 && x != sizeof(buf))
-    {
-        debugss(ssMMS77320, ERROR, "Bad media header: %s\n", driveMedia);
-        close(driveFd);
-        driveFd = -1;
-        return;
-    }
-
-    if (x == 0)
+    if (end == 0)
     {
         dataOffset = sectorSize;
         mediaCyl = params[type][0];
@@ -137,62 +179,34 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         mediaSsz = sectorSize;
         mediaSpt = sectorsPerTrack;
         mediaLat = 1;
+        memset(buf, 0, sizeof(buf));
         int l = sprintf((char *)buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
+        ftruncate(driveFd, capacity + sizeof(buf));
+        lseek(driveFd, capacity, SEEK_SET); // i.e. END - sizeof(buf)
         write(driveFd, buf, l);
-        ftruncate(driveFd, capacity + sectorSize);
     }
 
     else
     {
-        BYTE *b = buf;
+        // first, trying reading the last 128 bytes...
+        lseek(driveFd, end - sizeof(buf), SEEK_SET);
+        int x = read(driveFd, buf, sizeof(buf));
+        bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
-        while (*b != '\n' && *b != '\0' && b - buf < sizeof(buf))
+        if (!done)
         {
-            BYTE *e;
-            int p = strtoul((char *)b, (char **)&e, 0);
-
-            // TODO: removable flag, others?
-            // NOTE: removable media requires many more changes.
-            switch (tolower(*e))
-            {
-            case 'c':
-                mediaCyl = p;
-                break;
-
-            case 'h':
-                mediaHead = p;
-                break;
-
-            case 'z':
-                mediaSsz = p;
-                break;
-
-            case 'p':
-                mediaSpt = p;
-                break;
-
-            case 'l':
-                mediaLat = p;
-                break;
-
-            default:
-                debugss(ssMMS77320, ERROR, "Bad media header field(s): %s\n", driveMedia);
-                close(driveFd);
-                driveFd = -1;
-                return;
-            }
-
-            b = e + 1;
+            lseek(driveFd, (off_t)0, SEEK_SET);
+            x = read(driveFd, buf, sizeof(buf));
+            done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
+            dataOffset = mediaSsz;
         }
 
-        dataOffset = mediaSsz;
-
-        if (b - buf >= sizeof(buf))
+        if (!done)
         {
-            debugss(ssMMS77320, ERROR, "Missing media header: %s\n", driveMedia);
+            debugss(ssMMS77320, ERROR, "Bad media header: %s\n", driveMedia);
             close(driveFd);
             driveFd = -1;
             return;
