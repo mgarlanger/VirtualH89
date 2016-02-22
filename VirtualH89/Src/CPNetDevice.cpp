@@ -17,12 +17,64 @@
 #include <string.h>
 #include <fnmatch.h>
 
-CPNetDevice::CPNetDevice(int base) :
+///
+/// User (CP/M) prootocol:
+///
+/// Init/reset:
+///     OUT ctrlPort    ; RESET device
+///     IN  dataPort    ; get clientId (only valid after RESET)
+///     STA myClientId  ; save for CP/Net
+///     ; other initialization...
+///
+/// Send:
+///     MVI C,dataPort
+///     LXI H,msgbuf
+///     MVI B,5         ; header length
+///     OUTIR           ; send header
+///     LDA msgbuf+4    ; msg size (-1)
+///     INR A
+///     MOV B,A
+///     OUTIR           ; send message body
+///     IN  statusPort
+///     ANI 02h         ; cmd overrun bit
+///     RZ              ; message accepted
+///     ; error case
+///
+/// Receive:
+///     IN statusPort
+///     ANI 01h         ; data ready
+///     JZ  Receive
+///     MVI C,dataPort
+///     LXI H,msgbuf
+///     MVI B,5         ; header length
+///     INIR            ; get header
+///     LDA msgbuf+4    ; msg size (-1)
+///     INR A
+///     MOV B,A
+///     INIR            ; get message body
+///     IN  statusPort
+///     ANI 04h         ; rcv overrun bit
+///     RZ              ; message OK
+///     ; error case
+///
+/// For reference, standard CP/Net message header is:
+/// +0  format code (00 = CP/Net send, 01 = response)
+/// +1  dest node ID (server or this client, depending on direction)
+/// +2  src node ID (this client or server, '')
+/// +3  CP/Net, MP/M, CP/M BDOS function number
+/// +4  msg size - 1 (00 = 1, FF = 256)
+/// +5...   message body
+///
+
+
+CPNetDevice::CPNetDevice(int base, int cid) :
     IODevice(base, 2),
+    clientId(cid),
     header((struct NetworkServer::ndos *)buffer),
     bufIx(0),
     msgLen(0),
-    respLen(0)
+    respLen(0),
+    initDev(false)
 {
 }
 
@@ -38,6 +90,7 @@ void CPNetDevice::addServer(BYTE serverId, NetworkServer *server)
 CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
 {
     std::string s;
+    int cid = 0xfe; // OK default if we have no network connections
 
     s = props["cpnetdevice_port"];
 
@@ -48,18 +101,57 @@ CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
 
     int port = strtoul(s.c_str(), NULL, 0);
 
-    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02x\n", port);
-    CPNetDevice *cpnd = new CPNetDevice(port);
+    s = props["cpnetdevice_clientid"];
 
-    // TODO: search properties for server definitions. For now, assume 00=HostFileBdos
-    NetworkServer *nws = new HostFileBdos(props);
-    cpnd->addServer(0, nws);
+    if (!s.empty())
+    {
+        int c = strtoul(s.c_str(), NULL, 0);
+
+        if (c > 0x00 && c < 0xff)
+        {
+            cid = c;
+        }
+
+        else
+        {
+            debugss(ssCPNetDevice, ERROR, "Invalid CP/Net client ID \"%s\"\n", s.c_str());
+        }
+    }
+
+    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02x, client ID %02x\n", port, cid);
+    CPNetDevice *cpnd = new CPNetDevice(port, cid);
+
+    PropertyUtil::PropertyMapT::iterator it = props.begin();
+
+    for (; it != props.end(); ++it)
+    {
+        // property syntax: cpnetdevice_server## = ClassId [args...]
+        // where '##' is serverId in hex.
+        if (it->first.compare(0, 18, "cpnetdevice_server") == 0)
+        {
+            BYTE sid = strtoul(it->first.substr(18).c_str(), NULL, 16);
+            debugss(ssCPNetDevice, ERROR, "Server %02x: %s\n", sid, it->second.c_str());
+            std::vector<std::string> args = PropertyUtil::splitArgs(it->second);
+
+            if (args[0].compare("HostFileBdos") == 0)
+            {
+                NetworkServer *nws = new HostFileBdos(props, args, sid);
+                cpnd->addServer(sid, nws);
+            }
+
+//          else if args[0].compare("Socket") == 0) {
+//              NetworkServer *nws = new SocketServer(props, args, sid);
+//              cpnd->addServer(sid, nws);
+//          }
+        }
+    }
 
     return cpnd;
 }
 
 void CPNetDevice::reset()
 {
+    initDev = false;
     bufIx = 0;
     msgLen = 0;
     respLen = 0;
@@ -72,6 +164,8 @@ BYTE CPNetDevice::in(BYTE adr)
 
     if (off == statusPortOffset)
     {
+        initDev = false;
+
         if (respLen > 0)
         {
             val |= sts_DataReady;
@@ -101,11 +195,6 @@ BYTE CPNetDevice::in(BYTE adr)
         if (len > 0)
         {
             // This includes any failures or errors, must be returned as CP/Net errors.
-            header->mcode = 1; // CP/Net response
-            header->mdid = clientId;
-            header->msid = serverId;
-            header->mfunc = 0; // TODO: save last func?
-            header->msize = len - 1;
             respLen = sizeof(*header) + header->msize + 1;
             val |= sts_DataReady;
         }
@@ -121,6 +210,15 @@ BYTE CPNetDevice::in(BYTE adr)
 
     if (off == dataPortOffset)
     {
+        if (initDev)
+        {
+            val = clientId;
+            initDev = false;
+            return val;
+        }
+
+        initDev = false;
+
         // works for 'respLen == 0' (no data) case also.
         if (bufIx < respLen)
         {
@@ -159,10 +257,12 @@ void CPNetDevice::swapIds(struct NetworkServer::ndos *header)
 void CPNetDevice::out(BYTE adr, BYTE val)
 {
     BYTE off = getPortOffset(adr);
+    initDev = false;
 
     if (off == statusPortOffset)
     {
         // reset / resync. other functions needed?
+        initDev = true; // send clientId on next input data port.
         bufIx = 0;
         msgLen = 0;
         respLen = 0;
@@ -218,7 +318,6 @@ void CPNetDevice::out(BYTE adr, BYTE val)
 
                 else
                 {
-                    clientId = header->msid; // TODO: get this during client init...
                     int len = sendMsg(buffer, msgLen);
 
                     if (len == 0)
@@ -269,6 +368,13 @@ void CPNetDevice::out(BYTE adr, BYTE val)
 int CPNetDevice::checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len)
 {
     // TODO: interate over servers and call checkRecvMsg on each...
+    // server message should include these already? but clientId may not be
+    // known to servers.
+    //      header->mcode = 1; // CP/Net response
+    //      header->mdid = clientId;
+    //      header->msid = serverId;
+    //      header->mfunc = 0; // TODO: save last func? get from
+    //      header->msize = len - 1;
     return 0;
 }
 

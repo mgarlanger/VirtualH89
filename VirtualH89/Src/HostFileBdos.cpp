@@ -17,14 +17,28 @@
 #include <string.h>
 #include <fnmatch.h>
 
-HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props) :
+HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
+                           std::vector<std::string> args, BYTE srvId) :
     NetworkServer(),
+    serverId(srvId),
     curDsk(-1),
     curUsr(0),
     curROVec(0),
     curLogVec(0)
 {
-    std::string s = props["hostfilebdos_root_dir"];
+    // args[0] is our class name, like argv[0] in main().
+
+    std::string s;
+
+    if (args.size() > 1)
+    {
+        s = args[1];
+    }
+
+    else
+    {
+        s = props["hostfilebdos_root_dir"];
+    }
 
     if (s.empty())
     {

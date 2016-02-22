@@ -22,7 +22,7 @@
 class CPNetDevice : public IODevice
 {
   public:
-    CPNetDevice(int base);
+    CPNetDevice(int base, int clientId);
     virtual ~CPNetDevice();
     static CPNetDevice *install_CPNetDevice(PropertyUtil::PropertyMapT& props);
 
@@ -43,6 +43,7 @@ class CPNetDevice : public IODevice
     int bufIx;
     int msgLen;
     int respLen;
+    bool initDev;
 
     static const BYTE serverId = 0;
 

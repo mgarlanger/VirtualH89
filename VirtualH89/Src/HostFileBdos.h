@@ -26,7 +26,8 @@
 class HostFileBdos : public NetworkServer
 {
   public:
-    HostFileBdos(PropertyUtil::PropertyMapT& props);
+    HostFileBdos(PropertyUtil::PropertyMapT& props,
+                 std::vector<std::string> args, BYTE srvId);
     virtual ~HostFileBdos();
 
     virtual int checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len);
@@ -34,6 +35,7 @@ class HostFileBdos : public NetworkServer
 
   private:
     const char *dir;
+    BYTE serverId;
 
     struct fcb
     {
