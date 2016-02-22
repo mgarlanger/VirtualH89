@@ -6,10 +6,11 @@
 /// \brief Implements framework to handle all the I/O devices on the H89.
 ///
 
-#include "config.h"
+#include "h89-io.h"
 
 #include "logger.h"
-#include "h89-io.h"
+#include "DiskController.h"
+
 
 H89_IO::H89_IO()
 {

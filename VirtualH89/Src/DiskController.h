@@ -13,9 +13,10 @@
 #include <vector>
 #include <string>
 
-#include "h89Types.h"
 #include "IODevice.h"
-#include "GenericDiskDrive.h"
+
+class GenericDiskDrive;
+
 
 /// \todo - determine if interrupt level for the device should be here, or if we subclass
 ///         this to a IOIntrDevice.

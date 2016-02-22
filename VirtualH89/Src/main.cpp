@@ -13,14 +13,14 @@
 /// 6. Fix intermittent issue with 'pure virtual class' when exiting program.
 ///
 
-#include "config.h"
+#include "main.h"
+
 #include <iostream>
 #include <signal.h>
 #include <stdlib.h>
 #include <string>
 #include <unistd.h>
 
-#include "main.h"
 #include "H89.h"
 #include "Console.h"
 #include "h19.h"

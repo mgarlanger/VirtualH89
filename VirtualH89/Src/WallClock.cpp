@@ -7,6 +7,7 @@
 ///
 
 #include "WallClock.h"
+
 #include "config.h"
 #include "ClockUser.h"
 #include "logger.h"

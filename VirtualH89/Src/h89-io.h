@@ -1,5 +1,7 @@
 /// \file h89-io.h
 ///
+/// \brief Interfaces between the CPU and all the I/O devices
+///
 /// \date Mar 7, 2009
 /// \author Mark Garlanger
 ///
@@ -7,12 +9,14 @@
 #ifndef H89_IO_H_
 #define H89_IO_H_
 
+#include <vector>
+
 #include "config.h"
 #include "h89Types.h"
 
 #include "IODevice.h"
-#include "DiskController.h"
-#include <vector>
+
+class DiskController;
 
 ///
 /// \brief %H89 IO Bus

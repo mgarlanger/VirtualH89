@@ -9,7 +9,6 @@
 #ifndef INS8250_H_
 #define INS8250_H_
 
-#include "h89Types.h"
 #include "IODevice.h"
 
 class SerialPortDevice;

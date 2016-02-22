@@ -11,10 +11,9 @@
 #ifndef MMS316INTRCTRLR_H_
 #define MMS316INTRCTRLR_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "InterruptController.h"
-#include "mms77316.h"
+
+class MMS77316;
 
 /// \class MMS316IntrCtrlr
 ///

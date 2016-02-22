@@ -7,9 +7,11 @@
 #ifndef CPU_H_
 #define CPU_H_
 
+
+#include <string>
+
 #include "config.h"
 #include "h89Types.h"
-#include <string>
 
 class AddressBus;
 

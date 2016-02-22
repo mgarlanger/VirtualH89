@@ -22,13 +22,14 @@
 #define RAWFLOPPYIMAGE_H_
 
 #include <sys/types.h>
-#include <string>
 #include <vector>
 
-#include "config.h"
-#include "h89Types.h"
-#include "GenericFloppyDrive.h"
-#include "GenericFloppyFormat.h"
+#include "GenericFloppyDisk.h"
+
+
+class GenericFloppyDrive;
+class GenericFloppyFormat;
+class GenericDiskDrive;
 
 /// \class RawFloppyImage
 ///

@@ -5,6 +5,7 @@
 ///
 
 #include "StdioConsole.h"
+
 #include "logger.h"
 #include <stdio.h>
 #include <unistd.h>

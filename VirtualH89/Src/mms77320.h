@@ -10,15 +10,11 @@
 #ifndef MMS77320_H_
 #define MMS77320_H_
 
-#include <vector>
-#include <string>
 
-#include "config.h"
-#include "h89Types.h"
-#include "wd1797.h"
-#include "GenericSASIDrive.h"
 #include "DiskController.h"
 #include "propertyutil.h"
+
+class GenericSASIDrive;
 
 ///
 /// \brief Virtual soft-sectored disk controller

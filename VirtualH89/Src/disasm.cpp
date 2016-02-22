@@ -1,4 +1,4 @@
-/// \file disasm.c
+/// \file disasm.cpp
 ///
 /// \date Mar 10, 2009
 /// \author Mark Garlanger
@@ -37,12 +37,13 @@
 
 #define OCTAL 1
 
+#include "disasm.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include "config.h"
 
-#include "h89Types.h"
 #include "H89.h"
 #include "logger.h"
 #include "AddressBus.h"

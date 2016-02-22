@@ -8,8 +8,6 @@
 #ifndef H_17_4_H_
 #define H_17_4_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "DiskDrive.h"
 
 class FloppyDisk;

@@ -9,7 +9,6 @@
 #ifndef Z47CONTROLLER_H_
 #define Z47CONTROLLER_H_
 
-#include "h89Types.h"
 #include "ClockUser.h"
 #include "ParallelPortConnection.h"
 

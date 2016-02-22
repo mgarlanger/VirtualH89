@@ -9,7 +9,6 @@
 #ifndef RAM_H_
 #define RAM_H_
 
-#include "config.h"
 #include "Memory.h"
 
 /// \brief Virtual %RAM

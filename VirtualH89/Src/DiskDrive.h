@@ -10,6 +10,7 @@
 #ifndef DISKDRIVE_H_
 #define DISKDRIVE_H_
 
+#include "config.h"
 #include "h89Types.h"
 
 class FloppyDisk;

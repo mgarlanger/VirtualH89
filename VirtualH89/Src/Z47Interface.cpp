@@ -8,8 +8,8 @@
 ///
 
 #include "Z47Interface.h"
-#include "logger.h"
 
+#include "logger.h"
 #include "ParallelLink.h"
 
 Z47Interface::Z47Interface(int baseAddr): DiskController(baseAddr, H47_NumPorts_c),

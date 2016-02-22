@@ -15,8 +15,10 @@
 #include <string>
 
 #include "config.h"
-#include "GenericDiskDrive.h"
-#include "DiskController.h"
+
+class GenericDiskDrive;
+class DiskController;
+
 
 /// \brief H89Operator
 ///

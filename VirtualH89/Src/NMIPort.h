@@ -10,7 +10,6 @@
 #ifndef NMIPORT_H_
 #define NMIPORT_H_
 
-#include "config.h"
 #include "IODevice.h"
 
 ///

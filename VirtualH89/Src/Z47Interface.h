@@ -13,8 +13,6 @@
 #include "DiskController.h"
 #include "ClockUser.h"
 #include "ParallelPortConnection.h"
-#include <vector>
-#include <string>
 
 class Z47Interface: public virtual DiskController,
     public virtual ClockUser,

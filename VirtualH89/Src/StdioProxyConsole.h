@@ -14,9 +14,9 @@
 
 #include <assert.h>
 
-#include "config.h"
 #include "Console.h"
-#include "H89Operator.h"
+
+class H89Operator;
 
 /// \brief StdioProxyConsole
 ///

@@ -6,8 +6,9 @@
 /// \author Mark Garlanger
 ///
 
-#include "logger.h"
 #include "SoftSectoredDisk.h"
+
+#include "logger.h"
 #include "Track.h"
 #include "Sector.h"
 

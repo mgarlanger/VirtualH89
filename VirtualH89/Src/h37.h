@@ -7,12 +7,8 @@
 #ifndef Z_89_37_H_
 #define Z_89_37_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "DiskController.h"
 #include "ClockUser.h"
-#include <vector>
-#include <string>
 
 class DiskDrive;
 

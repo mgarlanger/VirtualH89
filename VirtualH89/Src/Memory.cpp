@@ -5,6 +5,7 @@
 ///
 
 #include "Memory.h"
+
 #include "logger.h"
 
 Memory::Memory(int size): baseAddress_m(0),

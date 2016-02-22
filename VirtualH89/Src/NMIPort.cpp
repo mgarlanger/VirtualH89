@@ -6,6 +6,7 @@
 ///
 
 #include "NMIPort.h"
+
 #include "H89.h"
 #include "logger.h"
 

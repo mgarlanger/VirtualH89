@@ -4,10 +4,8 @@
 /// \author Mark Garlanger
 ///
 
-#include <strings.h>
-
 #include "h-17-1.h"
-#include "WallClock.h"
+
 #include "logger.h"
 #include "FloppyDisk.h"
 

@@ -3,36 +3,26 @@
 /// \date Apr 12, 2009
 /// \author Mark Garlanger
 ///
-#include "config.h"
+
+#include "h19.h"
+
 #include <iostream>
 #include <signal.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <assert.h>
 
-#if OGL
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #else
-#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
-#else
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#include <wx/wx.h>
 
-#endif
-
-#include "h19.h"
 #include "h19-font.h"
 #include "logger.h"
 
-#include <pthread.h>
-#include <unistd.h>
 
 #include "ascii.h"
 
@@ -1299,7 +1289,6 @@ unsigned int H19::getBaudRate()
     return (9600);
 }
 
-#if OGL
 
 void H19::reshape(int w, int h)
 {
@@ -1407,13 +1396,13 @@ void H19::glDisplay()
 {
     h19->display();
 }
-#endif
+
 
 void H19::run()
 {
     int dummy_argc = 1;
     char *dummy_argv = (char *)"dummy";
-#if OGL
+
     glutInit(&dummy_argc, &dummy_argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(640, 500);
@@ -1438,5 +1427,4 @@ void H19::run()
     glutIgnoreKeyRepeat(1);
 
     glutMainLoop();
-#endif  // OGL
 }

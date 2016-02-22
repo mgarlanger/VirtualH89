@@ -5,6 +5,10 @@
 ///
 
 #include "h89-timer.h"
+
+#include <sys/time.h>
+#include <signal.h>
+
 #include "H89.h"
 #include "cpu.h"
 #include "InterruptController.h"
@@ -12,8 +16,6 @@
 #include "WallClock.h"
 #include "logger.h"
 
-#include <sys/time.h>
-#include <signal.h>
 
 #define USE_ONE_MSEC 0
 

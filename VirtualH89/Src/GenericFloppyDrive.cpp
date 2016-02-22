@@ -7,13 +7,13 @@
 /// \author Douglas Miller
 ///
 
-#include <strings.h>
+#include "GenericFloppyDrive.h"
 
 #include "WallClock.h"
 #include "logger.h"
 #include "FloppyDisk.h"
-#include "GenericFloppyDrive.h"
 #include "GenericFloppyFormat.h"
+#include "GenericFloppyDisk.h"
 
 GenericFloppyDrive::GenericFloppyDrive(DriveType type)
 {

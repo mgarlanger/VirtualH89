@@ -7,9 +7,7 @@
 #ifndef H_17_1_H_
 #define H_17_1_H_
 
-#include "config.h"
 
-#include "h89Types.h"
 #include "DiskDrive.h"
 
 ///

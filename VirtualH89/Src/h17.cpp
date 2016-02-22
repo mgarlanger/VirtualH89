@@ -7,10 +7,9 @@
 /// \author Mark Garlanger
 ///
 
-#include "config.h"
-#include "h89Types.h"
 
 #include "h17.h"
+
 #include "H89.h"
 #include "logger.h"
 #include "WallClock.h"

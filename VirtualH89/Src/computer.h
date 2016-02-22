@@ -9,9 +9,10 @@
 #ifndef COMPUTER_H_
 #define COMPUTER_H_
 
+#include "config.h"
 #include "h89Types.h"
-#include "AddressBus.h"
 
+class AddressBus;
 class H89Timer;
 class H89_IO;
 

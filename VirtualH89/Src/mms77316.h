@@ -9,15 +9,13 @@
 #ifndef MMS77316_H_
 #define MMS77316_H_
 
-#include <vector>
-#include <string>
 
-#include "config.h"
-#include "h89Types.h"
 #include "wd1797.h"
-#include "GenericFloppyDrive.h"
 #include "DiskController.h"
 #include "propertyutil.h"
+
+class GenericFloppyDrive;
+class GenericDiskDrive;
 
 ///
 /// \brief Virtual soft-sectored disk controller

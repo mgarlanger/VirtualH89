@@ -18,16 +18,18 @@
 #ifndef H89_H_
 #define H89_H_
 
-#include "config.h"
+#include <string>
+#include <pthread.h>
+
 #include "computer.h"
-#include "cpu.h"
-#include "Console.h"
+
 
 // Forward declare classes to avoid a tangled mess of includes.
 
 class ROM;
 class RAM;
 class AddressBus;
+class Console;
 class InterruptController;
 class H89Timer;
 class H89_IO;

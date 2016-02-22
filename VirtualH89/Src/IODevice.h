@@ -8,6 +8,7 @@
 #define IODEVICE_H_
 
 #include "h89Types.h"
+#include "config.h"
 
 /// \todo - determine if interrupt level for the device should be here, or if we subclass
 ///         this to a IOIntrDevice.

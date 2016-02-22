@@ -9,7 +9,6 @@
 #ifndef HARDSECTOREDDISK_H_
 #define HARDSECTOREDDISK_H_
 
-#include "h89Types.h"
 #include "FloppyDisk.h"
 
 class DiskData;

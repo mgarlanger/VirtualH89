@@ -9,8 +9,8 @@
 ///
 
 #include "Z47Controller.h"
-#include "logger.h"
 
+#include "logger.h"
 #include "ParallelLink.h"
 
 #include <string.h>

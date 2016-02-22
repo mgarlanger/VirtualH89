@@ -10,12 +10,9 @@
 #ifndef GENERICSASIDRIVE_H_
 #define GENERICSASIDRIVE_H_
 
-#include <string>
-
-#include "config.h"
-#include "h89Types.h"
 #include "GenericDiskDrive.h"
-#include "GenericFloppyDisk.h" // API issues
+
+class GenericFloppyDisk;
 
 ///
 /// \brief Virtual Generic SASI Drive

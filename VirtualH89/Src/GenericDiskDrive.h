@@ -14,7 +14,8 @@
 
 #include "config.h"
 #include "h89Types.h"
-#include "GenericFloppyDisk.h"
+
+class GenericFloppyDisk;
 
 ///
 /// \brief Virtual Generic Disk Drive

@@ -9,11 +9,10 @@
 #ifndef WD1797_H_
 #define WD1797_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "IODevice.h"
 #include "ClockUser.h"
-#include "GenericFloppyDrive.h"
+
+class GenericFloppyDrive;
 
 ///
 /// \brief Virtual soft-sectored disk controller

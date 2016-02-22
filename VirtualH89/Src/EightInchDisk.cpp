@@ -7,12 +7,14 @@
 ///
 
 #include "EightInchDisk.h"
+
+#include <iostream>     // std::cout
+#include <fstream>      // std::ifstream
+
 #include "logger.h"
 #include "Track.h"
 #include "Sector.h"
 
-#include <iostream>     // std::cout
-#include <fstream>      // std::ifstream
 
 EightInchDisk::EightInchDisk()
 {

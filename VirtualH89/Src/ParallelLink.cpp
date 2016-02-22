@@ -7,6 +7,7 @@
 ///
 
 #include "ParallelLink.h"
+
 #include "ParallelPortConnection.h"
 #include "logger.h"
 
@@ -22,13 +23,13 @@ ParallelLink::ParallelLink(): data_m(0xff),
     host_m(0),
     device_m(0)
 {
-    // TODO Auto-generated constructor stub
+    
 
 }
 
 ParallelLink::~ParallelLink()
 {
-    // TODO Auto-generated destructor stub
+    
 }
 
 void ParallelLink::sendHostData(BYTE data)

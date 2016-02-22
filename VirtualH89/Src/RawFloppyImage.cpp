@@ -7,6 +7,8 @@
 /// \author Douglas Miller
 ///
 
+#include "RawFloppyImage.h"
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -14,8 +16,10 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "RawFloppyImage.h"
 #include "logger.h"
+#include "GenericFloppyFormat.h"
+#include "GenericDiskDrive.h"
+
 
 void RawFloppyImage::getAddrMark(BYTE *tp, int nbytes,
                                  int& id_tk, int& id_sd, int& id_sc, int& id_sl)

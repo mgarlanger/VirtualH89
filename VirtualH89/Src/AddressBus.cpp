@@ -4,8 +4,9 @@
 ///  \author Mark Garlanger
 ///
 
-#include "logger.h"
 #include "AddressBus.h"
+
+#include "logger.h"
 #include "Memory.h"
 #include "InterruptController.h"
 

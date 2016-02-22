@@ -11,7 +11,7 @@
 #define GENERALPURPOSEPORT_H_
 
 #include <string>
-#include "config.h"
+
 #include "IODevice.h"
 
 ///

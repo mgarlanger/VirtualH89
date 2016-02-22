@@ -16,9 +16,7 @@
 #include <GL/gl.h>
 #endif
 
-#include <assert.h>
 
-#include "config.h"
 #include "Console.h"
 
 /// \brief Virtual %H19 %Terminal

@@ -10,16 +10,8 @@
 /// \todo Determine what needs to be a configuration variable, and what can be removed.
 
 #define USE_PTHREAD 1
-#define OGL 1
 #define CPM 0
-#define QTGL 0
-#if (!OGL)
-#define __WXOSX_COCOA__ 1
-#define WXUSINGDLL 1
-//#define wxABORT_ON_CONFIG_ERROR 0
-#endif
 
-#define WXWID 1
 
 #define CNTL_C
 //#define BUS_8080

@@ -9,6 +9,8 @@
 ///
 
 #include "MMS316IntrCtrlr.h"
+
+#include "mms77316.h"
 #include "logger.h"
 #include "z80.h"
 

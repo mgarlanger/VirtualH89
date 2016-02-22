@@ -5,8 +5,6 @@
 /// \author Mark Garlanger
 ///
 
-#include <strings.h>
-
 #include "h-17-4.h"
 
 #include "logger.h"

@@ -12,13 +12,13 @@
 
 ParallelPortConnection::ParallelPortConnection(): link_m(0)
 {
-    // TODO Auto-generated constructor stub
+    
 
 }
 
 ParallelPortConnection::~ParallelPortConnection()
 {
-    // TODO Auto-generated destructor stub
+    
 }
 
 void ParallelPortConnection::connectLink(ParallelLink *link)

@@ -10,15 +10,11 @@
 #ifndef Z80_H_
 #define Z80_H_
 
-#include "config.h"
-#include "h89Types.h"
-#include "cpu.h"
-#include "config.h"
-
 #include <csignal>
 #include <vector>
 #include <pthread.h>
 
+#include "cpu.h"
 #include "AddressBus.h"
 
 class Z80;

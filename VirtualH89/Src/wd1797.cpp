@@ -6,8 +6,9 @@
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///
 
-#include "H89.h"
 #include "wd1797.h"
+
+#include "H89.h"
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "GenericFloppyFormat.h"
