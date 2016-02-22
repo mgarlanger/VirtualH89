@@ -59,7 +59,7 @@ void StdioProxyConsole::processCharacter(char ch) {}
 void StdioProxyConsole::keypress(char ch)
 {
     // try not to overrun the UART, but do not wait too long.
-    int timeout = 2000;
+    int timeout = 4000;
     int sleep = 100;
 
     while (!sendReady() && timeout > 0)
