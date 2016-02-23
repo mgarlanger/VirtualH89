@@ -80,7 +80,9 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string>
     gapLen_m(0),
     indexGapLen_m(0),
     writePos_m(-1),
-    trackWrite_m(false)
+    trackWrite_m(false),
+    dataPos_m(0),
+    dataLen_m(0)
 {
     if (argv.size() < 1)
     {
@@ -564,83 +566,149 @@ bool RawFloppyImage::cacheTrack(int side, int track)
         return false;
     }
 
+    headPos_m = 0;
     bufferedSide_m = side;
     bufferedTrack_m = track;
     return true;
 }
 
-bool RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data)
+bool RawFloppyImage::findMark(int mark)
 {
-    BYTE d;
+    int indexCount = 0;
 
+    while (indexCount < 2)
+    {
+        BYTE d = trackBuffer_m[headPos_m++];
+
+        if (headPos_m >= trackLen_m)
+        {
+            // in most cases, should never hit this since
+            // we started at the address fields (there must be
+            // sector data after any address field, before index).
+            headPos_m = 0;
+            ++indexCount;
+            continue;
+        }
+
+        if (d == GenericFloppyFormat::ID_AM_BYTE)
+        {
+            if (mark == GenericFloppyFormat::ID_AM)
+            {
+                return true;
+            }
+
+            headPos_m += 6;
+        }
+
+        else if (d == GenericFloppyFormat::DATA_AM_BYTE)
+        {
+            if (mark == GenericFloppyFormat::DATA_AM)
+            {
+                return true;
+            }
+
+            headPos_m += secSize_m + 2;
+
+            if (mark == GenericFloppyFormat::CRC)
+            {
+                return true;
+            }
+
+            // should never get here, should always start before addr,
+            // and find what we're looknig for before this.
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
+{
+    if (findMark(GenericFloppyFormat::ID_AM))
+    {
+        if (track != trackBuffer_m[headPos_m] ||
+                side != trackBuffer_m[headPos_m + 1] ||
+                sector != trackBuffer_m[headPos_m + 2])
+        {
+            headPos_m += 6;
+            findMark(GenericFloppyFormat::CRC);
+            return false;
+        }
+
+        headPos_m += 6;
+
+        if (findMark(GenericFloppyFormat::DATA_AM))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
+{
     if (!cacheTrack(side, track))
     {
         // Just treat like unformatted disk/track.
         return false;
     }
 
-    d = trackBuffer_m[pos];
-
-    int p = pos;
-    p -= indexGapLen_m + secSize_m;
-    p %= gapLen_m + secSize_m;
-
-    if (pos <= indexGapLen_m || (p >= 0 && p < gapLen_m))
+    if (inSector < 0)
     {
-        if (d == GenericFloppyFormat::DATA_AM_BYTE)
+        if (sector == 0xfd) // read address
         {
+            if (findMark(GenericFloppyFormat::ID_AM))
+            {
+                dataPos_m = headPos_m;
+                dataLen_m = dataPos_m + 6;
+                data = GenericFloppyFormat::ID_AM;
+                findMark(GenericFloppyFormat::CRC);
+                debugss(ssRawFloppyImage, INFO, "read address %d %d\n", dataPos_m, dataLen_m);
+                return true;
+            }
+
+            data = GenericFloppyFormat::ERROR;
+            return true;
+        }
+        else if (sector == 0xff) // read track
+        {
+		dataPos_m = 0;
+		dataLen_m = trackLen_m;
+		data = GenericFloppyFormat::INDEX_AM;
+		debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
+		return true;
+	}
+        else if (locateSector(track, side, sector))
+        {
+            dataPos_m = headPos_m;
+            headPos_m += secSize_m + 2;
+            dataLen_m = dataPos_m + secSize_m;
             data = GenericFloppyFormat::DATA_AM;
             return true;
         }
 
-        else if (d == GenericFloppyFormat::ID_AM_BYTE)
-        {
-            data = GenericFloppyFormat::ID_AM;
-            return true;
-        }
-
-        else if (d == GenericFloppyFormat::INDEX_AM_BYTE)
-        {
-            data = GenericFloppyFormat::INDEX_AM;
-            return true;
-        }
+        data = GenericFloppyFormat::NO_DATA;
+        return true;
     }
 
-    data = d;
-    return true;
-}
-
-bool RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
-{
-    if (pos < indexGapLen_m / 2)
+    if (dataPos_m < dataLen_m)
     {
-        debugss(ssRawFloppyImage, WARNING, "TrackWrite not supported by RawFloppyImage\n");
-        trackWrite_m = true;
-        writePos_m = pos;
-        return false; // Not supported
+        data = trackBuffer_m[dataPos_m++];
     }
 
     else
     {
-        // 'pos' is position of DATA_AM, so start writing data at next byte.
-        writePos_m = pos + 1;
+        debugss(ssRawFloppyImage, INFO, "data done %d %d %d\n", track, side, sector);
+        data = GenericFloppyFormat::CRC;
     }
 
-    debugss(ssRawFloppyImage, INFO, "startWrite pos=%d writePos=%d\n", pos, writePos_m);
     return true;
 }
 
-bool RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned int pos)
-{
-    debugss(ssRawFloppyImage, INFO, "stopWrite pos=%d writePos=%d\n", pos, writePos_m);
-    writePos_m = -1;
-    return true;
-}
-
-bool RawFloppyImage::writeData(BYTE         side,
-                               BYTE         track,
-                               unsigned int pos,
-                               BYTE         data)
+bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
+                               int inSector, BYTE data, bool dataReady, int& result)
 {
     if (checkWriteProtect())
     {
@@ -658,18 +726,66 @@ bool RawFloppyImage::writeData(BYTE         side,
         return false;
     }
 
-    if (pos != writePos_m)
+    if (inSector < 0)
     {
-        // fallen behind, don't trash entire track...
-        return false;
+        if (sector == 0xff || sector == 0xfe) // write track
+        {
+#if 0
+		// density is in 'sector' LSB... use to handle proper track size, etc.
+
+		// This does actually work, in the sense that the pattern is
+		// written to the file. But, we have to re-mount the image
+		// in order to use it, and we have to deal with changes in density
+		// (not to mention other aspects of disk geometry). This all gets
+		// trickier if we need to handle formatting a single track and
+		// reading back sectors to verify. Really need to  significantly
+		// rework this paradigm in order to make it work just like a
+		// real disk/controller. Right now, it does not handle changing
+		// format on-the-fly let alone track-by-track.
+		dataPos_m = 0;
+		dataLen_m = trackLen_m;
+		result = GenericFloppyFormat::INDEX_AM;
+		debugss(ssRawFloppyImage, INFO, "write track %d %d\n", dataPos_m, dataLen_m);
+		return true;
+#else
+		result = GenericFloppyFormat::ERROR;
+		return true;
+#endif
+	}
+        else if (locateSector(track, side, sector))
+        {
+            dataPos_m = headPos_m;
+            headPos_m += secSize_m + 2;
+            dataLen_m = dataPos_m + secSize_m;
+            result = GenericFloppyFormat::DATA_AM;
+            return true;
+        }
+
+        result = GenericFloppyFormat::NO_DATA;
+        return true;
     }
 
-    ++writePos_m;
+    if (dataPos_m < dataLen_m)
+    {
+        if (!dataReady)
+        {
+            result = GenericFloppyFormat::NO_DATA;
+        }
 
-    debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", pos, data);
-    // TODO: limit or control access to non-sector bytes?
-    trackBuffer_m[pos] = data;
-    bufferDirty_m = true;
+        else
+        {
+            trackBuffer_m[dataPos_m++] = data;
+            bufferDirty_m = true;
+            result = data;
+        }
+    }
+
+    else
+    {
+        result = GenericFloppyFormat::CRC;
+    }
+
+    debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", inSector, data);
     return true;
 }
 

@@ -136,14 +136,6 @@ BYTE WD1797::in(BYTE addr)
         dataReady_m = false;
         statusReg_m &= ~stat_DataRequest_c;
         lowerDrq();
-
-        if (curCommand_m == completedCmd)
-        {
-            curCommand_m = noneCmd;
-            statusReg_m &= ~stat_Busy_c;
-            raiseIntrq();
-        }
-
         break;
 
     default:
@@ -353,6 +345,8 @@ void WD1797::processCmdTypeII(BYTE cmd)
                 __FUNCTION__, sectorReg_m, multiple_m, delay_m, sectorLength_m, side_m);
         curCommand_m = readSectorCmd;
     }
+
+    stepSettle_m = 100; // give host time to get ready...
 }
 
 void WD1797::processCmdTypeIII(BYTE cmd)
@@ -395,7 +389,10 @@ void WD1797::processCmdTypeIII(BYTE cmd)
     {
         debugss(ssWD1797, ERROR, "%s - Invalid type-III cmd: %x\n", __FUNCTION__, cmd);
         statusReg_m &= ~stat_Busy_c;
+        return;
     }
+
+    stepSettle_m = 100; // give host time to get ready...
 }
 
 // 'drive' might be NULL.
@@ -578,15 +575,19 @@ void WD1797::notification(unsigned int cycleCount)
 
     updateReady(drive);
 
-    if (stepSettle_m > 0 && stepSettle_m > cycleCount)
+    if (stepSettle_m > 0)
     {
-        stepSettle_m -= cycleCount;
-        return;
-    }
+        if (stepSettle_m > cycleCount)
+        {
+            stepSettle_m -= cycleCount;
+            return;
+        }
 
-    else
-    {
-        stepSettle_m = 0;
+        else
+        {
+            stepSettle_m = 0;
+            missCount_m = 0;
+        }
     }
 
     charPos = drive->getCharPos(doubleDensity());
@@ -733,6 +734,9 @@ void WD1797::notification(unsigned int cycleCount)
         break;
     }
 
+    int data;
+    int result;
+
     switch (curCommand_m)
     {
     case restoreCmd:
@@ -753,231 +757,267 @@ void WD1797::notification(unsigned int cycleCount)
 
         break;
 
-    case readAddressCmd:
     case readSectorCmd:
-    case writeSectorCmd:
+
+        // user may choose to ignore data... must not hang here!
+        if (dataReady_m)
         {
-            debugss(ssWD1797, ALL, "%s: sectorPos_m: %d\n", __FUNCTION__,
-                    sectorPos_m);
-            drive->selectSide(side_m);
-
-            if (indexCount_m > 2)
+            if ((statusReg_m & stat_LostData_c) == 0 && ++missCount_m < 4)
             {
-                sectorPos_m = -11;
-                curCommand_m = noneCmd;
-                statusReg_m &= ~stat_Busy_c;
-                statusReg_m |= stat_RecordNotFound_c;
-                raiseIntrq();
-            }
-
-            // TODO: detect second index pulse and time-out with stat_RecordNotFound_c
-            // negative data is "missing clock" detection.
-            int data = drive->readData(doubleDensity(), curPos_m);
-
-            if (data == GenericFloppyFormat::ERROR)
-            {
-                // probably density mis-match.
-                sectorPos_m = -11;
-                curCommand_m = noneCmd;
-                statusReg_m &= ~stat_Busy_c;
-                statusReg_m |= stat_CRCError_c; // a likely error
-                raiseIntrq();
-                return;
-            }
-
-            if (sectorPos_m < -10)
-            {
-                if (data == GenericFloppyFormat::ID_AM)
-                {
-                    // At ID AM, start getting sector ID...
-                    sectorPos_m = -10;
-                }
-            }
-
-            else if (sectorPos_m < -4)
-            {
-                addr_m[sectorPos_m + 10] = data;
-
-                if (curCommand_m == readAddressCmd)
-                {
-                    transferData(data);
-                }
-
-                ++sectorPos_m;
-
-                if (sectorPos_m >= -4)
-                {
-                    if (curCommand_m != readAddressCmd && !checkAddr(addr_m))
-                    {
-                        sectorPos_m = -11;
-                    }
-
-                    else if (curCommand_m == writeSectorCmd)
-                    {
-                        raiseDrq();
-                    }
-                }
-            }
-
-            else if (sectorPos_m < 0)
-            {
-                if (curCommand_m == readAddressCmd)
-                {
-                    sectorReg_m = addr_m[0];
-                    sectorPos_m = -11;
-                    curCommand_m = noneCmd;
-                    statusReg_m &= ~stat_Busy_c;
-                    raiseIntrq();
-                }
-
-                else if (data == GenericFloppyFormat::DATA_AM)
-                {
-                    // At DATA AM, start getting sector data...
-                    sectorPos_m = 0;
-
-                    if (curCommand_m == writeSectorCmd)
-                    {
-                        drive->startWrite(doubleDensity(), curPos_m);
-                        curCommand_m = writingSectorCmd;
-                    }
-                }
-            }
-
-            else
-            {
-                transferData(data);
-                ++sectorPos_m;
-
-                if (sectorPos_m >= sectorLen(addr_m))
-                {
-                    sectorPos_m = -11;
-                    curCommand_m = completedCmd;
-                }
-            }
-
-            break;
-        }
-
-    case writingSectorCmd:
-        {
-            BYTE data = dataReg_m;
-
-            if (!dataReady_m)
-            {
-                statusReg_m |= stat_LostData_c;
-                data = 0;
-            }
-
-            dataReady_m = false;
-
-            if (!drive->writeData(doubleDensity(), curPos_m, data))
-            {
-                // what to do here.
-            }
-
-            ++sectorPos_m;
-
-            if (sectorPos_m >= sectorLen(addr_m))
-            {
-                drive->stopWrite(doubleDensity(), curPos_m);
-                sectorPos_m = -11;
-                curCommand_m = noneCmd;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-            }
-
-            else
-            {
-                raiseDrq();
-            }
-
-            break;
-        }
-
-    case readTrackCmd:
-    case writeTrackCmd:
-        {
-            drive->selectSide(side_m);
-
-            if (sectorPos_m < -10)
-            {
-                if (indexEdge)
-                {
-                    sectorPos_m = 0;
-
-                    if (curCommand_m == writeTrackCmd)
-                    {
-                        drive->startWrite(doubleDensity(), curPos_m);
-                        curCommand_m = writingTrackCmd;
-                        goto startWritingTrackNow;
-                    }
-                }
-
-                else
-                {
-                    break;
-                }
-            }
-
-            int data = drive->readData(doubleDensity(), curPos_m);
-
-            if (data == GenericFloppyFormat::ERROR)
-            {
-                // probably density mis-match.
-                sectorPos_m = -11;
-                curCommand_m = noneCmd;
-                statusReg_m &= ~stat_Busy_c;
-                statusReg_m |= stat_CRCError_c; // a likely error
-                raiseIntrq();
+                // wait a little for host to catch up
                 break;
+            }
+
+            statusReg_m |= stat_LostData_c;
+        }
+
+        missCount_m == 0;
+        drive->selectSide(side_m);
+        data = drive->readData(doubleDensity(), trackReg_m, side_m, sectorReg_m, sectorPos_m);
+
+        if (data == GenericFloppyFormat::NO_DATA)
+        {
+            // just wait for sector to come around..
+        }
+        else if (data == GenericFloppyFormat::DATA_AM)
+        {
+            sectorPos_m = 0;
+        }
+
+        else if (data == GenericFloppyFormat::CRC)
+        {
+            sectorPos_m = -1;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else if (data < 0)
+        {
+            // probably ERROR
+            sectorPos_m = -1;
+            statusReg_m |= stat_CRCError_c;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else
+        {
+            transferData(data);
+            ++sectorPos_m;
+        }
+
+        break;
+
+    case readAddressCmd:
+
+        // user may choose to ignore data... must not hang here!
+        if (dataReady_m)
+        {
+            if ((statusReg_m & stat_LostData_c) == 0 && ++missCount_m < 4)
+            {
+                // wait a little for host to catch up
+                break;
+            }
+
+            statusReg_m |= stat_LostData_c;
+        }
+
+        missCount_m == 0;
+        drive->selectSide(side_m);
+        // sector '0xfd' indicates a read address
+        data = drive->readData(doubleDensity(), trackReg_m, side_m, 0xfd, sectorPos_m);
+
+        if (data == GenericFloppyFormat::NO_DATA)
+        {
+            // just wait for sector to come around..
+            // should never happen, as long as track was formatted.
+        }
+        else if (data == GenericFloppyFormat::ID_AM)
+        {
+            sectorPos_m = 0;
+        }
+
+        else if (data == GenericFloppyFormat::CRC)
+        {
+            sectorPos_m = -1;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else if (data < 0)
+        {
+            // probably ERROR
+            sectorPos_m = -1;
+            statusReg_m |= stat_CRCError_c;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else
+        {
+            if (sectorPos_m == 0)
+            {
+                sectorReg_m = data;
             }
 
             transferData(data);
             ++sectorPos_m;
-
-            if (indexEdge)
-            {
-                sectorPos_m = -11;
-                curCommand_m = completedCmd;
-            }
-
-            break;
         }
 
-    case writingTrackCmd:
-        if (indexEdge)
+        break;
+
+    case writeSectorCmd:
+        drive->selectSide(side_m);
+        result = drive->writeData(doubleDensity(), trackReg_m, side_m, sectorReg_m,
+                                  sectorPos_m, dataReg_m, dataReady_m);
+
+        if (result == GenericFloppyFormat::NO_DATA)
         {
-            drive->stopWrite(doubleDensity(), curPos_m);
-            sectorPos_m = -11;
-            curCommand_m = noneCmd;
+            // out of paranoia, but must be careful
+            if (sectorPos_m >= 0 && !drqRaised_m)
+            {
+                raiseDrq();
+            }
+
+            // just wait for sector to come around..
+        }
+
+        else if (result == GenericFloppyFormat::DATA_AM)
+        {
+            sectorPos_m = 0;
+        }
+
+        else if (result == GenericFloppyFormat::CRC)
+        {
+            sectorPos_m = -1;
             statusReg_m &= ~stat_Busy_c;
             raiseIntrq();
-            break;
+            curCommand_m = noneCmd;
         }
 
-startWritingTrackNow:
+        else if (result < 0)
         {
-
-            BYTE data = dataReg_m;
-
-            if (!dataReady_m)
-            {
-                statusReg_m |= stat_LostData_c;
-                data = 0;
-            }
-
-            dataReady_m = false;
-            raiseDrq();
-
-            if (!drive->writeData(doubleDensity(), curPos_m, data))
-            {
-                // what to do here.
-                statusReg_m |= stat_CRCError_c; // a likely error
-            }
-
-            ++sectorPos_m;
-            break;
+            // other errors
+            sectorPos_m = -1;
+            statusReg_m |= stat_WriteFault_c;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
         }
+
+        else
+        {
+            dataReady_m = false;
+            ++sectorPos_m;
+            raiseDrq();
+        }
+
+        break;
+
+    case readTrackCmd:
+
+        // user may choose to ignore data... must not hang here!
+        if (dataReady_m)
+        {
+            if ((statusReg_m & stat_LostData_c) == 0 && ++missCount_m < 4)
+            {
+                // wait a little for host to catch up
+                break;
+            }
+
+            statusReg_m |= stat_LostData_c;
+        }
+
+        missCount_m == 0;
+        drive->selectSide(side_m);
+        data = drive->readData(doubleDensity(), trackReg_m, side_m, 0xff, sectorPos_m);
+
+        if (data == GenericFloppyFormat::NO_DATA)
+        {
+            // just wait for index to come around..
+        }
+        else if (data == GenericFloppyFormat::INDEX_AM)
+        {
+            sectorPos_m = 0;
+        }
+
+        else if (data == GenericFloppyFormat::CRC)
+        {
+            sectorPos_m = -1;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else if (data < 0)
+        {
+            // probably ERROR
+            sectorPos_m = -1;
+            statusReg_m |= stat_CRCError_c;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else
+        {
+            transferData(data);
+            ++sectorPos_m;
+        }
+
+        break;
+    case writeTrackCmd:
+        drive->selectSide(side_m);
+        result = drive->writeData(doubleDensity(), trackReg_m, side_m, 0xff,
+                                  sectorPos_m, dataReg_m, dataReady_m);
+
+        if (result == GenericFloppyFormat::NO_DATA)
+        {
+            // out of paranoia, but must be careful
+            if (sectorPos_m >= 0 && !drqRaised_m)
+            {
+                raiseDrq();
+            }
+
+            // just wait for sector to come around..
+        }
+
+        else if (result == GenericFloppyFormat::INDEX_AM)
+        {
+            sectorPos_m = 0;
+        }
+
+        else if (result == GenericFloppyFormat::CRC)
+        {
+            sectorPos_m = -1;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else if (result < 0)
+        {
+            // other errors
+            debugss(ssWD1797, ERROR, "Error in write track\n");
+            sectorPos_m = -1;
+            statusReg_m |= stat_WriteFault_c;
+            statusReg_m &= ~stat_Busy_c;
+            raiseIntrq();
+            curCommand_m = noneCmd;
+        }
+
+        else
+        {
+            dataReady_m = false;
+            ++sectorPos_m;
+            raiseDrq();
+        }
+
+        break;
 
     case forceInterruptCmd:
         // TODO: watch for event(s) and raise interrupt when seen...

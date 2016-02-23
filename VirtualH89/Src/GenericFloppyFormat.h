@@ -26,10 +26,15 @@ class GenericFloppyFormat
         INDEX_AM_BYTE = 0xfc,
         ID_AM_BYTE = 0xfe,
         DATA_AM_BYTE = 0xfb,
+        CRC_BYTE = 0xf7,
+
         INDEX_AM = -INDEX_AM_BYTE,
         ID_AM = -ID_AM_BYTE,
         DATA_AM = -DATA_AM_BYTE,
+        CRC = -CRC_BYTE,
+
         ERROR = -1,
+        NO_DATA = -2,
     };
 
   private:

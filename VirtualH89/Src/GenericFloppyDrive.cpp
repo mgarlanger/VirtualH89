@@ -154,7 +154,7 @@ void GenericFloppyDrive::selectSide(BYTE side)
 }
 
 // negative data is "missing clock" detection.
-int GenericFloppyDrive::readData(bool dd, unsigned long pos)
+int GenericFloppyDrive::readData(bool dd, BYTE track, BYTE side, BYTE sector, int inSector)
 {
     int data = 0;
 
@@ -168,63 +168,46 @@ int GenericFloppyDrive::readData(bool dd, unsigned long pos)
         return GenericFloppyFormat::ERROR;
     }
 
-    if (disk_m->readData(headSel_m, track_m, pos, data))
+    if (track_m != track || headSel_m != side)
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, pos, data);
+        debugss(ssGenericFloppyDrive, INFO, "mismatch trk %d:%d sid %d:%d\n", track_m, track, headSel_m, side);
+    }
+
+    // override FDC track/side with our own - it's the real one
+    if (disk_m->readData(track_m, headSel_m, sector, inSector, data))
+    {
+        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, inSector, data);
     }
 
     return data;
 }
 
-bool GenericFloppyDrive::startWrite(bool dd, unsigned long pos)
+int GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
+                                  int inSector, BYTE data, bool dataReady)
 {
+    int result = GenericFloppyFormat::ERROR;
+
     if (!disk_m)
     {
-        return false;
+        return GenericFloppyFormat::ERROR;
     }
 
-    if (dd != disk_m->doubleDensity())
+    if (sector == 0xff) {
+	if (!dd) {
+		sector &= ~1;
+	}
+    } else if (dd != disk_m->doubleDensity())
     {
-        return false;
+        return GenericFloppyFormat::ERROR;
     }
 
-    return disk_m->startWrite(headSel_m, track_m, pos);
-}
-
-bool GenericFloppyDrive::stopWrite(bool dd, unsigned long pos)
-{
-    if (!disk_m)
+    // override FDC track/side with our own - it's the real one
+    if (!disk_m->writeData(track_m, headSel_m, sector, inSector, data, dataReady, result))
     {
-        return false;
+        debugss(ssGenericFloppyDrive, INFO, "%s: write failed - pos(%d) data(%d)\n", __FUNCTION__, inSector, data);
     }
 
-    if (dd != disk_m->doubleDensity())
-    {
-        return false;
-    }
-
-    return disk_m->stopWrite(headSel_m, track_m, pos);
-}
-
-bool GenericFloppyDrive::writeData(bool dd, unsigned long pos, BYTE data)
-{
-    if (!disk_m)
-    {
-        return false;
-    }
-
-    if (dd != disk_m->doubleDensity())
-    {
-        return false;
-    }
-
-    if (!disk_m->writeData(headSel_m, track_m, pos, data))
-    {
-        debugss(ssGenericFloppyDrive, WARNING, "%s: pos(%d)\n", __FUNCTION__, pos);
-        return false;
-    }
-
-    return true;
+    return result;
 }
 
 void GenericFloppyDrive::notification(unsigned int cycleCount)

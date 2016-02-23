@@ -66,6 +66,7 @@ class WD1797 : public ClockUser
     int indexCount_m;
     bool stepUpdate_m;
     unsigned long stepSettle_m;
+    int missCount_m;
 
     /// type I parameters.
     BYTE seekSpeed_m;
@@ -106,9 +107,6 @@ class WD1797 : public ClockUser
         forceInterruptCmd,
         // pseudo-commands/states used internally
         stepDoneCmd,
-        completedCmd,
-        writingSectorCmd,
-        writingTrackCmd,
         noneCmd
     };
     Command curCommand_m;
