@@ -6,8 +6,8 @@
 
 #include "SignalHandler.h"
 
-SignalHandler *SignalHandler::_inst;
-EventHandler *SignalHandler::signalHandlers[NSIG];
+SignalHandler* SignalHandler::_inst;
+EventHandler*  SignalHandler::signalHandlers[NSIG];
 
 SignalHandler::SignalHandler()
 {
@@ -19,7 +19,8 @@ SignalHandler::~SignalHandler()
 
 }
 
-SignalHandler *SignalHandler::instance(void)
+SignalHandler*
+SignalHandler::instance(void)
 {
     if (!_inst)
     {
@@ -29,25 +30,27 @@ SignalHandler *SignalHandler::instance(void)
     return (_inst);
 }
 
-EventHandler *SignalHandler::registerHandler(int signum, EventHandler *evtHandler)
+EventHandler*
+SignalHandler::registerHandler(int signum, EventHandler* evtHandler)
 {
     static struct sigaction newact;
 
-    EventHandler *orig_evtHandler = signalHandlers[signum];
+    EventHandler*           orig_evtHandler = signalHandlers[signum];
 
     signalHandlers[signum] = evtHandler;
-    newact.sa_handler = dispatcher;
+    newact.sa_handler      = dispatcher;
 
     sigaction(signum, &newact, 0);
 
     return (orig_evtHandler);
 }
 
-int SignalHandler::removeHandler(int signum)
+int
+SignalHandler::removeHandler(int signum)
 {
     static struct sigaction newact;
 
-    newact.sa_handler = SIG_IGN;
+    newact.sa_handler      = SIG_IGN;
     sigaction(signum, &newact, 0);
 
     signalHandlers[signum] = 0;
@@ -56,12 +59,11 @@ int SignalHandler::removeHandler(int signum)
 }
 
 
-void SignalHandler::dispatcher(int signum)
+void
+SignalHandler::dispatcher(int signum)
 {
     if (signalHandlers[signum] != 0)
     {
         signalHandlers[signum]->handleSignal(signum);
     }
 }
-
-

@@ -33,10 +33,10 @@ static const int TimerInterval_c = 2000;
 static const int TimerInterval_c = 10000;
 #endif
 
-H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
-    intEnabled_m(false),
-    count_m(0),
-    intLevel(intlvl)
+H89Timer::H89Timer(CPU* cpu, unsigned char intlvl): cpu_m(cpu),
+                                                    intEnabled_m(false),
+                                                    count_m(0),
+                                                    intLevel(intlvl)
 {
     // We need to start up the timer since it performs two tasks, it always provide the cpu
     // with extra clock ticks to accurately emulate the speed of the processor.
@@ -48,10 +48,10 @@ H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
 
-    tim.it_value.tv_sec = 0;
-    tim.it_value.tv_usec = TimerInterval_c;
+    tim.it_value.tv_sec     = 0;
+    tim.it_value.tv_usec    = TimerInterval_c;
 
-    tim.it_interval.tv_sec = 0;
+    tim.it_interval.tv_sec  = 0;
     tim.it_interval.tv_usec = TimerInterval_c;
 
     setitimer(ITIMER_REAL, &tim, NULL);
@@ -59,9 +59,9 @@ H89Timer::H89Timer(CPU *cpu, unsigned char intlvl): cpu_m(cpu),
 
 
 H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
-    intEnabled_m(false),
-    count_m(0),
-    intLevel(intlvl)
+                                          intEnabled_m(false),
+                                          count_m(0),
+                                          intLevel(intlvl)
 {
     static struct itimerval tim;
 
@@ -69,21 +69,22 @@ H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
 
-    tim.it_value.tv_sec = 0;
-    tim.it_value.tv_usec = TimerInterval_c;
+    tim.it_value.tv_sec      = 0;
+    tim.it_value.tv_usec     = TimerInterval_c;
 
-    tim.it_interval.tv_sec = 0;
-    tim.it_interval.tv_usec = TimerInterval_c;
+    tim.it_interval.tv_sec   = 0;
+    tim.it_interval.tv_usec  = TimerInterval_c;
 
 #if TEN_X_SLOWER
-    tim.it_value.tv_usec *= 20;
+    tim.it_value.tv_usec    *= 20;
     tim.it_interval.tv_usec *= 20;
 #endif
 
     setitimer(ITIMER_REAL, &tim, NULL);
 }
 
-void H89Timer::setCPU(CPU *cpu)
+void
+H89Timer::setCPU(CPU* cpu)
 {
     debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
 
@@ -98,18 +99,20 @@ H89Timer::~H89Timer()
 
     SignalHandler::instance()->removeHandler(SIGALRM);
 
-    tim.it_value.tv_sec = 0;
+    tim.it_value.tv_sec  = 0;
     tim.it_value.tv_usec = 0;
     setitimer(ITIMER_REAL, &tim, NULL);
 }
 
-void H89Timer::reset()
+void
+H89Timer::reset()
 {
     intEnabled_m = false;
-    count_m = 0;
+    count_m      = 0;
 }
 
-int H89Timer::handleSignal(int signum)
+int
+H89Timer::handleSignal(int signum)
 {
     debugss(ssTimer, ALL, "Timer Handle Signal\n");
 
@@ -153,14 +156,16 @@ int H89Timer::handleSignal(int signum)
     return (0);
 }
 
-void H89Timer::enableINT()
+void
+H89Timer::enableINT()
 {
     debugss(ssTimer, INFO, "Enable INT\n");
 
     intEnabled_m = true;
 }
 
-void H89Timer::disableINT()
+void
+H89Timer::disableINT()
 {
     debugss(ssTimer, INFO, "Disable INT\n");
 
@@ -168,4 +173,3 @@ void H89Timer::disableINT()
 
     h89.lowerINT(intLevel);
 }
-

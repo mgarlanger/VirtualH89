@@ -12,16 +12,17 @@
 
 ParallelPortConnection::ParallelPortConnection(): link_m(0)
 {
-    
+
 
 }
 
 ParallelPortConnection::~ParallelPortConnection()
 {
-    
+
 }
 
-void ParallelPortConnection::connectLink(ParallelLink *link)
+void
+ParallelPortConnection::connectLink(ParallelLink* link)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 

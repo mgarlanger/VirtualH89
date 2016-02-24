@@ -24,7 +24,7 @@
 /// Virtual Heathkit H19 Terminal that utilizes the GLUT framework to
 /// render a pixel accurate emulation of the terminal.
 ///
-class H19 : public Console //, public BaseThread
+class H19: public Console // , public BaseThread
 {
   public:
     H19();
@@ -52,14 +52,14 @@ class H19 : public Console //, public BaseThread
     static void timer(int i);
     static void keyboard(unsigned char key, int x, int y);
     static void special(int key, int x, int y);
-    static H19 *h19; // for static callback funcs
+    static H19*               h19; // for static callback funcs
     static const unsigned int screenRefresh_c = 1000 / 60;
-    static unsigned int screenRefresh;
+    static unsigned int       screenRefresh;
     void initGl();
 
     // screen size
-    static const unsigned int cols = 80;
-    static const unsigned int rows = 25;
+    static const unsigned int cols     = 80;
+    static const unsigned int rows     = 25;
     static const unsigned int rowsMain = 24;
 
     // state variables
@@ -72,34 +72,34 @@ class H19 : public Console //, public BaseThread
         SetMode,
         ResetMode
     };
-    InputMode mode;
-    bool updated;
+    InputMode    mode;
+    bool         updated;
 
     // display modes
-    bool reverseVideo;
-    bool graphicMode;
-    bool insertMode;
-    bool line25;
-    bool holdScreen;
-    bool cursorOff;
-    bool cursorBlock;
-    bool wrapEOL;
-    bool autoLF;
-    bool autoCR;
+    bool         reverseVideo;
+    bool         graphicMode;
+    bool         insertMode;
+    bool         line25;
+    bool         holdScreen;
+    bool         cursorOff;
+    bool         cursorBlock;
+    bool         wrapEOL;
+    bool         autoLF;
+    bool         autoCR;
 
-    bool keyboardEnabled;
-    bool keyClick;
-    bool keypadShifted;
-    bool altKeypadMode;
+    bool         keyboardEnabled;
+    bool         keyClick;
+    bool         keypadShifted;
+    bool         altKeypadMode;
 
-    bool offline;
+    bool         offline;
 
-    GLuint fontOffset;
-    GLuint screen[cols][rows + 1]; // extra row for GLUT wraparound.
+    GLuint       fontOffset;
+    GLuint       screen[cols][rows + 1]; // extra row for GLUT wraparound.
 
-    bool curCursor;
-    unsigned int  PosX, PosY;
-    unsigned int  SaveX, SaveY;
+    bool         curCursor;
+    unsigned int PosX, PosY;
+    unsigned int SaveX, SaveY;
 
     //
     // internal routines to handle control characters.

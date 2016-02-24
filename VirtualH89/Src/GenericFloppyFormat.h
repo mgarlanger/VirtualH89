@@ -24,12 +24,12 @@ class GenericFloppyFormat
     enum AMbytes
     {
         INDEX_AM_BYTE = 0xfc,
-        ID_AM_BYTE = 0xfe,
-        DATA_AM_BYTE = 0xfb,
-        INDEX_AM = -INDEX_AM_BYTE,
-        ID_AM = -ID_AM_BYTE,
-        DATA_AM = -DATA_AM_BYTE,
-        ERROR = -1,
+        ID_AM_BYTE    = 0xfe,
+        DATA_AM_BYTE  = 0xfb,
+        INDEX_AM      = -INDEX_AM_BYTE,
+        ID_AM         = -ID_AM_BYTE,
+        DATA_AM       = -DATA_AM_BYTE,
+        ERROR         = -1,
     };
 
   private:

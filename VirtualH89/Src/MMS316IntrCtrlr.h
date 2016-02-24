@@ -24,10 +24,10 @@ class MMS77316;
 class MMS316IntrCtrlr: public InterruptController
 {
   private:
-    MMS77316 *m316_m;
+    MMS77316* m316_m;
 
   public:
-    MMS316IntrCtrlr(InterruptController *ic, MMS77316 *m316);
+    MMS316IntrCtrlr(InterruptController* ic, MMS77316* m316);
     virtual ~MMS316IntrCtrlr();
 
     virtual void raiseInterrupt(BYTE level);

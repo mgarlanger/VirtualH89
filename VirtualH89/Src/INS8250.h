@@ -18,7 +18,7 @@ class SerialPortDevice;
 ///
 /// 8250 Serial Port
 ///
-class INS8250 : public IODevice
+class INS8250: public IODevice
 {
   public:
     INS8250(BYTE baseAddr, int IntLevel = -1);
@@ -27,7 +27,7 @@ class INS8250 : public IODevice
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
-    virtual bool attachDevice(SerialPortDevice *dev);
+    virtual bool attachDevice(SerialPortDevice* dev);
 
     virtual bool receiveReady();
     virtual void receiveData(BYTE data);
@@ -44,7 +44,7 @@ class INS8250 : public IODevice
     void lowerInterrupt();
 
     /// Line Control variables:
-    bool DLAB_m;    // Divisor Latch Access bit
+    bool DLAB_m; // Divisor Latch Access bit
     BYTE bits_m;
     bool stopBits_m;
     bool parityEnable_m;
@@ -70,57 +70,57 @@ class INS8250 : public IODevice
     // Line Status variables
 
     /// Data Ready
-    bool DR_m;
+    bool              DR_m;
 
     /// Overrun Error
-    bool OE_m;
+    bool              OE_m;
 
     /// Parity Error
-    bool PE_m;
+    bool              PE_m;
 
     /// Framing Error
-    bool FE_m;
+    bool              FE_m;
 
     /// Break Interrupt
-    bool BI_m;
+    bool              BI_m;
 
     /// Transmitter Holding Register Empty
-    bool THRE_m;
+    bool              THRE_m;
 
     /// Transmitter Shift Register Empty
-    bool TSRE_m;
+    bool              TSRE_m;
 
-    SerialPortDevice *device_m;
+    SerialPortDevice* device_m;
 
-    bool rxByteAvail;
-    BYTE RecvBuf;
-    bool txByteAvail;
-    BYTE TransHolding;
+    bool              rxByteAvail;
+    BYTE              RecvBuf;
+    bool              txByteAvail;
+    BYTE              TransHolding;
 
-    BYTE lsBaudDiv;
-    BYTE msBaudDiv;
+    BYTE              lsBaudDiv;
+    BYTE              msBaudDiv;
 
-    WORD baud_m;
+    WORD              baud_m;
 
-    unsigned long lastTransmit;
+    unsigned long     lastTransmit;
 
     /// Interrupt Enable Register
-    BYTE saveIER;
+    BYTE              saveIER;
 
     /// Interrupt Identification Register
-    BYTE saveIIR;
+    BYTE              saveIIR;
 
     /// Line Control Register
-    BYTE saveLCR;
+    BYTE              saveLCR;
 
     /// Modem Control Register
-    BYTE saveMCR;
+    BYTE              saveMCR;
 
     /// Line Status Register
-    BYTE saveLSR;
+    BYTE              saveLSR;
 
     /// Modem Status Register
-    BYTE saveMSR;
+    BYTE              saveMSR;
 
     ///
     /// Register offsets from the base address.
@@ -172,69 +172,69 @@ class INS8250 : public IODevice
     //
 
     /// Interrupt Identification Register - No Interrupt Pending
-    static const BYTE IIR_NoInterruptPending   = 0x01;
+    static const BYTE IIR_NoInterruptPending = 0x01;
 
     /// Interrupt Identification Register - Line Status
-    static const BYTE IIR_LineStatus           = 0x06;
+    static const BYTE IIR_LineStatus         = 0x06;
 
     /// Interrupt Identification Register - Data Available
-    static const BYTE IIR_DataAvailable        = 0x04;
+    static const BYTE IIR_DataAvailable      = 0x04;
 
     /// Interrupt Identification Register - Transmitter Empty
-    static const BYTE IIR_TransmitterEmpty     = 0x02;
+    static const BYTE IIR_TransmitterEmpty   = 0x02;
 
     /// Interrupt Identification Register - Modem Status
-    static const BYTE IIR_ModemStatus          = 0x00;
+    static const BYTE IIR_ModemStatus        = 0x00;
 
     //
     // Line Control Register Bits
     //
 
     /// Line Control Register - Word Length
-    static const BYTE LCR_WordLength           = 0x03;
+    static const BYTE LCR_WordLength         = 0x03;
 
     /// Line Control Register - Stop Bits
-    static const BYTE LCR_NumberOfStopBits     = 0x04;
+    static const BYTE LCR_NumberOfStopBits   = 0x04;
 
     /// Line Control Register - Parity Enable
-    static const BYTE LCR_ParityEnable         = 0x08;
+    static const BYTE LCR_ParityEnable       = 0x08;
 
     /// Line Control Register - Even Parity
-    static const BYTE LCR_EvenParitySelect     = 0x10;
+    static const BYTE LCR_EvenParitySelect   = 0x10;
 
     /// Line Control Register - Stick Parity
-    static const BYTE LCR_StickParity          = 0x20;
+    static const BYTE LCR_StickParity        = 0x20;
 
     /// Line Control Register - Set Break
-    static const BYTE LCR_SetBreak             = 0x40;
+    static const BYTE LCR_SetBreak           = 0x40;
 
     /// Line Control Register - Divisor Latch Access
-    static const BYTE LCR_DivisorLatchAccess   = 0x80;
+    static const BYTE LCR_DivisorLatchAccess = 0x80;
 
     //
     // Line Status Register Bits
     //
 
     ///  Line Status Register - Data Ready
-    static const BYTE LSB_DataReady            = 0x01;
+    static const BYTE LSB_DataReady      = 0x01;
 
     /// Line Status Register - Overrun
-    static const BYTE LSB_Overrun              = 0x02;
+    static const BYTE LSB_Overrun        = 0x02;
 
     /// Line Status Register - Parity Error
-    static const BYTE LSB_ParityError          = 0x04;
+    static const BYTE LSB_ParityError    = 0x04;
 
     /// Line Status Register - Framing Error
-    static const BYTE LSB_FramingError         = 0x08;
+    static const BYTE LSB_FramingError   = 0x08;
 
     /// Line Status Register - Break Interrupt
-    static const BYTE LSB_BreakInterrupt       = 0x10;
+    static const BYTE LSB_BreakInterrupt = 0x10;
 
     /// Line Status Register - Transmitting Holding Register Empty
-    static const BYTE LSB_THRE                 = 0x20;
+    static const BYTE LSB_THRE           = 0x20;
 
     /// Line Status Register - Transmitting Shift Register Empty
-    static const BYTE LSB_TSRE                 = 0x40;
+    static const BYTE LSB_TSRE           = 0x40;
 
     //
     // Modem Status Register Bits

@@ -34,16 +34,17 @@ using namespace std;
 #define RELEASE "1.17"
 #define H89COPYRIGHT "Copyright (C) 2009-2016 by Mark Garlanger"
 
-const char *usage_str = " -b -s -l";
+const char* usage_str = " -b -s -l";
 
 /// \todo - make H89 into a singleton.
-H89 h89;
-Console *console = NULL;
+H89         h89;
+Console*    console     = NULL;
 
-FILE *log_out = 0;
-FILE *console_out = 0;
+FILE*       log_out     = 0;
+FILE*       console_out = 0;
 
-void usage(char *pn)
+void
+usage(char* pn)
 {
     cerr << "usage: " << pn << usage_str << endl;
     cerr << "\ts = save core and cpu" << endl;
@@ -53,14 +54,15 @@ void usage(char *pn)
 }
 
 #if USE_PTHREAD
-static void *cpuThreadFunc(void *v)
+static void*
+cpuThreadFunc(void* v)
 {
     sigset_t set;
 
     sigemptyset(&set);
     sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_UNBLOCK, &set, 0);
-    H89 *h89 = (H89 *)v;
+    H89* h89 = (H89*) v;
 
 #if FIXME
 
@@ -73,8 +75,8 @@ static void *cpuThreadFunc(void *v)
     }
 
 #else
-    //h89->clearMemory(0);
-    //h89->reset();
+    // h89->clearMemory(0);
+    // h89->reset();
 #endif
 #if 0
     powerUp();
@@ -99,25 +101,26 @@ static void *cpuThreadFunc(void *v)
 #endif
 
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-    int c;
-    extern char *optarg;
-    std::string gui("H19");
-    int quiet = 0;
+    int          c;
+    extern char* optarg;
+    std::string  gui("H19");
+    int          quiet = 0;
     setDebugLevel();
 
     while ((c = getopt(argc, argv, "qg:")) != EOF)
     {
         switch (c)
         {
-        case 'q':
-            quiet = 1;
-            break;
+            case 'q':
+                quiet = 1;
+                break;
 
-        case 'g':
-            gui = optarg;
-            break;
+            case 'g':
+                gui = optarg;
+                break;
         }
     }
 
@@ -140,13 +143,27 @@ int main(int argc, char *argv[])
     {
         cout << "Virtual H89" << endl << endl;
 
-        cout << " #       #  #####  #####   #######  #     #    ###    #           #     #   #####    ##### " << endl;
-        cout << "  #     #     #    #    #     #     #     #   #   #   #           #     #  #     #  #     #" << endl;
-        cout << "  #     #     #    #    #     #     #     #  #     #  #           #     #  #     #  #     #" << endl;
-        cout << "   #   #      #    #####      #     #     #  #######  #           #######   #####    ######" << endl;
-        cout << "   #   #      #    #   #      #     #     #  #     #  #           #     #  #     #        #" << endl;
-        cout << "    # #       #    #    #     #     #     #  #     #  #           #     #  #     #  #     #" << endl;
-        cout << "     #      #####  #    #     #      #####   #     #  ######      #     #   #####    ##### " << endl;
+        cout <<
+            " #       #  #####  #####   #######  #     #    ###    #           #     #   #####    ##### "
+             << endl;
+        cout <<
+            "  #     #     #    #    #     #     #     #   #   #   #           #     #  #     #  #     #"
+             << endl;
+        cout <<
+            "  #     #     #    #    #     #     #     #  #     #  #           #     #  #     #  #     #"
+             << endl;
+        cout <<
+            "   #   #      #    #####      #     #     #  #######  #           #######   #####    ######"
+             << endl;
+        cout <<
+            "   #   #      #    #   #      #     #     #  #     #  #           #     #  #     #        #"
+             << endl;
+        cout <<
+            "    # #       #    #    #     #     #     #  #     #  #           #     #  #     #  #     #"
+             << endl;
+        cout <<
+            "     #      #####  #    #     #      #####   #     #  ######      #     #   #####    ##### "
+             << endl;
         cout << endl << "Portions derived from Z80Pack Release " << RELEASE << " - "
              << Z80COPYRIGHT << endl;
         cout << "Virtual H89 - " << H89COPYRIGHT << endl << endl;
@@ -186,11 +203,11 @@ int main(int argc, char *argv[])
     console->run();
 
     // TODO: call destructors...
-#endif  // USE_PTHREAD
+#endif // USE_PTHREAD
 
     // Leave open so destructors can log messages.
     // exit() always closes files anyway.
-    //fclose(log_out);
-    //fclose(console_out);
+    // fclose(log_out);
+    // fclose(console_out);
     return (0);
 }

@@ -22,7 +22,7 @@ class DiskDrive;
 /// at 102k per disk. Later (third-party) software upgrades supported disks up to 408k per
 /// disk, by using a double-sided 96 tpi drive (H-17-4 or H-17-5).
 ///
-class H17 : public DiskController, public ClockUser
+class H17: public DiskController, public ClockUser
 {
   public:
     H17(int BaseAddr);
@@ -31,7 +31,7 @@ class H17 : public DiskController, public ClockUser
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, DiskDrive *drive);
+    virtual bool connectDrive(BYTE unitNum, DiskDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void selectSide(BYTE side);
@@ -39,15 +39,15 @@ class H17 : public DiskController, public ClockUser
     virtual void notification(unsigned int cycleCount);
 
     // TODO: implement this
-    std::vector<GenericDiskDrive *> getDiskDrives()
+    std::vector<GenericDiskDrive*> getDiskDrives()
     {
-        return *(new std::vector<GenericDiskDrive *>());
+        return *(new std::vector<GenericDiskDrive*>());
     }
     std::string getDeviceName()
     {
         return "H17";
     }
-    GenericDiskDrive *findDrive(std::string ident)
+    GenericDiskDrive* findDrive(std::string ident)
     {
         return NULL;
     }
@@ -59,7 +59,8 @@ class H17 : public DiskController, public ClockUser
     {
         return "";
     }
-    void reset() {}
+    void reset() {
+    }
 
   private:
 
@@ -70,54 +71,54 @@ class H17 : public DiskController, public ClockUser
         readingState,
         writingState
     };
-    State state_m;
+    State              state_m;
 
     // for the spinning of the disk
     unsigned long long spinCycles_m;
 
-    unsigned long curCharPos_m;
+    unsigned long      curCharPos_m;
 
-    bool motorOn_m;
-    bool writeGate_m;
-    bool direction_m;
+    bool               motorOn_m;
+    bool               writeGate_m;
+    bool               direction_m;
 
     // statuses
-    bool syncCharacterReceived_m;
-    bool receiveDataAvail_m;
-    bool receiverOverrun_m;
+    bool               syncCharacterReceived_m;
+    bool               receiveDataAvail_m;
+    bool               receiverOverrun_m;
 //  bool receiverParityErr_m; // Not needed based the the H17 circuit, no parity is used.
-    bool fillCharTransmitted_m;
-    bool transmitterBufferEmpty_m;
+    bool               fillCharTransmitted_m;
+    bool               transmitterBufferEmpty_m;
 
-    BYTE receiverOutputRegister_m;
-    BYTE transmitterHoldingRegister_m;
+    BYTE               receiverOutputRegister_m;
+    BYTE               transmitterHoldingRegister_m;
 
     enum DiskDriveID
     {
-        ds0 = 0,
-        ds1 = 1,
-        ds2 = 2,
+        ds0            = 0,
+        ds1            = 1,
+        ds2            = 2,
         maxDiskDrive_c = 3
     };
 
     DiskDriveID curDrive_m;
 
-    DiskDrive *drives_m[maxDiskDrive_c];
+    DiskDrive*  drives_m[maxDiskDrive_c];
 
-    BYTE fillChar_m;
-    BYTE syncChar_m;
+    BYTE        fillChar_m;
+    BYTE        syncChar_m;
 
     ///
     /// Ports
     ///
-    static const BYTE H17_NumPorts_c       = 4;
+    static const BYTE H17_NumPorts_c = 4;
 
     ///
     /// Data Port - Typically Port 0x7c (Octal 0174)
     ///
     /// Receives and transmits the data characters to the USART
     ///
-    static const BYTE DataPortOffset_c     = 0;
+    static const BYTE DataPortOffset_c = 0;
 
     ///
     /// Status Port (read) - Typically Port 0x7d (Octal 0175)
@@ -125,8 +126,8 @@ class H17 : public DiskController, public ClockUser
     ///
     /// Reads the USART status, writes set the fill character.
     ///
-    static const BYTE StatusPortOffset_c   = 1;
-    static const BYTE FillPortOffset_c     = 1;
+    static const BYTE StatusPortOffset_c = 1;
+    static const BYTE FillPortOffset_c   = 1;
 
     ///
     /// Sync Port - Typically Port 0x7e (Octal 0176)
@@ -134,7 +135,7 @@ class H17 : public DiskController, public ClockUser
     /// Reads resets the USART to search character mode
     /// Writes the search character to the USART
     ///
-    static const BYTE SyncPortOffset_c     = 2;
+    static const BYTE SyncPortOffset_c = 2;
 
     ///
     /// Control Port - Typically Port 0x7f (Octal 0177)
@@ -142,7 +143,7 @@ class H17 : public DiskController, public ClockUser
     /// Reads the floppy disk status and sync character match and controls the floppy disk
     /// with respect to it's motor, track position, and write gate.
     ///
-    static const BYTE ControlPortOffset_c  = 3;
+    static const BYTE ControlPortOffset_c = 3;
 
     ///
     /// Number of CPU cycles for each read byte from the Floppy disk.
@@ -155,35 +156,35 @@ class H17 : public DiskController, public ClockUser
     ///
     /// Read from ControlPort_c
     ///
-    static const BYTE ctrlHoleDetect_Flag         = 0x01; // from floppy disk
-    static const BYTE ctrlTrackZeroDetect_Flag    = 0x02; // from disk drive
-    static const BYTE ctrlWriteProtect_Flag       = 0x04; // from floppy disk
-    static const BYTE ctrlSyncDetect_Flag         = 0x08; // from controller
+    static const BYTE ctrlHoleDetect_Flag      = 0x01; // from floppy disk
+    static const BYTE ctrlTrackZeroDetect_Flag = 0x02; // from disk drive
+    static const BYTE ctrlWriteProtect_Flag    = 0x04; // from floppy disk
+    static const BYTE ctrlSyncDetect_Flag      = 0x08; // from controller
 
     ///
     /// Write to ControlPort_c
     ///
-    static const BYTE WriteGate_Ctrl              = 0x01;
-    static const BYTE DriveSelect0_Ctrl           = 0x02;
-    static const BYTE DriveSelect1_Ctrl           = 0x04;
-    static const BYTE DriveSelect2_Ctrl           = 0x08;
-    static const BYTE MotorOn_Ctrl                = 0x10;  // Controls all the drives
-    static const BYTE Direction_Ctrl              = 0x20;  // (0 = out)
-    static const BYTE StepCommand_Ctrl            = 0x40;  // (Active high)
-    static const BYTE WriteEnableRAM_Ctrl         = 0x80;  // 0 - write protected
+    static const BYTE WriteGate_Ctrl      = 0x01;
+    static const BYTE DriveSelect0_Ctrl   = 0x02;
+    static const BYTE DriveSelect1_Ctrl   = 0x04;
+    static const BYTE DriveSelect2_Ctrl   = 0x08;
+    static const BYTE MotorOn_Ctrl        = 0x10; // Controls all the drives
+    static const BYTE Direction_Ctrl      = 0x20; // (0 = out)
+    static const BYTE StepCommand_Ctrl    = 0x40; // (Active high)
+    static const BYTE WriteEnableRAM_Ctrl = 0x80; // 0 - write protected
     // 1 - write enabled
 
     ///
     /// Read from the StatusPort_c
     ///
-    static const BYTE ReceiveDataAvail_Flag       = 0x01;  // from controller
-    static const BYTE ReceiverOverrun_Flag        = 0x02;  // from controller
-    static const BYTE ReceiverParityErr_Flag      = 0x04;  // from controller, NEVER set
+    static const BYTE ReceiveDataAvail_Flag       = 0x01; // from controller
+    static const BYTE ReceiverOverrun_Flag        = 0x02; // from controller
+    static const BYTE ReceiverParityErr_Flag      = 0x04; // from controller, NEVER set
     // on H17
-    static const BYTE SyncDetect_Flag             = 0x08;  // ??? - Manual says it, but Heath
+    static const BYTE SyncDetect_Flag             = 0x08; // ??? - Manual says it, but Heath
     // software didn't use it
-    static const BYTE FillCharTransmitted_Flag    = 0x40;  // from controller
-    static const BYTE TransmitterBufferEmpty_Flag = 0x80;  // from controller
+    static const BYTE FillCharTransmitted_Flag    = 0x40; // from controller
+    static const BYTE TransmitterBufferEmpty_Flag = 0x80; // from controller
 };
 
 #endif // H17_H_

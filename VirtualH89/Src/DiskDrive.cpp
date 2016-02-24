@@ -12,8 +12,8 @@
 
 
 DiskDrive::DiskDrive(): disk_m(0),
-    headLoaded_m(false),
-    numTracks_m(40)
+                        headLoaded_m(false),
+                        numTracks_m(40)
 {
 
 }
@@ -24,7 +24,8 @@ DiskDrive::~DiskDrive()
 }
 
 #if 0
-void DiskDrive::insertDisk(FloppyDisk *disk)
+void
+DiskDrive::insertDisk(FloppyDisk* disk)
 {
     disk_m = disk;
 
@@ -36,7 +37,8 @@ void DiskDrive::insertDisk(FloppyDisk *disk)
 }
 #endif
 
-void DiskDrive::ejectDisk(const char *name)
+void
+DiskDrive::ejectDisk(const char* name)
 {
     if (disk_m)
     {
@@ -46,22 +48,26 @@ void DiskDrive::ejectDisk(const char *name)
     disk_m = 0;
 }
 
-void DiskDrive::loadHead()
+void
+DiskDrive::loadHead()
 {
     headLoaded_m = true;
 }
 
-void DiskDrive::unLoadHead()
+void
+DiskDrive::unLoadHead()
 {
     headLoaded_m = false;
 }
 
-bool DiskDrive::getHeadLoadStatus()
+bool
+DiskDrive::getHeadLoadStatus()
 {
     return headLoaded_m;
 }
 
-void DiskDrive::step(bool direction)
+void
+DiskDrive::step(bool direction)
 {
     if (direction)
     {
@@ -83,4 +89,3 @@ void DiskDrive::step(bool direction)
         debugss(ssDiskDrive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
     }
 }
-

@@ -23,7 +23,7 @@ class CRC_CCITT
     WORD getCRC();
 
   private:
-    WORD crc_m;
+    WORD              crc_m;
 
     static const WORD initValue_c = 0xffff;
     static const WORD crctable[256];

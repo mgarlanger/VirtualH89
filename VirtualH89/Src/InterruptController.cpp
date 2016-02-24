@@ -12,13 +12,13 @@
 #include "z80.h"
 
 
-InterruptController::InterruptController(CPU *cpu) : intLevel_m(0), cpu_m(cpu)
+InterruptController::InterruptController(CPU* cpu): intLevel_m(0), cpu_m(cpu)
 {
     debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
 
 }
 
-InterruptController::InterruptController(InterruptController *ic) :
+InterruptController::InterruptController(InterruptController* ic):
     intLevel_m(ic->intLevel_m),
     cpu_m(ic->cpu_m)
 {
@@ -32,7 +32,8 @@ InterruptController::~InterruptController()
 
 }
 
-void InterruptController::raiseInterrupt(BYTE level)
+void
+InterruptController::raiseInterrupt(BYTE level)
 {
     debugss(ssInterruptController, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
 
@@ -49,7 +50,8 @@ void InterruptController::raiseInterrupt(BYTE level)
     cpu_m->raiseINT();
 }
 
-void InterruptController::lowerInterrupt(BYTE level)
+void
+InterruptController::lowerInterrupt(BYTE level)
 {
     debugss(ssInterruptController, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
 
@@ -73,7 +75,8 @@ void InterruptController::lowerInterrupt(BYTE level)
 
 
 // reading instructions for interrupts
-BYTE InterruptController::readDataBus()
+BYTE
+InterruptController::readDataBus()
 {
     BYTE opCode = 0;
 
@@ -124,15 +127,12 @@ BYTE InterruptController::readDataBus()
         debugss(ssInterruptController, ERROR, "%s: Invalid interrupt level: %d\n",
                 __FUNCTION__, intLevel_m);
 
-        //printf("Interrupt Instruction, bad interrupt level: %d\n", intLevel_m);
+        // printf("Interrupt Instruction, bad interrupt level: %d\n", intLevel_m);
     }
 
     debugss(ssInterruptController, VERBOSE, "%s: Interrupt Instruction %d\n",
             __FUNCTION__, opCode);
 
-    //printf("Interrupt Instruction: %d\n", opCode);
+    // printf("Interrupt Instruction: %d\n", opCode);
     return opCode;
 }
-
-
-

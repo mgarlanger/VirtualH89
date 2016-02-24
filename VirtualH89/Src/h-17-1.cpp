@@ -20,7 +20,8 @@ H_17_1::~H_17_1()
 }
 
 
-void H_17_1::insertDisk(FloppyDisk *disk)
+void
+H_17_1::insertDisk(FloppyDisk* disk)
 {
     disk_m = disk;
 
@@ -31,7 +32,8 @@ void H_17_1::insertDisk(FloppyDisk *disk)
     }
 }
 
-void H_17_1::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
+void
+H_17_1::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
 {
     // Track info comes from the drive, the hole and write-protect is determined
     // by the actual disk
@@ -47,12 +49,13 @@ void H_17_1::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool&
     else
     {
         debugss(ssH17_1, INFO, "%s no disk_m\n", __FUNCTION__);
-        hole = true;
+        hole         = true;
         writeProtect = false;
     }
 }
 
-void H_17_1::step(bool direction)
+void
+H_17_1::step(bool direction)
 {
     if (direction)
     {
@@ -75,12 +78,14 @@ void H_17_1::step(bool direction)
     }
 }
 
-void H_17_1::selectSide(BYTE side)
+void
+H_17_1::selectSide(BYTE side)
 {
     // Since the H-17-1 is single-sided, this is a NOP.
 }
 
-BYTE H_17_1::readData(unsigned int pos)
+BYTE
+H_17_1::readData(unsigned int pos)
 {
     BYTE data = 0;
 
@@ -97,7 +102,8 @@ BYTE H_17_1::readData(unsigned int pos)
     return data;
 }
 
-void H_17_1::writeData(unsigned int pos, BYTE data)
+void
+H_17_1::writeData(unsigned int pos, BYTE data)
 {
     if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
     {
@@ -105,7 +111,8 @@ void H_17_1::writeData(unsigned int pos, BYTE data)
     }
 }
 
-BYTE H_17_1::readSectorData(BYTE sector, unsigned int pos)
+BYTE
+H_17_1::readSectorData(BYTE sector, unsigned int pos)
 {
     BYTE data = 0;
 
@@ -121,4 +128,3 @@ BYTE H_17_1::readSectorData(BYTE sector, unsigned int pos)
 
     return data;
 }
-

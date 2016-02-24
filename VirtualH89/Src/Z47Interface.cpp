@@ -13,13 +13,13 @@
 #include "ParallelLink.h"
 
 Z47Interface::Z47Interface(int baseAddr): DiskController(baseAddr, H47_NumPorts_c),
-    interruptsEnabled_m(false),
-    DTR_m(false),
-    DDOut_m(false),
-    Busy_m(true),
-    Error_m(false),
-    Done_m(false),
-    linkToDrive_m(0)
+                                          interruptsEnabled_m(false),
+                                          DTR_m(false),
+                                          DDOut_m(false),
+                                          Busy_m(true),
+                                          Error_m(false),
+                                          Done_m(false),
+                                          linkToDrive_m(0)
 {
     debugss(ssH47, ALL, "%s(%d)\n", __FUNCTION__, baseAddr);
 
@@ -30,33 +30,35 @@ Z47Interface::~Z47Interface()
 
 }
 
-BYTE Z47Interface::in(BYTE addr)
+BYTE
+Z47Interface::in(BYTE addr)
 {
     debugss(ssH47, ALL, "%s(%d)\n", __FUNCTION__, addr);
     BYTE offset = getPortOffset(addr);
-    BYTE data = 0;
+    BYTE data   = 0;
 
     switch (offset)
     {
-    case StatusPort_Offset_c:
-        readStatus(data);
-        debugss(ssH47, ALL, "%s - StatusPort - 0x%02x\n", __FUNCTION__, data);
-        break;
+        case StatusPort_Offset_c:
+            readStatus(data);
+            debugss(ssH47, ALL, "%s - StatusPort - 0x%02x\n", __FUNCTION__, data);
+            break;
 
-    case DataPort_Offset_c:
-        readData(data);
-        debugss(ssH47, ALL, "%s - DataPort - 0x%02x\n", __FUNCTION__, data);
-        break;
+        case DataPort_Offset_c:
+            readData(data);
+            debugss(ssH47, ALL, "%s - DataPort - 0x%02x\n", __FUNCTION__, data);
+            break;
 
-    default:
-        debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
-        break;
+        default:
+            debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
+            break;
     }
 
     return data;
 }
 
-void Z47Interface::out(BYTE addr, BYTE val)
+void
+Z47Interface::out(BYTE addr, BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -64,24 +66,25 @@ void Z47Interface::out(BYTE addr, BYTE val)
 
     switch (offset)
     {
-    case StatusPort_Offset_c:
-        debugss(ssH47, ALL, "%s - StatusPort\n", __FUNCTION__);
-        writeStatus(val);
-        break;
+        case StatusPort_Offset_c:
+            debugss(ssH47, ALL, "%s - StatusPort\n", __FUNCTION__);
+            writeStatus(val);
+            break;
 
-    case DataPort_Offset_c:
-        debugss(ssH47, ALL, "%s - DataPort\n", __FUNCTION__);
-        writeData(val);
-        break;
+        case DataPort_Offset_c:
+            debugss(ssH47, ALL, "%s - DataPort\n", __FUNCTION__);
+            writeData(val);
+            break;
 
-    default:
-        debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
-        break;
+        default:
+            debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
+            break;
     }
 }
 
 
-void Z47Interface::reset(void)
+void
+Z47Interface::reset(void)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
     /// \todo Determine what to do for a reset.
@@ -92,13 +95,15 @@ void Z47Interface::reset(void)
     }
 }
 
-void Z47Interface::notification(unsigned int cycleCount)
+void
+Z47Interface::notification(unsigned int cycleCount)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
 }
 
-void Z47Interface::writeStatus(BYTE cmd)
+void
+Z47Interface::writeStatus(BYTE cmd)
 {
     debugss(ssH47, ALL, "%s: cmd = 0x%02x\n", __FUNCTION__, cmd);
 
@@ -130,7 +135,8 @@ void Z47Interface::writeStatus(BYTE cmd)
     }
 }
 
-void Z47Interface::writeData(BYTE data)
+void
+Z47Interface::writeData(BYTE data)
 {
     debugss(ssH47, ALL, "%s: data = 0x%02x\n", __FUNCTION__, data);
 
@@ -146,7 +152,8 @@ void Z47Interface::writeData(BYTE data)
 }
 
 
-void Z47Interface::readStatus(BYTE& data)
+void
+Z47Interface::readStatus(BYTE& data)
 {
     BYTE val = 0;
 
@@ -170,7 +177,8 @@ void Z47Interface::readStatus(BYTE& data)
     debugss(ssH47, ALL, "%s - Status 0x%02x\n", __FUNCTION__, data);
 }
 
-void Z47Interface::readData(BYTE& data)
+void
+Z47Interface::readData(BYTE& data)
 {
     if (linkToDrive_m)
     {
@@ -182,7 +190,8 @@ void Z47Interface::readData(BYTE& data)
 }
 
 
-void Z47Interface::connectDriveLink(ParallelLink *link)
+void
+Z47Interface::connectDriveLink(ParallelLink* link)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
@@ -199,106 +208,109 @@ void Z47Interface::connectDriveLink(ParallelLink *link)
     }
 }
 
-void Z47Interface::raiseSignal(SignalType sigType)
+void
+Z47Interface::raiseSignal(SignalType sigType)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
     switch (sigType)
     {
-    // Master Reset (Host to Disk System)
-    case st_MasterReset:
-        // Handle a reset
-        debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
-        break;
+        // Master Reset (Host to Disk System)
+        case st_MasterReset:
+            // Handle a reset
+            debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
+            break;
 
-    // Data Acknowledge (Host to Disk System)
-    case st_DTAK:
-        // Handle data acknowledge.
-        debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
-        break;
+        // Data Acknowledge (Host to Disk System)
+        case st_DTAK:
+            // Handle data acknowledge.
+            debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
+            break;
 
-    // Data Ready (Disk System to Host)
-    case st_DTR:
-        debugss(ssH47, INFO, "%s: DTR raised.\n", __FUNCTION__);
-        DTR_m = true;
-        break;
+        // Data Ready (Disk System to Host)
+        case st_DTR:
+            debugss(ssH47, INFO, "%s: DTR raised.\n", __FUNCTION__);
+            DTR_m = true;
+            break;
 
-    // Disk Drive Out (Disk System to Host)
-    case st_DDOUT:
-        debugss(ssH47, INFO, "%s: DDOUT raised.\n", __FUNCTION__);
-        DDOut_m = true;
-        break;
+        // Disk Drive Out (Disk System to Host)
+        case st_DDOUT:
+            debugss(ssH47, INFO, "%s: DDOUT raised.\n", __FUNCTION__);
+            DDOut_m = true;
+            break;
 
-    // Busy (Disk System to Host)
-    case st_Busy:
-        debugss(ssH47, INFO, "%s: Busy raised.\n", __FUNCTION__);
-        Busy_m = true;
-        Done_m = false;
-        break;
+        // Busy (Disk System to Host)
+        case st_Busy:
+            debugss(ssH47, INFO, "%s: Busy raised.\n", __FUNCTION__);
+            Busy_m = true;
+            Done_m = false;
+            break;
 
-    // Error (Disk System to Host)
-    case st_Error:
-        debugss(ssH47, INFO, "%s: Error raised.\n", __FUNCTION__);
-        Error_m = true;
-        break;
+        // Error (Disk System to Host)
+        case st_Error:
+            debugss(ssH47, INFO, "%s: Error raised.\n", __FUNCTION__);
+            Error_m = true;
+            break;
 
-    default:
-        debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
-        break;
+        default:
+            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            break;
     }
 }
 
-void Z47Interface::lowerSignal(SignalType sigType)
+void
+Z47Interface::lowerSignal(SignalType sigType)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
     switch (sigType)
     {
-    // Master Reset (Host to Disk System)
-    case st_MasterReset:
-        // Handle a reset
-        debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
-        break;
+        // Master Reset (Host to Disk System)
+        case st_MasterReset:
+            // Handle a reset
+            debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
+            break;
 
-    // Data Acknowledge (Host to Disk System)
-    case st_DTAK:
-        debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
-        break;
+        // Data Acknowledge (Host to Disk System)
+        case st_DTAK:
+            debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
+            break;
 
-    // Data Ready (Disk System to Host)
-    case st_DTR:
-        debugss(ssH47, INFO, "%s: DTR lowered.\n", __FUNCTION__);
-        DTR_m = false;
-        linkToDrive_m->setDTAK(false);
+        // Data Ready (Disk System to Host)
+        case st_DTR:
+            debugss(ssH47, INFO, "%s: DTR lowered.\n", __FUNCTION__);
+            DTR_m = false;
+            linkToDrive_m->setDTAK(false);
 
-        break;
+            break;
 
-    // Disk Drive Out (Disk System to Host)
-    case st_DDOUT:
-        debugss(ssH47, INFO, "%s: DDOUT lowered.\n", __FUNCTION__);
-        DDOut_m = false;
-        break;
+        // Disk Drive Out (Disk System to Host)
+        case st_DDOUT:
+            debugss(ssH47, INFO, "%s: DDOUT lowered.\n", __FUNCTION__);
+            DDOut_m = false;
+            break;
 
-    // Busy (Disk System to Host)
-    case st_Busy:
-        debugss(ssH47, INFO, "%s: Busy lowered.\n", __FUNCTION__);
-        Busy_m = false;
-        Done_m = true;
-        break;
+        // Busy (Disk System to Host)
+        case st_Busy:
+            debugss(ssH47, INFO, "%s: Busy lowered.\n", __FUNCTION__);
+            Busy_m = false;
+            Done_m = true;
+            break;
 
-    // Error (Disk System to Host)
-    case st_Error:
-        debugss(ssH47, INFO, "%s: Error lowered.\n", __FUNCTION__);
-        Error_m = false;
-        break;
+        // Error (Disk System to Host)
+        case st_Error:
+            debugss(ssH47, INFO, "%s: Error lowered.\n", __FUNCTION__);
+            Error_m = false;
+            break;
 
-    default:
-        debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
-        break;
+        default:
+            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            break;
     }
 }
 
-void Z47Interface::pulseSignal(SignalType sigType)
+void
+Z47Interface::pulseSignal(SignalType sigType)
 {
     debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 }

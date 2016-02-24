@@ -22,7 +22,8 @@ DiskController::~DiskController()
 
 }
 
-std::string DiskController::getDriveName(int index)
+std::string
+DiskController::getDriveName(int index)
 {
     std::ostringstream name;
     name << getDeviceName() << '-' << (index + 1);

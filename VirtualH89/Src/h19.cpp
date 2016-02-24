@@ -26,15 +26,15 @@
 
 #include "ascii.h"
 
-static  pthread_mutex_t h19_mutex;
+static pthread_mutex_t h19_mutex;
 
-H19 *H19::h19;
-unsigned int H19::screenRefresh = screenRefresh_c;
+H19*                   H19::h19;
+unsigned int           H19::screenRefresh = screenRefresh_c;
 
 H19::H19(): Console(0, NULL),
-    updated(true),
-    offline(false),
-    curCursor(false)
+            updated(true),
+            offline(false),
+            curCursor(false)
 {
     h19 = this;
     pthread_mutex_init(&h19_mutex, NULL);
@@ -47,7 +47,8 @@ H19::~H19()
 }
 
 
-bool H19::checkUpdated()
+bool
+H19::checkUpdated()
 {
     pthread_mutex_lock(&h19_mutex);
     static unsigned int count = 0;
@@ -57,7 +58,7 @@ bool H19::checkUpdated()
         if ((++count % 20) == 0)
         {
             curCursor = !curCursor;
-            updated = true;
+            updated   = true;
         }
     }
 
@@ -67,11 +68,13 @@ bool H19::checkUpdated()
     return tmp;
 }
 
-void H19::init()
+void
+H19::init()
 {
 }
 
-void H19::initGl()
+void
+H19::initGl()
 {
     GLuint i;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -95,18 +98,19 @@ void H19::initGl()
 
 // GLUT routine used to redisplay the screen when needed.
 
-#define max(a,b)    ((a) > (b) ? (a) : (b))
-#define min(a,b)    ((a) < (b) ? (a) : (b))
+#define max(a, b)    ((a) > (b) ? (a) : (b))
+#define min(a, b)    ((a) < (b) ? (a) : (b))
 
-void H19::display()
+void
+H19::display()
 {
     pthread_mutex_lock(&h19_mutex);
-    //GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
-    GLfloat color[3] = { 0.0, 1.0, 0.0 };  // green
-    //GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
-    //GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
-    //GLfloat color[3] = { 0.0, 0.8, 0.0 };
-    //GLfloat color[3] = { 0.9, 0.9, 0.0 };  // amber
+    // GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
+    GLfloat color[3] = {0.0, 1.0, 0.0}; // green
+    // GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
+    // GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
+    // GLfloat color[3] = { 0.0, 0.8, 0.0 };
+    // GLfloat color[3] = { 0.9, 0.9, 0.0 };  // amber
 
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3fv(color);
@@ -115,7 +119,7 @@ void H19::display()
 
     glPushAttrib(GL_LIST_BIT);
     glListBase(h19->fontOffset);
-    glCallLists(26 * cols, GL_UNSIGNED_INT, (GLuint *) screen);
+    glCallLists(26 * cols, GL_UNSIGNED_INT, (GLuint*) screen);
     glPopAttrib();
     glEnable(GL_COLOR_LOGIC_OP);
 
@@ -146,14 +150,16 @@ void H19::display()
     pthread_mutex_unlock(&h19_mutex);
 }
 
-void H19::receiveData(BYTE ch)
+void
+H19::receiveData(BYTE ch)
 {
     pthread_mutex_lock(&h19_mutex);
     processCharacter(ch);
     pthread_mutex_unlock(&h19_mutex);
 }
 
-void H19::keypress(char ch)
+void
+H19::keypress(char ch)
 {
     pthread_mutex_lock(&h19_mutex);
     /// \todo - Send the key to the serial port unless offline.
@@ -187,7 +193,8 @@ void H19::keypress(char ch)
     pthread_mutex_unlock(&h19_mutex);
 }
 
-void H19::reset()
+void
+H19::reset()
 {
     /// \todo - make sure these modes are the defaults.
     /// \todo - some of these are affected by dipswitches - implement.
@@ -207,8 +214,8 @@ void H19::reset()
     keyboardEnabled = false;
     wrapEOL         = true;
 
-    PosX  = PosY   = 0;
-    SaveX = SaveY  = 0;
+    PosX            = PosY = 0;
+    SaveX           = SaveY = 0;
 
     for (unsigned int y = 0; y < rows; ++y)
     {
@@ -223,7 +230,8 @@ void H19::reset()
 }
 
 
-void H19::processCharacter(char ch)
+void
+H19::processCharacter(char ch)
 {
     // mask off the high bit just in case, the real H19 would not have it set.
     ch &= 0x7f;
@@ -232,98 +240,98 @@ void H19::processCharacter(char ch)
     {
         switch (ch)
         {
-        case ascii::NUL:
-        case ascii::SOH:
-        case ascii::STX:
-        case ascii::ETX:
-        case ascii::EOT:
-        case ascii::ENQ:
-        case ascii::ACK:
-        case ascii::VT:
-        case ascii::FF:
-        case ascii::SO:
-        case ascii::SI:
-        case ascii::DLE:
-        case ascii::DC1:
-        case ascii::DC2:
-        case ascii::DC3:
-        case ascii::DC4:
-        case ascii::NAK:
-        case ascii::SYN:
-        case ascii::ETB:
-        case ascii::EM:
-        case ascii::SUB:
-        case ascii::FS:
-        case ascii::GS:
-        case ascii::RS:
-        case ascii::US:
-        case ascii::DEL:
-            // From manual, these characters are not processed by the terminal
-            break;
+            case ascii::NUL:
+            case ascii::SOH:
+            case ascii::STX:
+            case ascii::ETX:
+            case ascii::EOT:
+            case ascii::ENQ:
+            case ascii::ACK:
+            case ascii::VT:
+            case ascii::FF:
+            case ascii::SO:
+            case ascii::SI:
+            case ascii::DLE:
+            case ascii::DC1:
+            case ascii::DC2:
+            case ascii::DC3:
+            case ascii::DC4:
+            case ascii::NAK:
+            case ascii::SYN:
+            case ascii::ETB:
+            case ascii::EM:
+            case ascii::SUB:
+            case ascii::FS:
+            case ascii::GS:
+            case ascii::RS:
+            case ascii::US:
+            case ascii::DEL:
+                // From manual, these characters are not processed by the terminal
+                break;
 
-        case ascii::BEL:   // Rings the bell.
-            /// \todo - implement ringing bell.
+            case ascii::BEL: // Rings the bell.
+                /// \todo - implement ringing bell.
 #if CONSOLE_LOG
-            fprintf(console_out, "<BEL>");
+                fprintf(console_out, "<BEL>");
 #endif
 
-            break;
+                break;
 
-        case ascii::BS:    // Backspace
+            case ascii::BS: // Backspace
 #if CONSOLE_LOG
-            fprintf(console_out, "<BS>");
+                fprintf(console_out, "<BS>");
 #endif
-            processBS();
-            break;
+                processBS();
+                break;
 
-        case ascii::HT:    // Horizontal Tab
+            case ascii::HT: // Horizontal Tab
 #if CONSOLE_LOG
-            fprintf(console_out, "<TAB>");
+                fprintf(console_out, "<TAB>");
 #endif
-            processTAB();
-            break;
+                processTAB();
+                break;
 
-        case ascii::LF:    // Line Feed
-            processLF();
-
-            if (autoCR)
-            {
-                processCR();
-            }
-
-#if CONSOLE_LOG
-            fprintf(console_out, "\n");
-#endif
-            break;
-
-        case ascii::CR:    // Carriage Return
-            processCR();
-
-            if (autoLF)
-            {
+            case ascii::LF: // Line Feed
                 processLF();
-            }
 
-            break;
+                if (autoCR)
+                {
+                    processCR();
+                }
 
-        case ascii::CAN:   // Cancel.
-            break;
-
-        case ascii::ESC:   // Escape
-            mode = Escape;
 #if CONSOLE_LOG
-            fprintf(console_out, "<ESC>");
+                fprintf(console_out, "\n");
+#endif
+                break;
+
+            case ascii::CR: // Carriage Return
+                processCR();
+
+                if (autoLF)
+                {
+                    processLF();
+                }
+
+                break;
+
+            case ascii::CAN: // Cancel.
+                break;
+
+            case ascii::ESC: // Escape
+                mode = Escape;
+#if CONSOLE_LOG
+                fprintf(console_out, "<ESC>");
 #endif
 
-            break;
+                break;
 
-        default:
-            // if Printable character display it.
+            default:
+                // if Printable character display it.
 #if CONSOLE_LOG
-            fprintf(console_out, "%c", ch);
+                fprintf(console_out, "%c", ch);
 #endif
-            displayCharacter(ch);
-            break;
+                displayCharacter(ch);
+                break;
         }
     }
 
@@ -334,211 +342,211 @@ void H19::processCharacter(char ch)
 
         switch (ch)
         {
-        case ascii::CAN: // CAN - Cancel
-            // return to Normal mode, already set.
-            break;
+            case ascii::CAN: // CAN - Cancel
+                // return to Normal mode, already set.
+                break;
 
-        case ascii::ESC: // Escape
-            // From the ROM listing, stay in this mode.
-            mode = Escape;
-            break;
+            case ascii::ESC: // Escape
+                // From the ROM listing, stay in this mode.
+                mode = Escape;
+                break;
 
-        // Cursor Functions
+            // Cursor Functions
 
-        case 'H': // Cursor Home
-            PosX = PosY = 0;
-            updated = true;
-            break;
+            case 'H': // Cursor Home
+                PosX    = PosY = 0;
+                updated = true;
+                break;
 
-        case 'C': // Cursor Forward
-            cursorForward();
-            break;
+            case 'C': // Cursor Forward
+                cursorForward();
+                break;
 
-        case 'D': // Cursor Backward
-            processBS(); // same processing as cursor backward
-            break;
+            case 'D':        // Cursor Backward
+                processBS(); // same processing as cursor backward
+                break;
 
-        case 'B': // Cursor Down
-            cursorDown();
-            break;
+            case 'B': // Cursor Down
+                cursorDown();
+                break;
 
-        case 'A': // Cursor Up
-            cursorUp();
-            break;
+            case 'A': // Cursor Up
+                cursorUp();
+                break;
 
-        case 'I': // Reverse Index
-            reverseIndex();
-            break;
+            case 'I': // Reverse Index
+                reverseIndex();
+                break;
 
-        case 'n': // Cursor Position Report
-            cursorPositionReport();
-            break;
+            case 'n': // Cursor Position Report
+                cursorPositionReport();
+                break;
 
-        case 'j': // Save cursor position
-            saveCursorPosition();
-            break;
+            case 'j': // Save cursor position
+                saveCursorPosition();
+                break;
 
-        case 'k': // Restore cursor position
-            restoreCursorPosition();
-            break;
+            case 'k': // Restore cursor position
+                restoreCursorPosition();
+                break;
 
-        case 'Y': // Direct Cursor Addressing
-            mode = DCA_1;
-            break;
+            case 'Y': // Direct Cursor Addressing
+                mode = DCA_1;
+                break;
 
-        // Erase and Editing
+            // Erase and Editing
 
-        case 'E': // Clear Display
-            clearDisplay();
-            break;
+            case 'E': // Clear Display
+                clearDisplay();
+                break;
 
-        case 'b': // Erase Beginning of Display
-            eraseBOD();
-            break;
+            case 'b': // Erase Beginning of Display
+                eraseBOD();
+                break;
 
-        case 'J': // Erase to End of Page
-            eraseEOP();
-            break;
+            case 'J': // Erase to End of Page
+                eraseEOP();
+                break;
 
-        case 'l': // Erase entire Line
-            eraseEL();
-            break;
+            case 'l': // Erase entire Line
+                eraseEL();
+                break;
 
-        case 'o': // Erase Beginning Of Line
-            eraseBOL();
-            break;
+            case 'o': // Erase Beginning Of Line
+                eraseBOL();
+                break;
 
-        case 'K': // Erase To End Of Line
-            eraseEOL();
-            break;
+            case 'K': // Erase To End Of Line
+                eraseEOL();
+                break;
 
-        case 'L': // Insert Line
-            insertLine();
-            break;
+            case 'L': // Insert Line
+                insertLine();
+                break;
 
-        case 'M': // Delete Line
-            deleteLine();
-            break;
+            case 'M': // Delete Line
+                deleteLine();
+                break;
 
-        case 'N': // Delete Character
-            deleteChar();
-            break;
+            case 'N': // Delete Character
+                deleteChar();
+                break;
 
-        case '@': // Enter Insert Character Mode
-            insertMode = true;
-            break;
+            case '@': // Enter Insert Character Mode
+                insertMode = true;
+                break;
 
-        case 'O': // Exit Insert Character Mode
-            insertMode = false;
-            break;
+            case 'O': // Exit Insert Character Mode
+                insertMode = false;
+                break;
 
-        // Configuration
+            // Configuration
 
-        case 'z': // Reset To Power-Up Configuration
-            reset();
-            break;
+            case 'z': // Reset To Power-Up Configuration
+                reset();
+                break;
 
-        case 'r': // Modify the Baud Rate
-            /// \todo - determine if we should support this.
-            debugss(ssH19, ERROR, "Error Unimplemented Modify Baud\n");
-            break;
+            case 'r': // Modify the Baud Rate
+                /// \todo - determine if we should support this.
+                debugss(ssH19, ERROR, "Error Unimplemented Modify Baud\n");
+                break;
 
-        case 'x': // Set Mode
-            mode = SetMode;
-            break;
+            case 'x': // Set Mode
+                mode = SetMode;
+                break;
 
-        case 'y': // Reset Mode
-            mode = ResetMode;
-            break;
+            case 'y': // Reset Mode
+                mode = ResetMode;
+                break;
 
-        case '<': // Enter ANSI Mode
-            /// \todo - implement ANSI mode.
-            // ROM - just sets the mode
-            debugss(ssH19, ERROR, "Error Entering ANSI mode - unsupported\n");
-            break;
+            case '<': // Enter ANSI Mode
+                /// \todo - implement ANSI mode.
+                // ROM - just sets the mode
+                debugss(ssH19, ERROR, "Error Entering ANSI mode - unsupported\n");
+                break;
 
-        // Modes of operation
+            // Modes of operation
 
-        case '[': // Enter Hold Screen Mode
-            holdScreen = true;
-            break;
+            case '[': // Enter Hold Screen Mode
+                holdScreen = true;
+                break;
 
-        case '\\': // Exit Hold Screen Mode
-            holdScreen = false;
-            break;
+            case '\\': // Exit Hold Screen Mode
+                holdScreen = false;
+                break;
 
-        case 'p': // Enter Reverse Video Mode
-            reverseVideo = true;
-            break;
+            case 'p': // Enter Reverse Video Mode
+                reverseVideo = true;
+                break;
 
-        case 'q': // Exit Reverse Video Mode
-            reverseVideo = false;
-            break;
+            case 'q': // Exit Reverse Video Mode
+                reverseVideo = false;
+                break;
 
-        case 'F': // Enter Graphics Mode
-            graphicMode = true;
-            break;
+            case 'F': // Enter Graphics Mode
+                graphicMode = true;
+                break;
 
-        case 'G': // Exit Graphics Mode
-            graphicMode = false;
-            break;
+            case 'G': // Exit Graphics Mode
+                graphicMode = false;
+                break;
 
-        case 't': // Enter Keypad Shifted Mode
-            keypadShifted = true;
-            break;
+            case 't': // Enter Keypad Shifted Mode
+                keypadShifted = true;
+                break;
 
-        case 'u': // Exit Keypad Shifted Mode
-            // ROM - just sets the mode
-            keypadShifted = false;
-            break;
+            case 'u': // Exit Keypad Shifted Mode
+                // ROM - just sets the mode
+                keypadShifted = false;
+                break;
 
-        case '=': // Enter Alternate Keypad Mode
-            // ROM - just sets the mode
-            keypadShifted = true;
-            break;
+            case '=': // Enter Alternate Keypad Mode
+                // ROM - just sets the mode
+                keypadShifted = true;
+                break;
 
-        case '>': // Exit Alternate Keypad Mode
-            // ROM - just sets the mode
-            keypadShifted = false;
-            break;
+            case '>': // Exit Alternate Keypad Mode
+                // ROM - just sets the mode
+                keypadShifted = false;
+                break;
 
-        // Additional Functions
+            // Additional Functions
 
-        case '}': // Keyboard Disable
-            /// \todo - determine whether to do this.
-            keyboardEnabled = false;
-            break;
+            case '}': // Keyboard Disable
+                /// \todo - determine whether to do this.
+                keyboardEnabled = false;
+                break;
 
-        case '{': // Keyboard Enable
-            keyboardEnabled = true;
-            break;
+            case '{': // Keyboard Enable
+                keyboardEnabled = true;
+                break;
 
-        case 'v': // Wrap Around at End Of Line
-            wrapEOL = true;
-            break;
+            case 'v': // Wrap Around at End Of Line
+                wrapEOL = true;
+                break;
 
-        case 'w': // Discard At End Of Line
-            wrapEOL = false;
-            break;
+            case 'w': // Discard At End Of Line
+                wrapEOL = false;
+                break;
 
-        case 'Z': // Identify as VT52 (Data: ESC / K)
-            sendData(ascii::ESC);
-            sendData('/');
-            sendData('K');
-            break;
+            case 'Z': // Identify as VT52 (Data: ESC / K)
+                sendData(ascii::ESC);
+                sendData('/');
+                sendData('K');
+                break;
 
-        case ']': // Transmit 25th Line
-            transmitLine25();
-            break;
+            case ']': // Transmit 25th Line
+                transmitLine25();
+                break;
 
-        case '#': // Transmit Page
-            transmitPage();
-            break;
+            case '#': // Transmit Page
+                transmitPage();
+                break;
 
-        default:
-            debugss(ssH19, WARNING, "Unhandled ESC: %d\n", ch);
-            /// \todo - verify this is how the H19 ROM does it.
-            break;
+            default:
+                debugss(ssH19, WARNING, "Unhandled ESC: %d\n", ch);
+                /// \todo - verify this is how the H19 ROM does it.
+                break;
         }
     }
 
@@ -548,49 +556,49 @@ void H19::processCharacter(char ch)
 
         switch (ch)
         {
-        case '1': // Enable 25th line
-            // From the ROM, it erases line 25 on the enable, but here we erase on the disable.
-            line25 = true;
-            break;
+            case '1': // Enable 25th line
+                // From the ROM, it erases line 25 on the enable, but here we erase on the disable.
+                line25 = true;
+                break;
 
-        case '2': // No key click
-            keyClick = true;
-            break;
+            case '2': // No key click
+                keyClick = true;
+                break;
 
-        case '3': // Hold screen mode
-            holdScreen = true;
-            break;
+            case '3': // Hold screen mode
+                holdScreen = true;
+                break;
 
-        case '4': // Block Cursor
-            cursorBlock = true;
-            updated = true;
-            break;
+            case '4': // Block Cursor
+                cursorBlock = true;
+                updated     = true;
+                break;
 
-        case '5': // Cursor Off
-            cursorOff = true;
-            updated = true;
-            break;
+            case '5': // Cursor Off
+                cursorOff = true;
+                updated   = true;
+                break;
 
-        case '6': // Keypad Shifted
-            keypadShifted = true;
-            break;
+            case '6': // Keypad Shifted
+                keypadShifted = true;
+                break;
 
-        case '7': // Alternate Keypad mode
-            altKeypadMode = true;
-            break;
+            case '7': // Alternate Keypad mode
+                altKeypadMode = true;
+                break;
 
-        case '8': // Auto LF
-            autoLF = true;
-            break;
+            case '8': // Auto LF
+                autoLF = true;
+                break;
 
-        case '9': // Auto CR
-            autoCR = true;
-            break;
+            case '9': // Auto CR
+                autoCR = true;
+                break;
 
-        default:
-            /// \todo Need to process ch as if none of this happened...
-            debugss(ssH19, WARNING, "Invalid set Mode: %c\n", ch);
-            break;
+            default:
+                /// \todo Need to process ch as if none of this happened...
+                debugss(ssH19, WARNING, "Invalid set Mode: %c\n", ch);
+                break;
         }
     }
 
@@ -600,50 +608,50 @@ void H19::processCharacter(char ch)
 
         switch (ch)
         {
-        case '1': // Disable 25th line
-            eraseLine(rowsMain);
-            line25 = false;
-            updated = true;
-            break;
+            case '1': // Disable 25th line
+                eraseLine(rowsMain);
+                line25  = false;
+                updated = true;
+                break;
 
-        case '2': // key click
-            keyClick = false;
-            break;
+            case '2': // key click
+                keyClick = false;
+                break;
 
-        case '3': // Hold screen mode
-            holdScreen = false;
-            break;
+            case '3': // Hold screen mode
+                holdScreen = false;
+                break;
 
-        case '4': // Block Cursor
-            cursorBlock = false;
-            updated = true;
-            break;
+            case '4': // Block Cursor
+                cursorBlock = false;
+                updated     = true;
+                break;
 
-        case '5': // Cursor On
-            cursorOff = false;
-            updated = true;
-            break;
+            case '5': // Cursor On
+                cursorOff = false;
+                updated   = true;
+                break;
 
-        case '6': // Keypad Unshifted
-            keypadShifted = false;
-            break;
+            case '6': // Keypad Unshifted
+                keypadShifted = false;
+                break;
 
-        case '7': // Exit Alternate Keypad mode
-            altKeypadMode = false;
-            break;
+            case '7': // Exit Alternate Keypad mode
+                altKeypadMode = false;
+                break;
 
-        case '8': // No Auto LF
-            autoLF = false;
-            break;
+            case '8': // No Auto LF
+                autoLF = false;
+                break;
 
-        case '9': // No Auto CR
-            autoCR = false;
-            break;
+            case '9': // No Auto CR
+                autoCR = false;
+                break;
 
-        default:
-            /// \todo Need to process ch as if none of this happened...
-            debugss(ssH19, WARNING, "Invalid reset Mode: %c\n", ch);
-            break;
+            default:
+                /// \todo Need to process ch as if none of this happened...
+                debugss(ssH19, WARNING, "Invalid reset Mode: %c\n", ch);
+                break;
         }
     }
 
@@ -704,27 +712,28 @@ void H19::processCharacter(char ch)
             }
 
             updated = true;
-            mode = Normal;
+            mode    = Normal;
         }
     }
 }
 
 /// \brief Display character
 ///
-void H19::displayCharacter(unsigned int ch)
+void
+H19::displayCharacter(unsigned int ch)
 {
     // when in graphic mode, use this lookup table to determine character to display,
     // note: although entries 0 to 31 are defined, they are not used, since the control
     // characters are specifically checked in the switch statement.
-    static char graphicLookup[0x80] =
+    static char  graphicLookup[0x80] =
     {
-        0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14,  15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,  31,
         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,  47,
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,  63,
         64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,  79,
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 127, 31,
-        0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,  15,
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14,  15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,  32
     };
 
@@ -795,17 +804,18 @@ void H19::displayCharacter(unsigned int ch)
     screen[PosX][PosY] = symbol;
     PosX++;
 
-    updated = true;
+    updated            = true;
 }
 
 /// \brief Process Carriage Return
 ///
-void H19::processCR()
+void
+H19::processCR()
 {
     // check to possibly save the update.
     if (PosX)
     {
-        PosX = 0;
+        PosX    = 0;
         updated = true;
     }
 }
@@ -813,7 +823,8 @@ void H19::processCR()
 /// \brief Process Line Feed
 ///
 /// \todo - verify line 25 handling. make sure it doesn't clear line 25.
-void H19::processLF()
+void
+H19::processLF()
 {
     if (onLine25())
     {
@@ -838,7 +849,8 @@ void H19::processLF()
 
 /// \brief Process Backspace
 ///
-void H19::processBS()
+void
+H19::processBS()
 {
     if (PosX)
     {
@@ -849,13 +861,14 @@ void H19::processBS()
 
 /// \brief Process TAB
 ///
-void H19::processTAB()
+void
+H19::processTAB()
 {
     if (PosX < 72)
     {
-        PosX += 8;
+        PosX   += 8;
         // mask off the lower 3 bits to get the correct column.
-        PosX &= 0xf8;
+        PosX   &= 0xf8;
         updated = true;
     }
 
@@ -868,18 +881,20 @@ void H19::processTAB()
 
 /// \brief Process Cursor Home
 /// \todo - Determine how these function in relation to line 25..
-void H19::cursorHome()
+void
+H19::cursorHome()
 {
     if ((PosX) || (PosY))
     {
-        PosX = PosY = 0;
+        PosX    = PosY = 0;
         updated = true;
     }
 }
 
 /// \brief Process Cursor Forward
 ///
-void H19::cursorForward()
+void
+H19::cursorForward()
 {
     // ROM comment says that it will wrap around when at pos 80, but the code does not do that,
     // and verifying on a real H89, even with wrap-around enabled, the cursor will not wrap.
@@ -892,7 +907,8 @@ void H19::cursorForward()
 
 /// \brief Process cursor down
 ///
-void H19::cursorDown()
+void
+H19::cursorDown()
 {
     // ROM - Moves the cursor down one line on the display but does not cause a scroll past
     // the last line
@@ -905,7 +921,8 @@ void H19::cursorDown()
 
 /// \brief Process cursor up
 /// \todo determine if this is correct with line 25.
-void H19::cursorUp()
+void
+H19::cursorUp()
 {
     if (PosY)
     {
@@ -917,7 +934,8 @@ void H19::cursorUp()
 ///
 /// \brief Process reverse index
 ///
-void H19::reverseIndex()
+void
+H19::reverseIndex()
 {
     // Check for being on line 25
     if (onLine25())
@@ -953,7 +971,8 @@ void H19::reverseIndex()
 /// \brief Process cursor position report
 ///
 /// Send ESC Y <PosY+0x20> <PosX+0x20>
-void H19::cursorPositionReport()
+void
+H19::cursorPositionReport()
 {
     // Send ESC Y <PosY+0x20> <PosX+0x20>
     sendData(ascii::ESC);
@@ -965,7 +984,8 @@ void H19::cursorPositionReport()
 
 /// \brief Process save cursor position
 ///
-void H19::saveCursorPosition()
+void
+H19::saveCursorPosition()
 {
     SaveX = PosX;
     SaveY = PosY;
@@ -973,10 +993,11 @@ void H19::saveCursorPosition()
 
 /// \brief process restore cursor position
 ///
-void H19::restoreCursorPosition()
+void
+H19::restoreCursorPosition()
 {
-    PosX = SaveX;
-    PosY = SaveY;
+    PosX    = SaveX;
+    PosY    = SaveY;
 
     updated = true;
 }
@@ -985,7 +1006,8 @@ void H19::restoreCursorPosition()
 // Erasing and Editing
 
 /// \brief Clear Display
-void H19::clearDisplay()
+void
+H19::clearDisplay()
 {
     // if on line 25, then only erase line 25
     if (onLine25())
@@ -1009,7 +1031,8 @@ void H19::clearDisplay()
 
 /// \brief Erase to Beginning of display
 ///
-void H19::eraseBOD()
+void
+H19::eraseBOD()
 {
     eraseBOL();
 
@@ -1030,7 +1053,8 @@ void H19::eraseBOD()
 
 /// \brief Erase to End of Page
 ///
-void H19::eraseEOP()
+void
+H19::eraseEOP()
 {
     eraseEOL();
     unsigned int y = PosY + 1;
@@ -1047,7 +1071,8 @@ void H19::eraseEOP()
 
 /// \brief Erase to End of Line
 ///
-void H19::eraseEL()
+void
+H19::eraseEL()
 {
     eraseLine(PosY);
 
@@ -1056,7 +1081,8 @@ void H19::eraseEL()
 
 /// \brief Erase to beginning of line
 ///
-void H19::eraseBOL()
+void
+H19::eraseBOL()
 {
     int x = PosX;
 
@@ -1071,7 +1097,8 @@ void H19::eraseBOL()
 
 /// \brief erase to end of line
 ///
-void H19::eraseEOL()
+void
+H19::eraseEOL()
 {
     unsigned int x = PosX;
 
@@ -1086,7 +1113,8 @@ void H19::eraseEOL()
 
 /// \brief insert line
 ///
-void H19::insertLine()
+void
+H19::insertLine()
 {
     /// \todo - Determine how the REAL H89 does this on Line 25, the ROM listing is not clear.
     /// - a real H19 messes up with either an insert or delete line on line 25.
@@ -1101,7 +1129,7 @@ void H19::insertLine()
 
     eraseLine(PosX);
 
-    PosX = 0;
+    PosX    = 0;
 
     updated = true;
 }
@@ -1111,7 +1139,8 @@ void H19::insertLine()
 /// \todo - Determine how the REAL H89 does this on Line 25, the ROM listing is not clear.
 /// - a real H19 messes up with either an insert or delete line on line 25.
 /// - note tested with early H19, newer H19 roms should have this fixed.
-void H19::deleteLine()
+void
+H19::deleteLine()
 {
     // Go to the beginning of line
     PosX = 0;
@@ -1133,7 +1162,8 @@ void H19::deleteLine()
 
 /// \brief delete character
 ///
-void H19::deleteChar()
+void
+H19::deleteChar()
 {
     // move all character in.
     for (unsigned int x = PosX; x < (cols - 1); x++)
@@ -1144,10 +1174,11 @@ void H19::deleteChar()
     // clear the last column
     screen[cols - 1][PosY] = ascii::SP;
 
-    updated = true;
+    updated                = true;
 }
 
-void H19::eraseLine(unsigned int line)
+void
+H19::eraseLine(unsigned int line)
 {
     assert(line < rows);
 
@@ -1159,36 +1190,38 @@ void H19::eraseLine(unsigned int line)
 
 /// \brief Process enable line 25.
 ///
-void H19::processEnableLine25()
+void
+H19::processEnableLine25()
 {
     // From the ROM, it erases line 25 on the enable, but here we erase on the disable.
     //
 }
 
-void H19::transmitLines(int start, int end)
+void
+H19::transmitLines(int start, int end)
 {
     /// \todo verify this table.
-    static char characterLookup[0x80] =
+    static char   characterLookup[0x80] =
     {
-        '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',  'o',
-        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~',  '_',
-        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-        80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+        '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', '_',
+        32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,
+        48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,
+        64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
+        80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
+        96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
         112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, '^'
     };
 
-    bool reverse = false;
-    bool graphics = false;
-    unsigned char  ch;
+    bool          reverse  = false;
+    bool          graphics = false;
+    unsigned char ch;
 
     for (int line = start; line <= end; line++)
     {
         for (unsigned int col = 0; col < cols; col++)
         {
-            bool newReverse = ((screen[col][line] & 0x80) == 0x80);
+            bool newReverse  = ((screen[col][line] & 0x80) == 0x80);
             /// \todo determine if we should only change for lower case and graphics characters.
             ///
             bool newGraphics = (((screen[col][line] & 0x7f) < 0x20) ||
@@ -1253,7 +1286,8 @@ void H19::transmitLines(int start, int end)
 
 /// \brief Process transmit line 25
 ///
-void H19::transmitLine25()
+void
+H19::transmitLine25()
 {
     // if line 25 is not enabled, only send CR and ring bell.
     if (line25)
@@ -1268,7 +1302,8 @@ void H19::transmitLine25()
 
 /// \brief Process transmit page
 ///
-void H19::transmitPage()
+void
+H19::transmitPage()
 {
     transmitLines(0, rowsMain - 1);
     sendData(ascii::CR);
@@ -1278,19 +1313,22 @@ void H19::transmitPage()
 /// \brief Ring the H19 bell.
 ///
 /// \todo implement bell
-void H19::bell(void)
+void
+H19::bell(void)
 {
 
 }
 
-unsigned int H19::getBaudRate()
+unsigned int
+H19::getBaudRate()
 {
     /// \todo get this from the dip switch.
     return (9600);
 }
 
 
-void H19::reshape(int w, int h)
+void
+H19::reshape(int w, int h)
 {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
@@ -1303,7 +1341,8 @@ void H19::reshape(int w, int h)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void H19::timer(int i)
+void
+H19::timer(int i)
 {
     static int count = 0;
 
@@ -1322,12 +1361,14 @@ void H19::timer(int i)
     glutTimerFunc(screenRefresh, timer, i);
 }
 
-void H19::keyboard(unsigned char key, int x, int y)
+void
+H19::keyboard(unsigned char key, int x, int y)
 {
     h19->keypress(key);
 }
 
-void H19::special(int key, int x, int y)
+void
+H19::special(int key, int x, int y)
 {
     // NOTE: GLUT has already differentiated exact keystrokes
     // based on modern keyboard standards. Here we just encode
@@ -1335,86 +1376,88 @@ void H19::special(int key, int x, int y)
     // in the H19 class.
     switch (key)
     {
-    case GLUT_KEY_F1:
-        h19->keypress('S' | 0x80);
-        break;
+        case GLUT_KEY_F1:
+            h19->keypress('S' | 0x80);
+            break;
 
-    case GLUT_KEY_F2:
-        h19->keypress('T' | 0x80);
-        break;
+        case GLUT_KEY_F2:
+            h19->keypress('T' | 0x80);
+            break;
 
-    case GLUT_KEY_F3:
-        h19->keypress('U' | 0x80);
-        break;
+        case GLUT_KEY_F3:
+            h19->keypress('U' | 0x80);
+            break;
 
-    case GLUT_KEY_F4:
-        h19->keypress('V' | 0x80);
-        break;
+        case GLUT_KEY_F4:
+            h19->keypress('V' | 0x80);
+            break;
 
-    case GLUT_KEY_F5:
-        h19->keypress('W' | 0x80);
-        break;
+        case GLUT_KEY_F5:
+            h19->keypress('W' | 0x80);
+            break;
 
-    case GLUT_KEY_F6:
-        h19->keypress('P' | 0x80);
-        break;
+        case GLUT_KEY_F6:
+            h19->keypress('P' | 0x80);
+            break;
 
-    case GLUT_KEY_F7:
-        h19->keypress('Q' | 0x80);
-        break;
+        case GLUT_KEY_F7:
+            h19->keypress('Q' | 0x80);
+            break;
 
-    case GLUT_KEY_F8:
-        h19->keypress('R' | 0x80);
-        break;
+        case GLUT_KEY_F8:
+            h19->keypress('R' | 0x80);
+            break;
 
-    case GLUT_KEY_HOME:
-        h19->keypress('H' | 0x80);
-        break;
+        case GLUT_KEY_HOME:
+            h19->keypress('H' | 0x80);
+            break;
 
-    case GLUT_KEY_UP:
-        h19->keypress('A' | 0x80);
-        break;
+        case GLUT_KEY_UP:
+            h19->keypress('A' | 0x80);
+            break;
 
-    case GLUT_KEY_DOWN:
-        h19->keypress('B' | 0x80);
-        break;
+        case GLUT_KEY_DOWN:
+            h19->keypress('B' | 0x80);
+            break;
 
-    case GLUT_KEY_LEFT:
-        h19->keypress('D' | 0x80);
-        break;
+        case GLUT_KEY_LEFT:
+            h19->keypress('D' | 0x80);
+            break;
 
-    case GLUT_KEY_RIGHT:
-        h19->keypress('C' | 0x80);
-        break;
+        case GLUT_KEY_RIGHT:
+            h19->keypress('C' | 0x80);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
-void H19::glDisplay()
+void
+H19::glDisplay()
 {
     h19->display();
 }
 
 
-void H19::run()
+void
+H19::run()
 {
-    int dummy_argc = 1;
-    char *dummy_argv = (char *)"dummy";
+    int   dummy_argc = 1;
+    char* dummy_argv = (char*) "dummy";
 
     glutInit(&dummy_argc, &dummy_argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(640, 500);
     glutInitWindowPosition(500, 100);
-    glutCreateWindow((char *) "Virtual Heathkit H-89 All-in-One Computer");
+    glutCreateWindow((char*) "Virtual Heathkit H-89 All-in-One Computer");
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-    //glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    // glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glBlendFunc(GL_ONE, GL_ONE);
-    //glBlendEquation(GL_FUNC_ADD);
+    // glBlendEquation(GL_FUNC_ADD);
     glBlendColor(0.5, 0.5, 0.5, 0.9);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
     glShadeModel(GL_FLAT);

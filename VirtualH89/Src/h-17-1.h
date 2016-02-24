@@ -34,7 +34,7 @@ class H_17_1: public DiskDrive
     void writeData(unsigned int pos, BYTE data);
 
     virtual BYTE readSectorData(BYTE sector, unsigned int pos);
-    void insertDisk(FloppyDisk *disk);
+    void insertDisk(FloppyDisk* disk);
 
 
   private:

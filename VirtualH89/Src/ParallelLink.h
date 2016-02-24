@@ -76,8 +76,8 @@ class ParallelLink
     virtual void setError(bool val);
     virtual bool readError();
 
-    virtual void registerDevice(ParallelPortConnection *device);
-    virtual void registerHost(ParallelPortConnection *host);
+    virtual void registerDevice(ParallelPortConnection* device);
+    virtual void registerHost(ParallelPortConnection* host);
 
   protected:
     BYTE data_m;
@@ -121,14 +121,14 @@ class ParallelLink
     ///   (7) Attempting to write on a write protected diskette
     ///   (8) Sector with deleted data mark encountered.
     /// The specific error condition(s) can be found by a read status command.
-    bool error_m;
+    bool                    error_m;
 
 
     // pointer to the host computer
-    ParallelPortConnection *host_m;
+    ParallelPortConnection* host_m;
 
     // pointer to the drive subsystem
-    ParallelPortConnection *device_m;
+    ParallelPortConnection* device_m;
 
 };
 

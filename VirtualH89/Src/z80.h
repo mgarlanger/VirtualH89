@@ -19,8 +19,8 @@
 
 class Z80;
 
-typedef void (Z80::*opCodeMethod)(void);
-typedef void (Z80::*xd_cbMethod)(BYTE&);
+typedef void (Z80::* opCodeMethod)(void);
+typedef void (Z80::* xd_cbMethod)(BYTE&);
 
 
 ///
@@ -39,88 +39,88 @@ class Z80: public CPU
     // Registers
 
     // Register Pairs (union to allow all type of accesses without casting).
-    RP    af, bc, de, hl, wz;
-    RP    ix, iy, sp;
+    RP af, bc, de, hl, wz;
+    RP ix, iy, sp;
 
     // Reference variables to 'point' to the actual data in the register pair (RP).
 
     /// Register A
-    BYTE&  A;
+    BYTE&                 A;
     /// Register A viewed as a signed byte
-    SBYTE& sA;
+    SBYTE&                sA;
     /// Register Flags
-    BYTE&  F;
+    BYTE&                 F;
     /// Full 16-bit register A and Flags
-    WORD&  AF;
+    WORD&                 AF;
 
     /// Register B
-    BYTE&  B;
+    BYTE&                 B;
     /// Register C
-    BYTE&  C;
+    BYTE&                 C;
     /// Full 16-bit register B and C
-    WORD&  BC;
+    WORD&                 BC;
 
     /// Register D
-    BYTE&  D;
+    BYTE&                 D;
     /// Register E
-    BYTE&  E;
+    BYTE&                 E;
     /// Full 16-bit register D and E
-    WORD&  DE;
+    WORD&                 DE;
 
     /// Register H
-    BYTE&  H;
+    BYTE&                 H;
     /// Register L
-    BYTE&  L;
+    BYTE&                 L;
     /// Full 16-bit register H and L
-    WORD&  HL;
+    WORD&                 HL;
     /// Full 16-bit register H and L accessed as a signed 16-bit value
-    SWORD& sHL;
+    SWORD&                sHL;
 
-    BYTE&  W;
-    SBYTE& sW;
-    BYTE&  Z;
-    WORD&  WZ;
+    BYTE&                 W;
+    SBYTE&                sW;
+    BYTE&                 Z;
+    WORD&                 WZ;
 
-    BYTE&  IXl;
-    BYTE&  IXh;
-    WORD&  IX;
+    BYTE&                 IXl;
+    BYTE&                 IXh;
+    WORD&                 IX;
 
-    BYTE&  IYl;
-    BYTE&  IYh;
-    WORD&  IY;
+    BYTE&                 IYl;
+    BYTE&                 IYh;
+    WORD&                 IY;
 
-    WORD&  SP;
+    WORD&                 SP;
 
     /// secondary registers. These can be just words since they are always copied to the
     /// primary registers before they can be accessed.
-    WORD  _af, _bc, _de, _hl;
+    WORD                  _af, _bc, _de, _hl;
 
     /// Program Counter
-    WORD  PC;
+    WORD                  PC;
 
-    WORD  xxcb_effectiveAddress;
-    BYTE  I;                          // Z80 interrupt register
-    bool  IFF0, IFF1, IFF2;           // Use a new flag - IFF0 - to easily handle the one instruction before EI takes effect
-    unsigned int   R;                 // Z80 refresh register
+    WORD                  xxcb_effectiveAddress;
+    BYTE                  I;                // Z80 interrupt register
+    bool                  IFF0, IFF1, IFF2; // Use a new flag - IFF0 - to easily handle the one instruction before EI takes effect
+    unsigned int          R;                // Z80 refresh register
 
-    unsigned long int   ClockRate_m;
-    unsigned long int   ticksPerSecond_m;
-    unsigned long int   ticksPerClock_m;
+    unsigned long int     ClockRate_m;
+    unsigned long int     ticksPerSecond_m;
+    unsigned long int     ticksPerClock_m;
 
-    bool  INT_Line;
-    BYTE  intLevel_m;
-    bool  processingIntr;
+    bool                  INT_Line;
+    BYTE                  intLevel_m;
+    bool                  processingIntr;
 
     volatile sig_atomic_t ticks;
 
-    int lastInstTicks;
+    int                   lastInstTicks;
 
-    AddressBus *ab_m;
+    AddressBus*           ab_m;
 
-    static const int maxNumInst = 4;
-    BYTE curInst[maxNumInst];
-    BYTE curInstByte;
-    BYTE lastInstByte;
+    static const int      maxNumInst = 4;
+    BYTE                  curInst[maxNumInst];
+    BYTE                  curInstByte;
+    BYTE                  lastInstByte;
     enum instructionPrefix
     {
         ip_none,
@@ -134,12 +134,12 @@ class Z80: public CPU
         cm_singleStep,
         cm_halt
     };
-    cpuMode mode;
+    cpuMode                   mode;
 
-    instructionPrefix prefix;
-    bool resetReq;
+    instructionPrefix         prefix;
+    bool                      resetReq;
 
-    BYTE IM;
+    BYTE                      IM;
 
     static const opCodeMethod op_code[256];
     static const opCodeMethod op_cb[256];
@@ -162,7 +162,7 @@ class Z80: public CPU
 
     virtual void raiseNMI(void);
     virtual void addClockTicks(void);
-    virtual void setAddressBus(AddressBus *ab);
+    virtual void setAddressBus(AddressBus* ab);
     virtual void setSpeed(bool fast);
 
     /// \todo - fix this for general case with any instruction on the address bus
@@ -211,12 +211,12 @@ class Z80: public CPU
     static const BYTE ZSP[256];
 #endif
 
-    int cpu_state, int_type;
+    int               cpu_state, int_type;
 
     // Register related
-    inline BYTE& getReg8(BYTE val);
+    inline BYTE&      getReg8(BYTE val);
 
-    inline BYTE& getCoreReg8(BYTE val);
+    inline BYTE&      getCoreReg8(BYTE val);
 
     inline BYTE getReg8Val(BYTE val);
 
@@ -323,14 +323,14 @@ class Z80: public CPU
     /// \todo - move this outside of the z80 class.
     static const unsigned int speedUpFactor_c = 40;
 
-    //-------------------------
+    // -------------------------
     //
     // generic routines (i.e. multiple opcodes call them )
     //
     //  This routines share common code and are inlined to help avoid performance
     // impact.
     //
-    inline void op_add_reg16(WORD&, WORD);
+    inline void op_add_reg16(WORD &, WORD);
     inline void op_and(const BYTE);
     inline void op_or(const BYTE);
     inline void op_xor(const BYTE);
@@ -351,7 +351,7 @@ class Z80: public CPU
     inline void op_sra(BYTE&);
     inline void op_in_ic(BYTE&);
 
-    //-------------------------
+    // -------------------------
     //
     // All one byte opcodes.
     //

@@ -8,8 +8,8 @@
 
 #include "EightInchDisk.h"
 
-#include <iostream>     // std::cout
-#include <fstream>      // std::ifstream
+#include <iostream> // std::cout
+#include <fstream>  // std::ifstream
 
 #include "logger.h"
 #include "Track.h"
@@ -22,9 +22,9 @@ EightInchDisk::EightInchDisk()
 
 }
 
-EightInchDisk::EightInchDisk(const char *name,
+EightInchDisk::EightInchDisk(const char* name,
                              SoftSectoredDisk::DiskImageFormat format): SoftSectoredDisk(name,
-                                         format)
+                                                                                         format)
 {
 
 }
@@ -36,14 +36,15 @@ EightInchDisk::~EightInchDisk()
 }
 
 #if 0
-bool EightInchDisk::readRaw8(const char *name)
+bool
+EightInchDisk::readRaw8(const char* name)
 {
     // Currently just supporting the RAW HDOS 3.0 disk images... 40 track, single density,
     // single sided, 10 sectors/track, 256 bytes/sector.
-    std::ifstream file;
+    std::ifstream     file;
     unsigned long int fileSize;
     unsigned long int pos = 0;
-    BYTE *buf;
+    BYTE*             buf;
 
     file.open(name, std::ios::binary);
 
@@ -57,8 +58,8 @@ bool EightInchDisk::readRaw8(const char *name)
     fileSize = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    buf = new BYTE[fileSize];
-    file.read((char *)buf, fileSize);
+    buf      = new BYTE[fileSize];
+    file.read((char*) buf, fileSize);
 
     file.close();
 
@@ -66,12 +67,12 @@ bool EightInchDisk::readRaw8(const char *name)
 
     switch (fileSize)
     {
-    case 256256: // 1 side, 77 track, 26 sectors, 128 byte - FM
-        break;
+        case 256256: // 1 side, 77 track, 26 sectors, 128 byte - FM
+            break;
 
-    case 512512: // 1 side, 77 track, 26 sectors, 256 byte - MFM
-        // 1 side, 77 track, x sectors, 256 byte - FM
-        break;
+        case 512512: // 1 side, 77 track, 26 sectors, 256 byte - MFM
+            // 1 side, 77 track, x sectors, 256 byte - FM
+            break;
     }
 
     if (fileSize != (256 * 10 * 40))
@@ -85,11 +86,11 @@ bool EightInchDisk::readRaw8(const char *name)
 
     for (int trk = 0; trk < 40; trk++)
     {
-        Track *track = new Track(0, trk);
+        Track* track = new Track(0, trk);
 
         for (int sect = 0; sect < 10; sect++, pos += 256)
         {
-            Sector *sector = new Sector(0, trk, sect, 256, &buf[pos]);
+            Sector* sector = new Sector(0, trk, sect, 256, &buf[pos]);
 
             track->addSector(sector);
             track->setDensity(Track::singleDensity);
@@ -108,50 +109,57 @@ bool EightInchDisk::readRaw8(const char *name)
 #endif
 
 #if 0
-bool EightInchDisk::readData(BYTE side, BYTE track, unsigned int pos, BYTE& data)
+bool
+EightInchDisk::readData(BYTE side, BYTE track, unsigned int pos, BYTE& data)
 {
 
     return false;
 }
 
-bool EightInchDisk::writeData(BYTE side, BYTE track, unsigned int pos, BYTE data)
+bool
+EightInchDisk::writeData(BYTE side, BYTE track, unsigned int pos, BYTE data)
 {
 
     return false;
 }
 
-void EightInchDisk::getControlInfo(unsigned int pos, bool& hole, bool& writeProtect)
+void
+EightInchDisk::getControlInfo(unsigned int pos, bool& hole, bool& writeProtect)
 {
 
 }
 
-void EightInchDisk::setWriteProtect(bool value)
+void
+EightInchDisk::setWriteProtect(bool value)
 {
 
 }
 
-bool EightInchDisk::checkWriteProtect(void)
+bool
+EightInchDisk::checkWriteProtect(void)
 {
 
     return true;
 }
 
-bool EightInchDisk::readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE& data)
+bool
+EightInchDisk::readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE& data)
 {
 
     return false;
 }
 
 
-void EightInchDisk::eject(const char *name)
+void
+EightInchDisk::eject(const char* name)
 {
 
 }
 
 
-void EightInchDisk::dump(void)
+void
+EightInchDisk::dump(void)
 {
     SoftSectoredDisk::dump();
 }
 #endif
-

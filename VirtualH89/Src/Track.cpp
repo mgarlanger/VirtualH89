@@ -13,9 +13,9 @@
 #include "logger.h"
 
 Track::Track(BYTE sideNum, BYTE trackNum): sideNum_m(sideNum),
-    trackNum_m(trackNum),
-    density_m(density_Unknown),
-    dataRate_m(dr_Unknown)
+                                           trackNum_m(trackNum),
+                                           density_m(density_Unknown),
+                                           dataRate_m(dr_Unknown)
 {
 
 }
@@ -28,14 +28,16 @@ Track::~Track()
 //    }
 }
 
-bool Track::addSector(Sector *sector)
+bool
+Track::addSector(Sector* sector)
 {
     sectors_m.push_back(sector);
 
     return false;
 }
 
-void Track::dump()
+void
+Track::dump()
 {
     printf("Dumping track - head: %d track: %d\n", sideNum_m, trackNum_m);
 
@@ -46,17 +48,20 @@ void Track::dump()
     }
 }
 
-void Track::setDensity(Density density)
+void
+Track::setDensity(Density density)
 {
     density_m = density;
 }
 
-void Track::setDataRate(DataRate datarate)
+void
+Track::setDataRate(DataRate datarate)
 {
     dataRate_m = datarate;
 }
 
-bool Track::readSectorData(BYTE sector, WORD pos, BYTE& data)
+bool
+Track::readSectorData(BYTE sector, WORD pos, BYTE& data)
 {
     debugss(ssFloppyDisk, INFO, "%s: sector: %d pos: %d\n", __FUNCTION__, sector, pos);
 
@@ -75,4 +80,3 @@ bool Track::readSectorData(BYTE sector, WORD pos, BYTE& data)
     return false;
 
 }
-

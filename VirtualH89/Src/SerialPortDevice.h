@@ -27,13 +27,13 @@ class SerialPortDevice
     virtual bool sendReady();
     virtual bool sendData(BYTE data);
 
-    virtual void attachPort(INS8250 *port);
+    virtual void attachPort(INS8250* port);
 
     virtual unsigned int getBaudRate() = 0;
     static const int DISABLE_BAUD_CHECK = -1;
 
   private:
-    INS8250 *port_m;
+    INS8250*         port_m;
 
 };
 
