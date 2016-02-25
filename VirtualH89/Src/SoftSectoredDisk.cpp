@@ -354,7 +354,7 @@ SoftSectoredDisk::readIMD(const char* name)
                     sectorSizeKey);
             delete [] buf;
             delete trk;
-            
+
             return (false);
         }
 

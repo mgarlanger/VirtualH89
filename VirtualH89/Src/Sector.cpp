@@ -95,7 +95,8 @@ Sector::initialize(BYTE headNum,
     {
         // Error condition, shouldn't initialize an already valid object
 
-        debugss(ssFloppyDisk, ERROR, "%s: Sector already initialized - h: %d t: %d s: %d\n", __FUNCTION__, headNum, trackNum, sectorNum);
+        debugss(ssFloppyDisk, ERROR, "%s: Sector already initialized - h: %d t: %d s: %d\n",
+                __FUNCTION__, headNum, trackNum, sectorNum);
 
     }
 
