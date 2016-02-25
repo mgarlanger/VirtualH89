@@ -21,7 +21,7 @@ class Memory
 {
   protected:
     WORD baseAddress_m;
-    int size_m;
+    int  size_m;
 
   public:
 

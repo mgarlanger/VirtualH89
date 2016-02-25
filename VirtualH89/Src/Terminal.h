@@ -15,19 +15,19 @@
 ///
 /// Base class for generic terminal.
 ///
-class Terminal : public SerialPortDevice
+class Terminal: public SerialPortDevice
 {
   public:
     Terminal();
     virtual ~Terminal();
 
-    virtual void init() = 0;
-    virtual void reset() = 0;
+    virtual void init()                    = 0;
+    virtual void reset()                   = 0;
 
     virtual void processCharacter(char ch) = 0;
-    virtual void display() = 0;
-    virtual void keypress(char ch) = 0;
-    virtual bool checkUpdated() = 0;
+    virtual void display()                 = 0;
+    virtual void keypress(char ch)         = 0;
+    virtual bool checkUpdated()            = 0;
 
   private:
 

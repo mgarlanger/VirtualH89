@@ -9,7 +9,7 @@
 
 #include <cstdio>
 #include <list>
-//#include <atomic>
+// #include <atomic>
 
 class ClockUser;
 
@@ -30,26 +30,26 @@ class WallClock
   private:
     long long unsigned int clock_m = 0;
 //    std::atomic_ullong clock_m = 0;
-    unsigned int ticks_m = 0;
+    unsigned int           ticks_m = 0;
 //    std::atomic_uint ticks_m = 0;
-    static WallClock *_inst;
+    static WallClock*      _inst;
 
-    unsigned long ticksPerSecond = 2048000;
+    unsigned long          ticksPerSecond = 2048000;
 
     WallClock();
     virtual ~WallClock();
 
     /// use C++11 to avoid having to define copy constructor
-    WallClock(WallClock const&) = delete;
+    WallClock(WallClock const&)            = delete;
     WallClock& operator=(WallClock const&) = delete;
 
-    std::list<ClockUser *> users_m;
+    std::list<ClockUser*> users_m;
 
   public:
-    bool registerUser(ClockUser *user);
-    bool unregisterUser(ClockUser *user);
+    bool registerUser(ClockUser* user);
+    bool unregisterUser(ClockUser* user);
 
-    static WallClock *instance(void);
+    static WallClock* instance(void);
 
     void addTimerEvent();
 
@@ -65,9 +65,9 @@ class WallClock
 
     long long unsigned int getElapsedTime(long long unsigned int origTime);
 
-    void printTime(FILE *file);
+    void printTime(FILE* file);
 
-    bool addCallback(ClockUser *user, unsigned long long timeUs);
+    bool addCallback(ClockUser* user, unsigned long long timeUs);
 };
 
 #endif // WALLCLOCK_H_

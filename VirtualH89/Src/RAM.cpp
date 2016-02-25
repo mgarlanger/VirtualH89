@@ -10,8 +10,8 @@
 
 /// \todo - Should I just make size the number of KB, instead of bytes?
 RAM::RAM(int size): Memory(size),
-    data_m(0),
-    writeProtect_m(false)
+                    data_m(0),
+                    writeProtect_m(false)
 {
     debugss(ssRAM, INFO, "%s: Creating RAM: %d\n", __FUNCTION__, size_m);
 
@@ -28,7 +28,8 @@ RAM::~RAM()
 }
 
 
-void RAM::writeByte(WORD addr, BYTE val)
+void
+RAM::writeByte(WORD addr, BYTE val)
 {
     debugss(ssRAM, ALL, "%s: addr(%d) - %d\n", __FUNCTION__, addr, val);
 
@@ -53,9 +54,10 @@ void RAM::writeByte(WORD addr, BYTE val)
     }
 }
 
-BYTE RAM::readByte(WORD addr)
+BYTE
+RAM::readByte(WORD addr)
 {
-    BYTE val = 0;
+    BYTE val    = 0;
     WORD offset = addr - baseAddress_m;
 
     /// \todo - determine if this would be used for wrap-around at 64k..
@@ -76,8 +78,8 @@ BYTE RAM::readByte(WORD addr)
 }
 
 
-void RAM::writeProtect(bool wp)
+void
+RAM::writeProtect(bool wp)
 {
     writeProtect_m = wp;
 }
-

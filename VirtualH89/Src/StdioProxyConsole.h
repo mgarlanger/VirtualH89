@@ -14,17 +14,17 @@
 
 #include <assert.h>
 
-#include "config.h"
 #include "Console.h"
-#include "H89Operator.h"
+
+class H89Operator;
 
 /// \brief StdioProxyConsole
 ///
 ///
-class StdioProxyConsole : public Console
+class StdioProxyConsole: public Console
 {
   public:
-    StdioProxyConsole(int argc, char **argv);
+    StdioProxyConsole(int argc, char** argv);
     virtual ~StdioProxyConsole();
 
     virtual void init();
@@ -38,7 +38,7 @@ class StdioProxyConsole : public Console
     virtual void run();
 
   private:
-    H89Operator *op_m;
+    H89Operator* op_m;
 };
 
 #endif // STDIOPROXYCONSOLE_H_

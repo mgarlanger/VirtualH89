@@ -9,7 +9,6 @@
 #ifndef RAM_H_
 #define RAM_H_
 
-#include "config.h"
 #include "Memory.h"
 
 /// \brief Virtual %RAM
@@ -19,9 +18,9 @@
 class RAM: public virtual Memory
 {
   private:
-    BYTE *data_m;
+    BYTE* data_m;
 
-    bool writeProtect_m;
+    bool  writeProtect_m;
 
   public:
     RAM(int size);

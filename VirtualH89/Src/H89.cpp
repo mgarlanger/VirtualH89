@@ -42,12 +42,13 @@ H89::H89(): Computer()
     pthread_mutex_init(&h89_mutex, NULL);
 }
 
-void H89::buildSystem(Console *console)
+void
+H89::buildSystem(Console* console)
 {
     PropertyUtil::PropertyMapT props;
     // TODO: allow specification of config file via cmdline args.
-    std::string cfg;
-    char *env = getenv("V89_CONFIG");
+    std::string                cfg;
+    char*                      env = getenv("V89_CONFIG");
 
     this->console = console;
 
@@ -61,11 +62,13 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception& e) {}
+        catch (std::exception& e)
+        {
+        }
     }
     else
     {
-        cfg = getenv("HOME");
+        cfg  = getenv("HOME");
         cfg += "/.v89rc";
 
         try
@@ -73,7 +76,9 @@ void H89::buildSystem(Console *console)
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception& e) {}
+        catch (std::exception& e)
+        {
+        }
     }
 
     std::string s; // for general property queries.
@@ -81,17 +86,17 @@ void H89::buildSystem(Console *console)
     // TODO: use properties to configure rest of hardware.
     // Possibly set defaults and write/create file.
 
-    cpu   = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
+    cpu                 = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
     interruptController = new InterruptController(cpu);
-    ab    = new AddressBus(interruptController);
+    ab                  = new AddressBus(interruptController);
     cpu->setAddressBus(ab);
     cpu->setSpeed(false);
-    timer = new H89Timer(cpu);
-    h89io = new H89_IO;
+    timer               = new H89Timer(cpu);
+    h89io               = new H89_IO;
 
-    nmi1        = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
-    nmi2        = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
-    s = props["sw501"];
+    nmi1                = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
+    nmi2                = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
+    s                   = props["sw501"];
 
     if (!s.empty())
     {
@@ -103,18 +108,18 @@ void H89::buildSystem(Console *console)
         gpp = new GeneralPurposePort();
     }
 
-    h17   = nullptr;
-    h37         = nullptr;
-    z47If       = nullptr;
-    z47Cntrl    = nullptr;
-    z47Link     = nullptr;
-    MMS77316 *m316 = NULL;
-    MMS77320 *m320 = NULL;
+    h17      = nullptr;
+    h37      = nullptr;
+    z47If    = nullptr;
+    z47Cntrl = nullptr;
+    z47Link  = nullptr;
+    MMS77316*                m316      = NULL;
+    MMS77320*                m320      = NULL;
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
-    std::vector<std::string> devslots = { "slot_p504", "slot_p505", "slot_p506" };
-    bool dev_slots = false;
-    bool ser_slots = true;
+    std::vector<std::string> devslots  = {"slot_p504", "slot_p505", "slot_p506"};
+    bool                     dev_slots = false;
+    bool                     ser_slots = true;
 
     for (int x = 0; x < devslots.size(); ++x)
     {
@@ -122,7 +127,7 @@ void H89::buildSystem(Console *console)
 
         if (s.compare("MMS77316") == 0)
         {
-            m316 = MMS77316::install_MMS77316(props, devslots[x]);
+            m316      = MMS77316::install_MMS77316(props, devslots[x]);
             dev_slots = true;
         }
 
@@ -145,14 +150,14 @@ void H89::buildSystem(Console *console)
 
     if (!dev_slots)
     {
-        h17   = new H17(H17_BaseAddress_c);
+        h17         = new H17(H17_BaseAddress_c);
         // create the floppy drives for the hard-sectored controller.
         driveUnitH0 = new H_17_1;
         driveUnitH1 = new H_17_4;
         driveUnitH2 = new H_17_4;
 
 #if Z37
-        h37   = new Z_89_37(H37_BasePort_c);
+        h37         = new Z_89_37(H37_BasePort_c);
         // create the floppy drives for the soft-sectored controller.
         driveUnitS0 = new H_17_1;
         driveUnitS1 = new H_17_1;
@@ -166,24 +171,24 @@ void H89::buildSystem(Console *console)
 #endif
 
 #if Z47
-        z47If       = new Z47Interface(Z47_BasePort1_c);
-        z47Cntrl    = new Z47Controller();
-        z47Link     = new ParallelLink();
+        z47If    = new Z47Interface(Z47_BasePort1_c);
+        z47Cntrl = new Z47Controller();
+        z47Link  = new ParallelLink();
 
         z47If->connectDriveLink(z47Link);
         z47Cntrl->connectHostLink(z47Link);
 
         driveUnitE0 = new H47Drive;
         driveUnitE1 = new H47Drive;
-        s = props["z47_disk1"];
+        s           = props["z47_disk1"];
 
         if (s.empty())
         {
             s = "diskA.eightdisk";
         }
 
-        eight0      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-        s = props["z47_disk2"];
+        eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+        s      = props["z47_disk2"];
 
         if (s.empty())
         {
@@ -208,9 +213,9 @@ void H89::buildSystem(Console *console)
 
     if (!ser_slots)
     {
-        lpPort      = new INS8250(Serial_LpPort_c);
-        modemPort   = new INS8250(Serial_ModemPort_c);
-        auxPort     = new INS8250(Serial_AuxPort_c);
+        lpPort    = new INS8250(Serial_LpPort_c);
+        modemPort = new INS8250(Serial_ModemPort_c);
+        auxPort   = new INS8250(Serial_AuxPort_c);
     }
 
     if (!dev_slots)
@@ -222,26 +227,26 @@ void H89::buildSystem(Console *console)
             s = "diskA.tmpdisk";
         }
 
-        hard0       = new HardSectoredDisk(s.c_str());
-        s = props["z17_disk2"];
+        hard0 = new HardSectoredDisk(s.c_str());
+        s     = props["z17_disk2"];
 
         if (s.empty())
         {
             s = "diskB.tmpdisk";
         }
 
-        hard1       = new HardSectoredDisk(s.c_str());
-        s = props["z17_disk3"];
+        hard1 = new HardSectoredDisk(s.c_str());
+        s     = props["z17_disk3"];
 
         if (s.empty())
         {
             s = "diskC.tmpdisk";
         }
 
-        hard2       = new HardSectoredDisk(s.c_str());
+        hard2 = new HardSectoredDisk(s.c_str());
 
 #if Z37
-        s = props["z37_disk1"];
+        s     = props["z37_disk1"];
 
         if (s.empty())
         {
@@ -249,7 +254,7 @@ void H89::buildSystem(Console *console)
         }
 
         soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-        s = props["z37_disk2"];
+        s     = props["z37_disk2"];
 
         if (s.empty())
         {
@@ -257,7 +262,7 @@ void H89::buildSystem(Console *console)
         }
 
         soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-        s = props["z37_disk3"];
+        s     = props["z37_disk3"];
 
         if (s.empty())
         {
@@ -283,7 +288,7 @@ void H89::buildSystem(Console *console)
     }
 
     monitorROM = NULL;
-    s = props["monitor_rom"];
+    s          = props["monitor_rom"];
 
     if (!s.empty())
     {
@@ -303,15 +308,15 @@ void H89::buildSystem(Console *console)
 #endif
     }
 
-    h17ROM     = new ROM(2048);
+    h17ROM = new ROM(2048);
     h17ROM->setBaseAddress(6 * 1024);
     h17ROM->initialize(&H17_ROM[0], 2048);
 
-    h17RAM     = new RAM(1024);
+    h17RAM = new RAM(1024);
     h17RAM->setBaseAddress(5 * 1024);
     /// TODO determine whether the default h17RAM is write-protected or write-enabled at boot.
 
-    CPM8k      = new RAM(8 * 1024);
+    CPM8k = new RAM(8 * 1024);
     CPM8k->setBaseAddress(0);
 
     /// \todo - consolidate RAM into a single object
@@ -409,11 +414,11 @@ void H89::buildSystem(Console *console)
 H89::~H89()
 {
     // eject all the disk files
-    std::vector<DiskController *> dsks = h89io->getDiskDevices();
+    std::vector<DiskController*> dsks = h89io->getDiskDevices();
 
     for (int x = 0; x < dsks.size(); ++x)
     {
-        DiskController *dev = dsks[x];
+        DiskController* dev = dsks[x];
 
         if (dev != NULL)
         {
@@ -431,16 +436,18 @@ H89::~H89()
 //    driveUnitS3->ejectDisk("saveS3.tmpdisk");
 }
 
-void H89::reset()
+void
+H89::reset()
 {
-    enableROM(); // resetting GPP does (may do) this...
+    enableROM();      // resetting GPP does (may do) this...
     cpu->reset();
     console->reset(); // TODO: does H89 reset really also reset H19?
     h89io->reset();
     timer->reset();
 }
 
-void H89::init()
+void
+H89::init()
 {
     console->init();
 
@@ -450,29 +457,34 @@ void H89::init()
     }
 }
 
-void H89::enableROM()
+void
+H89::enableROM()
 {
     ab->installMemory(monitorROM);
     ab->installMemory(h17RAM);
     ab->installMemory(h17ROM);
 }
 
-void H89::disableROM()
+void
+H89::disableROM()
 {
     ab->installMemory(CPM8k);
 }
 
-void H89::writeProtectH17RAM()
+void
+H89::writeProtectH17RAM()
 {
     h17RAM->writeProtect(true);
 }
 
-void H89::writeEnableH17RAM()
+void
+H89::writeEnableH17RAM()
 {
     h17RAM->writeProtect(false);
 }
 
-void H89::selectSideH17(BYTE side)
+void
+H89::selectSideH17(BYTE side)
 {
     if (h17 != NULL)
     {
@@ -480,81 +492,96 @@ void H89::selectSideH17(BYTE side)
     }
 }
 
-void H89::setSpeed(bool fast)
+void
+H89::setSpeed(bool fast)
 {
     cpu->setSpeed(fast);
 }
 
-H89Timer& H89::getTimer()
+H89Timer&
+H89::getTimer()
 {
     return (*timer);
 }
 
-void H89::raiseNMI(void)
+void
+H89::raiseNMI(void)
 {
     cpu->raiseNMI();
 }
 
-void H89::systemMutexAcquire()
+void
+H89::systemMutexAcquire()
 {
     pthread_mutex_lock(&h89_mutex);
 }
 
-void H89::systemMutexRelease()
+void
+H89::systemMutexRelease()
 {
     pthread_mutex_unlock(&h89_mutex);
 }
 
-void H89::raiseINT(int level)
+void
+H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
     getAddressBus().getIntrCtrlr()->raiseInterrupt(level);
 }
 
-void H89::lowerINT(int level)
+void
+H89::lowerINT(int level)
 {
     debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
     getAddressBus().getIntrCtrlr()->lowerInterrupt(level);
 }
 
-void H89::continueCPU(void)
+void
+H89::continueCPU(void)
 {
     cpu->continueRunning();
 }
 
-void H89::waitCPU(void)
+void
+H89::waitCPU(void)
 {
     cpu->waitState();
 }
 
-H89_IO& H89::getIO()
+H89_IO&
+H89::getIO()
 {
     return (*h89io);
 }
 
-BYTE H89::run()
+BYTE
+H89::run()
 {
     cpu->reset();
 
     return (cpu->execute());
 }
 
-void H89::clearMemory(BYTE data)
+void
+H89::clearMemory(BYTE data)
 {
     ab->clearMemory(data);
 }
 
-AddressBus& H89::getAddressBus()
+AddressBus&
+H89::getAddressBus()
 {
     return (*ab);
 }
 
-CPU& H89::getCPU()
+CPU&
+H89::getCPU()
 {
     return (*cpu);
 }
 
-std::string H89::dumpDebug()
+std::string
+H89::dumpDebug()
 {
     std::string ret = gpp->dumpDebug();
     // Note: INT should be part of H89 (or InterruptController), not CPU...
@@ -566,5 +593,9 @@ std::string H89::dumpDebug()
 }
 
 // DEPRECATED
-void H89::keypress(BYTE ch) {}
-void H89::display() {}
+void
+H89::keypress(BYTE ch) {
+}
+void
+H89::display() {
+}

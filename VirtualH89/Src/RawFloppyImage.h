@@ -22,13 +22,14 @@
 #define RAWFLOPPYIMAGE_H_
 
 #include <sys/types.h>
-#include <string>
 #include <vector>
 
-#include "config.h"
-#include "h89Types.h"
-#include "GenericFloppyDrive.h"
-#include "GenericFloppyFormat.h"
+#include "GenericFloppyDisk.h"
+
+
+class GenericFloppyDrive;
+class GenericFloppyFormat;
+class GenericDiskDrive;
 
 /// \class RawFloppyImage
 ///
@@ -37,7 +38,7 @@
 class RawFloppyImage: public GenericFloppyDisk
 {
   public:
-    RawFloppyImage(GenericDiskDrive *drive, std::vector<std::string> argv);
+    RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv);
     ~RawFloppyImage();
 
     bool readData(BYTE side, BYTE track, unsigned int pos, int& data);
@@ -45,27 +46,27 @@ class RawFloppyImage: public GenericFloppyDisk
     bool stopWrite(BYTE side, BYTE track, unsigned int pos);
     bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
     bool isReady();
-    void eject(const char *name);
+    void eject(const char* name);
     void dump(void);
     std::string getMediaName();
 
   private:
-    const char *imageName_m;
-    int imageFd_m;
-    BYTE *trackBuffer_m;
-    int bufferedTrack_m;
-    int bufferedSide_m;
-    off_t bufferOffset_m;
-    bool bufferDirty_m;
-    bool hypoTrack_m; // ST media in DT drive
-    bool hyperTrack_m; // DT media in ST drive
-    bool interlaced_m;
-    int gapLen_m;
-    int indexGapLen_m;
+    const char*   imageName_m;
+    int           imageFd_m;
+    BYTE*         trackBuffer_m;
+    int           bufferedTrack_m;
+    int           bufferedSide_m;
+    off_t         bufferOffset_m;
+    bool          bufferDirty_m;
+    bool          hypoTrack_m;  // ST media in DT drive
+    bool          hyperTrack_m; // DT media in ST drive
+    bool          interlaced_m;
+    int           gapLen_m;
+    int           indexGapLen_m;
     unsigned long writePos_m;
-    bool trackWrite_m;
+    bool          trackWrite_m;
 
-    void getAddrMark(BYTE *tp, int nbytes, int& id_tk, int& id_sd, int& id_sc, int& id_sl);
+    void getAddrMark(BYTE* tp, int nbytes, int& id_tk, int& id_sd, int& id_sc, int& id_sl);
     bool cacheTrack(int side, int track);
 
   protected:

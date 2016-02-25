@@ -14,14 +14,14 @@
 class Sector
 {
   private:
-    BYTE headNum_m;
-    BYTE trackNum_m;
-    BYTE sectorNum_m;
-    bool deletedDataAddressMark_m;
-    bool readError_m;
-    bool valid_m;
-    BYTE *data_m;
-    WORD sectorLength_m;
+    BYTE  headNum_m;
+    BYTE  trackNum_m;
+    BYTE  sectorNum_m;
+    bool  deletedDataAddressMark_m;
+    bool  readError_m;
+    bool  valid_m;
+    BYTE* data_m;
+    WORD  sectorLength_m;
 
   public:
     Sector();
@@ -29,7 +29,7 @@ class Sector
            BYTE trackNum,
            BYTE sectorNum,
            WORD sectorLength,
-           BYTE *data);
+           BYTE* data);
 
     Sector(BYTE headNum,
            BYTE trackNum,
@@ -41,7 +41,7 @@ class Sector
                     BYTE trackNum,
                     BYTE sectorNum,
                     WORD sectorLength,
-                    BYTE *data);
+                    BYTE* data);
 
     virtual ~Sector();
 

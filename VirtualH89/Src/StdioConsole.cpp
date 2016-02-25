@@ -5,6 +5,7 @@
 ///
 
 #include "StdioConsole.h"
+
 #include "logger.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -17,21 +18,31 @@
 /// \brief StdioConsole
 ///
 ///
-StdioConsole::StdioConsole(int argc, char **argv): Console(argc, argv)
+StdioConsole::StdioConsole(int argc, char** argv): Console(argc, argv)
 {
 }
 
-StdioConsole::~StdioConsole() {}
+StdioConsole::~StdioConsole() {
+}
 
-void StdioConsole::init() {}
+void
+StdioConsole::init() {
+}
 
-void StdioConsole::reset() {}
+void
+StdioConsole::reset() {
+}
 
-void StdioConsole::display() {}
+void
+StdioConsole::display() {
+}
 
-void StdioConsole::processCharacter(char ch) {}
+void
+StdioConsole::processCharacter(char ch) {
+}
 
-void StdioConsole::keypress(char ch)
+void
+StdioConsole::keypress(char ch)
 {
     if (ch == 0x0a)
     {
@@ -41,7 +52,8 @@ void StdioConsole::keypress(char ch)
     sendData(ch);
 }
 
-void StdioConsole::receiveData(BYTE ch)
+void
+StdioConsole::receiveData(BYTE ch)
 {
     static int mode = 0;
 
@@ -71,18 +83,21 @@ void StdioConsole::receiveData(BYTE ch)
     }
 }
 
-bool StdioConsole::checkUpdated()
+bool
+StdioConsole::checkUpdated()
 {
     return false;
 }
-unsigned int StdioConsole::getBaudRate()
+unsigned int
+StdioConsole::getBaudRate()
 {
     return SerialPortDevice::DISABLE_BAUD_CHECK;
 }
-void StdioConsole::run()
+void
+StdioConsole::run()
 {
-    int ret;
-    int c;
+    int            ret;
+    int            c;
     struct termios termios0;
     struct termios termios;
 
@@ -97,7 +112,7 @@ void StdioConsole::run()
         memcpy(&termios0, &termios, sizeof(termios0));
         termios.c_lflag &= ~ICANON;
         termios.c_lflag &= ~ECHO;
-        ret = tcsetattr(0, 0, &termios);
+        ret              = tcsetattr(0, 0, &termios);
     }
 
     while ((c = fgetc(stdin)) != EOF)

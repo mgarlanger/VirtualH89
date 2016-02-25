@@ -7,7 +7,6 @@
 #ifndef ROM_H_
 #define ROM_H_
 
-#include "config.h"
 #include "Memory.h"
 
 /// \brief  Virtual %ROM
@@ -19,14 +18,14 @@ class ROM: public virtual Memory
   private:
     /// \brief Actual storage for the rom.
     ///
-    BYTE *data_m;
+    BYTE* data_m;
 
   public:
     ROM(int size);
     virtual ~ROM();
-    static ROM *getROM(const char *file, WORD addr);
+    static ROM* getROM(const char* file, WORD addr);
 
-    virtual void initialize(BYTE *block, WORD size);
+    virtual void initialize(BYTE* block, WORD size);
     virtual void writeByte(WORD addr, BYTE val);
     virtual BYTE readByte(WORD addr);
 };

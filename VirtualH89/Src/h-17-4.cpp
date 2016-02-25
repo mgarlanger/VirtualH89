@@ -5,8 +5,6 @@
 /// \author Mark Garlanger
 ///
 
-#include <strings.h>
-
 #include "h-17-4.h"
 
 #include "logger.h"
@@ -14,7 +12,7 @@
 
 
 H_17_4::H_17_4(): side_m(0),
-    track_m(0)
+                  track_m(0)
 {
     numTracks_m = maxTracks_c;
 
@@ -25,7 +23,8 @@ H_17_4::~H_17_4()
 
 }
 
-void H_17_4::insertDisk(FloppyDisk *disk)
+void
+H_17_4::insertDisk(FloppyDisk* disk)
 {
     disk_m = disk;
 
@@ -36,10 +35,11 @@ void H_17_4::insertDisk(FloppyDisk *disk)
     }
 }
 
-void H_17_4::getControlInfo(unsigned int pos,
-                            bool& hole,
-                            bool& trackZero,
-                            bool& writeProtect)
+void
+H_17_4::getControlInfo(unsigned int pos,
+                       bool& hole,
+                       bool& trackZero,
+                       bool& writeProtect)
 {
     debugss(ssH17_4, INFO, "%s - pos: %d\n", __FUNCTION__, pos);
 
@@ -53,12 +53,13 @@ void H_17_4::getControlInfo(unsigned int pos,
     else
     {
         debugss(ssH17_4, INFO, "%s no disk_m\n", __FUNCTION__);
-        hole = true;
+        hole         = true;
         writeProtect = false;
     }
 }
 
-void H_17_4::step(bool direction)
+void
+H_17_4::step(bool direction)
 {
     if (direction)
     {
@@ -81,7 +82,8 @@ void H_17_4::step(bool direction)
     }
 }
 
-void H_17_4::selectSide(BYTE side)
+void
+H_17_4::selectSide(BYTE side)
 {
     if (side == side_m)
     {
@@ -102,7 +104,8 @@ void H_17_4::selectSide(BYTE side)
 }
 
 
-BYTE H_17_4::readData(unsigned int pos)
+BYTE
+H_17_4::readData(unsigned int pos)
 {
     BYTE data = 0;
 
@@ -119,7 +122,8 @@ BYTE H_17_4::readData(unsigned int pos)
     return data;
 }
 
-void H_17_4::writeData(unsigned int pos, BYTE data)
+void
+H_17_4::writeData(unsigned int pos, BYTE data)
 {
     debugss(ssH17_4, INFO, "%s: pos(%d) data(%d)\n", __FUNCTION__, pos, data);
 
@@ -129,7 +133,8 @@ void H_17_4::writeData(unsigned int pos, BYTE data)
     }
 }
 
-BYTE H_17_4::readSectorData(BYTE sector, unsigned int pos)
+BYTE
+H_17_4::readSectorData(BYTE sector, unsigned int pos)
 {
     BYTE data = 0;
 

@@ -6,12 +6,13 @@
 ///
 
 #include "GeneralPurposePort.h"
+
+#include <stdlib.h>
+
 #include "H89.h"
 #include "logger.h"
 #include "h89-timer.h"
-#include "IODevice.h"
 #include "propertyutil.h"
-#include <stdlib.h>
 
 const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Count_c] =
 {
@@ -25,11 +26,11 @@ const BYTE GeneralPurposePort::gpp_Mms_128k_Unlock_Seq_c[gpp_Mms_128k_Unlock_Cou
 };
 
 GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
-    mms128k_Unlocked(false),
-    mms128k_Unlock_Pos(0),
-    curSide_m(-1),
-    portBits_m(0),
-    fast_m(false)
+                                          mms128k_Unlocked(false),
+                                          mms128k_Unlock_Pos(0),
+                                          curSide_m(-1),
+                                          portBits_m(0),
+                                          fast_m(false)
 {
     dipsw_m = (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
 
@@ -52,18 +53,20 @@ GeneralPurposePort::~GeneralPurposePort()
 
 }
 
-void GeneralPurposePort::reset()
+void
+GeneralPurposePort::reset()
 {
-    mms128k_Unlocked = false;
+    mms128k_Unlocked   = false;
     mms128k_Unlock_Pos = 0;
-    curSide_m = -1;
-    fast_m = false;
+    curSide_m          = -1;
+    fast_m             = false;
     // do not change 'dispsw_m'!
     // portBits_m = 0; // must actually call out()... side-effects...
     out(GPP_BaseAddress_c, 0);
 }
 
-BYTE GeneralPurposePort::in(BYTE addr)
+BYTE
+GeneralPurposePort::in(BYTE addr)
 {
     /// The general purpose port returns the value of SW501.
     /// This varies depending on the monitor ROM.
@@ -151,7 +154,8 @@ BYTE GeneralPurposePort::in(BYTE addr)
     return (0);
 }
 
-void GeneralPurposePort::out(BYTE addr, BYTE val)
+void
+GeneralPurposePort::out(BYTE addr, BYTE val)
 {
     if (verifyPort(addr))
     {
@@ -238,7 +242,8 @@ void GeneralPurposePort::out(BYTE addr, BYTE val)
     }
 }
 
-std::string GeneralPurposePort::dumpDebug()
+std::string
+GeneralPurposePort::dumpDebug()
 {
     std::string ret = PropertyUtil::sprintf("GP-OUT=%02x GP-IN=%02x\n",
                                             portBits_m, dipsw_m);

@@ -10,6 +10,7 @@
 #define PARALLELPORTCONNECTION_H_
 
 #include "h89Types.h"
+#include "config.h"
 
 class ParallelLink;
 
@@ -20,7 +21,7 @@ class ParallelPortConnection
     virtual ~ParallelPortConnection();
 
     //
-    virtual void connectLink(ParallelLink *link);
+    virtual void connectLink(ParallelLink* link);
 
     enum SignalType
     {
@@ -42,10 +43,10 @@ class ParallelPortConnection
     virtual void lowerSignal(SignalType sigType) = 0;
     virtual void pulseSignal(SignalType sigType) = 0;
 
-    //virtual void receiveData(BYTE val) = 0;
+    // virtual void receiveData(BYTE val) = 0;
 
   protected:
-    ParallelLink *link_m;
+    ParallelLink* link_m;
 
 };
 

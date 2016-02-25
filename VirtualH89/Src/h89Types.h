@@ -15,28 +15,28 @@
 ///
 /// 16-bit unsigned integer
 ///
-typedef uint16_t    WORD;
+typedef uint16_t WORD;
 
 ///
 /// \typedef SWORD
 ///
 /// 16-bit signed integer
 ///
-typedef int16_t     SWORD;
+typedef int16_t SWORD;
 
 ///
 /// \typedef BYTE
 ///
 /// 8-bit unsigned integer
 ///
-typedef uint8_t     BYTE;
+typedef uint8_t BYTE;
 
 ///
 /// \typedef SBYTE
 ///
 /// 8-bit signed integer
 ///
-typedef int8_t      SBYTE;
+typedef int8_t SBYTE;
 
 ///
 /// \struct RP
@@ -65,11 +65,11 @@ struct RP
         };
 
         /// Option 3, register appears to be an unsigned word.
-        WORD val;
+        WORD  val;
 
         /// Option 4, register appears to be a signed word.
         SWORD sval;
     };
 };
 
-#endif    // H89_TYPES_H_
+#endif // H89_TYPES_H_

@@ -6,15 +6,17 @@
 /// \author Douglas Miller
 ///
 
-#include "logger.h"
-#include <string.h>
-
-#include "H89.h"
 #include "mms77320.h"
 
-const char *MMS77320::MMS77320_Name_c = "MMS77320";
+#include "logger.h"
+#include "H89.h"
+#include "GenericSASIDrive.h"
 
-GenericSASIDrive *MMS77320::getCurDrive()
+
+const char* MMS77320::MMS77320_Name_c = "MMS77320";
+
+GenericSASIDrive*
+MMS77320::getCurDrive()
 {
     // This could be NULL
     return drives_m[control1Reg_m & ctrl_DriveSel_c];
@@ -37,10 +39,10 @@ MMS77320::MMS77320(int baseAddr, int intLevel, int switches):
     }
 }
 
-std::vector<GenericDiskDrive *> MMS77320::getDiskDrives()
+std::vector<GenericDiskDrive*> MMS77320::getDiskDrives()
 {
     // No removable drives (?) so nothing returned here...
-    std::vector<GenericDiskDrive *> drives;
+    std::vector<GenericDiskDrive*> drives;
     // TODO: handle removeable drives, and return those here...
 #if 0
 
@@ -53,20 +55,22 @@ std::vector<GenericDiskDrive *> MMS77320::getDiskDrives()
     return drives;
 }
 
-std::string MMS77320::getDriveName(int index)
+std::string
+MMS77320::getDriveName(int index)
 {
     if (index < 0 || index >= numDisks_c)
     {
         return NULL;
     }
 
-    char buf[32];
+    char        buf[32];
     sprintf(buf, "%s-%d", MMS77320_Name_c, index + 1);
     std::string str(buf);
     return str;
 }
 
-GenericDiskDrive *MMS77320::findDrive(std::string ident)
+GenericDiskDrive*
+MMS77320::findDrive(std::string ident)
 {
 
     if (ident.find(MMS77320_Name_c) != 0 || ident[strlen(MMS77320_Name_c)] != '-')
@@ -74,8 +78,8 @@ GenericDiskDrive *MMS77320::findDrive(std::string ident)
         return NULL;
     }
 
-    char *e;
-    int x = strtoul(ident.c_str() + strlen(MMS77320_Name_c) + 1, &e, 10);
+    char* e;
+    int   x = strtoul(ident.c_str() + strlen(MMS77320_Name_c) + 1, &e, 10);
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {
@@ -85,14 +89,15 @@ GenericDiskDrive *MMS77320::findDrive(std::string ident)
     return drives_m[x - 1];
 }
 
-MMS77320 *MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
+MMS77320*
+MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
 {
-    std::map<int, GenericSASIDrive *> mmsdrives;
-    std::string s;
-    int port = 0x78;
-    int sw = 0;
-    int intr = 0;
-    std::string dir = "";
+    std::map<int, GenericSASIDrive*> mmsdrives;
+    std::string                      s;
+    int                              port = 0x78;
+    int                              sw   = 0;
+    int                              intr = 0;
+    std::string                      dir  = "";
 
     // TODO: just look at sw501 and make it match?
     // BYTE sw = h89.getIO().in(0xf2);
@@ -137,16 +142,16 @@ MMS77320 *MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::str
 
     dir = props["mms77320_dir"];
 
-    MMS77320 *m320 = new MMS77320(port, intr, sw);
+    MMS77320* m320 = new MMS77320(port, intr, sw);
 
     // First identify what drives are installed.
     for (int x = 0; x < numDisks_c; ++x)
     {
-        std::string prop = "mms77320_drive";
+        std::string prop  = "mms77320_drive";
         std::string media = dir + "/" + MMS77320_Name_c + "-";
         media += ('0' + x);
-        prop += ('0' + x);
-        s = props[prop];
+        prop  += ('0' + x);
+        s      = props[prop];
 
         if (!s.empty())
         {
@@ -172,7 +177,8 @@ MMS77320::~MMS77320()
     }
 }
 
-void MMS77320::reset(void)
+void
+MMS77320::reset(void)
 {
     control0Reg_m = 0;
     control1Reg_m = 0;
@@ -180,10 +186,11 @@ void MMS77320::reset(void)
     // TODO: reset all drives?
 }
 
-BYTE MMS77320::in(BYTE addr)
+BYTE
+MMS77320::in(BYTE addr)
 {
     BYTE offset = getPortOffset(addr);
-    BYTE val = 0;
+    BYTE val    = 0;
 
     debugss(ssMMS77320, ALL, "MMS77320::in(%d)\n", addr);
 
@@ -210,7 +217,7 @@ BYTE MMS77320::in(BYTE addr)
                 (val & sts_Cmd_c) ? "CMD" : "   ",
                 (val & sts_POut_c) ? "OUT" : "   ",
                 (val & sts_Busy_c) ? "BSY" : "   "
-               );
+                );
         lowerIntrq();
         // TODO; other side-effects?
     }
@@ -224,7 +231,8 @@ BYTE MMS77320::in(BYTE addr)
     return (val);
 }
 
-BYTE MMS77320::getStatus(BYTE ctl)
+BYTE
+MMS77320::getStatus(BYTE ctl)
 {
     BYTE status = 0;
 
@@ -258,13 +266,14 @@ BYTE MMS77320::getStatus(BYTE ctl)
         status |= sts_Ack_c;
     }
 
-    //debugss(ssMMS77320, INFO, "raw getStatus %02x (ctl: %02x)\n", status, ctl);
+    // debugss(ssMMS77320, INFO, "raw getStatus %02x (ctl: %02x)\n", status, ctl);
     // TODO: get ACTINT bit...
-    //return ~status; // or (status ^ 0xf8)...
+    // return ~status; // or (status ^ 0xf8)...
     return status;
 }
 
-void MMS77320::out(BYTE addr, BYTE val)
+void
+MMS77320::out(BYTE addr, BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -285,7 +294,7 @@ void MMS77320::out(BYTE addr, BYTE val)
 
     else if (offset == Control1Port_Offset_c)
     {
-        val &= 0x0f;
+        val          &= 0x0f;
         debugss(ssMMS77320, INFO, "MMS77320::out(Control1Port) %02x\n", val);
         bool diff = ((control1Reg_m ^ val) & ctrl_DriveSel_c) != 0;
         control1Reg_m = val;
@@ -309,7 +318,8 @@ void MMS77320::out(BYTE addr, BYTE val)
     {
         val &= 0xf0;
         int diffs = (control0Reg_m ^ val);
-        debugss(ssMMS77320, INFO, "MMS77320::out(Control0Port) %02x [%02x] (%s)\n", val, diffs, curDrive_m != NULL ? "OK" : "null");
+        debugss(ssMMS77320, INFO, "MMS77320::out(Control0Port) %02x [%02x] (%s)\n", val, diffs,
+                curDrive_m != NULL ? "OK" : "null");
         control0Reg_m = val;
 
         if (diffs && curDrive_m != NULL)
@@ -343,7 +353,8 @@ void MMS77320::out(BYTE addr, BYTE val)
     }
 }
 
-GenericSASIDrive *MMS77320::getDrive(BYTE unitNum)
+GenericSASIDrive*
+MMS77320::getDrive(BYTE unitNum)
 {
     if (unitNum < numDisks_c)
     {
@@ -353,7 +364,8 @@ GenericSASIDrive *MMS77320::getDrive(BYTE unitNum)
     return NULL;
 }
 
-bool MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive *drive)
+bool
+MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive* drive)
 {
     bool retVal = false;
 
@@ -364,7 +376,7 @@ bool MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive *drive)
         if (drives_m[unitNum] == NULL)
         {
             drives_m[unitNum] = drive;
-            retVal = true;
+            retVal            = true;
         }
 
         else
@@ -381,12 +393,14 @@ bool MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive *drive)
     return (retVal);
 }
 
-bool MMS77320::removeDrive(BYTE unitNum)
+bool
+MMS77320::removeDrive(BYTE unitNum)
 {
     return (false);
 }
 
-void MMS77320::raiseIntrq()
+void
+MMS77320::raiseIntrq()
 {
     debugss(ssMMS77320, INFO, "%s\n", __FUNCTION__);
 
@@ -398,20 +412,22 @@ void MMS77320::raiseIntrq()
     }
 }
 
-void MMS77320::lowerIntrq()
+void
+MMS77320::lowerIntrq()
 {
     debugss(ssMMS77320, INFO, "%s\n", __FUNCTION__);
     h89.lowerINT(intLevel_m);
 }
 
-std::string MMS77320::dumpDebug()
+std::string
+MMS77320::dumpDebug()
 {
     std::string ret = PropertyUtil::sprintf(
-                          "CTRL-0=%02x     CTRL-1=%02x\n"
-                          "DAT-IN=%02x    DAT-OUT=%02x\n"
-                          "STATUS=%02x\n",
-                          control0Reg_m, control1Reg_m,
-                          dataInReg_m, dataOutReg_m,
-                          getStatus(ctrlBus_m));
+        "CTRL-0=%02x     CTRL-1=%02x\n"
+        "DAT-IN=%02x    DAT-OUT=%02x\n"
+        "STATUS=%02x\n",
+        control0Reg_m, control1Reg_m,
+        dataInReg_m, dataOutReg_m,
+        getStatus(ctrlBus_m));
     return ret;
 }

@@ -72,17 +72,20 @@ CRC_CCITT::~CRC_CCITT()
 
 }
 
-void CRC_CCITT::initCRC()
+void
+CRC_CCITT::initCRC()
 {
     crc_m = initValue_c;
 }
 
-void CRC_CCITT::updateCRC(BYTE val)
+void
+CRC_CCITT::updateCRC(BYTE val)
 {
     crc_m = crctable[((crc_m >> 8) ^ val) & 0xff] ^ (crc_m << 8);
 }
 
-WORD CRC_CCITT::getCRC()
+WORD
+CRC_CCITT::getCRC()
 {
     return crc_m;
 }

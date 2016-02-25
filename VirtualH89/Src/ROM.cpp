@@ -14,11 +14,11 @@
 #include "logger.h"
 
 ROM::ROM(int size): Memory(size),
-    data_m(0)
+                    data_m(0)
 {
     debugss(ssROM, INFO, "%s: Creating ROM: %d\n", __FUNCTION__, size_m);
 
-    data_m = new BYTE [size_m];
+    data_m = new BYTE[size_m];
 }
 
 ROM::~ROM()
@@ -30,12 +30,13 @@ ROM::~ROM()
     size_m = 0;
 }
 
-ROM *ROM::getROM(const char *filename, WORD addr)
+ROM*
+ROM::getROM(const char* filename, WORD addr)
 {
-    std::ifstream file;
+    std::ifstream     file;
     unsigned long int fileSize;
-    BYTE *buf;
-    ROM *rom = NULL;
+    BYTE*             buf;
+    ROM*              rom = NULL;
 
     file.open(filename, std::ios::binary);
 
@@ -51,12 +52,13 @@ ROM *ROM::getROM(const char *filename, WORD addr)
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename, fileSize);
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename,
+                fileSize);
         return NULL;
     }
 
     buf = new BYTE[fileSize];
-    file.read((char *)buf, fileSize);
+    file.read((char*) buf, fileSize);
     file.close();
 
     rom = new ROM(fileSize);
@@ -66,7 +68,8 @@ ROM *ROM::getROM(const char *filename, WORD addr)
     return rom;
 }
 
-void ROM::initialize(BYTE *block, WORD size)
+void
+ROM::initialize(BYTE* block, WORD size)
 {
     debugss(ssROM, INFO, "%s: size(%d)\n", __FUNCTION__, size);
 
@@ -86,7 +89,8 @@ void ROM::initialize(BYTE *block, WORD size)
 }
 
 
-void ROM::writeByte(WORD addr, BYTE val)
+void
+ROM::writeByte(WORD addr, BYTE val)
 {
     // can't write to ROM.
     /// \todo update to set the RAM.
@@ -95,9 +99,10 @@ void ROM::writeByte(WORD addr, BYTE val)
     return;
 }
 
-BYTE ROM::readByte(WORD addr)
+BYTE
+ROM::readByte(WORD addr)
 {
-    BYTE val = 0;
+    BYTE val    = 0;
     WORD offset = addr - baseAddress_m;
 
     if ((addr < baseAddress_m) || (offset >= size_m))

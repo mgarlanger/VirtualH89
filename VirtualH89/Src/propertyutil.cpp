@@ -12,7 +12,8 @@
 #include <cstdarg>
 #include <memory>
 
-void PropertyUtil::read(const char *filename, PropertyMapT& map)
+void
+PropertyUtil::read(const char* filename, PropertyMapT& map)
 {
     std::ifstream file(filename);
 
@@ -25,7 +26,8 @@ void PropertyUtil::read(const char *filename, PropertyMapT& map)
     file.close();
 }
 
-void PropertyUtil::read(std::istream& is, PropertyMapT& map)
+void
+PropertyUtil::read(std::istream& is, PropertyMapT& map)
 {
     if (!is)
     {
@@ -40,29 +42,29 @@ void PropertyUtil::read(std::istream& is, PropertyMapT& map)
     {
         switch (ch)
         {
-        case '#' :
-        case '!' :
-            do
-            {
+            case '#':
+            case '!':
+                do
+                {
+                    ch = is.get();
+                }
+                while (!is.eof() && ch >= 0 && ch != '\n' && ch != '\r');
+
+                continue;
+
+            case '\n':
+            case '\r':
+            case ' ':
+            case '\t':
                 ch = is.get();
-            }
-            while (!is.eof() && ch >= 0 && ch != '\n' && ch != '\r');
-
-            continue;
-
-        case '\n':
-        case '\r':
-        case ' ' :
-        case '\t':
-            ch = is.get();
-            continue;
+                continue;
         }
 
         // Read the key
         std::ostringstream key, val;
 
         while (!is.eof() && ch >= 0 && ch != '=' && ch != ':' &&
-                ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
+               ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
         {
             key << ch;
             ch = is.get();
@@ -94,41 +96,41 @@ void PropertyUtil::read(std::istream& is, PropertyMapT& map)
 
                 switch (ch)
                 {
-                case '\r':
-                    ch = is.get();
+                    case '\r':
+                        ch = is.get();
 
-                    if (ch != '\n' && ch != ' ' && ch != '\t')
-                    {
+                        if (ch != '\n' && ch != ' ' && ch != '\t')
+                        {
+                            continue;
+                        }
+
+                    // fall through
+                    case '\n':
+                        ch = is.get();
+
+                        while (!is.eof() && (ch == ' ' || ch == '\t'))
+                        {
+                            is >> ch;
+                        }
+
                         continue;
-                    }
 
-                // fall through
-                case '\n':
-                    ch = is.get();
+                    case 't':
+                        ch   = '\t';
+                        next = is.get();
+                        break;
 
-                    while (!is.eof() && (ch == ' ' || ch == '\t'))
-                    {
-                        is >> ch;
-                    }
+                    case 'n':
+                        ch   = '\n';
+                        next = is.get();
+                        break;
 
-                    continue;
+                    case 'r':
+                        ch   = '\r';
+                        next = is.get();
+                        break;
 
-                case 't':
-                    ch = '\t';
-                    next = is.get();
-                    break;
-
-                case 'n':
-                    ch = '\n';
-                    next = is.get();
-                    break;
-
-                case 'r':
-                    ch = '\r';
-                    next = is.get();
-                    break;
-
-                case 'u':
+                    case 'u':
                     {
                         ch = is.get();
 
@@ -140,45 +142,45 @@ void PropertyUtil::read(std::istream& is, PropertyMapT& map)
                         int d = 0;
 loop:
 
-                        for (int i = 0 ; !is.eof() && i < 4 ; i++)
+                        for (int i = 0; !is.eof() && i < 4; i++)
                         {
                             next = is.get();
 
                             switch (ch)
                             {
-                            case '0':
-                            case '1':
-                            case '2':
-                            case '3':
-                            case '4':
-                            case '5':
-                            case '6':
-                            case '7':
-                            case '8':
-                            case '9':
-                                d = (d << 4) +      ch - '0';
-                                break;
+                                case '0':
+                                case '1':
+                                case '2':
+                                case '3':
+                                case '4':
+                                case '5':
+                                case '6':
+                                case '7':
+                                case '8':
+                                case '9':
+                                    d = (d << 4) + ch - '0';
+                                    break;
 
-                            case 'a':
-                            case 'b':
-                            case 'c':
-                            case 'd':
-                            case 'e':
-                            case 'f':
-                                d = (d << 4) + 10 + ch - 'a';
-                                break;
+                                case 'a':
+                                case 'b':
+                                case 'c':
+                                case 'd':
+                                case 'e':
+                                case 'f':
+                                    d = (d << 4) + 10 + ch - 'a';
+                                    break;
 
-                            case 'A':
-                            case 'B':
-                            case 'C':
-                            case 'D':
-                            case 'E':
-                            case 'F':
-                                d = (d << 4) + 10 + ch - 'A';
-                                break;
+                                case 'A':
+                                case 'B':
+                                case 'C':
+                                case 'D':
+                                case 'E':
+                                case 'F':
+                                    d = (d << 4) + 10 + ch - 'A';
+                                    break;
 
-                            default:
-                                goto loop;
+                                default:
+                                    goto loop;
                             }
 
                             ch = is.get();
@@ -188,9 +190,9 @@ loop:
                         break;
                     }
 
-                default:
-                    next = is.get();
-                    break;
+                    default:
+                        next = is.get();
+                        break;
                 }
             }
 
@@ -209,14 +211,16 @@ loop:
     }
 }
 
-void PropertyUtil::write(const char *filename, PropertyMapT& map, const char *header)
+void
+PropertyUtil::write(const char* filename, PropertyMapT& map, const char* header)
 {
     std::ofstream file(filename);
     write(file, map, header);
     file.close();
 }
 
-void PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char *header)
+void
+PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char* header)
 {
     if (header != NULL)
     {
@@ -228,11 +232,11 @@ void PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char *header
 
     for (iterator it = map.begin(), end = map.end(); it != end; ++it)
     {
-        const std::string& key = (*it).first,
-                           &val = (*it).second;
+        const std::string& key   = (*it).first,
+        & val                    = (*it).second;
         os << key << '=';
 
-        bool empty = false;
+        bool               empty = false;
 
         for (size_t i = 0, sz = val.size(); i < sz; i++)
         {
@@ -240,32 +244,34 @@ void PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char *header
 
             switch (ch)
             {
-            case '\\':
-                os << '\\' << '\\';
-                break;
+                case '\\':
+                    os << '\\' << '\\';
+                    break;
 
-            case '\t':
-                os << '\\' << 't';
-                break;
+                case '\t':
+                    os << '\\' << 't';
+                    break;
 
-            case '\n':
-                os << '\\' << 'n';
-                break;
+                case '\n':
+                    os << '\\' << 'n';
+                    break;
 
-            case '\r':
-                os << '\\' << 'r';
-                break;
+                case '\r':
+                    os << '\\' << 'r';
+                    break;
 
-            default:
-                if (ch < ' ' || ch >= 127 || (empty && ch == ' '))
-                    os << '\\' << 'u'
-                       << m_hex((ch >> 12) & 0x0f) << m_hex((ch >> 8) & 0x0f)
-                       << m_hex((ch >>  4) & 0x0f) << m_hex((ch >> 0) & 0x0f);
+                default:
+                    if (ch < ' ' || ch >= 127 || (empty && ch == ' '))
+                    {
+                        os << '\\' << 'u'
+                           << m_hex((ch >> 12) & 0x0f) << m_hex((ch >> 8) & 0x0f)
+                           << m_hex((ch >> 4) & 0x0f) << m_hex((ch >> 0) & 0x0f);
+                    }
 
-                else
-                {
-                    os << ch;
-                }
+                    else
+                    {
+                        os << ch;
+                    }
             }
 
             empty = false;
@@ -275,7 +281,8 @@ void PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char *header
     }
 }
 
-void PropertyUtil::print(std::ostream& os, PropertyMapT& map)
+void
+PropertyUtil::print(std::ostream& os, PropertyMapT& map)
 {
     iterator it = map.begin(), end = map.end();
 
@@ -288,8 +295,8 @@ void PropertyUtil::print(std::ostream& os, PropertyMapT& map)
 std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
 {
     std::vector<std::string> args;
-    std::istringstream ss(prop);
-    std::string arg;
+    std::istringstream       ss(prop);
+    std::string              arg;
 
     while (ss >> arg)
     {
@@ -299,7 +306,8 @@ std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
     return args;
 }
 
-std::string PropertyUtil::combineArgs(std::vector<std::string> args, int start)
+std::string
+PropertyUtil::combineArgs(std::vector<std::string> args, int start)
 {
     std::string str;
 
@@ -328,11 +336,12 @@ std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args, 
     return oargs;
 }
 
-std::string PropertyUtil::sprintf(const char *fmt, ...)
+std::string
+PropertyUtil::sprintf(const char* fmt, ...)
 {
-    va_list vl;
+    va_list                 vl;
     va_start(vl, fmt);
-    size_t size = vsnprintf(nullptr, 0, fmt, vl) + 1;
+    size_t                  size = vsnprintf(nullptr, 0, fmt, vl) + 1;
     va_end(vl);
     std::unique_ptr<char[]> buf(new char[size]);
     va_start(vl, fmt);

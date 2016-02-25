@@ -11,9 +11,9 @@
 
 #include <cstring>
 
-HardSectoredDisk::HardSectoredDisk(const char *name)
+HardSectoredDisk::HardSectoredDisk(const char* name)
 {
-    FILE *file;
+    FILE* file;
 
     initialized_m = true;
     memset(rawImage_m, 0, maxHeads_c * bytesPerTrack_c * maxTracksPerSide_c);
@@ -21,7 +21,7 @@ HardSectoredDisk::HardSectoredDisk(const char *name)
     if ((file = fopen(name, "r")) != NULL)
     {
         int readCount;
-        int trk = 0;
+        int trk  = 0;
         int head = 0;
 
         do
@@ -39,7 +39,7 @@ HardSectoredDisk::HardSectoredDisk(const char *name)
             }
 
             if ((readCount =
-                        fread(&rawImage_m[head][trk][0], bytesPerTrack_c, 1, file)) == 1)
+                     fread(&rawImage_m[head][trk][0], bytesPerTrack_c, 1, file)) == 1)
             {
                 trk++;
             }
@@ -72,8 +72,8 @@ HardSectoredDisk::HardSectoredDisk()
     // clear disk
     bzero(rawImage_m, maxHeads_c * bytesPerTrack_c * maxTracksPerSide_c);
 
-    tracks_m = maxTracksPerSide_c;
-    sides_m  = maxHeads_c;
+    tracks_m      = maxTracksPerSide_c;
+    sides_m       = maxHeads_c;
 
     initialized_m = true;
     setWriteProtect(false);
@@ -84,10 +84,11 @@ HardSectoredDisk::~HardSectoredDisk()
 
 }
 
-bool HardSectoredDisk::readData(BYTE          side,
-                                BYTE          track,
-                                unsigned int  pos,
-                                BYTE&         data)
+bool
+HardSectoredDisk::readData(BYTE side,
+                           BYTE track,
+                           unsigned int pos,
+                           BYTE& data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
             tracks_m);
@@ -140,10 +141,11 @@ bool HardSectoredDisk::readData(BYTE          side,
     }
 }
 
-bool HardSectoredDisk::writeData(BYTE         side,
-                                 BYTE         track,
-                                 unsigned int pos,
-                                 BYTE         data)
+bool
+HardSectoredDisk::writeData(BYTE side,
+                            BYTE track,
+                            unsigned int pos,
+                            BYTE data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
             maxTrack_m, tracks_m);
@@ -175,7 +177,8 @@ bool HardSectoredDisk::writeData(BYTE         side,
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
             rawImage_m[side][track][pos] = data;
-            debugss(ssFloppyDisk, ALL, "%s: side (%d) track(%d) pos(%d) = %d\n", __FUNCTION__, side, track,
+            debugss(ssFloppyDisk, ALL, "%s: side (%d) track(%d) pos(%d) = %d\n", __FUNCTION__, side,
+                    track,
                     pos, rawImage_m[side][track][pos]);
             return true;
         }
@@ -196,9 +199,10 @@ bool HardSectoredDisk::writeData(BYTE         side,
 
 }
 
-void HardSectoredDisk::getControlInfo(unsigned int  pos,
-                                      bool&         hole,
-                                      bool&         writeProtect)
+void
+HardSectoredDisk::getControlInfo(unsigned int pos,
+                                 bool& hole,
+                                 bool& writeProtect)
 {
     if (initialized_m)
     {
@@ -216,7 +220,8 @@ void HardSectoredDisk::getControlInfo(unsigned int  pos,
     }
 }
 
-bool HardSectoredDisk::defaultHoleStatus(unsigned int pos)
+bool
+HardSectoredDisk::defaultHoleStatus(unsigned int pos)
 {
     debugss(ssFloppyDisk, ALL, "%s: pos = %d ", __FUNCTION__, pos);
 
@@ -239,14 +244,16 @@ bool HardSectoredDisk::defaultHoleStatus(unsigned int pos)
     return false;
 }
 
-void HardSectoredDisk::dump()
+void
+HardSectoredDisk::dump()
 {
     debugss(ssFloppyDisk, ALL, "%s: Not Implemented\n", __FUNCTION__);
 }
 
-void HardSectoredDisk::eject(const char *name)
+void
+HardSectoredDisk::eject(const char* name)
 {
-    FILE *file;
+    FILE* file;
     debugss(ssFloppyDisk, ALL, "%s: Save: %s\n", __FUNCTION__, name);
 
     if ((file = fopen(name, "wb")) != NULL)
@@ -258,7 +265,7 @@ void HardSectoredDisk::eject(const char *name)
             for (int track = 0; track < tracks_m; track++)
             {
                 if ((readCount =
-                            fwrite(&rawImage_m[head][track][0], bytesPerTrack_c, 1, file)) != 1)
+                         fwrite(&rawImage_m[head][track][0], bytesPerTrack_c, 1, file)) != 1)
                 {
                     debugss(ssFloppyDisk, ERROR, "%s: Unable to save file: %s head: %d track: %d\n",
                             __FUNCTION__, name, head, track);
@@ -275,11 +282,12 @@ void HardSectoredDisk::eject(const char *name)
     }
 }
 
-bool HardSectoredDisk::readSectorData(BYTE   side,
-                                      BYTE   track,
-                                      BYTE   sector,
-                                      WORD   pos,
-                                      BYTE&  data)
+bool
+HardSectoredDisk::readSectorData(BYTE side,
+                                 BYTE track,
+                                 BYTE sector,
+                                 WORD pos,
+                                 BYTE& data)
 {
     return false;
 }

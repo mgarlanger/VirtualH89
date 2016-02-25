@@ -6,25 +6,28 @@
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///
 
-#include <string.h>
+#include "mms77316.h"
+
 
 #include "H89.h"
-#include "mms77316.h"
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
 #include "InterruptController.h"
 #include "MMS316IntrCtrlr.h"
+#include "AddressBus.h"
 
-const char *MMS77316::MMS77316_Name_c = "MMS77316";
+const char* MMS77316::MMS77316_Name_c = "MMS77316";
 
-GenericFloppyDrive *MMS77316::getCurDrive()
+GenericFloppyDrive*
+MMS77316::getCurDrive()
 {
     // This could be NULL
     return drives_m[controlReg_m & ctrl_DriveSel_c];
 }
 
-int MMS77316::getClockPeriod()
+int
+MMS77316::getClockPeriod()
 {
     return ((controlReg_m & ctrl_525DriveSel_c) != 0 ? 1000 : 500);
 }
@@ -40,13 +43,13 @@ MMS77316::MMS77316(int baseAddr):
         drives_m[x] = nullptr;
     }
 
-    InterruptController *ic = h89.getAddressBus().getIntrCtrlr();
+    InterruptController* ic = h89.getAddressBus().getIntrCtrlr();
     h89.getAddressBus().setIntrCtrlr(new MMS316IntrCtrlr(ic, this));
 }
 
-std::vector<GenericDiskDrive *> MMS77316::getDiskDrives()
+std::vector<GenericDiskDrive*> MMS77316::getDiskDrives()
 {
-    std::vector<GenericDiskDrive *> drives;
+    std::vector<GenericDiskDrive*> drives;
 
     for (int x = 0; x < numDisks_c; ++x)
     {
@@ -56,20 +59,22 @@ std::vector<GenericDiskDrive *> MMS77316::getDiskDrives()
     return drives;
 }
 
-std::string MMS77316::getDriveName(int index)
+std::string
+MMS77316::getDriveName(int index)
 {
     if (index < 0 || index >= numDisks_c)
     {
         return NULL;
     }
 
-    char buf[32];
+    char        buf[32];
     sprintf(buf, "%s-%d", MMS77316_Name_c, index + 1);
     std::string str(buf);
     return str;
 }
 
-GenericDiskDrive *MMS77316::findDrive(std::string ident)
+GenericDiskDrive*
+MMS77316::findDrive(std::string ident)
 {
 
     if (ident.find(MMS77316_Name_c) != 0 || ident[strlen(MMS77316_Name_c)] != '-')
@@ -77,8 +82,8 @@ GenericDiskDrive *MMS77316::findDrive(std::string ident)
         return NULL;
     }
 
-    char *e;
-    int x = strtoul(ident.c_str() + strlen(MMS77316_Name_c) + 1, &e, 10);
+    char* e;
+    int   x = strtoul(ident.c_str() + strlen(MMS77316_Name_c) + 1, &e, 10);
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {
@@ -88,18 +93,19 @@ GenericDiskDrive *MMS77316::findDrive(std::string ident)
     return drives_m[x - 1];
 }
 
-MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot)
+MMS77316*
+MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot)
 {
-    std::map<int, GenericFloppyDrive *> mmsdrives;
-    std::string s;
-    MMS77316 *m316 = new MMS77316(BasePort_c);
+    std::map<int, GenericFloppyDrive*> mmsdrives;
+    std::string                        s;
+    MMS77316*                          m316 = new MMS77316(BasePort_c);
 
     // First identify what drives are installed.
     for (int x = 0; x < numDisks_c; ++x)
     {
         std::string prop = "mms77316_drive";
         prop += ('0' + x + 1);
-        s = props[prop];
+        s     = props[prop];
 
         if (!s.empty())
         {
@@ -126,11 +132,11 @@ MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::str
     {
         std::string prop = "mms77316_disk";
         prop += ('0' + x + 1);
-        s = props[prop];
+        s     = props[prop];
 
         if (!s.empty())
         {
-            GenericFloppyDrive *drv = m316->getDrive(x);
+            GenericFloppyDrive* drv = m316->getDrive(x);
 
             if (drv != NULL)
             {
@@ -142,14 +148,15 @@ MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::str
     return m316;
 }
 
-bool MMS77316::interResponder(BYTE& opCode)
+bool
+MMS77316::interResponder(BYTE& opCode)
 {
     // The MMS77316 controller assumes it is the highest priority interrupt,
     // so if we have an interrupt asserted then we take control.
     if (intrqAllowed() && (intrqRaised_m || drqRaised_m))
     {
         // TODO: generate op-codes without knowing Z80CPU?
-        opCode = (intrqRaised_m ? 0xf7 : 0xfb);
+        opCode        = (intrqRaised_m ? 0xf7 : 0xfb);
         // TODO: should anything be reset here?
         intrqRaised_m = false;
         return true;
@@ -169,17 +176,19 @@ MMS77316::~MMS77316()
     }
 }
 
-void MMS77316::reset(void)
+void
+MMS77316::reset(void)
 {
     controlReg_m = 0;
     h89.lowerINT(MMS77316_Intr_c);
     WD1797::reset();
 }
 
-BYTE MMS77316::in(BYTE addr)
+BYTE
+MMS77316::in(BYTE addr)
 {
     BYTE offset = getPortOffset(addr);
-    BYTE val = 0;
+    BYTE val    = 0;
 
     debugss(ssMMS77316, ALL, "MMS77316::in(%d)\n", addr);
 
@@ -218,7 +227,8 @@ BYTE MMS77316::in(BYTE addr)
     return (val);
 }
 
-void MMS77316::out(BYTE addr, BYTE val)
+void
+MMS77316::out(BYTE addr, BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -244,11 +254,11 @@ void MMS77316::out(BYTE addr, BYTE val)
     {
         debugss(ssMMS77316, INFO, "MMS77316::out(ControlPort) %02x\n", val);
         controlReg_m = val;
-        drqCount_m = 0;
+        drqCount_m   = 0;
 
         if ((controlReg_m & ctrl_525DriveSel_c) != 0)
         {
-            GenericFloppyDrive *drive = getCurDrive();
+            GenericFloppyDrive* drive = getCurDrive();
 
             if (drive)
             {
@@ -272,7 +282,8 @@ void MMS77316::out(BYTE addr, BYTE val)
     }
 }
 
-GenericFloppyDrive *MMS77316::getDrive(BYTE unitNum)
+GenericFloppyDrive*
+MMS77316::getDrive(BYTE unitNum)
 {
     if (unitNum < numDisks_c)
     {
@@ -282,7 +293,8 @@ GenericFloppyDrive *MMS77316::getDrive(BYTE unitNum)
     return NULL;
 }
 
-bool MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive *drive)
+bool
+MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive* drive)
 {
     bool retVal = false;
 
@@ -293,7 +305,7 @@ bool MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive *drive)
         if (drives_m[unitNum] == NULL)
         {
             drives_m[unitNum] = drive;
-            retVal = true;
+            retVal            = true;
         }
 
         else
@@ -310,12 +322,14 @@ bool MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive *drive)
     return (retVal);
 }
 
-bool MMS77316::removeDrive(BYTE unitNum)
+bool
+MMS77316::removeDrive(BYTE unitNum)
 {
     return (false);
 }
 
-void MMS77316::raiseIntrq()
+void
+MMS77316::raiseIntrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
 
@@ -330,7 +344,8 @@ void MMS77316::raiseIntrq()
     }
 }
 
-void MMS77316::raiseDrq()
+void
+MMS77316::raiseDrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
 
@@ -344,7 +359,8 @@ void MMS77316::raiseDrq()
     }
 }
 
-void MMS77316::lowerIntrq()
+void
+MMS77316::lowerIntrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
     WD1797::lowerIntrq();
@@ -352,7 +368,8 @@ void MMS77316::lowerIntrq()
     h89.lowerINT(MMS77316_Intr_c);
 }
 
-void MMS77316::lowerDrq()
+void
+MMS77316::lowerDrq()
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
     WD1797::lowerDrq();
@@ -364,7 +381,8 @@ void MMS77316::lowerDrq()
     }
 }
 
-void MMS77316::loadHead(bool load)
+void
+MMS77316::loadHead(bool load)
 {
     debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
     WD1797::loadHead(load);
@@ -372,22 +390,23 @@ void MMS77316::loadHead(bool load)
     if (!load)
     {
         // TODO: fix this... need timeout...
-        //debugss(ssMMS77316, ERROR, "Clearing controlReg_m\n");
-        //controlReg_m = 0;
+        // debugss(ssMMS77316, ERROR, "Clearing controlReg_m\n");
+        // controlReg_m = 0;
         // TODO: start timer for motor-off (if was on...)
     }
 }
 
-std::string MMS77316::dumpDebug()
+std::string
+MMS77316::dumpDebug()
 {
     std::string ret = PropertyUtil::sprintf(
-                          "CTRL=%02x\n"
-                          "FDC-STS=%02x FDC-CMD=%02x\n"
-                          "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n"
-                          "DRQ=%d INTRQ=%d\n",
-                          controlReg_m,
-                          statusReg_m, cmdReg_m,
-                          trackReg_m, sectorReg_m, dataReg_m,
-                          drqRaised_m, intrqRaised_m);
+        "CTRL=%02x\n"
+        "FDC-STS=%02x FDC-CMD=%02x\n"
+        "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n"
+        "DRQ=%d INTRQ=%d\n",
+        controlReg_m,
+        statusReg_m, cmdReg_m,
+        trackReg_m, sectorReg_m, dataReg_m,
+        drqRaised_m, intrqRaised_m);
     return ret;
 }

@@ -16,11 +16,11 @@
 
 using namespace std;
 
-DiskData::DiskData(char *name): fileRead_m(false),
-    valid_m(false),
-    data_m(0),
-    dataSize_m(0),
-    writeProtectedFlag_m(false)
+DiskData::DiskData(char* name): fileRead_m(false),
+                                valid_m(false),
+                                data_m(0),
+                                dataSize_m(0),
+                                writeProtectedFlag_m(false)
 {
     ifstream inFile;
 
@@ -31,19 +31,19 @@ DiskData::DiskData(char *name): fileRead_m(false),
     {
         fileRead_m = true;
         dataSize_m = inFile.tellg();
-        data_m     = new BYTE [dataSize_m];
+        data_m     = new BYTE[dataSize_m];
         inFile.seekg(0, ios::beg);
-        inFile.read((char *) data_m, dataSize_m);
+        inFile.read((char*) data_m, dataSize_m);
         inFile.close();
     }
 }
 
 #if 0
 DiskData::DiskData(): fileRead_m(false),
-    valid_m(true),
-    data_m(0),
-    dataSize_m(0),
-    writeProtectedFlag_m(false)
+                      valid_m(true),
+                      data_m(0),
+                      dataSize_m(0),
+                      writeProtectedFlag_m(false)
 {
     createBlank();
 }
@@ -54,7 +54,8 @@ DiskData::~DiskData()
 
 }
 
-bool DiskData::parse()
+bool
+DiskData::parse()
 {
     unsigned int pos;
 
@@ -80,21 +81,21 @@ bool DiskData::parse()
 
     switch (data_m[1])
     {
-    case '1':
-        debugss(ssFloppyDisk, INFO, "Reading an H17D file.\n");
-        break;
+        case '1':
+            debugss(ssFloppyDisk, INFO, "Reading an H17D file.\n");
+            break;
 
-    case '3':
-    case '4':
-    case '6':
-        debugss(ssFloppyDisk, ERROR, "Disk format H%c7D not currently supported\n",
-                data_m[1]);
-        return false;
+        case '3':
+        case '4':
+        case '6':
+            debugss(ssFloppyDisk, ERROR, "Disk format H%c7D not currently supported\n",
+                    data_m[1]);
+            return false;
 
-    default:
-        debugss(ssFloppyDisk, ERROR, "Invalid file signature %c%c%c%c\n", data_m[0],
-                data_m[1], data_m[2], data_m[3]);
-        return false;
+        default:
+            debugss(ssFloppyDisk, ERROR, "Invalid file signature %c%c%c%c\n", data_m[0],
+                    data_m[1], data_m[2], data_m[3]);
+            return false;
     }
 
     majorVersion_m = data_m[4];
@@ -168,7 +169,8 @@ bool DiskData::parse()
     return true;
 }
 
-unsigned int DiskData::readLength(unsigned int& pos)
+unsigned int
+DiskData::readLength(unsigned int& pos)
 {
     unsigned int tmp = 0;
 
@@ -180,7 +182,8 @@ unsigned int DiskData::readLength(unsigned int& pos)
     return tmp;
 }
 
-bool DiskData::readDiskFormat(unsigned int& pos)
+bool
+DiskData::readDiskFormat(unsigned int& pos)
 {
     BYTE flags = data_m[pos++];
 
@@ -202,7 +205,8 @@ bool DiskData::readDiskFormat(unsigned int& pos)
 
     return true;
 }
-bool DiskData::readFlags(unsigned int& pos)
+bool
+DiskData::readFlags(unsigned int& pos)
 {
     BYTE flags = data_m[pos++];
 
@@ -220,16 +224,16 @@ bool DiskData::readFlags(unsigned int& pos)
     }
 
     // First is the write protection
-    writeProtectedFlag_m = ((data_m[pos++] & boolFlagMask_c) == boolFlagMask_c);
+    writeProtectedFlag_m   = ((data_m[pos++] & boolFlagMask_c) == boolFlagMask_c);
 
     // Second is the Distribution Flag
     distributionDiskFlag_m = (data_m[pos++] & valueFlagMask_c);
 
     // Third is the source of the track data
-    imagingTypeFlag_m = (data_m[pos++] & valueFlagMask_c);
+    imagingTypeFlag_m      = (data_m[pos++] & valueFlagMask_c);
 
     // now we must go through the rest of the flags, if any
-    blockLength -= flagsSize_c;
+    blockLength           -= flagsSize_c;
 
     while (blockLength--)
     {
@@ -244,7 +248,8 @@ bool DiskData::readFlags(unsigned int& pos)
     return true;
 }
 
-bool DiskData::readDataBlock(unsigned int& pos)
+bool
+DiskData::readDataBlock(unsigned int& pos)
 {
     BYTE flags = data_m[pos++];
 
@@ -264,7 +269,8 @@ bool DiskData::readDataBlock(unsigned int& pos)
     return true;
 }
 
-bool DiskData::readHoleBlock(unsigned int& pos)
+bool
+DiskData::readHoleBlock(unsigned int& pos)
 {
     BYTE flags = data_m[pos++];
 
@@ -280,10 +286,11 @@ bool DiskData::readHoleBlock(unsigned int& pos)
 
     // since we don't actually read it yet, we must return failure if we encounter one.
     return false;
-    //return true;
+    // return true;
 }
 
-bool DiskData::readUnknownBlock(unsigned int& pos)
+bool
+DiskData::readUnknownBlock(unsigned int& pos)
 {
     BYTE flags = data_m[pos++];
     debugss(ssFloppyDisk, WARNING, "Unknown block type: 0x%02x\n", data_m[pos - 1]);
@@ -302,12 +309,14 @@ bool DiskData::readUnknownBlock(unsigned int& pos)
     return true;
 }
 
-bool DiskData::checkWriteProtect()
+bool
+DiskData::checkWriteProtect()
 {
     return writeProtectedFlag_m;
 }
 
-bool DiskData::getType(DiskTypes& type)
+bool
+DiskData::getType(DiskTypes& type)
 {
     type = fiveHardSectored_c;
 

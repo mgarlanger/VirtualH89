@@ -7,11 +7,11 @@
 /// \author Douglas Miller
 ///
 
-#include <strings.h>
+#include "GenericDiskDrive.h"
+
 
 #include "WallClock.h"
 #include "logger.h"
-#include "GenericDiskDrive.h"
 
 GenericDiskDrive::GenericDiskDrive()
 {

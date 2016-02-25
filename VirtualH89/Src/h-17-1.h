@@ -7,9 +7,7 @@
 #ifndef H_17_1_H_
 #define H_17_1_H_
 
-#include "config.h"
 
-#include "h89Types.h"
 #include "DiskDrive.h"
 
 ///
@@ -36,7 +34,7 @@ class H_17_1: public DiskDrive
     void writeData(unsigned int pos, BYTE data);
 
     virtual BYTE readSectorData(BYTE sector, unsigned int pos);
-    void insertDisk(FloppyDisk *disk);
+    void insertDisk(FloppyDisk* disk);
 
 
   private:
