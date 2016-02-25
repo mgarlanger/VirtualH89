@@ -672,14 +672,16 @@ bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, 
             data = GenericFloppyFormat::ERROR;
             return true;
         }
+
         else if (sector == 0xff) // read track
         {
-		dataPos_m = 0;
-		dataLen_m = trackLen_m;
-		data = GenericFloppyFormat::INDEX_AM;
-		debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
-		return true;
-	}
+            dataPos_m = 0;
+            dataLen_m = trackLen_m;
+            data = GenericFloppyFormat::INDEX_AM;
+            debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
+            return true;
+        }
+
         else if (locateSector(track, side, sector))
         {
             dataPos_m = headPos_m;
@@ -731,27 +733,28 @@ bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
         if (sector == 0xff || sector == 0xfe) // write track
         {
 #if 0
-		// density is in 'sector' LSB... use to handle proper track size, etc.
+            // density is in 'sector' LSB... use to handle proper track size, etc.
 
-		// This does actually work, in the sense that the pattern is
-		// written to the file. But, we have to re-mount the image
-		// in order to use it, and we have to deal with changes in density
-		// (not to mention other aspects of disk geometry). This all gets
-		// trickier if we need to handle formatting a single track and
-		// reading back sectors to verify. Really need to  significantly
-		// rework this paradigm in order to make it work just like a
-		// real disk/controller. Right now, it does not handle changing
-		// format on-the-fly let alone track-by-track.
-		dataPos_m = 0;
-		dataLen_m = trackLen_m;
-		result = GenericFloppyFormat::INDEX_AM;
-		debugss(ssRawFloppyImage, INFO, "write track %d %d\n", dataPos_m, dataLen_m);
-		return true;
+            // This does actually work, in the sense that the pattern is
+            // written to the file. But, we have to re-mount the image
+            // in order to use it, and we have to deal with changes in density
+            // (not to mention other aspects of disk geometry). This all gets
+            // trickier if we need to handle formatting a single track and
+            // reading back sectors to verify. Really need to  significantly
+            // rework this paradigm in order to make it work just like a
+            // real disk/controller. Right now, it does not handle changing
+            // format on-the-fly let alone track-by-track.
+            dataPos_m = 0;
+            dataLen_m = trackLen_m;
+            result = GenericFloppyFormat::INDEX_AM;
+            debugss(ssRawFloppyImage, INFO, "write track %d %d\n", dataPos_m, dataLen_m);
+            return true;
 #else
-		result = GenericFloppyFormat::ERROR;
-		return true;
+            result = GenericFloppyFormat::ERROR;
+            return true;
 #endif
-	}
+        }
+
         else if (locateSector(track, side, sector))
         {
             dataPos_m = headPos_m;

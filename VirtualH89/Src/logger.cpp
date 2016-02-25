@@ -60,6 +60,7 @@ void setDebugLevel()
     debugLevel[ssGenericSASIDrive]   = defaultLevel;
     debugLevel[ssHostFileBdos]   = defaultLevel;
     debugLevel[ssCPNetDevice]   = defaultLevel;
+    debugLevel[ssSectorFloppyImage]   = defaultLevel;
 }
 
 void setDebug(subSystems ss, logLevel level)

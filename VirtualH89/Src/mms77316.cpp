@@ -13,6 +13,7 @@
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
+#include "SectorFloppyImage.h"
 #include "InterruptController.h"
 #include "MMS316IntrCtrlr.h"
 
@@ -134,7 +135,7 @@ MMS77316 *MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::str
 
             if (drv != NULL)
             {
-                drv->insertDisk(new RawFloppyImage(drv, PropertyUtil::splitArgs(s)));
+                drv->insertDisk(SectorFloppyImage::getDiskette(drv, PropertyUtil::splitArgs(s)));
             }
         }
     }

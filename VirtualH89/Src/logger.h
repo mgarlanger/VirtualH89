@@ -125,6 +125,7 @@ enum subSystems
     ssGenericSASIDrive,
     ssHostFileBdos,
     ssCPNetDevice,
+    ssSectorFloppyImage,
     ssMax
 };
 

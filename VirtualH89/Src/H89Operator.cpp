@@ -24,6 +24,7 @@
 #include "DiskController.h"
 #include "GenericDiskDrive.h"
 #include "RawFloppyImage.h"
+#include "SectorFloppyImage.h"
 #include "propertyutil.h"
 
 /// \brief H89Operator
@@ -124,7 +125,7 @@ std::string H89Operator::executeCommand(std::string cmd)
             return "error nodrive: " + args[1];
         }
 
-        drv->insertDisk(new RawFloppyImage(drv, PropertyUtil::shiftArgs(args, 2)));
+        drv->insertDisk(SectorFloppyImage::getDiskette(drv, PropertyUtil::shiftArgs(args, 2)));
         return "ok";
     }
 

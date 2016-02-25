@@ -841,6 +841,7 @@ void WD1797::notification(unsigned int cycleCount)
 
         else if (data == GenericFloppyFormat::CRC)
         {
+            debugss(ssWD1797, INFO, "read address %d - done\n", sectorPos_m);
             sectorPos_m = -1;
             statusReg_m &= ~stat_Busy_c;
             raiseIntrq();
@@ -863,6 +864,8 @@ void WD1797::notification(unsigned int cycleCount)
             {
                 sectorReg_m = data;
             }
+
+            debugss(ssWD1797, INFO, "read address %d - %02x\n", sectorPos_m, data);
 
             transferData(data);
             ++sectorPos_m;
@@ -970,6 +973,7 @@ void WD1797::notification(unsigned int cycleCount)
         }
 
         break;
+
     case writeTrackCmd:
         drive->selectSide(side_m);
         result = drive->writeData(doubleDensity(), trackReg_m, side_m, 0xff,

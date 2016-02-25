@@ -52,6 +52,14 @@ class GenericSASIDrive : public GenericDiskDrive
     {
         return 0;
     }
+    int getNumTracks()
+    {
+        return 0;
+    }
+    bool isReady()
+    {
+        return true;
+    }
     void insertDisk(GenericFloppyDisk *disk) {}
 
     std::string getMediaName();

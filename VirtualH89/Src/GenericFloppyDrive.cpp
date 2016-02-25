@@ -192,11 +192,15 @@ int GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
         return GenericFloppyFormat::ERROR;
     }
 
-    if (sector == 0xff) {
-	if (!dd) {
-		sector &= ~1;
-	}
-    } else if (dd != disk_m->doubleDensity())
+    if (sector == 0xff)
+    {
+        if (!dd)
+        {
+            sector &= ~1;
+        }
+    }
+
+    else if (dd != disk_m->doubleDensity())
     {
         return GenericFloppyFormat::ERROR;
     }
