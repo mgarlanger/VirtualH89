@@ -353,6 +353,7 @@ SoftSectoredDisk::readIMD(const char* name)
             debugss(ssFloppyDisk, ERROR, "%s: Sector Size unknown: %d\n", __FUNCTION__,
                     sectorSizeKey);
             delete [] buf;
+            delete trk;
 
             return (false);
         }

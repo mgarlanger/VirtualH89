@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "logger.h"
 #include "GenericFloppyFormat.h"
@@ -294,6 +295,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         id_tk != 0 || id_sd != 0)
     {
         debugss(ssRawFloppyImage, ERROR, "%s: format not recognized\n", __FUNCTION__);
+        free((void*) name);
         close(fd);
         return;
     }
