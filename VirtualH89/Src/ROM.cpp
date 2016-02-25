@@ -64,7 +64,7 @@ ROM::getROM(const char* filename, WORD addr)
     rom = new ROM(fileSize);
     rom->setBaseAddress(addr);
     rom->initialize(buf, fileSize);
-    delete buf;
+    delete[] buf;
     return rom;
 }
 
