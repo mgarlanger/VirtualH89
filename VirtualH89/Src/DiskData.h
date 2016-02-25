@@ -40,7 +40,7 @@ class DiskData
     DiskTypes         type;
 
     BYTE*             data_m;
-    unsigned int      dataSize_m;
+    long long         dataSize_m;
     BYTE              majorVersion_m;
     BYTE              minorVersion_m;
     BYTE              pointVersion_m;

@@ -35,7 +35,7 @@ H47Drive::insertDisk(FloppyDisk* disk)
 }
 
 void
-H47Drive::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
+H47Drive::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect)
 {
 
 }

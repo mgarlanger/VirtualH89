@@ -46,7 +46,7 @@ H89Operator::findDrive(std::string name)
     for (int x = 0; x < devs.size(); ++x)
     {
         DiskController*   dev = devs[x];
-        GenericDiskDrive* drv;
+        GenericDiskDrive* drv = nullptr;
 
         if (dev != NULL && (drv = dev->findDrive(name)) != NULL)
         {

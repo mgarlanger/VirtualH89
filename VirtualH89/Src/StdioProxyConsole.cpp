@@ -40,7 +40,7 @@ StdioProxyConsole::StdioProxyConsole(int argc, char** argv): Console(argc, argv)
         switch (c)
         {
             case 'd':
-                sleep(strtol(optarg, NULL, 0));
+                sleep((unsigned int) strtol(optarg, NULL, 0));
                 break;
         }
     }

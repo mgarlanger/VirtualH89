@@ -74,7 +74,7 @@ SoftSectoredDisk::~SoftSectoredDisk()
 bool
 SoftSectoredDisk::readData(BYTE side,
                            BYTE track,
-                           unsigned int pos,
+                           unsigned long pos,
                            BYTE& data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
@@ -130,7 +130,7 @@ SoftSectoredDisk::readData(BYTE side,
 bool
 SoftSectoredDisk::writeData(BYTE side,
                             BYTE track,
-                            unsigned int pos,
+                            unsigned long pos,
                             BYTE data)
 {
     debugss(ssFloppyDisk, INFO, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
@@ -184,7 +184,7 @@ SoftSectoredDisk::writeData(BYTE side,
 }
 
 void
-SoftSectoredDisk::getControlInfo(unsigned int pos,
+SoftSectoredDisk::getControlInfo(unsigned long pos,
                                  bool& hole,
                                  bool& writeProtect)
 {

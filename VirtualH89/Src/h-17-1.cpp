@@ -33,11 +33,11 @@ H_17_1::insertDisk(FloppyDisk* disk)
 }
 
 void
-H_17_1::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
+H_17_1::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect)
 {
     // Track info comes from the drive, the hole and write-protect is determined
     // by the actual disk
-    debugss(ssH17_1, INFO, "%s - pos: %d\n", __FUNCTION__, pos);
+    debugss(ssH17_1, INFO, "%s - pos: %ld\n", __FUNCTION__, pos);
 
     trackZero = (track_m == 0);
 

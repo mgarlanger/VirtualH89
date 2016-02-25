@@ -87,7 +87,7 @@ HardSectoredDisk::~HardSectoredDisk()
 bool
 HardSectoredDisk::readData(BYTE side,
                            BYTE track,
-                           unsigned int pos,
+                           unsigned long pos,
                            BYTE& data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
@@ -120,7 +120,7 @@ HardSectoredDisk::readData(BYTE side,
     {
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, INFO, "%s: side(%d) track(%d) pos(%d) = %d\n", __FUNCTION__,
+            debugss(ssFloppyDisk, INFO, "%s: side(%d) track(%d) pos(%lu) = %d\n", __FUNCTION__,
                     side, track, pos, rawImage_m[side][track][pos]);
             data = rawImage_m[side][track][pos];
             return true;
@@ -128,7 +128,7 @@ HardSectoredDisk::readData(BYTE side,
 
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%d)\n",
+            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%lu)\n",
                     __FUNCTION__, track, pos);
             return false;
         }
@@ -144,7 +144,7 @@ HardSectoredDisk::readData(BYTE side,
 bool
 HardSectoredDisk::writeData(BYTE side,
                             BYTE track,
-                            unsigned int pos,
+                            unsigned long pos,
                             BYTE data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
@@ -177,7 +177,8 @@ HardSectoredDisk::writeData(BYTE side,
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
             rawImage_m[side][track][pos] = data;
-            debugss(ssFloppyDisk, ALL, "%s: side (%d) track(%d) pos(%d) = %d\n", __FUNCTION__, side,
+            debugss(ssFloppyDisk, ALL, "%s: side (%d) track(%d) pos(%lu) = %d\n", __FUNCTION__,
+                    side,
                     track,
                     pos, rawImage_m[side][track][pos]);
             return true;
@@ -185,7 +186,7 @@ HardSectoredDisk::writeData(BYTE side,
 
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%d)\n",
+            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%lu)\n",
                     __FUNCTION__, track, pos);
             return false;
         }
@@ -200,7 +201,7 @@ HardSectoredDisk::writeData(BYTE side,
 }
 
 void
-HardSectoredDisk::getControlInfo(unsigned int pos,
+HardSectoredDisk::getControlInfo(unsigned long pos,
                                  bool& hole,
                                  bool& writeProtect)
 {

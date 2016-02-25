@@ -27,9 +27,9 @@ class HardSectoredDisk: public FloppyDisk
     HardSectoredDisk();
     virtual ~HardSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data);
-    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect);
+    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data);
+    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect);
     void dump();
 
     virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos,

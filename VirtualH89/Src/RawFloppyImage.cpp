@@ -153,7 +153,8 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
 
         else
         {
-            debugss(ssRawFloppyImage, WARNING, "%s: unrecognized hint - %s\n", argv[x].c_str());
+            debugss(ssRawFloppyImage, WARNING, "%s: unrecognized hint - %s\n", __FUNCTION__,
+                    argv[x].c_str());
         }
     }
 
@@ -185,7 +186,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         return;
     }
 
-    int n = read(fd, trackBuffer_m, nbytes);
+    long n = read(fd, trackBuffer_m, nbytes);
 
     if (n != nbytes)
     {

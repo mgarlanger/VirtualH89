@@ -675,7 +675,7 @@ WD1797::notification(unsigned int cycleCount)
 
                 if (drive->getTrackZero())
                 {
-                    statusReg_m != stat_TrackZero_c;
+                    statusReg_m |= stat_TrackZero_c;
                 }
 
                 else
@@ -743,7 +743,7 @@ WD1797::notification(unsigned int cycleCount)
         case stepDoneCmd:
             if (drive->getTrackZero())
             {
-                statusReg_m != stat_TrackZero_c;
+                statusReg_m |= stat_TrackZero_c;
             }
 
             else

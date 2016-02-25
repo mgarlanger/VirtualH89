@@ -25,7 +25,7 @@ class H_17_1: public DiskDrive
     H_17_1();
     virtual ~H_17_1();
 
-    void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect);
+    void getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect);
 
     void step(bool direction);
     void selectSide(BYTE side);

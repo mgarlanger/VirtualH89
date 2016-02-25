@@ -36,12 +36,12 @@ H_17_4::insertDisk(FloppyDisk* disk)
 }
 
 void
-H_17_4::getControlInfo(unsigned int pos,
+H_17_4::getControlInfo(unsigned long pos,
                        bool& hole,
                        bool& trackZero,
                        bool& writeProtect)
 {
-    debugss(ssH17_4, INFO, "%s - pos: %d\n", __FUNCTION__, pos);
+    debugss(ssH17_4, INFO, "%s - pos: %ld\n", __FUNCTION__, pos);
 
     trackZero = (track_m == 0);
 

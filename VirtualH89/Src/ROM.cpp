@@ -52,7 +52,7 @@ ROM::getROM(const char* filename, WORD addr)
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename,
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %lu\n", __FUNCTION__, filename,
                 fileSize);
         return NULL;
     }

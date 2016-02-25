@@ -176,7 +176,7 @@ GenericFloppyDrive::readData(bool dd, unsigned long pos)
 
     if (disk_m->readData(headSel_m, track_m, pos, data))
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__,
+        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__,
                 pos, data);
     }
 
@@ -230,7 +230,7 @@ GenericFloppyDrive::writeData(bool dd, unsigned long pos, BYTE data)
 
     if (!disk_m->writeData(headSel_m, track_m, pos, data))
     {
-        debugss(ssGenericFloppyDrive, WARNING, "%s: pos(%d)\n", __FUNCTION__, pos);
+        debugss(ssGenericFloppyDrive, WARNING, "%s: pos(%lu)\n", __FUNCTION__, pos);
         return false;
     }
 

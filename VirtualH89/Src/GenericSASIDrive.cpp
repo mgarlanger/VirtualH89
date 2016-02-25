@@ -119,7 +119,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     }
 
     BYTE buf[128];
-    int  x = read(driveFd, buf, sizeof(buf));
+    long x = read(driveFd, buf, sizeof(buf));
 
     // special case: 0 (EOF) means new media - initialize it.
     if (x != 0 && x != sizeof(buf))
