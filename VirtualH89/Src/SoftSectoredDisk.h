@@ -56,7 +56,7 @@ class SoftSectoredDisk: public FloppyDisk
     // move these to track, that is how it is encoded in IMD files.
 //    DataRate dataRate_m;
 
-    bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned long pos);
 
     void determineDiskFormat(const char* name, DiskImageFormat& format);
     bool readTD0(const char* name);

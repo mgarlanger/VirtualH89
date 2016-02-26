@@ -174,13 +174,13 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
 
     // First examine at least one track, but we don't know the format...
     // So get enough data for 1.5 DD tracks on this drive...
-    int nbytes = drive->getRawBytesPerTrack() * 2;
+    long nbytes = drive->getRawBytesPerTrack() * 2;
     nbytes       += nbytes / 2;
     trackBuffer_m = new BYTE[nbytes];
 
     if (trackBuffer_m == NULL)
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: unable to allocate track buffer of %d bytes\n",
+        debugss(ssRawFloppyImage, ERROR, "%s: unable to allocate track buffer of %ld bytes\n",
                 __FUNCTION__, nbytes);
         close(fd);
         return;
@@ -199,11 +199,11 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
     BYTE* idx    = NULL;
     BYTE* dat    = NULL;
     BYTE* end    = NULL;
-    int   trklen = 0;
+    long  trklen = 0;
     int   seclen = 0;
     int   numsec = 0;
-    int   idxgap = 0;
-    int   gaplen = 0;
+    long  idxgap = 0;
+    long  gaplen = 0;
     int   id_tk  = -1;
     int   id_sd  = -1;
     int   id_sc  = -1;
@@ -278,7 +278,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
 
             else if (gaplen != tp + 1 - end)
             {
-                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent data gap %d (%d)\n",
+                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent data gap %ld (%ld)\n",
                         __FUNCTION__, tp + 1 - end, gaplen);
             }
 
@@ -309,7 +309,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         --nbytes;
     }
 
-    getAddrMark(tp, nbytes, id_tk, id_sd, id_sc, id_sl);
+    getAddrMark(tp, (int) nbytes, id_tk, id_sd, id_sc, id_sl);
 
     // it's really an error if not found... must be more than one track.
     if (id_tk >= 0 && id_sd >= 0)
@@ -337,8 +337,9 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
     trackLen_m = trklen;
     struct stat stb;
     fstat(fd, &stb);
-    int         est_trks = stb.st_size / trackLen_m;
-    debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %d, trklen=%d\n", __FUNCTION__,
+    long long   est_trks = stb.st_size / trackLen_m;
+    debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %lld, trklen=%ld\n",
+            __FUNCTION__,
             est_trks, trackLen_m);
 
     if (est_trks == 77 || est_trks == 154)
@@ -389,7 +390,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         {
             tp     = trackBuffer_m;
             nbytes = trackLen_m;
-            getAddrMark(tp, nbytes, id_tk, id_sd, id_sc, id_sl);
+            getAddrMark(tp, (int) nbytes, id_tk, id_sd, id_sc, id_sl);
 
             if (id_tk >= 0 && id_sd >= 0)
             {
@@ -539,7 +540,7 @@ RawFloppyImage::cacheTrack(int side, int track)
     {
         // Must write to disk...
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-        int rd = write(imageFd_m, trackBuffer_m, trackLen_m);
+        long rd = write(imageFd_m, trackBuffer_m, trackLen_m);
         // TODO: what to do if this failed? Also might not know unitl close().
         bufferDirty_m = false;
     }
@@ -576,7 +577,7 @@ RawFloppyImage::cacheTrack(int side, int track)
     }
 
     lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-    int rd = read(imageFd_m, trackBuffer_m, trackLen_m);
+    long rd = read(imageFd_m, trackBuffer_m, trackLen_m);
 
     if (rd != trackLen_m)
     {
@@ -591,7 +592,7 @@ RawFloppyImage::cacheTrack(int side, int track)
 }
 
 bool
-RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data)
+RawFloppyImage::readData(BYTE side, BYTE track, unsigned long pos, int& data)
 {
     BYTE d;
 
@@ -603,11 +604,11 @@ RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data)
 
     d  = trackBuffer_m[pos];
 
-    int p = pos;
+    unsigned long p = pos;
     p -= indexGapLen_m + secSize_m;
     p %= gapLen_m + secSize_m;
 
-    if (pos <= indexGapLen_m || (p >= 0 && p < gapLen_m))
+    if (pos <= indexGapLen_m || (p < gapLen_m))
     {
         if (d == GenericFloppyFormat::DATA_AM_BYTE)
         {
@@ -633,7 +634,7 @@ RawFloppyImage::readData(BYTE side, BYTE track, unsigned int pos, int& data)
 }
 
 bool
-RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
+RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned long pos)
 {
     if (pos < indexGapLen_m / 2)
     {
@@ -649,14 +650,14 @@ RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned int pos)
         writePos_m = pos + 1;
     }
 
-    debugss(ssRawFloppyImage, INFO, "startWrite pos=%d writePos=%d\n", pos, writePos_m);
+    debugss(ssRawFloppyImage, INFO, "startWrite pos=%lu writePos=%lu\n", pos, writePos_m);
     return true;
 }
 
 bool
-RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned int pos)
+RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned long pos)
 {
-    debugss(ssRawFloppyImage, INFO, "stopWrite pos=%d writePos=%d\n", pos, writePos_m);
+    debugss(ssRawFloppyImage, INFO, "stopWrite pos=%lu writePos=%lu\n", pos, writePos_m);
     writePos_m = -1;
     return true;
 }
@@ -664,7 +665,7 @@ RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned int pos)
 bool
 RawFloppyImage::writeData(BYTE side,
                           BYTE track,
-                          unsigned int pos,
+                          unsigned long pos,
                           BYTE data)
 {
     if (checkWriteProtect())
@@ -691,7 +692,7 @@ RawFloppyImage::writeData(BYTE side,
 
     ++writePos_m;
 
-    debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", pos, data);
+    debugss(ssRawFloppyImage, INFO, "writeData pos=%lu data=%02x\n", pos, data);
     // TODO: limit or control access to non-sector bytes?
     trackBuffer_m[pos] = data;
     bufferDirty_m      = true;

@@ -53,7 +53,6 @@ usage(char* pn)
     exit(1);
 }
 
-#if USE_PTHREAD
 static void*
 cpuThreadFunc(void* v)
 {
@@ -98,7 +97,6 @@ cpuThreadFunc(void* v)
 
     return (0);
 }
-#endif
 
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int
@@ -170,8 +168,6 @@ main(int argc, char* argv[])
         cout << "CPU speed is 2.048 MHz" << endl << endl;
     }
 
-#if USE_PTHREAD
-
     sigset_t set;
 
     sigemptyset(&set);
@@ -203,7 +199,6 @@ main(int argc, char* argv[])
     console->run();
 
     // TODO: call destructors...
-#endif // USE_PTHREAD
 
     // Leave open so destructors can log messages.
     // exit() always closes files anyway.

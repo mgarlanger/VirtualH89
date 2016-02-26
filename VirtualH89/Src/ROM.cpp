@@ -34,7 +34,7 @@ ROM*
 ROM::getROM(const char* filename, WORD addr)
 {
     std::ifstream     file;
-    unsigned long int fileSize;
+    unsigned int      fileSize;
     BYTE*             buf;
     ROM*              rom = NULL;
 
@@ -47,12 +47,12 @@ ROM::getROM(const char* filename, WORD addr)
     }
 
     file.seekg(0, std::ios::end);
-    fileSize = file.tellg();
+    fileSize = (unsigned int) file.tellg();
     file.seekg(0, std::ios::beg);
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %lu\n", __FUNCTION__, filename,
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %u\n", __FUNCTION__, filename,
                 fileSize);
         return NULL;
     }

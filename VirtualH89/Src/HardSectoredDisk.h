@@ -51,7 +51,7 @@ class HardSectoredDisk: public FloppyDisk
     unsigned int              tracks_m      = 80;
     unsigned int              sides_m       = 2;
 
-    bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned long pos);
 };
 
 #endif // HARDSECTOREDDISK_H_

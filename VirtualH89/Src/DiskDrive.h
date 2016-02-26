@@ -31,12 +31,12 @@ class DiskDrive
     virtual void selectSide(BYTE side)              = 0;
     virtual void step(bool direction)               = 0;
 
-    virtual BYTE readData(unsigned int pos)         = 0;
-    virtual void writeData(unsigned int pos,
+    virtual BYTE readData(unsigned long pos)        = 0;
+    virtual void writeData(unsigned long pos,
                            BYTE data)               = 0;
 
     virtual BYTE readSectorData(BYTE sector,
-                                unsigned int pos)   = 0;
+                                unsigned long pos)  = 0;
 
     virtual void loadHead();
     virtual void unLoadHead();

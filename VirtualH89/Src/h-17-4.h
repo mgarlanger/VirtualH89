@@ -30,10 +30,10 @@ class H_17_4: public DiskDrive
     void selectSide(BYTE side);
     void step(bool direction);
 
-    BYTE readData(unsigned int pos);
-    void writeData(unsigned int pos, BYTE data);
+    BYTE readData(unsigned long pos);
+    void writeData(unsigned long pos, BYTE data);
 
-    virtual BYTE readSectorData(BYTE sector, unsigned int pos);
+    virtual BYTE readSectorData(BYTE sector, unsigned long pos);
     void insertDisk(FloppyDisk* disk);
 
   private:

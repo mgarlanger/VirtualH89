@@ -85,45 +85,45 @@ H_17_1::selectSide(BYTE side)
 }
 
 BYTE
-H_17_1::readData(unsigned int pos)
+H_17_1::readData(unsigned long pos)
 {
     BYTE data = 0;
 
     if ((disk_m) && (disk_m->readData(head_c, track_m, pos, data)))
     {
-        debugss(ssH17_1, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, pos, data);
+        debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
 
     else
     {
-        debugss(ssH17_1, WARNING, "%s: read failed - pos(%d)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
     }
 
     return data;
 }
 
 void
-H_17_1::writeData(unsigned int pos, BYTE data)
+H_17_1::writeData(unsigned long pos, BYTE data)
 {
     if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
     {
-        debugss(ssH17_1, WARNING, "%s: pos(%d)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "%s: pos(%lu)\n", __FUNCTION__, pos);
     }
 }
 
 BYTE
-H_17_1::readSectorData(BYTE sector, unsigned int pos)
+H_17_1::readSectorData(BYTE sector, unsigned long pos)
 {
     BYTE data = 0;
 
     if ((disk_m) && (disk_m->readSectorData(0, track_m, sector, pos, data)))
     {
-        debugss(ssH17_1, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, pos, data);
+        debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
 
     else
     {
-        debugss(ssH17_1, WARNING, "%s: read failed - pos(%d)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
     }
 
     return data;

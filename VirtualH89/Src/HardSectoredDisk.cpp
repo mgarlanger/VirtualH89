@@ -20,9 +20,9 @@ HardSectoredDisk::HardSectoredDisk(const char* name)
 
     if ((file = fopen(name, "r")) != NULL)
     {
-        int readCount;
-        int trk  = 0;
-        int head = 0;
+        unsigned long readCount;
+        int           trk  = 0;
+        int           head = 0;
 
         do
         {
@@ -222,9 +222,9 @@ HardSectoredDisk::getControlInfo(unsigned long pos,
 }
 
 bool
-HardSectoredDisk::defaultHoleStatus(unsigned int pos)
+HardSectoredDisk::defaultHoleStatus(unsigned long pos)
 {
-    debugss(ssFloppyDisk, ALL, "%s: pos = %d ", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, ALL, "%s: pos = %lu ", __FUNCTION__, pos);
 
     // check for a sector hole
     if ((pos % 320) < 64)
@@ -259,7 +259,7 @@ HardSectoredDisk::eject(const char* name)
 
     if ((file = fopen(name, "wb")) != NULL)
     {
-        int readCount;
+        unsigned long readCount;
 
         for (int head = 0; head < sides_m; head++)
         {

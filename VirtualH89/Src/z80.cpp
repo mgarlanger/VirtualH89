@@ -1490,7 +1490,7 @@ Z80::addClockTicks()
         // the CPU was idle waiting for input.
         debugss(ssZ80, ALL, "%s: ticks(%d) = ticksPerClock(%lu)\n", __FUNCTION__,
                 ticks, ticksPerClock_m);
-        ticks = ticksPerClock_m;
+        ticks = (sig_atomic_t) ticksPerClock_m;
     }
 
     lastInstTicks = ticks;

@@ -755,6 +755,11 @@ WD1797::notification(unsigned int cycleCount)
             raiseIntrq();
             curCommand_m = noneCmd;
             break;
+
+        default:
+            debugss(ssWD1797, WARNING, "%s: default1: %d\n", __FUNCTION__,
+                    curCommand_m);
+            break;
     }
 
     switch (curCommand_m)
@@ -1006,6 +1011,12 @@ startWritingTrackNow:
         case forceInterruptCmd:
             // TODO: watch for event(s) and raise interrupt when seen...
             break;
+
+        default:
+            debugss(ssWD1797, WARNING, "%s: default2: %d\n", __FUNCTION__,
+                    curCommand_m);
+            break;
+
     }
 
 }
