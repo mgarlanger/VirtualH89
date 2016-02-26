@@ -67,10 +67,10 @@
 ///
 
 
-CPNetDevice::CPNetDevice(int base, int cid) :
+CPNetDevice::CPNetDevice(int base, int cid):
     IODevice(base, 2),
     clientId(cid),
-    header((struct NetworkServer::ndos *)buffer),
+    header((struct NetworkServer::ndos*) buffer),
     bufIx(0),
     msgLen(0),
     respLen(0),
@@ -82,15 +82,17 @@ CPNetDevice::~CPNetDevice()
 {
 }
 
-void CPNetDevice::addServer(BYTE serverId, NetworkServer *server)
+void
+CPNetDevice::addServer(BYTE serverId, NetworkServer* server)
 {
     servers[serverId] = server;
 }
 
-CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
+CPNetDevice*
+CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
 {
     std::string s;
-    int cid = 0xfe; // OK default if we have no network connections
+    int         cid = 0xfe; // OK default if we have no network connections
 
     s = props["cpnetdevice_port"];
 
@@ -118,10 +120,11 @@ CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
         }
     }
 
-    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02x, client ID %02x\n", port, cid);
-    CPNetDevice *cpnd = new CPNetDevice(port, cid);
+    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02x, client ID %02x\n",
+            port, cid);
+    CPNetDevice*                         cpnd = new CPNetDevice(port, cid);
 
-    PropertyUtil::PropertyMapT::iterator it = props.begin();
+    PropertyUtil::PropertyMapT::iterator it   = props.begin();
 
     for (; it != props.end(); ++it)
     {
@@ -129,13 +132,13 @@ CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
         // where '##' is serverId in hex.
         if (it->first.compare(0, 18, "cpnetdevice_server") == 0)
         {
-            BYTE sid = strtoul(it->first.substr(18).c_str(), NULL, 16);
+            BYTE                     sid  = strtoul(it->first.substr(18).c_str(), NULL, 16);
             debugss(ssCPNetDevice, ERROR, "Server %02x: %s\n", sid, it->second.c_str());
             std::vector<std::string> args = PropertyUtil::splitArgs(it->second);
 
             if (args[0].compare("HostFileBdos") == 0)
             {
-                NetworkServer *nws = new HostFileBdos(props, args, sid);
+                NetworkServer* nws = new HostFileBdos(props, args, sid);
                 cpnd->addServer(sid, nws);
             }
 
@@ -149,15 +152,17 @@ CPNetDevice *CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
     return cpnd;
 }
 
-void CPNetDevice::reset()
+void
+CPNetDevice::reset()
 {
     initDev = false;
-    bufIx = 0;
-    msgLen = 0;
+    bufIx   = 0;
+    msgLen  = 0;
     respLen = 0;
 }
 
-BYTE CPNetDevice::in(BYTE adr)
+BYTE
+CPNetDevice::in(BYTE adr)
 {
     BYTE off = getPortOffset(adr);
     BYTE val = 0x00;
@@ -196,7 +201,7 @@ BYTE CPNetDevice::in(BYTE adr)
         {
             // This includes any failures or errors, must be returned as CP/Net errors.
             respLen = sizeof(*header) + header->msize + 1;
-            val |= sts_DataReady;
+            val    |= sts_DataReady;
         }
 
         else if (len < 0)
@@ -212,7 +217,7 @@ BYTE CPNetDevice::in(BYTE adr)
     {
         if (initDev)
         {
-            val = clientId;
+            val     = clientId;
             initDev = false;
             return val;
         }
@@ -229,7 +234,7 @@ BYTE CPNetDevice::in(BYTE adr)
                 debugss(ssCPNetDevice, INFO, "Response finished: %02x %02x %02x %02x %02x : %02x\n",
                         buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]);
                 respLen = 0;
-                bufIx = 0;
+                bufIx   = 0;
             }
         }
 
@@ -238,7 +243,7 @@ BYTE CPNetDevice::in(BYTE adr)
             // error condition: reading bytes that don't exist.
             debugss(ssCPNetDevice, INFO, "Response overrun %d/%d\n", bufIx, respLen);
             respLen = -1;
-            bufIx = 0;
+            bufIx   = 0;
         }
 
         return val;
@@ -247,14 +252,16 @@ BYTE CPNetDevice::in(BYTE adr)
     debugss(ssCPNetDevice, ERROR, "Invalid port address %02x\n", adr);
 }
 
-void CPNetDevice::swapIds(struct NetworkServer::ndos *header)
+void
+CPNetDevice::swapIds(struct NetworkServer::ndos* header)
 {
     BYTE temp = header->mdid;
     header->mdid = header->msid;
     header->msid = temp;
 }
 
-void CPNetDevice::out(BYTE adr, BYTE val)
+void
+CPNetDevice::out(BYTE adr, BYTE val)
 {
     BYTE off = getPortOffset(adr);
     initDev = false;
@@ -263,8 +270,8 @@ void CPNetDevice::out(BYTE adr, BYTE val)
     {
         // reset / resync. other functions needed?
         initDev = true; // send clientId on next input data port.
-        bufIx = 0;
-        msgLen = 0;
+        bufIx   = 0;
+        msgLen  = 0;
         respLen = 0;
         return;
     }
@@ -312,8 +319,8 @@ void CPNetDevice::out(BYTE adr, BYTE val)
                     debugss(ssCPNetDevice, ERROR, "Not a CP/Net message\n");
                     header->mcode |= 0x01;
                     swapIds(header);
-                    buffer[5] = 0xff;
-                    header->msize = 1 - 1;
+                    buffer[5]      = 0xff;
+                    header->msize  = 1 - 1;
                 }
 
                 else
@@ -324,7 +331,7 @@ void CPNetDevice::out(BYTE adr, BYTE val)
                     {
                         // indicates async message sent - wait for recv later.
                         // but currently we don't support that.
-                        bufIx = 0;
+                        bufIx  = 0;
                         msgLen = 0;
                         return;
                     }
@@ -335,17 +342,17 @@ void CPNetDevice::out(BYTE adr, BYTE val)
                         // no response is coming, do something...
                         header->mcode |= 0x01;
                         swapIds(header);
-                        buffer[5] = 0xff;
-                        header->msize = 1 - 1;
+                        buffer[5]      = 0xff;
+                        header->msize  = 1 - 1;
                     }
 
-                    header->msize = len - 1;
+                    header->msize  = len - 1;
                     header->mcode |= 0x01;
                     swapIds(header);
                 }
 
-                bufIx = 0;
-                msgLen = 0;
+                bufIx   = 0;
+                msgLen  = 0;
                 respLen = sizeof(*header) + header->msize + 1;
                 debugss(ssCPNetDevice, INFO, "Response: %02x %02x %02x %02x %02x : %02x\n",
                         buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]);
@@ -365,7 +372,8 @@ void CPNetDevice::out(BYTE adr, BYTE val)
     debugss(ssCPNetDevice, ERROR, "Invalid port address %02x\n", adr);
 }
 
-int CPNetDevice::checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len)
+int
+CPNetDevice::checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len)
 {
     // TODO: interate over servers and call checkRecvMsg on each...
     // server message should include these already? but clientId may not be
@@ -378,14 +386,16 @@ int CPNetDevice::checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len)
     return 0;
 }
 
-int CPNetDevice::sendMsg(BYTE *msgbuf, int len)
+int
+CPNetDevice::sendMsg(BYTE* msgbuf, int len)
 {
-    struct NetworkServer::ndos *hdr = (struct NetworkServer::ndos *)msgbuf;
-    NetworkServer *nws = servers[hdr->mdid];
+    struct         NetworkServer::ndos* hdr = (struct NetworkServer::ndos*) msgbuf;
+    NetworkServer* nws = servers[hdr->mdid];
 
     if (nws == NULL)
     {
-        debugss(ssCPNetDevice, ERROR, "Attempting to send to non-existent server %02x\n", hdr->mdid);
+        debugss(ssCPNetDevice, ERROR, "Attempting to send to non-existent server %02x\n",
+                hdr->mdid);
         return -1; // reasonable?
     }
 

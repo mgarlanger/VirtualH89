@@ -106,7 +106,7 @@ class GenericSASIDrive: public GenericDiskDrive
     static const BYTE cmd_WriteLong_c      = 0xe6;
 
   private:
-    bool checkHeader(BYTE *b, int n);
+    bool checkHeader(BYTE* b, int n);
     void startStatus(BYTE& ctrl);
     void startSense(BYTE& ctrl);
     void startDataIn(BYTE& ctrl);

@@ -551,13 +551,14 @@ RawFloppyImage::cacheTrack(int side, int track)
         return false;
     }
 
-    headPos_m = 0;
+    headPos_m       = 0;
     bufferedSide_m  = side;
     bufferedTrack_m = track;
     return true;
 }
 
-bool RawFloppyImage::findMark(int mark)
+bool
+RawFloppyImage::findMark(int mark)
 {
     int indexCount = 0;
 
@@ -608,13 +609,14 @@ bool RawFloppyImage::findMark(int mark)
     return false;
 }
 
-bool RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
+bool
+RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
 {
     if (findMark(GenericFloppyFormat::ID_AM))
     {
         if (track != trackBuffer_m[headPos_m] ||
-                side != trackBuffer_m[headPos_m + 1] ||
-                sector != trackBuffer_m[headPos_m + 2])
+            side != trackBuffer_m[headPos_m + 1] ||
+            sector != trackBuffer_m[headPos_m + 2])
         {
             headPos_m += 6;
             findMark(GenericFloppyFormat::CRC);
@@ -632,7 +634,8 @@ bool RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
     return false;
 }
 
-bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
+bool
+RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
 {
     if (!cacheTrack(side, track))
     {
@@ -648,7 +651,7 @@ bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, 
             {
                 dataPos_m = headPos_m;
                 dataLen_m = dataPos_m + 6;
-                data = GenericFloppyFormat::ID_AM;
+                data      = GenericFloppyFormat::ID_AM;
                 findMark(GenericFloppyFormat::CRC);
                 debugss(ssRawFloppyImage, INFO, "read address %d %d\n", dataPos_m, dataLen_m);
                 return true;
@@ -662,17 +665,17 @@ bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, 
         {
             dataPos_m = 0;
             dataLen_m = trackLen_m;
-            data = GenericFloppyFormat::INDEX_AM;
+            data      = GenericFloppyFormat::INDEX_AM;
             debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
             return true;
         }
 
         else if (locateSector(track, side, sector))
         {
-            dataPos_m = headPos_m;
+            dataPos_m  = headPos_m;
             headPos_m += secSize_m + 2;
-            dataLen_m = dataPos_m + secSize_m;
-            data = GenericFloppyFormat::DATA_AM;
+            dataLen_m  = dataPos_m + secSize_m;
+            data       = GenericFloppyFormat::DATA_AM;
             return true;
         }
 
@@ -693,8 +696,9 @@ bool RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, 
     return true;
 }
 
-bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
-                               int inSector, BYTE data, bool dataReady, int& result)
+bool
+RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
+                          int inSector, BYTE data, bool dataReady, int& result)
 {
     if (checkWriteProtect())
     {
@@ -730,7 +734,7 @@ bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
             // format on-the-fly let alone track-by-track.
             dataPos_m = 0;
             dataLen_m = trackLen_m;
-            result = GenericFloppyFormat::INDEX_AM;
+            result    = GenericFloppyFormat::INDEX_AM;
             debugss(ssRawFloppyImage, INFO, "write track %d %d\n", dataPos_m, dataLen_m);
             return true;
 #else
@@ -741,10 +745,10 @@ bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
 
         else if (locateSector(track, side, sector))
         {
-            dataPos_m = headPos_m;
+            dataPos_m  = headPos_m;
             headPos_m += secSize_m + 2;
-            dataLen_m = dataPos_m + secSize_m;
-            result = GenericFloppyFormat::DATA_AM;
+            dataLen_m  = dataPos_m + secSize_m;
+            result     = GenericFloppyFormat::DATA_AM;
             return true;
         }
 
@@ -762,8 +766,8 @@ bool RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
         else
         {
             trackBuffer_m[dataPos_m++] = data;
-            bufferDirty_m = true;
-            result = data;
+            bufferDirty_m              = true;
+            result                     = data;
         }
     }
 

@@ -35,9 +35,9 @@ class GenericDiskDrive
     virtual void insertDisk(GenericFloppyDisk* disk) = 0;
 
     // Returns the number of raw bytes per track, lowest density.
-    virtual int getRawBytesPerTrack() = 0;
-    virtual int getNumTracks() = 0;
-    virtual bool isReady() = 0;
+    virtual int getRawBytesPerTrack()                = 0;
+    virtual int getNumTracks()                       = 0;
+    virtual bool isReady()                           = 0;
 
   private:
 };

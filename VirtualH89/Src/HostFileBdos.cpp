@@ -18,7 +18,7 @@
 #include <fnmatch.h>
 
 HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
-                           std::vector<std::string> args, BYTE srvId) :
+                           std::vector<std::string> args, BYTE srvId):
     NetworkServer(),
     serverId(srvId),
     curDsk(-1),
@@ -42,7 +42,7 @@ HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
 
     if (s.empty())
     {
-        s = getenv("HOME");
+        s  = getenv("HOME");
         s += "/HostFileBdos";
     }
 
@@ -62,17 +62,19 @@ HostFileBdos::~HostFileBdos()
 {
 }
 
-int HostFileBdos::checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len)
+int
+HostFileBdos::checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len)
 {
     // For HostFileBdos, this indicates an error. The client did not
     // get the response we posted from sendMsg().
     return 0;
 }
 
-int HostFileBdos::sendMsg(BYTE *msgbuf, int len)
+int
+HostFileBdos::sendMsg(BYTE* msgbuf, int len)
 {
-    struct NetworkServer::ndos *hdr = (struct NetworkServer::ndos *)msgbuf;
-    BYTE *msg = msgbuf + sizeof(*hdr);
+    struct NetworkServer::ndos* hdr = (struct NetworkServer::ndos*) msgbuf;
+    BYTE*  msg = msgbuf + sizeof(*hdr);
 
     if (bdosFunctions[hdr->mfunc] == NULL)
     {
@@ -84,43 +86,50 @@ int HostFileBdos::sendMsg(BYTE *msgbuf, int len)
     return bdosFunctions[hdr->mfunc](this, msg, len - sizeof(*hdr));
 }
 
-int HostFileBdos::getDPB(BYTE *msgbuf, int len)
+int
+HostFileBdos::getDPB(BYTE* msgbuf, int len)
 {
     memcpy(msgbuf, &curDpb, sizeof(curDpb));
     return sizeof(curDpb);
 }
-int HostFileBdos::writeProt(BYTE *msgbuf, int len)
+int
+HostFileBdos::writeProt(BYTE* msgbuf, int len)
 {
     curROVec |= (1 << (msgbuf[0] & 0x0f));
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::resetDrive(BYTE *msgbuf, int len)
+int
+HostFileBdos::resetDrive(BYTE* msgbuf, int len)
 {
     curROVec &= ~(1 << (msgbuf[0] & 0x0f));
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::getROVec(BYTE *msgbuf, int len)
+int
+HostFileBdos::getROVec(BYTE* msgbuf, int len)
 {
     msgbuf[0] = (curROVec & 0x0ff);
     msgbuf[1] = ((curROVec >> 8) & 0x0ff);
     return 2;
 }
-int HostFileBdos::getAllocVec(BYTE *msgbuf, int len)
+int
+HostFileBdos::getAllocVec(BYTE* msgbuf, int len)
 {
     // TODO: is there anything here?
     memset(msgbuf, 0, 256);
     return 256;
 }
-int HostFileBdos::getLoginVec(BYTE *msgbuf, int len)
+int
+HostFileBdos::getLoginVec(BYTE* msgbuf, int len)
 {
     msgbuf[0] = (curLogVec & 0x0ff);
     msgbuf[1] = ((curLogVec >> 8) & 0x0ff);
     return 2;
 }
 
-int HostFileBdos::selectDisk(BYTE *msgbuf, int len)
+int
+HostFileBdos::selectDisk(BYTE* msgbuf, int len)
 {
     BYTE d = msgbuf[0];
     msgbuf[0] = 0;
@@ -131,10 +140,10 @@ int HostFileBdos::selectDisk(BYTE *msgbuf, int len)
     }
 
     curDsk = d;
-    char buf[256];
+    char        buf[256];
     struct stat stb;
     cpmDrive(buf, d);
-    int rc = stat(buf, &stb);
+    int         rc = stat(buf, &stb);
 
     if (rc < 0 && errno == ENOENT)
     {
@@ -151,7 +160,7 @@ int HostFileBdos::selectDisk(BYTE *msgbuf, int len)
     {
         debugss(ssHostFileBdos, INFO, "Seldisk error (%d) %s\n", errno, buf);
         curLogVec &= ~(1 << d);
-        msgbuf[0] = 0xff;
+        msgbuf[0]  = 0xff;
         return 1;
     }
 
@@ -160,13 +169,14 @@ int HostFileBdos::selectDisk(BYTE *msgbuf, int len)
     return 1;
 }
 
-int HostFileBdos::openFile(BYTE *msgbuf, int len)
+int
+HostFileBdos::openFile(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     // ignore password...
-    int rc = openFileFcb(fcb, u);
+    int         rc  = openFileFcb(fcb, u);
 
     if (rc < 0)
     {
@@ -181,11 +191,12 @@ int HostFileBdos::openFile(BYTE *msgbuf, int len)
     }
 }
 
-int HostFileBdos::closeFile(BYTE *msgbuf, int len)
+int
+HostFileBdos::closeFile(BYTE* msgbuf, int len)
 {
-    int rc;
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    int         rc;
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (!fcb->s1[1])
@@ -193,7 +204,7 @@ int HostFileBdos::closeFile(BYTE *msgbuf, int len)
         // special truncate for SUBMIT (CCP)
         off_t len = fcb->rc;
         len *= 128;
-        rc = ftruncate(fcb->fd, len);
+        rc   = ftruncate(fcb->fd, len);
 
         if (rc < 0)
         {
@@ -201,7 +212,7 @@ int HostFileBdos::closeFile(BYTE *msgbuf, int len)
         }
     }
 
-    rc = close(fcb->fd);
+    rc      = close(fcb->fd);
     fcb->fd = -1;
 
     if (rc < 0)
@@ -217,11 +228,12 @@ int HostFileBdos::closeFile(BYTE *msgbuf, int len)
     }
 }
 
-int HostFileBdos::searchNext(BYTE *msgbuf, int len)
+int
+HostFileBdos::searchNext(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[1] & 0x1f;
+    BYTE  u    = msgbuf[1] & 0x1f;
     msgbuf[0] = 0;
-    char *name = doSearch(&curSearch);
+    char* name = doSearch(&curSearch);
 
     if (!name)
     {
@@ -233,11 +245,12 @@ int HostFileBdos::searchNext(BYTE *msgbuf, int len)
     return 33;
 }
 
-int HostFileBdos::searchFirst(BYTE *msgbuf, int len)
+int
+HostFileBdos::searchFirst(BYTE* msgbuf, int len)
 {
-    BYTE d = msgbuf[0] & 0x0f;
-    BYTE u = msgbuf[1] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[2];
+    BYTE        d   = msgbuf[0] & 0x0f;
+    BYTE        u   = msgbuf[1] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[2];
     msgbuf[0] = 0;
 
     if (fcb->drv == '?')
@@ -246,7 +259,7 @@ int HostFileBdos::searchFirst(BYTE *msgbuf, int len)
         fcb->drv = d;
     }
 
-    char *f = startSearch(fcb, &curSearch, u);
+    char* f = startSearch(fcb, &curSearch, u);
 
     if (f == NULL)
     {
@@ -270,17 +283,18 @@ int HostFileBdos::searchFirst(BYTE *msgbuf, int len)
     return 33;
 }
 
-int HostFileBdos::deleteFile(BYTE *msgbuf, int len)
+int
+HostFileBdos::deleteFile(BYTE* msgbuf, int len)
 {
     struct search era;
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE          u   = msgbuf[0] & 0x1f;
+    struct fcb*   fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     memset(&era, 0, sizeof(era));
-    errno = 0;
-    char *name = startSearch(fcb, &era, u);
-    int rc = 0;
+    errno     = 0;
+    char* name = startSearch(fcb, &era, u);
+    int   rc   = 0;
 
     while (name)
     {
@@ -305,10 +319,11 @@ int HostFileBdos::deleteFile(BYTE *msgbuf, int len)
     return 1;
 }
 
-int HostFileBdos::readSeq(BYTE *msgbuf, int len)
+int
+HostFileBdos::readSeq(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -321,7 +336,7 @@ int HostFileBdos::readSeq(BYTE *msgbuf, int len)
     {
         fcb->s1[0] = fcb->cr;
         off_t len = fcb->cr;
-        len *= 128;
+        len       *= 128;
         lseek(fcb->fd, len, SEEK_SET);
     }
 
@@ -345,10 +360,11 @@ int HostFileBdos::readSeq(BYTE *msgbuf, int len)
     return 0xa5;
 }
 
-int HostFileBdos::writeSeq(BYTE *msgbuf, int len)
+int
+HostFileBdos::writeSeq(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -376,17 +392,18 @@ int HostFileBdos::writeSeq(BYTE *msgbuf, int len)
     return 1;
 }
 
-int HostFileBdos::createFile(BYTE *msgbuf, int len)
+int
+HostFileBdos::createFile(BYTE* msgbuf, int len)
 {
-    char buf[16];
-    char path[256];
-    uint8_t d;
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    char        buf[16];
+    char        path[256];
+    uint8_t     d;
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     getFileName(buf, fcb);
-    fcb->fd = -1;
-    d = fcb->drv;
+    fcb->fd   = -1;
+    d         = fcb->drv;
 
     if (!d)
     {
@@ -400,7 +417,7 @@ int HostFileBdos::createFile(BYTE *msgbuf, int len)
 
     cpmPath(path, d, u, buf);
     int flags = O_RDWR | O_CREAT | O_EXCL;
-    int fd = open(path, flags, 0666);
+    int fd    = open(path, flags, 0666);
 
     if (fd < 0)
     {
@@ -413,27 +430,28 @@ int HostFileBdos::createFile(BYTE *msgbuf, int len)
         return 1;
     }
 
-    curLogVec |= (1 << d);
-    fcb->ext = 0;
-    fcb->rc = 0;
-    fcb->fd = fd;
+    curLogVec  |= (1 << d);
+    fcb->ext    = 0;
+    fcb->rc     = 0;
+    fcb->fd     = fd;
     fcb->oflags = flags;
-    fcb->s1[1] = 0x80;
+    fcb->s1[1]  = 0x80;
     memcpy(&msgbuf[1], fcb, 36);
     return 37;
 }
 
-int HostFileBdos::renameFile(BYTE *msgbuf, int len)
+int
+HostFileBdos::renameFile(BYTE* msgbuf, int len)
 {
-    char buf[32];
-    char old[256];
-    char newn[256];
-    BYTE d;
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    char        buf[32];
+    char        old[256];
+    char        newn[256];
+    BYTE        d;
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     getFileName(buf, fcb);
-    d = fcb->drv;
+    d         = fcb->drv;
 
     if (!d)
     {
@@ -446,7 +464,7 @@ int HostFileBdos::renameFile(BYTE *msgbuf, int len)
     }
 
     cpmPath(old, d, u, buf);
-    fcb = (struct fcb *)&msgbuf[17];
+    fcb = (struct fcb*) &msgbuf[17];
     getFileName(buf, fcb);
     cpmPath(newn, d, u, buf);
     int rc = rename(old, newn);
@@ -467,10 +485,11 @@ int HostFileBdos::renameFile(BYTE *msgbuf, int len)
     return 1;
 }
 
-int HostFileBdos::readRand(BYTE *msgbuf, int len)
+int
+HostFileBdos::readRand(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -500,10 +519,11 @@ int HostFileBdos::readRand(BYTE *msgbuf, int len)
     return 0xa5;
 }
 
-int HostFileBdos::writeRand(BYTE *msgbuf, int len)
+int
+HostFileBdos::writeRand(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -532,10 +552,11 @@ int HostFileBdos::writeRand(BYTE *msgbuf, int len)
     return 37;
 }
 
-int HostFileBdos::setRandRec(BYTE *msgbuf, int len)
+int
+HostFileBdos::setRandRec(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -544,20 +565,21 @@ int HostFileBdos::setRandRec(BYTE *msgbuf, int len)
         return 1;
     }
 
-    off_t r = lseek(fcb->fd, (off_t)0, SEEK_CUR);
-    r = (r + 127) / 128;
+    off_t r = lseek(fcb->fd, (off_t) 0, SEEK_CUR);
+    r          = (r + 127) / 128;
     fcb->rr[0] = r & 0x0ff;
-    r >>= 8;
+    r        >>= 8;
     fcb->rr[1] = r & 0x0ff;
-    r >>= 8;
+    r        >>= 8;
     fcb->rr[2] = r & 0x0ff;
     return 37;
 }
 
-int HostFileBdos::compFileSize(BYTE *msgbuf, int len)
+int
+HostFileBdos::compFileSize(BYTE* msgbuf, int len)
 {
-    BYTE u = msgbuf[0] & 0x1f;
-    struct fcb *fcb = (struct fcb *)&msgbuf[1];
+    BYTE        u   = msgbuf[0] & 0x1f;
+    struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
 
     if (fcb->fd <= 0)
@@ -575,7 +597,7 @@ int HostFileBdos::compFileSize(BYTE *msgbuf, int len)
 
     struct stat stb;
 
-    int rc = fstat(fcb->fd, &stb);
+    int         rc = fstat(fcb->fd, &stb);
 
     if (rc < 0)
     {
@@ -584,101 +606,124 @@ int HostFileBdos::compFileSize(BYTE *msgbuf, int len)
     }
 
     off_t r = stb.st_size;
-    r = (r + 127) / 128;
+    r          = (r + 127) / 128;
     fcb->rr[0] = r & 0x0ff;
-    r >>= 8;
+    r        >>= 8;
     fcb->rr[1] = r & 0x0ff;
-    r >>= 8;
+    r        >>= 8;
     fcb->rr[2] = r & 0x0ff;
     return 37;
 }
 
-int HostFileBdos::setFileAttrs(BYTE *msgbuf, int len)
+int
+HostFileBdos::setFileAttrs(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::accessDrive(BYTE *msgbuf, int len)
+int
+HostFileBdos::accessDrive(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::freeDrive(BYTE *msgbuf, int len)
+int
+HostFileBdos::freeDrive(BYTE* msgbuf, int len)
 {
-    curDsk = -1; // do this?
+    curDsk    = -1; // do this?
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::writeRandZF(BYTE *msgbuf, int len)
+int
+HostFileBdos::writeRandZF(BYTE* msgbuf, int len)
 {
     // Linux zero-fills for us...
     return writeRand(msgbuf, len);
 }
-int HostFileBdos::unlockRec(BYTE *msgbuf, int len)
+int
+HostFileBdos::unlockRec(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 37;
 }
-int HostFileBdos::login(BYTE *msgbuf, int len)
+int
+HostFileBdos::login(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::logoff(BYTE *msgbuf, int len)
+int
+HostFileBdos::logoff(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::setCompAttrs(BYTE *msgbuf, int len)
+int
+HostFileBdos::setCompAttrs(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
-int HostFileBdos::getServCfg(BYTE *msgbuf, int len)
+int
+HostFileBdos::getServCfg(BYTE* msgbuf, int len)
 {
     // TODO: implement this if needed...
     memset(msgbuf, 0, 17);
     return 17;
 }
-int HostFileBdos::setDefPwd(BYTE *msgbuf, int len)
+int
+HostFileBdos::setDefPwd(BYTE* msgbuf, int len)
 {
     msgbuf[0] = 0;
     return 1;
 }
 
 // '0' means not supported
-int (*HostFileBdos::bdosFunctions[256])(HostFileBdos *, BYTE *, int) =
+int (*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 00-0D
-    selectDisk, openFile, closeFile, searchFirst, searchNext,
-    deleteFile, readSeq, writeSeq, createFile, renameFile,
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0, // 00-0D
+    selectDisk,   openFile,   closeFile,    searchFirst,  searchNext,
+    deleteFile,   readSeq,    writeSeq,     createFile,   renameFile,
     getLoginVec,
-    0, 0,   // 19-1A
-    getAllocVec, writeProt, getROVec, setFileAttrs, getDPB,
-    0,  // 20
-    readRand, writeRand, compFileSize, setRandRec, resetDrive,
-    accessDrive, freeDrive, writeRandZF,
-    0, 0,   // 29-2A
+    0,            0, // 19-1A
+    getAllocVec,  writeProt,  getROVec,     setFileAttrs, getDPB,
+    0,               // 20
+    readRand,     writeRand,  compFileSize, setRandRec,   resetDrive,
+    accessDrive,  freeDrive,  writeRandZF,
+    0,            0, // 29-2A
     unlockRec,
-    0, 0,   // 2C-2D
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 2E-3F
-    login, logoff,  // not really implemented... but must not return error.
-    0, 0, 0, 0, // 42-45
+    0,            0, // 2C-2D
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,               // 2E-3F
+    login,        logoff,                      // not really implemented... but must not return error.
+    0,            0,          0,            0, // 42-45
     setCompAttrs, getServCfg,
-    0, 0, 0, 0, 0, 0, 0, 0, // 48-4F
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 50-5F
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 60-69
-    setDefPwd,  // not really implemented...
+    0,            0,          0,            0,            0,          0,
+    0,            0, // 48-4F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0, // 50-5F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,         // 60-69
+    setDefPwd, // not really implemented...
     0
 };
 
-int HostFileBdos::cpmDrive(char *buf, int drive)
+int
+HostFileBdos::cpmDrive(char* buf, int drive)
 {
     drive &= 0x0f;
     return sprintf(buf, "%s/%c", dir, drive + 'a');
 }
 
-int HostFileBdos::cpmFilename(char *buf, int user, char *file)
+int
+HostFileBdos::cpmFilename(char* buf, int user, char* file)
 {
     int x = 0;
     user &= 0x1f;
@@ -692,33 +737,38 @@ int HostFileBdos::cpmFilename(char *buf, int user, char *file)
     return x;
 }
 
-int HostFileBdos::cpmPath(char *buf, int drive, int user, char *file)
+int
+HostFileBdos::cpmPath(char* buf, int drive, int user, char* file)
 {
 
     int x = cpmDrive(buf, drive);
     buf[x++] = '/';
-    x += cpmFilename(buf + x, user, file);
+    x       += cpmFilename(buf + x, user, file);
     return x;
 }
 
-char *HostFileBdos::cpmNameFound(struct search::find *find)
+char*
+HostFileBdos::cpmNameFound(struct search::find* find)
 {
     return find->path + find->dirlen + 1;
 }
 
-char *HostFileBdos::cpmPathFound(struct search::find *find)
+char*
+HostFileBdos::cpmPathFound(struct search::find* find)
 {
     return find->path;
 }
 
-char *HostFileBdos::cpmFindInit(struct search::find *find)
+char*
+HostFileBdos::cpmFindInit(struct search::find* find)
 {
     find->dir = NULL;
 }
 
-char *HostFileBdos::cpmFind(struct search::find *find, int drive, char *pattern)
+char*
+HostFileBdos::cpmFind(struct search::find* find, int drive, char* pattern)
 {
-    struct dirent *de;
+    struct dirent* de;
 
     if (pattern)
     {
@@ -729,8 +779,8 @@ char *HostFileBdos::cpmFind(struct search::find *find, int drive, char *pattern)
 
         strncpy(find->pat, pattern, sizeof(find->pat));
         find->pat[sizeof(find->pat) - 1] = '\0';
-        find->dirlen = cpmDrive(find->path, drive);
-        find->dir = opendir(find->path);
+        find->dirlen                     = cpmDrive(find->path, drive);
+        find->dir                        = opendir(find->path);
 
         if (!find->dir)
         {
@@ -769,7 +819,8 @@ char *HostFileBdos::cpmFind(struct search::find *find, int drive, char *pattern)
     return cpmNameFound(find);
 }
 
-void HostFileBdos::getFileName(char *dst, struct fcb *fcb)
+void
+HostFileBdos::getFileName(char* dst, struct fcb* fcb)
 {
     int x;
 
@@ -791,12 +842,13 @@ void HostFileBdos::getFileName(char *dst, struct fcb *fcb)
     *dst++ = '\0';
 }
 
-void HostFileBdos::getAmbFileName(char *dst, struct fcb *fcb, uint8_t usr)
+void
+HostFileBdos::getAmbFileName(char* dst, struct fcb* fcb, uint8_t usr)
 {
-    int x;
-    char buf[16];
-    char *s = buf;
-    int sawQ = 0;
+    int   x;
+    char  buf[16];
+    char* s    = buf;
+    int   sawQ = 0;
 
     for (x = 0; x < 8 && (fcb->name[x] & 0x7f) != ' '; ++x)
     {
@@ -839,12 +891,13 @@ void HostFileBdos::getAmbFileName(char *dst, struct fcb *fcb, uint8_t usr)
     cpmFilename(dst, usr, buf);
 }
 
-void HostFileBdos::copyOutDir(BYTE *dma, char *name)
+void
+HostFileBdos::copyOutDir(BYTE* dma, char* name)
 {
-    struct fcb *fcb = (struct fcb *)dma;
-    char *t;
+    struct fcb* fcb = (struct fcb*) dma;
+    char*       t;
     t = strchr(name, ':');
-    uint8_t u;
+    uint8_t     u;
 
     if (t)
     {
@@ -858,7 +911,7 @@ void HostFileBdos::copyOutDir(BYTE *dma, char *name)
         t = name;
     }
 
-    fcb->drv = u;   // user code , not drive
+    fcb->drv = u; // user code , not drive
     int x = 0;
 
     while (*t && *t != '.' && x < 8)
@@ -891,14 +944,15 @@ void HostFileBdos::copyOutDir(BYTE *dma, char *name)
         fcb->name[x++] = ' ';
     }
 
-    fcb->ext = 0;
+    fcb->ext   = 0;
     fcb->s1[0] = 0;
     fcb->s1[1] = 0;
-    fcb->rc = 0;
+    fcb->rc    = 0;
     memset(fcb->d0, 0, sizeof(fcb->d0));
 }
 
-void HostFileBdos::copyOutSearch(BYTE *buf, char *name)
+void
+HostFileBdos::copyOutSearch(BYTE* buf, char* name)
 {
     copyOutDir(buf, name);
 
@@ -907,12 +961,12 @@ void HostFileBdos::copyOutSearch(BYTE *buf, char *name)
         // return size of file... by some definition...
         // create fake info in FCB to fool caller into
         // thinking the file is of about the right size.
-        struct fcb *fcb = (struct fcb *)buf;
-        off_t len = curSearch.size;
-        len = (len + 127) / 128; // num records
-        fcb->ext = (len >> 7) & 0x1f;   // max size < 512K
-        fcb->rc = len & 0x7f;
-        len = (len + curDpb.blm) >> curDpb.bsh;
+        struct fcb* fcb = (struct fcb*) buf;
+        off_t       len = curSearch.size;
+        len      = (len + 127) / 128; // num records
+        fcb->ext = (len >> 7) & 0x1f; // max size < 512K
+        fcb->rc  = len & 0x7f;
+        len      = (len + curDpb.blm) >> curDpb.bsh;
 
         if (len > 16)
         {
@@ -927,9 +981,10 @@ void HostFileBdos::copyOutSearch(BYTE *buf, char *name)
     }
 }
 
-char *HostFileBdos::commonSearch(struct search *search, char *pat)
+char*
+HostFileBdos::commonSearch(struct search* search, char* pat)
 {
-    char *f = cpmFind(&search->find, search->drv, pat);
+    char* f = cpmFind(&search->find, search->drv, pat);
 
     if (!f)
     {
@@ -947,19 +1002,21 @@ char *HostFileBdos::commonSearch(struct search *search, char *pat)
     return f;
 }
 
-char *HostFileBdos::doSearch(struct search *search)
+char*
+HostFileBdos::doSearch(struct search* search)
 {
     return commonSearch(search, NULL);
 }
 
-char *HostFileBdos::startSearch(struct fcb *fcb, struct search *search, BYTE u)
+char*
+HostFileBdos::startSearch(struct fcb* fcb, struct search* search, BYTE u)
 {
     char pat[16];
     BYTE d = fcb->drv;
 
     if (d == '?')
     {
-        d = curDsk;
+        d      = curDsk;
         pat[0] = '*';
         pat[1] = '\0';
     }
@@ -979,25 +1036,27 @@ char *HostFileBdos::startSearch(struct fcb *fcb, struct search *search, BYTE u)
         getAmbFileName(pat, fcb, u);
     }
 
-    search->drv = d;
-    search->usr = u;
-    search->ext = fcb->ext;
+    search->drv  = d;
+    search->usr  = u;
+    search->ext  = fcb->ext;
     search->iter = 0;
     return commonSearch(search, pat);
 }
 
-void HostFileBdos::seekFile(struct fcb *fcb)
+void
+HostFileBdos::seekFile(struct fcb* fcb)
 {
     off_t r = fcb->rr[0] | (fcb->rr[0] << 8) | (fcb->rr[0] << 16);
-    r *= 128;
-    (void)lseek(fcb->fd, r, SEEK_SET);
+    r         *= 128;
+    (void) lseek(fcb->fd, r, SEEK_SET);
     fcb->s1[0] = fcb->cr;
 }
 
-int HostFileBdos::openFileFcb(struct fcb *fcb, BYTE u)
+int
+HostFileBdos::openFileFcb(struct fcb* fcb, BYTE u)
 {
-    char buf[32];
-    char path[256];
+    char    buf[32];
+    char    path[256];
     uint8_t d;
     getFileName(buf, fcb);
     d = fcb->drv;
@@ -1043,16 +1102,16 @@ int HostFileBdos::openFileFcb(struct fcb *fcb, BYTE u)
         return -1;
     }
 
-    curLogVec |= (1 << d); // drive must be valid
-    fcb->ext = 0;
-    fcb->rc = 0;
-    fcb->fd = fd;
+    curLogVec  |= (1 << d); // drive must be valid
+    fcb->ext    = 0;
+    fcb->rc     = 0;
+    fcb->fd     = fd;
     fcb->oflags = flags;
     struct stat stb;
     fstat(fd, &stb);
-    off_t len = stb.st_size;
-    len = (len + 127) / 128; // num records
-    fcb->rc = len & 0x7f;
+    off_t       len = stb.st_size;
+    len        = (len + 127) / 128; // num records
+    fcb->rc    = len & 0x7f;
     fcb->s1[0] = 0;
     fcb->s1[1] = 0x80; // flag if close needs to update...
     return 0;

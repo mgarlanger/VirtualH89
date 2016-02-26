@@ -75,47 +75,48 @@ int GenericSASIDrive::params[NUM_DRV_TYPE][4]
     /*[XEBEC_RO204] */ {321, 8, 132, 0},
 };
 
-bool GenericSASIDrive::checkHeader(BYTE *buf, int n)
+bool
+GenericSASIDrive::checkHeader(BYTE* buf, int n)
 {
-    BYTE *b = buf;
-    int m = 0;
+    BYTE* b = buf;
+    int   m = 0;
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE *e;
-        int p = strtoul((char *)b, (char **)&e, 0);
+        BYTE* e;
+        int   p = strtoul((char*) b, (char**) &e, 0);
 
         // TODO: removable flag, others?
         // NOTE: removable media requires many more changes.
         switch (tolower(*e))
         {
-        case 'c':
-            m |= 0x01;
-            mediaCyl = p;
-            break;
+            case 'c':
+                m       |= 0x01;
+                mediaCyl = p;
+                break;
 
-        case 'h':
-            m |= 0x02;
-            mediaHead = p;
-            break;
+            case 'h':
+                m        |= 0x02;
+                mediaHead = p;
+                break;
 
-        case 'z':
-            m |= 0x04;
-            mediaSsz = p;
-            break;
+            case 'z':
+                m       |= 0x04;
+                mediaSsz = p;
+                break;
 
-        case 'p':
-            m |= 0x08;
-            mediaSpt = p;
-            break;
+            case 'p':
+                m       |= 0x08;
+                mediaSpt = p;
+                break;
 
-        case 'l':
-            m |= 0x10;
-            mediaLat = p;
-            break;
+            case 'l':
+                m       |= 0x10;
+                mediaLat = p;
+                break;
 
-        default:
-            return false;
+            default:
+                return false;
         }
 
         b = e + 1;
@@ -165,20 +166,20 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     }
 
     dataOffset = 0;
-    BYTE buf[128];
-    off_t end = lseek(driveFd, (off_t)0, SEEK_END);
+    BYTE  buf[128];
+    off_t end = lseek(driveFd, (off_t) 0, SEEK_END);
 
     // special case: 0 (EOF) means new media - initialize it.
     if (end == 0)
     {
         dataOffset = sectorSize;
-        mediaCyl = params[type][0];
-        mediaHead = params[type][1];
-        mediaSsz = sectorSize;
-        mediaSpt = sectorsPerTrack;
-        mediaLat = 1;
+        mediaCyl   = params[type][0];
+        mediaHead  = params[type][1];
+        mediaSsz   = sectorSize;
+        mediaSpt   = sectorsPerTrack;
+        mediaLat   = 1;
         memset(buf, 0, sizeof(buf));
-        int l = sprintf((char *)buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
+        int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
@@ -190,14 +191,14 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     {
         // first, trying reading the last 128 bytes...
         lseek(driveFd, end - sizeof(buf), SEEK_SET);
-        int x = read(driveFd, buf, sizeof(buf));
+        int  x    = read(driveFd, buf, sizeof(buf));
         bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
         if (!done)
         {
-            lseek(driveFd, (off_t)0, SEEK_SET);
-            x = read(driveFd, buf, sizeof(buf));
-            done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
+            lseek(driveFd, (off_t) 0, SEEK_SET);
+            x          = read(driveFd, buf, sizeof(buf));
+            done       = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
             dataOffset = mediaSsz;
         }
 

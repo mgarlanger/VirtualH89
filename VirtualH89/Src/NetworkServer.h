@@ -19,8 +19,8 @@ class NetworkServer
     NetworkServer();
     virtual ~NetworkServer();
 
-    virtual int checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len) = 0;
-    virtual int sendMsg(BYTE *msgbuf, int len) = 0;
+    virtual int checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len) = 0;
+    virtual int sendMsg(BYTE* msgbuf, int len)                     = 0;
 
     // This is the standard CP/Net message header.
     struct ndos

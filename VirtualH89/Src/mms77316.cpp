@@ -6,8 +6,9 @@
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///
 
-#include "mms77316.h"
+#include <string.h>
 
+#include "mms77316.h"
 
 #include "H89.h"
 #include "logger.h"

@@ -149,7 +149,8 @@ GenericFloppyDrive::selectSide(BYTE side)
 }
 
 // negative data is "missing clock" detection.
-int GenericFloppyDrive::readData(bool dd, BYTE track, BYTE side, BYTE sector, int inSector)
+int
+GenericFloppyDrive::readData(bool dd, BYTE track, BYTE side, BYTE sector, int inSector)
 {
     int data = 0;
 
@@ -165,20 +166,23 @@ int GenericFloppyDrive::readData(bool dd, BYTE track, BYTE side, BYTE sector, in
 
     if (track_m != track || headSel_m != side)
     {
-        debugss(ssGenericFloppyDrive, INFO, "mismatch trk %d:%d sid %d:%d\n", track_m, track, headSel_m, side);
+        debugss(ssGenericFloppyDrive, INFO, "mismatch trk %d:%d sid %d:%d\n", track_m, track,
+                headSel_m, side);
     }
 
     // override FDC track/side with our own - it's the real one
     if (disk_m->readData(track_m, headSel_m, sector, inSector, data))
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__, inSector, data);
+        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__,
+                inSector, data);
     }
 
     return data;
 }
 
-int GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
-                                  int inSector, BYTE data, bool dataReady)
+int
+GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
+                              int inSector, BYTE data, bool dataReady)
 {
     int result = GenericFloppyFormat::ERROR;
 
@@ -203,7 +207,8 @@ int GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
     // override FDC track/side with our own - it's the real one
     if (!disk_m->writeData(track_m, headSel_m, sector, inSector, data, dataReady, result))
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: write failed - pos(%d) data(%d)\n", __FUNCTION__, inSector, data);
+        debugss(ssGenericFloppyDrive, INFO, "%s: write failed - pos(%d) data(%d)\n", __FUNCTION__,
+                inSector, data);
     }
 
     return result;

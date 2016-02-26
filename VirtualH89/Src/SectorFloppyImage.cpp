@@ -18,85 +18,86 @@
 #include "RawFloppyImage.h"
 #include "logger.h"
 
-bool SectorFloppyImage::checkHeader(BYTE *buf, int n)
+bool
+SectorFloppyImage::checkHeader(BYTE* buf, int n)
 {
-    BYTE *b = buf;
-    int m = 0;
+    BYTE* b = buf;
+    int   m = 0;
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE *e;
-        int p = strtoul((char *)b, (char **)&e, 0);
+        BYTE* e;
+        int   p = strtoul((char*) b, (char**) &e, 0);
 
         switch (tolower(*e))
         {
-        case 'm':
-            if (p != 5 && p != 8)
-            {
+            case 'm':
+                if (p != 5 && p != 8)
+                {
+                    break;
+                }
+
+                m          |= 0x01;
+                mediaSize_m = p;
                 break;
-            }
 
-            m |= 0x01;
-            mediaSize_m = p;
-            break;
+            case 'z':
+                if (p != 128 && p != 256 && p != 512 && p != 1024)
+                {
+                    break;
+                }
 
-        case 'z':
-            if (p != 128 && p != 256 && p != 512 && p != 1024)
-            {
+                m        |= 0x02;
+                secSize_m = p;
                 break;
-            }
 
-            m |= 0x02;
-            secSize_m = p;
-            break;
+            case 'p':
+                if (p == 0)
+                {
+                    break;
+                }
 
-        case 'p':
-            if (p == 0)
-            {
+                m           |= 0x04;
+                numSectors_m = p;
                 break;
-            }
 
-            m |= 0x04;
-            numSectors_m = p;
-            break;
+            case 's':
+                if (p < 1 || p > 2)
+                {
+                    break;
+                }
 
-        case 's':
-            if (p < 1 || p > 2)
-            {
+                m         |= 0x08;
+                numSides_m = p;
                 break;
-            }
 
-            m |= 0x08;
-            numSides_m = p;
-            break;
+            case 't':
+                if (p == 0)
+                {
+                    break;
+                }
 
-        case 't':
-            if (p == 0)
-            {
+                m          |= 0x10;
+                numTracks_m = p;
                 break;
-            }
 
-            m |= 0x10;
-            numTracks_m = p;
-            break;
+            case 'd':
+                m              |= 0x20;
+                doubleDensity_m = (p != 0);
+                break;
 
-        case 'd':
-            m |= 0x20;
-            doubleDensity_m = (p != 0);
-            break;
+            case 'i':
+                m           |= 0x40;
+                interlaced_m = (p != 0);
+                break;
 
-        case 'i':
-            m |= 0x40;
-            interlaced_m = (p != 0);
-            break;
+            case 'l': // optional ?
+                // m |= 0x80;
+                mediaLat_m = p;
+                break;
 
-        case 'l': // optional ?
-            //m |= 0x80;
-            mediaLat_m = p;
-            break;
-
-        default:
-            return false;
+            default:
+                return false;
         }
 
         b = e + 1;
@@ -110,19 +111,21 @@ bool SectorFloppyImage::checkHeader(BYTE *buf, int n)
     return (m == 0x7f);
 }
 
-void SectorFloppyImage::eject(char const *file)
+void
+SectorFloppyImage::eject(char const* file)
 {
     // flush data...
     close(imageFd_m);
     imageFd_m = -1;
 }
 
-void SectorFloppyImage::dump()
+void
+SectorFloppyImage::dump()
 {
 }
 
 // TODO: If constructor fails, the drive should not mount this disk!
-SectorFloppyImage::SectorFloppyImage(GenericDiskDrive *drive, std::vector<std::string> argv):
+SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv):
     GenericFloppyDisk(),
     imageName_m(NULL),
     imageFd_m(-1),
@@ -137,7 +140,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive *drive, std::vector<std::s
         return;
     }
 
-    const char *name = strdup(argv[0].c_str());
+    const char* name = strdup(argv[0].c_str());
 
     for (int x = 1; x < argv.size(); ++x)
     {
@@ -161,8 +164,8 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive *drive, std::vector<std::s
         return;
     }
 
-    BYTE buf[128];
-    off_t end = lseek(fd, (off_t)0, SEEK_END);
+    BYTE  buf[128];
+    off_t end = lseek(fd, (off_t) 0, SEEK_END);
 
     if (end == 0)
     {
@@ -172,23 +175,24 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive *drive, std::vector<std::s
     }
 
     lseek(fd, end - sizeof(buf), SEEK_SET);
-    int x = read(fd, buf, sizeof(buf));
+    int  x    = read(fd, buf, sizeof(buf));
     bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
     if (!done)
     {
-        debugss(ssSectorFloppyImage, INFO, "file is not SectorFloppyImage (%d,%d) - %s\n", x, errno, name);
+        debugss(ssSectorFloppyImage, INFO, "file is not SectorFloppyImage (%d,%d) - %s\n", x, errno,
+                name);
         return;
     }
 
-    hypoTrack_m = (drive->getNumTracks() > numTracks_m);
+    hypoTrack_m  = (drive->getNumTracks() > numTracks_m);
     hyperTrack_m = (drive->getNumTracks() < numTracks_m);
-    trackLen_m = (mediaSize_m == 5 ? 3200 : 6400);
+    trackLen_m   = (mediaSize_m == 5 ? 3200 : 6400);
     secLenCode_m = ffs(secSize_m); // 128==8, 1024==11
 
     if (secLenCode_m > 0)
     {
-        secLenCode_m -= 8; // 128==0, 256=1, 512=2, 1024==3
+        secLenCode_m -= 8;    // 128==0, 256=1, 512=2, 1024==3
         secLenCode_m &= 0x03; // just to be sure.
     }
 
@@ -197,12 +201,14 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive *drive, std::vector<std::s
         trackLen_m *= 2;
     }
 
-    secBuf_m = new BYTE[secSize_m];
+    secBuf_m    = new BYTE[secSize_m];
 
-    imageFd_m = fd;
+    imageFd_m   = fd;
     imageName_m = name;
-    debugss(ssSectorFloppyImage, ERROR, "mounted %d\" floppy %s: sides=%d tracks=%d spt=%d DD=%s R%s\n",
-            mediaSize_m, imageName_m, numSides_m, numTracks_m, numSectors_m, doubleDensity_m ? "yes" : "no", writeProtect_m ? "O" : "W");
+    debugss(ssSectorFloppyImage, ERROR,
+            "mounted %d\" floppy %s: sides=%d tracks=%d spt=%d DD=%s R%s\n",
+            mediaSize_m, imageName_m, numSides_m, numTracks_m, numSectors_m,
+            doubleDensity_m ? "yes" : "no", writeProtect_m ? "O" : "W");
 }
 
 SectorFloppyImage::~SectorFloppyImage()
@@ -217,10 +223,11 @@ SectorFloppyImage::~SectorFloppyImage()
     imageFd_m = -1;
 }
 
-GenericFloppyDisk *SectorFloppyImage::getDiskette(GenericDiskDrive *drive,
-        std::vector<std::string> argv)
+GenericFloppyDisk*
+SectorFloppyImage::getDiskette(GenericDiskDrive*        drive,
+                               std::vector<std::string> argv)
 {
-    GenericFloppyDisk *gd = new SectorFloppyImage(drive, argv);
+    GenericFloppyDisk* gd = new SectorFloppyImage(drive, argv);
 
     if (!gd->isReady())
     {
@@ -232,7 +239,8 @@ GenericFloppyDisk *SectorFloppyImage::getDiskette(GenericDiskDrive *drive,
     return gd;
 }
 
-bool SectorFloppyImage::cacheSector(int side, int track, int sector)
+bool
+SectorFloppyImage::cacheSector(int side, int track, int sector)
 {
     if (bufferedSide_m == side && bufferedTrack_m == track && bufferedSector_m == sector)
     {
@@ -286,20 +294,21 @@ bool SectorFloppyImage::cacheSector(int side, int track, int sector)
 
     if (rd != secSize_m)
     {
-        bufferedSide_m = -1;
-        bufferedTrack_m = -1;
+        bufferedSide_m   = -1;
+        bufferedTrack_m  = -1;
         bufferedSector_m = -1;
         return false;
     }
 
-    bufferedSide_m = side;
-    bufferedTrack_m = track;
+    bufferedSide_m   = side;
+    bufferedTrack_m  = track;
     bufferedSector_m = sector;
     return true;
 
 }
 
-bool SectorFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
+bool
+SectorFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
 {
     if (inSector < 0)
     {
@@ -319,7 +328,7 @@ bool SectorFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSecto
         {
             dataPos_m = 0;
             dataLen_m = dataPos_m + secSize_m;
-            data = GenericFloppyFormat::DATA_AM;
+            data      = GenericFloppyFormat::DATA_AM;
             return true;
         }
 
@@ -331,33 +340,33 @@ bool SectorFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSecto
     {
         switch (inSector)
         {
-        case 0:
-            data = track;
-            break;
+            case 0:
+                data = track;
+                break;
 
-        case 1:
-            data = side;
-            break;
+            case 1:
+                data = side;
+                break;
 
-        case 2:
-            data = 1;   // anything will do? 'sector' is 0xfd...
-            break;
+            case 2:
+                data = 1; // anything will do? 'sector' is 0xfd...
+                break;
 
-        case 3:
-            data = secLenCode_m;
-            break;
+            case 3:
+                data = secLenCode_m;
+                break;
 
-        case 4:
-            data = 0; // CRC 1
-            break;
+            case 4:
+                data = 0; // CRC 1
+                break;
 
-        case 5:
-            data = 0; // CRC 2
-            break;
+            case 5:
+                data = 0; // CRC 2
+                break;
 
-        default:
-            data = GenericFloppyFormat::CRC;
-            break;
+            default:
+                data = GenericFloppyFormat::CRC;
+                break;
         }
 
         return true;
@@ -393,8 +402,9 @@ bool SectorFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSecto
     return true;
 }
 
-bool SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSector,
-                                  BYTE data, bool dataReady, int& result)
+bool
+SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSector,
+                             BYTE data, bool dataReady, int& result)
 {
     if (checkWriteProtect())
     {
@@ -420,7 +430,7 @@ bool SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSect
         {
             dataPos_m = 0;
             dataLen_m = dataPos_m + secSize_m;
-            result = GenericFloppyFormat::DATA_AM;
+            result    = GenericFloppyFormat::DATA_AM;
             return true;
         }
 
@@ -441,8 +451,8 @@ bool SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSect
         else
         {
             secBuf_m[dataPos_m++] = data;
-            bufferDirty_m = true;
-            result = data;
+            bufferDirty_m         = true;
+            result                = data;
         }
     }
 
@@ -454,12 +464,14 @@ bool SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSect
     return true;
 }
 
-bool SectorFloppyImage::isReady()
+bool
+SectorFloppyImage::isReady()
 {
     return (imageFd_m >= 0);
 }
 
-std::string SectorFloppyImage::getMediaName()
+std::string
+SectorFloppyImage::getMediaName()
 {
     if (imageName_m == NULL)
     {

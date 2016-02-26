@@ -17,25 +17,25 @@
 #include <dirent.h>
 #include <string>
 
-#define BDOS_FUNC(name)                                          \
-    int name(BYTE *msgbuf, int len);                             \
-    static int name(HostFileBdos *thus, BYTE *msgbuf, int len) { \
-        return thus->name(msgbuf, len);                          \
+#define BDOS_FUNC(name)                                            \
+    int name(BYTE * msgbuf, int len);                              \
+    static int name(HostFileBdos * thus, BYTE * msgbuf, int len) { \
+        return thus->name(msgbuf, len);                            \
     }
 
-class HostFileBdos : public NetworkServer
+class HostFileBdos: public NetworkServer
 {
   public:
     HostFileBdos(PropertyUtil::PropertyMapT& props,
                  std::vector<std::string> args, BYTE srvId);
     virtual ~HostFileBdos();
 
-    virtual int checkRecvMsg(BYTE clientId, BYTE *msgbuf, int len);
-    virtual int sendMsg(BYTE *msgbuf, int len);
+    virtual int checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len);
+    virtual int sendMsg(BYTE* msgbuf, int len);
 
   private:
-    const char *dir;
-    BYTE serverId;
+    const char* dir;
+    BYTE        serverId;
 
     struct fcb
     {
@@ -59,17 +59,17 @@ class HostFileBdos : public NetworkServer
 
     struct search
     {
-        int iter;
-        BYTE drv;
-        BYTE usr;
-        BYTE ext;
+        int   iter;
+        BYTE  drv;
+        BYTE  usr;
+        BYTE  ext;
         off_t size;
         struct find
         {
-            DIR *dir;
+            DIR* dir;
             char pat[16];
             char path[1024];
-            int dirlen;
+            int  dirlen;
         } find;
     };
 
@@ -87,20 +87,20 @@ class HostFileBdos : public NetworkServer
         WORD off;
     } __attribute__((packed));
 
-    static const int DEF_BLS_SH = 14;   // 2^14 = 16K
-    static const int DEF_BLS = (1 << DEF_BLS_SH);
+    static const int DEF_BLS_SH  = 14;  // 2^14 = 16K
+    static const int DEF_BLS     = (1 << DEF_BLS_SH);
     static const int DEF_NBLOCKS = 128; // keep alloc vec small, disk size 2M
 
-    static int (*bdosFunctions[256])(HostFileBdos *, BYTE *, int);
+    static int (*bdosFunctions[256])(HostFileBdos*, BYTE*, int);
 
-    WORD curDma;
-    void *curDmaReal;
-    WORD curDsk;
-    WORD curUsr;
-    WORD curROVec;
-    WORD curLogVec;
-    struct search curSearch;
-    struct dpb curDpb;
+    WORD             curDma;
+    void*            curDmaReal;
+    WORD             curDsk;
+    WORD             curUsr;
+    WORD             curROVec;
+    WORD             curLogVec;
+    struct search    curSearch;
+    struct dpb       curDpb;
 
     BDOS_FUNC(getDPB);
     BDOS_FUNC(writeProt);
@@ -134,22 +134,22 @@ class HostFileBdos : public NetworkServer
     BDOS_FUNC(setDefPwd);
 
     // Utility functions
-    int cpmDrive(char *buf, int drive);
-    int cpmFilename(char *buf, int user, char *file);
-    int cpmPath(char *buf, int drive, int user, char *file);
-    char *cpmNameFound(struct search::find *find);
-    char *cpmPathFound(struct search::find *find);
-    char *cpmFindInit(struct search::find *find);
-    char *cpmFind(struct search::find *find, int drive, char *pattern);
-    void getFileName(char *dst, struct fcb *fcb);
-    void getAmbFileName(char *dst, struct fcb *fcb, uint8_t usr);
-    void copyOutDir(BYTE *dma, char *name);
-    void copyOutSearch(BYTE *buf, char *name);
-    char *commonSearch(struct search *search, char *pat);
-    char *doSearch(struct search *search);
-    char *startSearch(struct fcb *fcb, struct search *search, BYTE u);
-    void seekFile(struct fcb *fcb);
-    int openFileFcb(struct fcb *fcb, BYTE u);
+    int cpmDrive(char* buf, int drive);
+    int cpmFilename(char* buf, int user, char* file);
+    int cpmPath(char* buf, int drive, int user, char* file);
+    char* cpmNameFound(struct search::find* find);
+    char* cpmPathFound(struct search::find* find);
+    char* cpmFindInit(struct search::find* find);
+    char* cpmFind(struct search::find* find, int drive, char* pattern);
+    void getFileName(char* dst, struct fcb* fcb);
+    void getAmbFileName(char* dst, struct fcb* fcb, uint8_t usr);
+    void copyOutDir(BYTE* dma, char* name);
+    void copyOutSearch(BYTE* buf, char* name);
+    char* commonSearch(struct search* search, char* pat);
+    char* doSearch(struct search* search);
+    char* startSearch(struct fcb* fcb, struct search* search, BYTE u);
+    void seekFile(struct fcb* fcb);
+    int openFileFcb(struct fcb* fcb, BYTE u);
 
 };
 
