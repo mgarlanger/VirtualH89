@@ -32,11 +32,10 @@ MMS77316::getClockPeriod()
     return ((controlReg_m & ctrl_525DriveSel_c) != 0 ? 1000 : 500);
 }
 
-MMS77316::MMS77316(int baseAddr):
-    DiskController(baseAddr, MMS77316_NumPorts_c),
-    WD1797(baseAddr + Wd1797_Offset_c),
-    controlReg_m(0),
-    intLevel_m(MMS77316_Intr_c)
+MMS77316::MMS77316(int baseAddr): DiskController(baseAddr, MMS77316_NumPorts_c),
+                                  WD1797(baseAddr + Wd1797_Offset_c),
+                                  controlReg_m(0),
+                                  intLevel_m(MMS77316_Intr_c)
 {
     for (int x = 0; x < numDisks_c; ++x)
     {

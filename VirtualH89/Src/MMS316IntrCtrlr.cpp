@@ -14,9 +14,8 @@
 #include "logger.h"
 #include "z80.h"
 
-MMS316IntrCtrlr::MMS316IntrCtrlr(InterruptController* ic, MMS77316* m316):
-    InterruptController(ic),
-    m316_m(m316)
+MMS316IntrCtrlr::MMS316IntrCtrlr(InterruptController* ic, MMS77316* m316): InterruptController(ic),
+                                                                           m316_m(m316)
 {
     debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr(InterruptController *, MMS77316 *)\n");
 }
