@@ -147,7 +147,6 @@ H89Timer::handleSignal(int signum)
             h89.raiseINT(intLevel);
         }
     }
-
     else
     {
         debugss(ssTimer, ERROR, "%s: cpu_m is NULL\n", __FUNCTION__);

@@ -24,10 +24,10 @@ Sector::Sector(): headNum_m(0),
 
 }
 
-Sector::Sector(BYTE headNum,
-               BYTE trackNum,
-               BYTE sectorNum,
-               WORD sectorLength,
+Sector::Sector(BYTE  headNum,
+               BYTE  trackNum,
+               BYTE  sectorNum,
+               WORD  sectorLength,
                BYTE* data): headNum_m(headNum),
                             trackNum_m(trackNum),
                             sectorNum_m(sectorNum),
@@ -85,10 +85,10 @@ Sector::~Sector()
 }
 
 void
-Sector::initialize(BYTE headNum,
-                   BYTE trackNum,
-                   BYTE sectorNum,
-                   WORD sectorLength,
+Sector::initialize(BYTE  headNum,
+                   BYTE  trackNum,
+                   BYTE  sectorNum,
+                   WORD  sectorLength,
                    BYTE* data)
 {
     if (valid_m)
@@ -115,7 +115,6 @@ Sector::initialize(BYTE headNum,
             data_m[i] = data[i];
         }
     }
-
     else
     {
         valid_m = false;
@@ -151,7 +150,6 @@ Sector::dump()
         {
             printf("     0x%04x: ", i);
         }
-
         else
         {
             if ((i % 8) == 0)

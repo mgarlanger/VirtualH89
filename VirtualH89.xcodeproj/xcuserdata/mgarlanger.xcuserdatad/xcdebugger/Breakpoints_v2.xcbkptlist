@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "659"
             endingLineNumber = "659"
-            landmarkName = "RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned long pos)"
+            landmarkName = "RawFloppyImage::writeData(BYTE side, BYTE track, unsigned long pos, BYTE data)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -87,7 +87,6 @@ INS8250::in(BYTE addr)
                     // LS Byte
                     val = lsBaudDiv;
                 }
-
                 else
                 {
                     if (rxByteAvail)
@@ -108,7 +107,6 @@ INS8250::in(BYTE addr)
                     // LS Byte
                     val = msBaudDiv;
                 }
-
                 else
                 {
                     val = saveIER;
@@ -121,7 +119,6 @@ INS8250::in(BYTE addr)
                 {
                     val = IIR_DataAvailable;
                 }
-
                 else
                 {
                     val = IIR_NoInterruptPending;
@@ -185,7 +182,6 @@ INS8250::in(BYTE addr)
 
         debugss(ss8250, INFO, "%s: %d(%d) <- %d", __FUNCTION__, addr, offset, val);
     }
-
     else
     {
         debugss(ss8250, ERROR, "%s: Verify Port failed: %d", __FUNCTION__, addr);
@@ -214,13 +210,11 @@ INS8250::out(BYTE addr, BYTE val)
                         device_m->receiveData(val);
                         lastTransmit = WallClock::instance()->getClock();
                     }
-
                     else
                     {
                         debugss(ss8250, ERROR, "%s: THR - No device_m.", __FUNCTION__);
                     }
                 }
-
                 else
                 {
                     unsigned int div;
@@ -246,14 +240,12 @@ INS8250::out(BYTE addr, BYTE val)
                     {
                         ERBFI_m = true;
                     }
-
                     else
                     {
                         ERBFI_m = false;
                     }
 
                 }
-
                 else
                 {
                     unsigned int div;
@@ -344,7 +336,6 @@ INS8250::receiveData(BYTE data)
         PE_m = false;
         FE_m = false;
     }
-
     else if (baud > baud_m)
     {
         // computer is at lower baud than the remote device.
@@ -354,7 +345,6 @@ INS8250::receiveData(BYTE data)
         // a full character will not be received, so we must exit and not set rxByteAvail
         return;
     }
-
     else
     {
         // computer is at a faster baud than the remote device.

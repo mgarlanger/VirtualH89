@@ -86,12 +86,10 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     {
         sectorsPerTrack = 32;
     }
-
     else if (sectorSize == 512)
     {
         sectorsPerTrack = 17;
     }
-
     else
     {
         // not supported, but do something...
@@ -99,7 +97,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         {
             sectorsPerTrack = 0;
         }
-
         else
         {
             sectorsPerTrack = 8192 / sectorSize;
@@ -145,7 +142,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         write(driveFd, buf, l);
         ftruncate(driveFd, capacity + sectorSize);
     }
-
     else
     {
         BYTE* b = buf;
@@ -222,47 +218,38 @@ GenericSASIDrive::getInstance(std::string type, std::string media, int cnum)
     {
         etype = XEBEC_ST506;
     }
-
     else if (type.compare("XEBEC_ST412") == 0)
     {
         etype = XEBEC_ST412;
     }
-
     else if (type.compare("XEBEC_CM5206") == 0)
     {
         etype = XEBEC_CM5206;
     }
-
     else if (type.compare("XEBEC_CM5410") == 0)
     {
         etype = XEBEC_CM5410;
     }
-
     else if (type.compare("XEBEC_CM5616") == 0)
     {
         etype = XEBEC_CM5616;
     }
-
     else if (type.compare("XEBEC_RO201") == 0)
     {
         etype = XEBEC_RO201;
     }
-
     else if (type.compare("XEBEC_RO202") == 0)
     {
         etype = XEBEC_RO202;
     }
-
     else if (type.compare("XEBEC_RO203") == 0)
     {
         etype = XEBEC_RO203;
     }
-
     else if (type.compare("XEBEC_RO204") == 0)
     {
         etype = XEBEC_RO204;
     }
-
     else
     {
         debugss(ssMMS77320, ERROR, "Invalid controller/drive combination: %s\n", type.c_str());
@@ -394,7 +381,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else if (curState == STATUS)
     {
         if (stsIx < stsLength)
@@ -419,7 +405,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl    &= ~ctl_Req_o_c;
         curState = IDLE;
     }
-
     else if (curState == SENSE)
     {
         if (senseIx < senseLength)
@@ -435,7 +420,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ack(dataIn, dataOut, ctrl);
 
     }
-
     else if (curState == DATA_IN)
     {
         if (dataIx < dataLength)
@@ -459,7 +443,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ack(dataIn, dataOut, ctrl);
 
     }
-
     else if (curState == DRIVECB)
     {
         dcbBuf[dcbIx++] = dataOut;
@@ -474,7 +457,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else if (curState == DATA_OUT)
     {
         dataBuf[dataIx++] = dataOut;
@@ -489,7 +471,6 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else
     {
         // must be IDLE, and host is trying to sync-up with us.

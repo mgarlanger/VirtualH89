@@ -48,7 +48,6 @@ AddressBus::readByte(WORD addr, bool interruptAck)
     {
         return (mem[index]->readByte(addr));
     }
-
     else
     {
         // read from non-existent memory.
@@ -72,7 +71,6 @@ AddressBus::writeByte(WORD addr, BYTE val)
     {
         mem[index]->writeByte(addr, val);
     }
-
     else
     {
         // otherwise just drop the byte...

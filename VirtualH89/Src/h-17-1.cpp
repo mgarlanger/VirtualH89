@@ -45,7 +45,6 @@ H_17_1::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& wri
     {
         disk_m->getControlInfo(pos, hole, writeProtect);
     }
-
     else
     {
         debugss(ssH17_1, INFO, "%s no disk_m\n", __FUNCTION__);
@@ -66,7 +65,6 @@ H_17_1::step(bool direction)
 
         debugss(ssH17_1, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m)
@@ -93,7 +91,6 @@ H_17_1::readData(unsigned long pos)
     {
         debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
-
     else
     {
         debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
@@ -120,7 +117,6 @@ H_17_1::readSectorData(BYTE sector, unsigned long pos)
     {
         debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
-
     else
     {
         debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);

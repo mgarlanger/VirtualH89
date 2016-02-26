@@ -17,11 +17,6 @@
 #include "cpu.h"
 #include "AddressBus.h"
 
-class Z80;
-
-typedef void (Z80::* opCodeMethod)(void);
-typedef void (Z80::* xd_cbMethod)(BYTE&);
-
 
 ///
 /// \brief  Zilog %Z80 %CPU simulator.
@@ -33,6 +28,9 @@ typedef void (Z80::* xd_cbMethod)(BYTE&);
 class Z80: public CPU
 {
   private:
+    typedef void (Z80::* opCodeMethod)(void);
+    typedef void (Z80::* xd_cbMethod)(BYTE&);
+
     void systemMutexCycle();
     // data
 
@@ -100,7 +98,8 @@ class Z80: public CPU
 
     WORD                  xxcb_effectiveAddress;
     BYTE                  I;                // Z80 interrupt register
-    bool                  IFF0, IFF1, IFF2; // Use a new flag - IFF0 - to easily handle the one instruction before EI takes effect
+    bool                  IFF0, IFF1, IFF2; // Use a new flag - IFF0 -
+                                            //   to easily handle the one instruction before EI takes effect
     unsigned int          R;                // Z80 refresh register
 
     unsigned long int     ClockRate_m;
@@ -140,6 +139,7 @@ class Z80: public CPU
     bool                      resetReq;
 
     BYTE                      IM;
+    int                       cpu_state, int_type;
 
     static const opCodeMethod op_code[256];
     static const opCodeMethod op_cb[256];
@@ -211,12 +211,12 @@ class Z80: public CPU
     static const BYTE ZSP[256];
 #endif
 
-    int               cpu_state, int_type;
+
 
     // Register related
-    inline BYTE&      getReg8(BYTE val);
+    inline BYTE& getReg8(BYTE val);
 
-    inline BYTE&      getCoreReg8(BYTE val);
+    inline BYTE& getCoreReg8(BYTE val);
 
     inline BYTE getReg8Val(BYTE val);
 
@@ -437,19 +437,7 @@ class Z80: public CPU
     void op_jr_c(void);
     void op_jr_nc(void);
 
-    void op_rst00(void);
-    void op_rst08(void);
-    void op_rst10(void);
-    void op_rst18(void);
-    void op_rst20(void);
-    void op_rst28(void);
-    void op_rst30(void);
-    void op_rst38(void);
-#if !(INDIVIDUAL_FUNCTIONS)
-    /// \todo - enable arbitrary instructions for interrupts, thus the rstnn() could
-    // be removed
     void op_rst(void);
-#endif
 
     // routines to handle prefix instructions.
     void op_cb_handle(void);

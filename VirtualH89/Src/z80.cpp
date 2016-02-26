@@ -52,7 +52,7 @@ const BYTE Z80::parity[256] =
 /// Since 8 bit values are all we have to check, setting up a table
 /// is much more efficient than recalculating these values
 /// up to 500,000 times a sec (at 2Mhz).
-const BYTE         Z80::ZSP[256] =
+const BYTE              Z80::ZSP[256] =
 {
     0x44, 0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x00,
     0x00, 0x04, 0x04, 0x00, 0x04, 0x00, 0x00, 0x04,
@@ -88,7 +88,7 @@ const BYTE         Z80::ZSP[256] =
     0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84
 };
 
-const opCodeMethod Z80::op_code[256] =
+const Z80::opCodeMethod Z80::op_code[256] =
 {
     &Z80::op_nop,       /* 0x00 - 000 */
     &Z80::op_ld_xx_nn,  /* 0x01 - 001 */
@@ -348,7 +348,7 @@ const opCodeMethod Z80::op_code[256] =
     &Z80::op_rst        /* 0xff - 377 */
 };
 
-const opCodeMethod Z80::op_cb[256] =
+const Z80::opCodeMethod Z80::op_cb[256] =
 {
     &Z80::op_rlc_x,    /* 0x00 */
     &Z80::op_rlc_x,    /* 0x01 */
@@ -609,7 +609,7 @@ const opCodeMethod Z80::op_cb[256] =
 };
 
 
-const opCodeMethod Z80::op_ed[256] =
+const Z80::opCodeMethod Z80::op_ed[256] =
 {
     &Z80::op_ed_nop,    /* 0x00 */
     &Z80::op_ed_nop,    /* 0x01 */
@@ -869,7 +869,7 @@ const opCodeMethod Z80::op_ed[256] =
     &Z80::op_ed_nop     /* 0xff */
 };
 
-const opCodeMethod Z80::op_xxcb[32] =
+const Z80::opCodeMethod Z80::op_xxcb[32] =
 {
     &Z80::op_rlc_xx_d,  /* 0x06 */
     &Z80::op_rrc_xx_d,  /* 0x0e */
@@ -1331,7 +1331,6 @@ Z80::COND_FLAGS(bool cond, BYTE flags)
     {
         SET_FLAGS(flags);
     }
-
     else
     {
         CLEAR_FLAGS(flags);
@@ -1411,7 +1410,6 @@ Z80::Z80(int clockRate, int ticksPerSecond): CPU(),
         ClockRate_m      = clockRate;
         ticksPerSecond_m = ticksPerSecond;
     }
-
     else
     {
         // Assume a 4MHz processor with a 10ms clock interrupt.
@@ -1427,9 +1425,6 @@ Z80::Z80(int clockRate, int ticksPerSecond): CPU(),
 
     mode = cm_running;
 
-    // Give it ticks to get started.
-
-    // addClockTicks(); // done by reset()
 }
 
 ///
@@ -1483,7 +1478,6 @@ Z80::addClockTicks()
                 ticksPerClock_m);
         ticks += ticksPerClock_m;
     }
-
     else
     {
         // else just set it, otherwise we run the risk of accumulating too many ticks if
@@ -1503,7 +1497,6 @@ Z80::setSpeed(bool fast)
 
     if (fast)
     {
-#if NEW_TICKS
 
         if (ticks > 0)
         {
@@ -1511,21 +1504,11 @@ Z80::setSpeed(bool fast)
             lastInstTicks = ticks;
         }
 
-#else
-
-        if (ticks > 0)
-        {
-            ticks *= speedUpFactor_c;
-        }
-
-#endif
         ClockRate_m     = 2048000 * speedUpFactor_c;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
-
     else
     {
-#if NEW_TICKS
 
         if (ticks > 0)
         {
@@ -1533,14 +1516,6 @@ Z80::setSpeed(bool fast)
             lastInstTicks = ticks;
         }
 
-#else
-
-        if (ticks > 0)
-        {
-            ticks /= speedUpFactor_c;
-        }
-
-#endif
         ClockRate_m     = 2048000;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
@@ -1824,7 +1799,6 @@ Z80::execute(WORD numInst)
             PC        = 0x66;
             mode      = cm_running;
         }
-
         else if ((int_type & Intr_INT) && (IFF1))
         {
             // ISR required to enable interrupts (EI).
@@ -1844,9 +1818,10 @@ Z80::execute(WORD numInst)
 
                 case 1:
                     debugss(ssZ80, VERBOSE, "Processing interrupt mode 1\n");
-                    int_type &= ~Intr_INT;
-                    op_rst38();
-                    ticks    -= 4;
+                    int_type    &= ~Intr_INT;
+                    lastInstByte = 0xff;
+                    op_rst();
+                    ticks       -= 4;
                     break;
 
                 case 2:
@@ -1872,7 +1847,6 @@ Z80::execute(WORD numInst)
         {
             traceInstructions(); // debug("\n");
         }
-
         else
         {
             traceInstructions();
@@ -2073,7 +2047,6 @@ Z80::op_ccf(void)
         SET_FLAGS(H_FLAG);
         CLEAR_FLAGS(C_FLAG);
     }
-
     else
     {
         CLEAR_FLAGS(H_FLAG);
@@ -2182,7 +2155,6 @@ Z80::op_daa(void)
 
         tmp_a -= adjustment;
     }
-
     else
     {
         // Addition
@@ -4537,7 +4509,6 @@ Z80::op_djnz(void) // DJNZ
         ticks -= 3;
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4580,7 +4551,6 @@ Z80::op_jp_cc(void)
     {
         PC = READnn();
     }
-
     else
     {
         PC += 2;
@@ -4603,7 +4573,6 @@ Z80::op_call_cc(void)
 
         ticks -= 5;
     }
-
     else
     {
         PC    += 2;
@@ -4638,7 +4607,6 @@ Z80::op_jr_z(void) // JR Z,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4658,7 +4626,6 @@ Z80::op_jr_nz(void) // JR NZ,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4676,7 +4643,6 @@ Z80::op_jr_c(void) // JR C,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4694,7 +4660,6 @@ Z80::op_jr_nc(void) // JR NC,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4763,109 +4728,6 @@ Z80::op_rst(void)
     ticks -= 1;
 }
 
-/// \brief Restart 0x00
-///
-/// \retval none
-///
-void
-Z80::op_rst00(void)
-{
-    PUSH(PC);
-    PC     = 0x00;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x08
-///
-/// \retval none
-///
-void
-Z80::op_rst08(void)
-{
-    PUSH(PC);
-    PC     = 0x08;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x10
-///
-/// \retval none
-///
-void
-Z80::op_rst10(void)
-{
-    PUSH(PC);
-    PC     = 0x10;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x18
-///
-/// \retval none
-///
-void
-Z80::op_rst18(void)
-{
-    PUSH(PC);
-    PC     = 0x18;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x20
-///
-/// \retval none
-///
-void
-Z80::op_rst20(void)
-{
-    PUSH(PC);
-    PC     = 0x20;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x28
-///
-/// \retval none
-///
-void
-Z80::op_rst28(void)
-{
-    PUSH(PC);
-    PC     = 0x28;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x30
-///
-/// \retval none
-///
-void
-Z80::op_rst30(void)
-{
-    PUSH(PC);
-    PC     = 0x30;
-
-    ticks -= 1;
-}
-
-/// \brief Restart 0x38
-///
-/// \retval none
-///
-void
-Z80::op_rst38(void)
-{
-    PUSH(PC);
-    PC     = 0x38;
-
-    ticks -= 1;
-}
 
 ///
 /// CB Prefix instructions

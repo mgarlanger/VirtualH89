@@ -123,7 +123,6 @@ Z47Interface::writeStatus(BYTE cmd)
         debugss(ssH47, INFO, "%s: Interrupts Enabled\n", __FUNCTION__);
         interruptsEnabled_m = true;
     }
-
     else
     {
         interruptsEnabled_m = false;
@@ -144,7 +143,6 @@ Z47Interface::writeData(BYTE data)
     {
         linkToDrive_m->sendDriveData(data);
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);
@@ -201,7 +199,6 @@ Z47Interface::connectDriveLink(ParallelLink* link)
     {
         linkToDrive_m->registerHost(this);
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);

@@ -29,7 +29,6 @@ WD1797::updateReady(GenericFloppyDrive* drive)
     {
         statusReg_m |= stat_WriteProtect_c;
     }
-
     else
     {
         statusReg_m &= ~stat_WriteProtect_c;
@@ -39,7 +38,6 @@ WD1797::updateReady(GenericFloppyDrive* drive)
     {
         statusReg_m &= ~stat_NotReady_c;
     }
-
     else
     {
         statusReg_m |= stat_NotReady_c;
@@ -246,13 +244,11 @@ WD1797::processCmd(BYTE cmd)
         // Type I commands
         processCmdTypeI(cmd);
     }
-
     else if ((cmd & 0x40) == 0x00)
     {
         // Type II commands
         processCmdTypeII(cmd);
     }
-
     else
     {
         // must be Type III command
@@ -287,13 +283,11 @@ WD1797::processCmdTypeI(BYTE cmd)
         debugss(ssWD1797, INFO, "%s - Restore\n", __FUNCTION__);
         curCommand_m = restoreCmd;
     }
-
     else if ((cmd & 0xf0) == 0x10)
     {
         debugss(ssWD1797, INFO, "%s - Seek\n", __FUNCTION__);
         curCommand_m = dataReg_m == 0 ? restoreCmd : seekCmd;
     }
-
     else
     {
         // One of the Step commands
@@ -311,7 +305,6 @@ WD1797::processCmdTypeI(BYTE cmd)
                 debugss(ssWD1797, INFO, "%s - Step Out\n", __FUNCTION__);
                 stepDirection_m = dir_out;
             }
-
             else
             {
                 // Step In
@@ -357,7 +350,6 @@ WD1797::processCmdTypeII(BYTE cmd)
         debugss(ssWD1797, INFO, "%s - Write Sector - \n", __FUNCTION__);
         curCommand_m = writeSectorCmd;
     }
-
     else
     {
         // Read Sector
@@ -386,7 +378,6 @@ WD1797::processCmdTypeIII(BYTE cmd)
         curCommand_m = readAddressCmd;
 
     }
-
     else if ((cmd & 0xf0) == 0xf0)
     {
         // write Track
@@ -395,7 +386,6 @@ WD1797::processCmdTypeIII(BYTE cmd)
         raiseDrq();
 
     }
-
     else if ((cmd & 0xf0) == 0xe0)
     {
         // read Track
@@ -403,7 +393,6 @@ WD1797::processCmdTypeIII(BYTE cmd)
         curCommand_m = readTrackCmd;
 
     }
-
     else
     {
         debugss(ssWD1797, ERROR, "%s - Invalid type-III cmd: %x\n", __FUNCTION__, cmd);
@@ -430,7 +419,6 @@ WD1797::processCmdTypeIV(BYTE cmd)
         abortCmd();
         statusReg_m &= ~stat_Busy_c;
     }
-
     else if (drive)
     {
         // no Command running, update status.
@@ -441,7 +429,6 @@ WD1797::processCmdTypeIV(BYTE cmd)
         // stat_LostData_c and stat_DataRequest_c ? But not if Type I.
         debugss(ssWD1797, INFO, "%s - updating statusReg: %d\n", __FUNCTION__, statusReg_m);
     }
-
     else
     {
         debugss(ssWD1797, ERROR, "Type IV with no drive\n");
@@ -478,7 +465,6 @@ WD1797::processCmdTypeIV(BYTE cmd)
             raiseIntrq();
         }
     }
-
     else
     {
         debugss(ssWD1797, INFO, "%s - No Interrupt/ Clear Busy\n", __FUNCTION__);
@@ -594,7 +580,6 @@ WD1797::notification(unsigned int cycleCount)
 
         lastIndexStatus_m = true;
     }
-
     else
     {
         lastIndexStatus_m = false;
@@ -607,7 +592,6 @@ WD1797::notification(unsigned int cycleCount)
         stepSettle_m -= cycleCount;
         return;
     }
-
     else
     {
         stepSettle_m = 0;
@@ -633,7 +617,6 @@ WD1797::notification(unsigned int cycleCount)
                 drive->step(false);
                 stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
             }
-
             else
             {
                 trackReg_m   = 0;
@@ -654,7 +637,6 @@ WD1797::notification(unsigned int cycleCount)
                 trackReg_m  += (dir ? 1 : -1);
                 stepSettle_m = 100; // millisecToTicks(seekSpeed_m);
             }
-
             else
             {
                 if (verifyTrack_m)
@@ -666,7 +648,6 @@ WD1797::notification(unsigned int cycleCount)
                     {
                         statusReg_m |= stat_CRCError_c;
                     }
-
                     else if (track != trackReg_m)
                     {
                         statusReg_m |= stat_SeekError_c;
@@ -677,7 +658,6 @@ WD1797::notification(unsigned int cycleCount)
                 {
                     statusReg_m |= stat_TrackZero_c;
                 }
-
                 else
                 {
                     statusReg_m &= ~stat_TrackZero_c;
@@ -703,7 +683,6 @@ WD1797::notification(unsigned int cycleCount)
                     {
                         statusReg_m |= stat_TrackZero_c;
                     }
-
                     else
                     {
                         statusReg_m &= ~stat_TrackZero_c;
@@ -716,13 +695,11 @@ WD1797::notification(unsigned int cycleCount)
                         trackReg_m--;
                     }
                 }
-
                 else
                 {
                     statusReg_m |= stat_TrackZero_c;
                 }
             }
-
             else if (stepDirection_m == dir_in)
             {
                 debugss(ssWD1797, INFO, "%s - step in\n", __FUNCTION__);
@@ -745,7 +722,6 @@ WD1797::notification(unsigned int cycleCount)
             {
                 statusReg_m |= stat_TrackZero_c;
             }
-
             else
             {
                 statusReg_m &= ~stat_TrackZero_c;
@@ -774,7 +750,6 @@ WD1797::notification(unsigned int cycleCount)
             {
                 statusReg_m |= stat_IndexPulse_c;
             }
-
             else
             {
                 statusReg_m &= ~stat_IndexPulse_c;
@@ -822,7 +797,6 @@ WD1797::notification(unsigned int cycleCount)
                     sectorPos_m = -10;
                 }
             }
-
             else if (sectorPos_m < -4)
             {
                 addr_m[sectorPos_m + 10] = data;
@@ -840,14 +814,12 @@ WD1797::notification(unsigned int cycleCount)
                     {
                         sectorPos_m = -11;
                     }
-
                     else if (curCommand_m == writeSectorCmd)
                     {
                         raiseDrq();
                     }
                 }
             }
-
             else if (sectorPos_m < 0)
             {
                 if (curCommand_m == readAddressCmd)
@@ -858,7 +830,6 @@ WD1797::notification(unsigned int cycleCount)
                     statusReg_m &= ~stat_Busy_c;
                     raiseIntrq();
                 }
-
                 else if (data == GenericFloppyFormat::DATA_AM)
                 {
                     // At DATA AM, start getting sector data...
@@ -871,7 +842,6 @@ WD1797::notification(unsigned int cycleCount)
                     }
                 }
             }
-
             else
             {
                 transferData(data);
@@ -914,7 +884,6 @@ WD1797::notification(unsigned int cycleCount)
                 statusReg_m &= ~stat_Busy_c;
                 raiseIntrq();
             }
-
             else
             {
                 raiseDrq();
@@ -941,7 +910,6 @@ WD1797::notification(unsigned int cycleCount)
                         goto startWritingTrackNow;
                     }
                 }
-
                 else
                 {
                     break;

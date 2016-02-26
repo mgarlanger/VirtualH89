@@ -64,18 +64,15 @@ StdioConsole::receiveData(BYTE ch)
             sendData('K');
             mode = -1;
         }
-
         else
         {
             mode = 0;
         }
     }
-
     else if (mode == 0 && ch == 0x1b)
     {
         ++mode;
     }
-
     else
     {
         fputc(ch, stdout);

@@ -112,7 +112,6 @@ ROM::readByte(WORD addr)
         assert((addr >= baseAddress_m) && (offset < size_m));
 
     }
-
     else
     {
         val = data_m[offset];

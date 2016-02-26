@@ -857,7 +857,6 @@ ddfd(const char* s, WORD addr)
     {
         ireg = regix;
     }
-
     else
     {
         ireg = regiy;

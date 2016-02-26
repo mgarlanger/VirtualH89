@@ -43,7 +43,6 @@ RawFloppyImage::getAddrMark(BYTE* tp, int nbytes,
 
             ++indexes;
         }
-
         else if (*tp == GenericFloppyFormat::ID_AM_BYTE)
         {
             id_tk = tp[1];
@@ -110,47 +109,38 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         {
             sd = true;
         }
-
         else if (argv[x].compare("dd") == 0)
         {
             dd = true;
         }
-
         else if (argv[x].compare("ss") == 0)
         {
             ss = true;
         }
-
         else if (argv[x].compare("ds") == 0)
         {
             ds = true;
         }
-
         else if (argv[x].compare("st") == 0)
         {
             st = true;
         }
-
         else if (argv[x].compare("dt") == 0)
         {
             dt = true;
         }
-
         else if (argv[x].compare("5") == 0)
         {
             media = 5;
         }
-
         else if (argv[x].compare("8") == 0)
         {
             media = 8;
         }
-
         else if (argv[x].compare("rw") == 0)
         {
             writeProtect_m = false;
         }
-
         else
         {
             debugss(ssRawFloppyImage, WARNING, "%s: unrecognized hint - %s\n", __FUNCTION__,
@@ -217,7 +207,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
             {
                 idx = tp;
             }
-
             else
             {
                 trklen = (tp - idx);
@@ -226,14 +215,12 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
                 break;
             }
         }
-
         else if (*tp == GenericFloppyFormat::ID_AM_BYTE)
         {
             if (id_tk == -1)
             {
                 id_tk = tp[1];
             }
-
             else if (id_tk != tp[1])
             {
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent track number %d (%d)\n",
@@ -244,7 +231,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
             {
                 id_sd = tp[2];
             }
-
             else if (id_sd != tp[2])
             {
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent side number %d (%d)\n",
@@ -262,7 +248,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
 
             seclen = sl;
         }
-
         else if (*tp == GenericFloppyFormat::DATA_AM_BYTE)
         {
             if (dat == NULL)
@@ -270,12 +255,10 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
                 dat    = tp + 1;
                 idxgap = dat - trackBuffer_m;
             }
-
             else if (gaplen == 0)
             {
                 gaplen = tp + 1 - end;
             }
-
             else if (gaplen != tp + 1 - end)
             {
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent data gap %ld (%ld)\n",
@@ -319,7 +302,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
             // either SS or image has side 2 in last half...
             interlaced_m = false; // already done.
         }
-
         else if (id_tk == 0 && id_sd == 1)
         {
             // interlaced image.
@@ -327,7 +309,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
             interlaced_m = true;
             numSides_m   = 2;
         }
-
         else
         {
             debugss(ssRawFloppyImage, ERROR, "%s: invalid track/side layout\n", __FUNCTION__);
@@ -352,13 +333,11 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         {
             numSides_m = 2;
         }
-
         else
         {
             numSides_m = 1;
         }
     }
-
     else if (est_trks == 40 || est_trks == 80 || est_trks == 160)
     {
         mediaSize_m = 5;
@@ -368,14 +347,12 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
             numSides_m  = 2;
             numTracks_m = 80;
         }
-
         else if (est_trks < 80)
         {
             numSides_m  = 1;
             numTracks_m = 40;
         }
     }
-
     else
     {
         debugss(ssRawFloppyImage, ERROR, "%s: invalid image size\n", __FUNCTION__);
@@ -400,21 +377,18 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
                     numSides_m  = 1;
                     numTracks_m = 80;
                 }
-
                 else if (id_tk == 0 && id_sd == 1)
                 {
                     // non-interlaced double-sided media...
                     numSides_m  = 2;
                     numTracks_m = 40;
                 }
-
                 else
                 {
                     debugss(ssRawFloppyImage, ERROR, "%s: invalid track/side layout\n",
                             __FUNCTION__);
                 }
             }
-
             else
             {
                 // probably an error.
@@ -434,22 +408,18 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
     {
         doubleDensity_m = false;
     }
-
     else if (nbytes * 2 == trackLen_m)
     {
         doubleDensity_m = true;
     }
-
     else if (dd)
     {
         doubleDensity_m = true;
     }
-
     else if (sd)
     {
         doubleDensity_m = false;
     }
-
     else
     {
         debugss(ssRawFloppyImage, ERROR, "%s: invalid track length\n", __FUNCTION__);
@@ -461,17 +431,14 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         {
             numTracks_m = 80;
         }
-
         else if (st && mediaSize_m == 5)
         {
             numTracks_m = 40;
         }
-
         else if (st && mediaSize_m == 8)
         {
             numTracks_m = 77;
         }
-
         else
         {
             debugss(ssRawFloppyImage, ERROR, "%s: can't determine number of tracks\n",
@@ -485,12 +452,10 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string>
         {
             numSides_m = 2;
         }
-
         else if (ss)
         {
             numSides_m = 1;
         }
-
         else
         {
             debugss(ssRawFloppyImage, ERROR, "%s: can't determine number of sides\n", __FUNCTION__);
@@ -560,7 +525,6 @@ RawFloppyImage::cacheTrack(int side, int track)
 
         track /= 2;
     }
-
     else if (hyperTrack_m)
     {
         track *= 2;
@@ -570,7 +534,6 @@ RawFloppyImage::cacheTrack(int side, int track)
     {
         bufferOffset_m = (track * numSides_m + side) * trackLen_m;
     }
-
     else
     {
         bufferOffset_m = (side * numTracks_m + track) * trackLen_m;
@@ -615,13 +578,11 @@ RawFloppyImage::readData(BYTE side, BYTE track, unsigned long pos, int& data)
             data = GenericFloppyFormat::DATA_AM;
             return true;
         }
-
         else if (d == GenericFloppyFormat::ID_AM_BYTE)
         {
             data = GenericFloppyFormat::ID_AM;
             return true;
         }
-
         else if (d == GenericFloppyFormat::INDEX_AM_BYTE)
         {
             data = GenericFloppyFormat::INDEX_AM;
@@ -643,7 +604,6 @@ RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned long pos)
         writePos_m   = pos;
         return false; // Not supported
     }
-
     else
     {
         // 'pos' is position of DATA_AM, so start writing data at next byte.
@@ -663,10 +623,10 @@ RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned long pos)
 }
 
 bool
-RawFloppyImage::writeData(BYTE side,
-                          BYTE track,
+RawFloppyImage::writeData(BYTE          side,
+                          BYTE          track,
                           unsigned long pos,
-                          BYTE data)
+                          BYTE          data)
 {
     if (checkWriteProtect())
     {

@@ -52,7 +52,6 @@ HardSectoredDisk::HardSectoredDisk(const char* name)
                 sides_m, tracks_m);
         fclose(file);
     }
-
     else
     {
         debugss(ssFloppyDisk, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
@@ -85,10 +84,10 @@ HardSectoredDisk::~HardSectoredDisk()
 }
 
 bool
-HardSectoredDisk::readData(BYTE side,
-                           BYTE track,
+HardSectoredDisk::readData(BYTE          side,
+                           BYTE          track,
                            unsigned long pos,
-                           BYTE& data)
+                           BYTE&         data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
             tracks_m);
@@ -108,7 +107,6 @@ HardSectoredDisk::readData(BYTE side,
                     __FUNCTION__, track, track / 2);
             track /= 2;
         }
-
         else if ((maxTrack_m == 40) && (tracks_m == 80))
         {
             debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
@@ -125,7 +123,6 @@ HardSectoredDisk::readData(BYTE side,
             data = rawImage_m[side][track][pos];
             return true;
         }
-
         else
         {
             debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%lu)\n",
@@ -133,7 +130,6 @@ HardSectoredDisk::readData(BYTE side,
             return false;
         }
     }
-
     else
     {
         debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
@@ -142,10 +138,10 @@ HardSectoredDisk::readData(BYTE side,
 }
 
 bool
-HardSectoredDisk::writeData(BYTE side,
-                            BYTE track,
+HardSectoredDisk::writeData(BYTE          side,
+                            BYTE          track,
                             unsigned long pos,
-                            BYTE data)
+                            BYTE          data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
             maxTrack_m, tracks_m);
@@ -164,7 +160,6 @@ HardSectoredDisk::writeData(BYTE side,
             debugss(ssFloppyDisk, INFO, "%s: max - 80 trk_m - 40\n", __FUNCTION__);
             track /= 2;
         }
-
         else if ((maxTrack_m == 40) && (tracks_m == 80))
         {
             debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
@@ -183,7 +178,6 @@ HardSectoredDisk::writeData(BYTE side,
                     pos, rawImage_m[side][track][pos]);
             return true;
         }
-
         else
         {
             debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%lu)\n",
@@ -191,7 +185,6 @@ HardSectoredDisk::writeData(BYTE side,
             return false;
         }
     }
-
     else
     {
         debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
@@ -202,15 +195,14 @@ HardSectoredDisk::writeData(BYTE side,
 
 void
 HardSectoredDisk::getControlInfo(unsigned long pos,
-                                 bool& hole,
-                                 bool& writeProtect)
+                                 bool&         hole,
+                                 bool&         writeProtect)
 {
     if (initialized_m)
     {
         hole         = defaultHoleStatus(pos);
         writeProtect = checkWriteProtect();
     }
-
     else
     {
         // No disk in drive so hole light is on.
@@ -276,7 +268,6 @@ HardSectoredDisk::eject(const char* name)
 
         fclose(file);
     }
-
     else
     {
         debugss(ssFloppyDisk, WARNING, "%s: unable to save file - %s\n", __FUNCTION__, name);
@@ -284,10 +275,10 @@ HardSectoredDisk::eject(const char* name)
 }
 
 bool
-HardSectoredDisk::readSectorData(BYTE side,
-                                 BYTE track,
-                                 BYTE sector,
-                                 WORD pos,
+HardSectoredDisk::readSectorData(BYTE  side,
+                                 BYTE  track,
+                                 BYTE  sector,
+                                 WORD  pos,
                                  BYTE& data)
 {
     return false;

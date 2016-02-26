@@ -12,7 +12,8 @@
 #include "z80.h"
 
 
-InterruptController::InterruptController(CPU* cpu): intLevel_m(0), cpu_m(cpu)
+InterruptController::InterruptController(CPU* cpu): intLevel_m(0),
+                                                    cpu_m(cpu)
 {
     debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
 
@@ -85,42 +86,34 @@ InterruptController::readDataBus()
     {
         opCode = 0xff;
     }
-
     else if (intLevel_m & 0x40)
     {
         opCode = 0xf7;
     }
-
     else if (intLevel_m & 0x20)
     {
         opCode = 0xef;
     }
-
     else if (intLevel_m & 0x10)
     {
         opCode = 0xe7;
     }
-
     else if (intLevel_m & 0x08)
     {
         opCode = 0xdf;
     }
-
     else if (intLevel_m & 0x04)
     {
         opCode = 0xd7;
     }
-
     else if (intLevel_m & 0x02)
     {
         opCode = 0xcf;
     }
-
     else if (intLevel_m & 0x01)
     {
         opCode = 0xc7;
     }
-
     else
     {
         // invalid interrupt level.

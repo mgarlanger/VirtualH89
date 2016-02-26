@@ -170,7 +170,6 @@ GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: Enable Timer Interrupt.\n", __FUNCTION__);
             h89.getTimer().enableINT();
         }
-
         else
         {
             debugss(ssGpp, ALL, "%s: Disable Timer Interrupt.\n", __FUNCTION__);
@@ -186,7 +185,6 @@ GeneralPurposePort::out(BYTE addr, BYTE val)
                 debugss(ssGpp, ALL, "%s: Enable ORG 0.\n", __FUNCTION__);
                 h89.disableROM();
             }
-
             else
             {
                 // re-enable the ROM
@@ -208,7 +206,6 @@ GeneralPurposePort::out(BYTE addr, BYTE val)
             debugss(ssGpp, ALL, "%s: H17 Set Side 1.\n", __FUNCTION__);
             h89.selectSideH17(1);
         }
-
         else
         {
             debugss(ssGpp, ALL, "%s: H17 Set Side 0.\n", __FUNCTION__);
@@ -228,7 +225,6 @@ GeneralPurposePort::out(BYTE addr, BYTE val)
                     fast_m = true;
                 }
             }
-
             else
             {
                 if (fast_m)

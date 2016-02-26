@@ -131,13 +131,11 @@ H17::in(BYTE addr)
                         val |= H17::ctrlWriteProtect_Flag;
                     }
                 }
-
                 else
                 {
                     debugss(ssH17, INFO, " h17.in(Control) - No drive [%d]\n", curDrive_m);
                 }
             }
-
             else
             {
                 debugss(ssH17, INFO, " h17.in(Control) - Invalid drive [%d]\n", curDrive_m);
@@ -207,7 +205,6 @@ H17::out(BYTE addr, BYTE val)
                 writeGate_m = true;
                 state_m     = writingState;
             }
-
             else
             {
                 writeGate_m = false;
@@ -225,7 +222,6 @@ H17::out(BYTE addr, BYTE val)
                 transmitterBufferEmpty_m = false;
                 fillCharTransmitted_m    = false;
             }
-
             else if (val & DriveSelect1_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS1");
@@ -233,7 +229,6 @@ H17::out(BYTE addr, BYTE val)
                 transmitterBufferEmpty_m = false;
                 fillCharTransmitted_m    = false;
             }
-
             else if (val & DriveSelect2_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS2");
@@ -241,7 +236,6 @@ H17::out(BYTE addr, BYTE val)
                 transmitterBufferEmpty_m = false;
                 fillCharTransmitted_m    = false;
             }
-
             else
             {
                 debugss_nts(ssH17, INFO, " DS-");
@@ -254,7 +248,6 @@ H17::out(BYTE addr, BYTE val)
                 debugss_nts(ssH17, INFO, " Dir-in");
                 direction_m = true;
             }
-
             else
             {
                 debugss_nts(ssH17, INFO, " Dir-out");
@@ -269,7 +262,6 @@ H17::out(BYTE addr, BYTE val)
                 motorOn_m = true;
                 /// \todo Register with the cpu clock for notification.
             }
-
             else
             {
                 debugss_nts(ssH17, INFO, " MtrOff");
@@ -288,7 +280,6 @@ H17::out(BYTE addr, BYTE val)
             {
                 h89.writeEnableH17RAM();
             }
-
             else
             {
                 h89.writeProtectH17RAM();
@@ -300,7 +291,6 @@ H17::out(BYTE addr, BYTE val)
                 {
                     drives_m[curDrive_m]->step(direction_m);
                 }
-
                 else
                 {
                     // all drives have been unselected...
@@ -331,13 +321,11 @@ H17::connectDrive(BYTE unitNum, DiskDrive* drive)
             drives_m[unitNum] = drive;
             retVal            = true;
         }
-
         else
         {
             debugss(ssH17, ERROR, "%s: drive already connect\n", __FUNCTION__);
         }
     }
-
     else
     {
         debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
@@ -360,13 +348,11 @@ H17::removeDrive(BYTE unitNum)
             drives_m[unitNum] = 0;
             retVal            = true;
         }
-
         else
         {
             debugss(ssH17, WARNING, "%s: no unit to remove (%d)\n", __FUNCTION__, unitNum);
         }
     }
-
     else
     {
         debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
@@ -409,7 +395,6 @@ H17::notification(unsigned int cycleCount)
                 charPos);
         curCharPos_m = charPos;
     }
-
     else
     {
         // Drive motor is not turned on. Nothing to do.
@@ -420,7 +405,6 @@ H17::notification(unsigned int cycleCount)
             transmitterBufferEmpty_m = true;
             fillCharTransmitted_m    = true;
         }
-
         else
         {
             transmitterBufferEmpty_m = false;
@@ -455,7 +439,6 @@ H17::notification(unsigned int cycleCount)
                 debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
                         curDrive_m, data);
             }
-
             else
             {
                 debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
@@ -515,7 +498,6 @@ H17::notification(unsigned int cycleCount)
                 debugss(ssH17, ERROR, "%s: fill char sent Pos: %ld\n",
                         __FUNCTION__, curCharPos_m);
             }
-
             else
             {
                 data                     = transmitterHoldingRegister_m;
@@ -528,7 +510,6 @@ H17::notification(unsigned int cycleCount)
             {
                 drives_m[curDrive_m]->writeData(curCharPos_m, data);
             }
-
             else
             {
                 debugss(ssH17, INFO, "%s: No Valid Drive - Pos: %ld\n", __FUNCTION__,

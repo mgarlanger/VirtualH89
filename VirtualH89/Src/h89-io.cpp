@@ -108,7 +108,6 @@ H89_IO::removeDevice(IODevice* device)
                     // TODO: call destructor? (i.e. "delete iodevices[port];"?)
                     iodevices[port] = 0;
                 }
-
                 else
                 {
                     // Doesn't match what is attempting to be removed.
@@ -118,7 +117,6 @@ H89_IO::removeDevice(IODevice* device)
                 }
             }
         }
-
         else
         {
             // no ports.
@@ -127,7 +125,6 @@ H89_IO::removeDevice(IODevice* device)
             retVal = false;
         }
     }
-
     else
     {
         // NULL device passed in
@@ -162,7 +159,6 @@ H89_IO::in(BYTE addr)
     {
         val = iodevices[addr]->in(addr);
     }
-
     else
     {
         // undefined in
@@ -182,7 +178,6 @@ H89_IO::out(BYTE addr, BYTE val)
     {
         iodevices[addr]->out(addr, val);
     }
-
     else
     {
         debugss(ssIO, WARNING, "%s: undefined port (%03o) = 0x%02x\n", __FUNCTION__,
