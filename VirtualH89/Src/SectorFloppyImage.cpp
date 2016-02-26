@@ -180,7 +180,8 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
 
     if (!done)
     {
-        debugss(ssSectorFloppyImage, INFO, "file is not SectorFloppyImage (%d,%d) - %s\n", x, errno,
+        debugss(ssSectorFloppyImage, ERROR, "file is not SectorFloppyImage (%d,%d) - %s\n", x,
+                errno,
                 name);
         return;
     }

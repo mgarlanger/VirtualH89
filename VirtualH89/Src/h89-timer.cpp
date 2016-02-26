@@ -34,7 +34,8 @@ static const int TimerInterval_c = 10000;
 #endif
 
 H89Timer::H89Timer(CPU*          cpu,
-                   unsigned char intlvl): cpu_m(cpu),
+                   unsigned char intlvl): GppListener(h89timer_gpp2msIntEnBit_c),
+                                          cpu_m(cpu),
                                           intEnabled_m(false),
                                           count_m(0),
                                           intLevel(intlvl)
@@ -56,6 +57,7 @@ H89Timer::H89Timer(CPU*          cpu,
     tim.it_interval.tv_usec = TimerInterval_c;
 
     setitimer(ITIMER_REAL, &tim, NULL);
+    GppListener::addListener(this);
 }
 
 
@@ -157,19 +159,10 @@ H89Timer::handleSignal(int signum)
 }
 
 void
-H89Timer::enableINT()
-{
-    debugss(ssTimer, INFO, "Enable INT\n");
-
-    intEnabled_m = true;
-}
-
-void
-H89Timer::disableINT()
-{
-    debugss(ssTimer, INFO, "Disable INT\n");
-
-    intEnabled_m = false;
-
-    h89.lowerINT(intLevel);
+H89Timer::gppNewValue(BYTE gpo) {
+    intEnabled_m = ((gpo & h89timer_gpp2msIntEnBit_c) != 0);
+    if (!intEnabled_m)
+    {
+        h89.lowerINT(intLevel);
+    }
 }

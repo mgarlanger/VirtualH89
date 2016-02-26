@@ -12,6 +12,7 @@
 
 #include "DiskController.h"
 #include "ClockUser.h"
+#include "GppListener.h"
 
 class DiskDrive;
 
@@ -22,7 +23,7 @@ class DiskDrive;
 /// at 102k per disk. Later (third-party) software upgrades supported disks up to 408k per
 /// disk, by using a double-sided 96 tpi drive (H-17-4 or H-17-5).
 ///
-class H17: public DiskController, public ClockUser
+class H17: public DiskController, public ClockUser, public GppListener
 {
   public:
     H17(int BaseAddr);
@@ -65,6 +66,8 @@ class H17: public DiskController, public ClockUser
     }
 
   private:
+    virtual void gppNewValue(BYTE gpo);
+    static const BYTE h17_gppSideSelectBit_c = 0b01000000;
 
     enum State
     {

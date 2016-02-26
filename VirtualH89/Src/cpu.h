@@ -41,10 +41,11 @@ class CPU
     virtual void lowerINT(void)                = 0;
     virtual void raiseNMI(void)                = 0;
     virtual void setAddressBus(AddressBus* ab) = 0;
-    virtual void setSpeed(bool fast)           = 0;
     virtual void continueRunning(void)         = 0;
     virtual void waitState(void)               = 0;
     virtual std::string dumpDebug()            = 0;
+    virtual void setSpeedup(int factor)        = 0;
+    virtual void enableFast(void)              = 0;
 
 };
 

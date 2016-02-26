@@ -23,11 +23,9 @@
 
 #include "computer.h"
 
-
 // Forward declare classes to avoid a tangled mess of includes.
 
 class ROM;
-class RAM;
 class AddressBus;
 class Console;
 class InterruptController;
@@ -45,6 +43,7 @@ class CPU;
 class Terminal;
 class FloppyDisk;
 class ParallelLink;
+class HDOSMemory8K;
 
 ///
 /// \brief Virtual Heathkit %H89 Computer
@@ -70,7 +69,6 @@ class H89: public Computer
     INS8250*             modemPort;
     INS8250*             auxPort;
 
-    H17*                 h17;
     Console*             console;
     Z_89_37*             h37;
     Z47Interface*        z47If;
@@ -105,13 +103,7 @@ class H89: public Computer
 
     ROM*                 monitorROM;
     ROM*                 h17ROM;
-    RAM*                 memory;
-
-    /// \todo consolidate the RAM into one and change how ORG-0 is handled. - maybe not.
-    /// \todo also need to change the way this is handled so writes when rom enabled, go to
-    ///       the RAM.
-    RAM* h17RAM;
-    RAM* CPM8k;
+    HDOSMemory8K*        HDOS;
 
     /// Port Addresses
 
@@ -159,7 +151,6 @@ class H89: public Computer
 
     virtual void reset();
     virtual BYTE run();
-    virtual H89Timer& getTimer();
 
     virtual void init();
 
@@ -175,22 +166,16 @@ class H89: public Computer
     virtual void waitCPU(void);
     std::string dumpDebug();
 
-    virtual void disableROM();
-    virtual void enableROM();
-
     virtual void writeProtectH17RAM();
     virtual void writeEnableH17RAM();
 
-    virtual void selectSideH17(BYTE side);
-
-    virtual void setSpeed(bool fast);
-
-    virtual H89_IO&     getIO();
+    virtual H89_IO&             getIO();
 
     virtual void clearMemory(BYTE data = 0);
 
-    virtual AddressBus& getAddressBus();
-    virtual CPU&        getCPU();
+    virtual AddressBus&         getAddressBus();
+    virtual CPU&                getCPU();
+    virtual GeneralPurposePort& getGPP();
 };
 
 extern H89 h89;

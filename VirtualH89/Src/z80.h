@@ -16,6 +16,7 @@
 
 #include "cpu.h"
 #include "AddressBus.h"
+#include "GppListener.h"
 
 
 ///
@@ -25,7 +26,7 @@
 /// to C++ and more of the undocumented opcodes have been implemented. Also, fixed
 /// a few of the flags for opcodes like DAA.
 ///
-class Z80: public CPU
+class Z80: public CPU, public GppListener
 {
   private:
     typedef void (Z80::* opCodeMethod)(void);
@@ -145,6 +146,8 @@ class Z80: public CPU
     static const opCodeMethod op_cb[256];
     static const opCodeMethod op_ed[256];
     static const opCodeMethod op_xxcb[32];
+    virtual void gppNewValue(BYTE gpo);
+    static const BYTE         z80_gppSpeedSelBit_c = 0b00010000;
 
   public:
     Z80(int clockRate, int ticksPerSecond);
@@ -163,7 +166,8 @@ class Z80: public CPU
     virtual void raiseNMI(void);
     virtual void addClockTicks(void);
     virtual void setAddressBus(AddressBus* ab);
-    virtual void setSpeed(bool fast);
+    virtual void setSpeedup(int factor);
+    virtual void enableFast();
 
     /// \todo - fix this for general case with any instruction on the address bus
     virtual void raiseINT();
@@ -324,7 +328,8 @@ class Z80: public CPU
   private:
 
     /// \todo - move this outside of the z80 class.
-    static const unsigned int speedUpFactor_c = 40;
+    unsigned int speedUpFactor_m;
+    bool         fast_m;
 
     // -------------------------
     //

@@ -1365,6 +1365,7 @@ Z80::SET_ZSP_FLAGS(BYTE val)
 ///
 Z80::Z80(int clockRate,
          int ticksPerSecond): CPU(),
+                              GppListener(z80_gppSpeedSelBit_c),
                               A(af.hi),
                               sA(af.shi),
                               F(af.lo),
@@ -1399,6 +1400,8 @@ Z80::Z80(int clockRate,
                               mode(cm_reset),
                               prefix(ip_none),
                               resetReq(false), // never used
+                              speedUpFactor_m(40),
+                              fast_m(false),
                               IM(0)
 
 {
@@ -1462,6 +1465,8 @@ Z80::reset(void)
     int_type      = 0;
     mode          = cm_reset;
     ticks         = 0;
+    fast_m        = false;
+    // TODO: reset speedup...
     addClockTicks();
 }
 
@@ -1493,37 +1498,42 @@ Z80::addClockTicks()
 }
 
 void
-Z80::setSpeed(bool fast)
-{
-    debugss(ssZ80, WARNING, "%s: - %d\n", __FUNCTION__, fast);
+Z80::setSpeedup(int factor) {
+    speedUpFactor_m = factor;
+}
 
-    if (fast)
+void
+Z80::enableFast() {
+    GppListener::addListener(this);
+}
+
+void
+Z80::gppNewValue(BYTE gpo) {
+    fast_m = ((gpo & z80_gppSpeedSelBit_c) != 0);
+    debugss(ssZ80, WARNING, "%s: fast_m = %d\n", __FUNCTION__, fast_m);
+
+    if (fast_m)
     {
-
         if (ticks > 0)
         {
-            ticks        *= speedUpFactor_c;
+            ticks        *= speedUpFactor_m;
             lastInstTicks = ticks;
         }
-
-        ClockRate_m     = 2048000 * speedUpFactor_c;
+        ClockRate_m     = 2048000 * speedUpFactor_m;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
     else
     {
-
         if (ticks > 0)
         {
-            ticks        /= speedUpFactor_c;
+            ticks        /= speedUpFactor_m;
             lastInstTicks = ticks;
         }
-
         ClockRate_m     = 2048000;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
 
     WallClock::instance()->updateTicksPerSecond(ClockRate_m);
-
 }
 
 ///

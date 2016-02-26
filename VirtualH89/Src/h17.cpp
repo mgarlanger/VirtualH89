@@ -17,6 +17,7 @@
 
 
 H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
+                        GppListener(h17_gppSideSelectBit_c),
                         state_m(idleState),
                         spinCycles_m(0),
                         curCharPos_m(0),
@@ -40,11 +41,17 @@ H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
     }
 
     WallClock::instance()->registerUser(this);
+    GppListener::addListener(this);
 }
 
 H17::~H17()
 {
     WallClock::instance()->unregisterUser(this);
+}
+
+void
+H17::gppNewValue(BYTE gpo) {
+    selectSide((gpo & h17_gppSideSelectBit_c) ? 1 : 0);
 }
 
 BYTE

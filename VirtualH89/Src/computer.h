@@ -28,7 +28,6 @@ class Computer
 
     virtual void reset()                    = 0;
     virtual BYTE run()                      = 0;
-    virtual H89Timer& getTimer()            = 0;
 
     virtual void init()                     = 0;
 

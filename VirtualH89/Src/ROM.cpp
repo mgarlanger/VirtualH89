@@ -13,8 +13,10 @@
 #include <fstream>
 #include "logger.h"
 
-ROM::ROM(int size): Memory(size),
-                    data_m(0)
+ROM::ROM(int size):
+    data_m(0),
+    base_m(0),
+    size_m(size)
 {
     debugss(ssROM, INFO, "%s: Creating ROM: %d\n", __FUNCTION__, size_m);
 
@@ -35,7 +37,7 @@ ROM::getROM(const char* filename,
             WORD        addr)
 {
     std::ifstream     file;
-    unsigned int      fileSize;
+    unsigned long int fileSize;
     BYTE*             buf;
     ROM*              rom = NULL;
 
@@ -48,12 +50,12 @@ ROM::getROM(const char* filename,
     }
 
     file.seekg(0, std::ios::end);
-    fileSize = (unsigned int) file.tellg();
+    fileSize = file.tellg();
     file.seekg(0, std::ios::beg);
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %u\n", __FUNCTION__, filename,
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename,
                 fileSize);
         return NULL;
     }
@@ -65,8 +67,12 @@ ROM::getROM(const char* filename,
     rom = new ROM(fileSize);
     rom->setBaseAddress(addr);
     rom->initialize(buf, fileSize);
-    delete[] buf;
     return rom;
+}
+
+void
+ROM::setBaseAddress(WORD adr) {
+    base_m = adr;
 }
 
 void
@@ -106,15 +112,16 @@ BYTE
 ROM::readByte(WORD addr)
 {
     BYTE val    = 0;
-    WORD offset = addr - baseAddress_m;
+    WORD offset = addr - base_m;
 
-    if ((addr < baseAddress_m) || (offset >= size_m))
+    if ((addr < base_m) || (offset >= size_m))
     {
         debugss(ssROM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n", __FUNCTION__,
-                addr, baseAddress_m, size_m);
-        assert((addr >= baseAddress_m) && (offset < size_m));
+                addr, base_m, size_m);
+        assert((addr >= base_m) && (offset < size_m));
 
     }
+
     else
     {
         val = data_m[offset];
@@ -122,4 +129,17 @@ ROM::readByte(WORD addr)
 
     debugss(ssROM, ALL, "%s: addr[%d] = %d\n", __FUNCTION__, addr, val);
     return (val);
+}
+
+WORD
+ROM::getBase() {
+    return base_m;
+}
+WORD
+ROM::getSize() {
+    return size_m;
+}
+BYTE*
+ROM::getImage() {
+    return data_m;
 }
