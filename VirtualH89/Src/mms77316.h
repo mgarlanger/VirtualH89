@@ -9,15 +9,13 @@
 #ifndef MMS77316_H_
 #define MMS77316_H_
 
-#include <vector>
-#include <string>
 
-#include "config.h"
-#include "h89Types.h"
 #include "wd1797.h"
-#include "GenericFloppyDrive.h"
 #include "DiskController.h"
 #include "propertyutil.h"
+
+class GenericFloppyDrive;
+class GenericDiskDrive;
 
 ///
 /// \brief Virtual soft-sectored disk controller
@@ -26,7 +24,7 @@
 ///
 /// The MMS77316 uses the 1797-02 controller.
 ///
-class MMS77316 : public DiskController, WD1797
+class MMS77316: public DiskController, WD1797
 {
   public:
     static const int numDisks_c = 8;
@@ -34,33 +32,33 @@ class MMS77316 : public DiskController, WD1797
     MMS77316(int baseAddr);
     virtual ~MMS77316();
 
-    static MMS77316 *install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot);
+    static MMS77316* install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot);
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, GenericFloppyDrive *drive);
+    virtual bool connectDrive(BYTE unitNum, GenericFloppyDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
-    virtual GenericFloppyDrive *getDrive(BYTE unitNum);
+    virtual GenericFloppyDrive* getDrive(BYTE unitNum);
 
     virtual void reset(void);
 
     static const BYTE MMS77316_Intr_c = 5; // INT5N
 
     // TODO: implement this
-    std::vector<GenericDiskDrive *> getDiskDrives();
+    std::vector<GenericDiskDrive*> getDiskDrives();
     std::string getDriveName(int index);
     std::string getDeviceName()
     {
         return MMS77316_Name_c;
     }
-    GenericDiskDrive *findDrive(std::string ident);
+    GenericDiskDrive* findDrive(std::string ident);
     std::string dumpDebug();
 
     bool interResponder(BYTE& opCode);
 
   protected:
-    static const char *MMS77316_Name_c;
+    static const char* MMS77316_Name_c;
 
   private:
     void raiseIntrq();
@@ -68,26 +66,26 @@ class MMS77316 : public DiskController, WD1797
     void lowerIntrq();
     void lowerDrq();
 
-    static const BYTE MMS77316_NumPorts_c       = 8;
+    static const BYTE   MMS77316_NumPorts_c  = 8;
 
-    static const BYTE BasePort_c                = 0x38;
-    static const BYTE ControlPort_Offset_c      = 0;
-    static const BYTE Wd1797_Offset_c           = 4;
-    BYTE controlReg_m;
+    static const BYTE   BasePort_c           = 0x38;
+    static const BYTE   ControlPort_Offset_c = 0;
+    static const BYTE   Wd1797_Offset_c      = 4;
+    BYTE                controlReg_m;
 
-    GenericFloppyDrive *getCurDrive();
+    GenericFloppyDrive* getCurDrive();
     int getClockPeriod();
-    GenericFloppyDrive *drives_m[numDisks_c];
+    GenericFloppyDrive* drives_m[numDisks_c];
 
-    unsigned char     intLevel_m;
-    int drqCount_m;
+    unsigned char       intLevel_m;
+    int                 drqCount_m;
 
     /// Bits set in cmd_ControlPort_c
-    static const BYTE ctrl_EnableIntReq_c       = 0x08;
-    static const BYTE ctrl_EnableBurstN_c       = 0x20;
-    static const BYTE ctrl_SetMFMRecordingN_c   = 0x40;
-    static const BYTE ctrl_DriveSel_c           = 0x07;
-    static const BYTE ctrl_525DriveSel_c        = 0x04;
+    static const BYTE   ctrl_EnableIntReq_c     = 0x08;
+    static const BYTE   ctrl_EnableBurstN_c     = 0x20;
+    static const BYTE   ctrl_SetMFMRecordingN_c = 0x40;
+    static const BYTE   ctrl_DriveSel_c         = 0x07;
+    static const BYTE   ctrl_525DriveSel_c      = 0x04;
 
     bool burstMode()
     {

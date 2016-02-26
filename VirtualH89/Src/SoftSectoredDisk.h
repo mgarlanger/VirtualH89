@@ -27,42 +27,42 @@ class SoftSectoredDisk: public FloppyDisk
         dif_8RAW
     };
 
-    SoftSectoredDisk(const char *name, DiskImageFormat format);
+    SoftSectoredDisk(const char* name, DiskImageFormat format);
     SoftSectoredDisk();
     virtual ~SoftSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data);
-    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect);
+    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data);
+    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect);
 
     virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE& data);
-    virtual void eject(const char *name);
+    virtual void eject(const char* name);
 
   private:
     static const unsigned int bytesPerTrack_c = 6400;
 
     static const unsigned int tracksPerSide_c = 80;
     static const unsigned int maxHeads_c      = 2;
-    BYTE rawImage_m[maxHeads_c][tracksPerSide_c][bytesPerTrack_c];
+    BYTE                      rawImage_m[maxHeads_c][tracksPerSide_c][bytesPerTrack_c];
 
-    std::vector <Track *> tracks_m[maxHeads_c];
-    BYTE  maxTrack_m;
+    std::vector <Track*>      tracks_m[maxHeads_c];
+    BYTE                      maxTrack_m;
 
-    bool initialized_m    = false;
-    BYTE numTracks_m      = 80;
-    BYTE numHeads_m       = 2;
-    BYTE numSectors_m     = 10;
+    bool                      initialized_m = false;
+    BYTE                      numTracks_m   = 80;
+    BYTE                      numHeads_m    = 2;
+    BYTE                      numSectors_m  = 10;
 
     // move these to track, that is how it is encoded in IMD files.
 //    DataRate dataRate_m;
 
-    bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned long pos);
 
-    void determineDiskFormat(const char *name, DiskImageFormat& format);
-    bool readTD0(const char *name);
-    bool readIMD(const char *name);
-    bool readRaw(const char *name);
-    bool readRaw8(const char *name);
+    void determineDiskFormat(const char* name, DiskImageFormat& format);
+    bool readTD0(const char* name);
+    bool readIMD(const char* name);
+    bool readRaw(const char* name);
+    bool readRaw8(const char* name);
 
   protected:
     void dump();

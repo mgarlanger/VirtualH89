@@ -10,6 +10,8 @@
 /// \author Douglas Miller
 ///
 
+#include "StdioProxyConsole.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -21,46 +23,56 @@
 
 #include "H89.h"
 #include "h89-io.h"
-#include "StdioProxyConsole.h"
 #include "logger.h"
+#include "H89Operator.h"
 
 /// \brief StdioProxyConsole
 ///
 ///
-StdioProxyConsole::StdioProxyConsole(int argc, char **argv): Console(argc, argv)
+StdioProxyConsole::StdioProxyConsole(int argc, char** argv): Console(argc, argv)
 {
-    int c;
-    extern char *optarg;
+    int          c;
+    extern char* optarg;
 
     // TODO: interpret args to get pipe/fifo for commands.
     while ((c = getopt(argc, argv, "d:")) != EOF)
     {
         switch (c)
         {
-        case 'd':
-            sleep(strtol(optarg, NULL, 0));
-            break;
+            case 'd':
+                sleep((unsigned int) strtol(optarg, NULL, 0));
+                break;
         }
     }
 
     op_m = new H89Operator();
 }
 
-StdioProxyConsole::~StdioProxyConsole() {}
+StdioProxyConsole::~StdioProxyConsole() {
+}
 
-void StdioProxyConsole::init() {}
+void
+StdioProxyConsole::init() {
+}
 
-void StdioProxyConsole::reset() {}
+void
+StdioProxyConsole::reset() {
+}
 
-void StdioProxyConsole::display() {}
+void
+StdioProxyConsole::display() {
+}
 
-void StdioProxyConsole::processCharacter(char ch) {}
+void
+StdioProxyConsole::processCharacter(char ch) {
+}
 
-void StdioProxyConsole::keypress(char ch)
+void
+StdioProxyConsole::keypress(char ch)
 {
     // try not to overrun the UART, but do not wait too long.
     int timeout = 4000;
-    int sleep = 100;
+    int sleep   = 100;
 
     while (!sendReady() && timeout > 0)
     {
@@ -71,29 +83,33 @@ void StdioProxyConsole::keypress(char ch)
     sendData(ch);
 }
 
-void StdioProxyConsole::receiveData(BYTE ch)
+void
+StdioProxyConsole::receiveData(BYTE ch)
 {
     fputc(ch | 0x80, stdout);
     fflush(stdout);
 }
 
-bool StdioProxyConsole::checkUpdated()
+bool
+StdioProxyConsole::checkUpdated()
 {
     return false;
 }
 
-unsigned int StdioProxyConsole::getBaudRate()
+unsigned int
+StdioProxyConsole::getBaudRate()
 {
     return SerialPortDevice::DISABLE_BAUD_CHECK;
 }
 
-void StdioProxyConsole::run()
+void
+StdioProxyConsole::run()
 {
     static char buf[1024];
-    int x = 0;
-    int c;
+    int         x = 0;
+    int         c;
 
-    //setbuf(stdin, NULL);
+    // setbuf(stdin, NULL);
 
     while ((c = fgetc(stdin)) != EOF)
     {
@@ -102,7 +118,6 @@ void StdioProxyConsole::run()
             c &= 0x7f;
             keypress(c);
         }
-
         else if (c == 0x0a)
         {
             if (x >= sizeof(buf))
@@ -111,13 +126,12 @@ void StdioProxyConsole::run()
             }
 
             buf[x] = '\0';
-            x = 0;
+            x      = 0;
             std::string resp = op_m->handleCommand(buf);
             fputs(resp.c_str(), stdout);
             fputc('\n', stdout);
             fflush(stdout);
         }
-
         else
         {
             if (x < sizeof(buf))

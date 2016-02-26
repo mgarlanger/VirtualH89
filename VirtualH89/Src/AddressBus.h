@@ -34,19 +34,19 @@ class AddressBus
     /// \todo - should I have a read and a write memory separate to handle the lower
     ///         8k RAM/ROM, so that writes get written out to memory... but how do
     ///         I handle less than 64k of memory... ?? start at 8k and have it wrap around???
-    Memory *mem[numOfPages_c];
-    InterruptController *ic_m;
+    Memory*              mem[numOfPages_c];
+    InterruptController* ic_m;
 
   public:
-    AddressBus(InterruptController *ic);
+    AddressBus(InterruptController* ic);
     virtual ~AddressBus();
 
     // setup memory
-    void installMemory(Memory *mem);
+    void installMemory(Memory* mem);
     virtual void clearMemory(BYTE data = 0);
 
-    InterruptController *getIntrCtrlr();
-    void setIntrCtrlr(InterruptController *ic);
+    InterruptController* getIntrCtrlr();
+    void setIntrCtrlr(InterruptController* ic);
     // Wanted to use the [] operator, but unfortunately it can't be used since the
     // emulated CPU may need to handle writing and reading differently.
     BYTE readByte(WORD addr, bool interruptAck = false);

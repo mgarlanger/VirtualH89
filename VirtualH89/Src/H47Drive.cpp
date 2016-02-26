@@ -11,11 +11,11 @@
 #include "logger.h"
 
 H47Drive::H47Drive(): tracks_m(maxTracks_c),
-    sectors_m(maxSectorsPerTrack_c),
-    bytes_m(maxBytesPerSector_c),
-    track_m(0),
-    sector_m(1),
-    byte_m(0)
+                      sectors_m(maxSectorsPerTrack_c),
+                      bytes_m(maxBytesPerSector_c),
+                      track_m(0),
+                      sector_m(1),
+                      byte_m(0)
 {
     // TODO Auto-generated constructor stub
 
@@ -27,23 +27,27 @@ H47Drive::~H47Drive()
     // TODO Auto-generated destructor stub
 }
 
-void H47Drive::insertDisk(FloppyDisk *disk)
+void
+H47Drive::insertDisk(FloppyDisk* disk)
 {
     disk_m = disk;
 
 }
 
-void H47Drive::getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect)
+void
+H47Drive::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect)
 {
 
 }
 
-void H47Drive::selectSide(BYTE side)
+void
+H47Drive::selectSide(BYTE side)
 {
 
 }
 
-void H47Drive::step(bool direction)
+void
+H47Drive::step(bool direction)
 {
     if (direction)
     {
@@ -54,7 +58,6 @@ void H47Drive::step(bool direction)
 
         debugss(ssH47Drive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m)
@@ -67,20 +70,22 @@ void H47Drive::step(bool direction)
 
 }
 
-BYTE H47Drive::readData(unsigned int pos)
+BYTE
+H47Drive::readData(unsigned long pos)
 {
 
     return 0;
 }
 
-void H47Drive::writeData(unsigned int pos, BYTE data)
+void
+H47Drive::writeData(unsigned long pos, BYTE data)
 {
 
 }
 
-BYTE H47Drive::readSectorData(BYTE sector, unsigned int pos)
+BYTE
+H47Drive::readSectorData(BYTE sector, unsigned long pos)
 {
 
     return 0;
 }
-

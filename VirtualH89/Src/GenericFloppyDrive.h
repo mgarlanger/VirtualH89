@@ -10,12 +10,9 @@
 #ifndef GENERICFLOPPYDRIVE_H_
 #define GENERICFLOPPYDRIVE_H_
 
-#include <string>
-
-#include "config.h"
-#include "h89Types.h"
-#include "GenericFloppyDisk.h"
 #include "GenericDiskDrive.h"
+
+class GenericFloppyDisk;
 
 ///
 /// \brief Virtual Generic Floppy Drive
@@ -23,7 +20,7 @@
 /// Implements a virtual floppy disk drive. Supports 48/96 tpi 5.25",
 /// 48 tpi 8", either can be SS or DS. Note, the media determines density.
 ///
-class GenericFloppyDrive : public GenericDiskDrive
+class GenericFloppyDrive: public GenericDiskDrive
 {
   public:
     enum DriveType
@@ -40,7 +37,7 @@ class GenericFloppyDrive : public GenericDiskDrive
 
     virtual ~GenericFloppyDrive();
 
-    static GenericFloppyDrive *getInstance(std::string type);
+    static GenericFloppyDrive* getInstance(std::string type);
     bool getTrackZero();
     bool readAddress(int& track, int& sector, int& side);
 
@@ -51,13 +48,13 @@ class GenericFloppyDrive : public GenericDiskDrive
     int writeData(bool doubleDensity, BYTE track, BYTE side, BYTE sector,
                   int inSector, BYTE data, bool dataReady);
 
-    void insertDisk(GenericFloppyDisk *disk);
+    void insertDisk(GenericFloppyDisk* disk);
 
     void notification(unsigned int cycleCount);
     unsigned long getCharPos(bool doubleDensity);
 
     void headLoad(bool load); // Ignored on 5.25" drives?
-    void motor(bool on); // Ignored on 8" drives
+    void motor(bool on);      // Ignored on 8" drives
     bool getIndexPulse()
     {
         return indexPulse_m;
@@ -76,21 +73,21 @@ class GenericFloppyDrive : public GenericDiskDrive
     std::string getMediaName();
 
   private:
-    unsigned int numTracks_m;
-    unsigned int numHeads_m;
-    unsigned int driveRpm_m;
-    unsigned int mediaSize_m;
-    unsigned int rawSDBytesPerTrack_m;
-    unsigned long ticksPerSec_m;
-    unsigned long ticksPerRev_m;
+    unsigned int       numTracks_m;
+    unsigned int       numHeads_m;
+    unsigned int       driveRpm_m;
+    unsigned int       mediaSize_m;
+    unsigned int       rawSDBytesPerTrack_m;
+    unsigned long      ticksPerSec_m;
+    unsigned long      ticksPerRev_m;
     unsigned long long cycleCount_m;
-    bool indexPulse_m;
+    bool               indexPulse_m;
 
-    GenericFloppyDisk *disk_m;
-    int headSel_m;
-    int track_m;
-    bool motor_m;
-    bool head_m;
+    GenericFloppyDisk* disk_m;
+    int                headSel_m;
+    int                track_m;
+    bool               motor_m;
+    bool               head_m;
 };
 
 #endif // GENERICFLOPPYDRIVE_H_

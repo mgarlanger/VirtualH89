@@ -8,6 +8,8 @@
 /// \author Douglas Miller
 ///
 
+#include "H89Operator.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -17,10 +19,10 @@
 #include <unistd.h>
 #include <sstream>
 
+#include "cpu.h"
 #include "H89.h"
 #include "h89-io.h"
 #include "logger.h"
-#include "H89Operator.h"
 #include "DiskController.h"
 #include "GenericDiskDrive.h"
 #include "RawFloppyImage.h"
@@ -34,16 +36,18 @@ H89Operator::H89Operator()
 {
 }
 
-H89Operator::~H89Operator() {}
+H89Operator::~H89Operator() {
+}
 
-GenericDiskDrive *H89Operator::findDrive(std::string name)
+GenericDiskDrive*
+H89Operator::findDrive(std::string name)
 {
-    std::vector<DiskController *> devs = h89.getIO().getDiskDevices();
+    std::vector<DiskController*> devs = h89.getIO().getDiskDevices();
 
     for (int x = 0; x < devs.size(); ++x)
     {
-        DiskController *dev = devs[x];
-        GenericDiskDrive *drv;
+        DiskController*   dev = devs[x];
+        GenericDiskDrive* drv = nullptr;
 
         if (dev != NULL && (drv = dev->findDrive(name)) != NULL)
         {
@@ -54,13 +58,14 @@ GenericDiskDrive *H89Operator::findDrive(std::string name)
     return NULL;
 }
 
-DiskController *H89Operator::findDiskCtrlr(std::string name)
+DiskController*
+H89Operator::findDiskCtrlr(std::string name)
 {
-    std::vector<DiskController *> devs = h89.getIO().getDiskDevices();
+    std::vector<DiskController*> devs = h89.getIO().getDiskDevices();
 
     for (int x = 0; x < devs.size(); ++x)
     {
-        DiskController *dev = devs[x];
+        DiskController* dev = devs[x];
 
         if (dev != NULL && name.compare(dev->getDeviceName()) == 0)
         {
@@ -71,7 +76,8 @@ DiskController *H89Operator::findDiskCtrlr(std::string name)
     return NULL;
 }
 
-std::string H89Operator::cleanse(std::string resp)
+std::string
+H89Operator::cleanse(std::string resp)
 {
     size_t pos = 0;
 
@@ -84,9 +90,10 @@ std::string H89Operator::cleanse(std::string resp)
     return resp;
 }
 
-std::string H89Operator::executeCommand(std::string cmd)
+std::string
+H89Operator::executeCommand(std::string cmd)
 {
-    std::string resp;
+    std::string              resp;
     std::vector<std::string> args = PropertyUtil::splitArgs(cmd);
     debugss(ssStdioConsole, INFO, "Servicing cmd = %s\n", cmd.c_str());
 
@@ -118,7 +125,7 @@ std::string H89Operator::executeCommand(std::string cmd)
             return "error syntax: " + cmd;
         }
 
-        GenericDiskDrive *drv = findDrive(args[1]);
+        GenericDiskDrive* drv = findDrive(args[1]);
 
         if (drv == NULL)
         {
@@ -131,22 +138,22 @@ std::string H89Operator::executeCommand(std::string cmd)
 
     if (args[0].compare("getdisks") == 0)
     {
-        int count = 0;
-        std::vector<DiskController *> devs = h89.getIO().getDiskDevices();
-        std::ostringstream resp;
+        int                          count = 0;
+        std::vector<DiskController*> devs  = h89.getIO().getDiskDevices();
+        std::ostringstream           resp;
         resp << "ok ";
 
         for (int x = 0; x < devs.size(); ++x)
         {
-            DiskController *dev = devs[x];
+            DiskController* dev = devs[x];
 
             if (dev != NULL)
             {
-                std::vector<GenericDiskDrive *> drives = dev->getDiskDrives();
+                std::vector<GenericDiskDrive*> drives = dev->getDiskDrives();
 
                 for (int y = 0; y < drives.size(); ++y)
                 {
-                    GenericDiskDrive *drv = drives[y];
+                    GenericDiskDrive* drv = drives[y];
 
                     if (drv != NULL)
                     {
@@ -156,7 +163,7 @@ std::string H89Operator::executeCommand(std::string cmd)
                         }
 
                         std::string media = drv->getMediaName();
-                        //media = media.replaceAll(" ", "%20");
+                        // media = media.replaceAll(" ", "%20");
                         resp << dev->getDriveName(y) << "=" << media;
                     }
                 }
@@ -182,7 +189,7 @@ std::string H89Operator::executeCommand(std::string cmd)
 
         if (args[1].compare("disk") == 0 && args.size() > 2)
         {
-            DiskController *dev = findDiskCtrlr(args[2]);
+            DiskController* dev = findDiskCtrlr(args[2]);
 
             if (dev == NULL)
             {
@@ -197,7 +204,8 @@ std::string H89Operator::executeCommand(std::string cmd)
     return "error badcmd: " + cmd;
 }
 
-std::string H89Operator::handleCommand(std::string cmd)
+std::string
+H89Operator::handleCommand(std::string cmd)
 {
     h89.systemMutexAcquire();
     std::string resp = executeCommand(cmd);

@@ -13,9 +13,10 @@
 #include <vector>
 #include <string>
 
-#include "h89Types.h"
 #include "IODevice.h"
-#include "GenericDiskDrive.h"
+
+class GenericDiskDrive;
+
 
 /// \todo - determine if interrupt level for the device should be here, or if we subclass
 ///         this to a IOIntrDevice.
@@ -26,7 +27,7 @@
 ///
 /// Base class for all Disk Controller I/O devices.
 ///
-class DiskController : public IODevice
+class DiskController: public IODevice
 {
   public:
     ///
@@ -37,7 +38,7 @@ class DiskController : public IODevice
     virtual ~DiskController();
 
     // Return list of all connected disk drives.
-    virtual std::vector<GenericDiskDrive *> getDiskDrives() = 0;
+    virtual std::vector<GenericDiskDrive*> getDiskDrives() = 0;
 
     // Return the nmemonic identifier for this device.
     // For example "H17" or "MMS77316".
@@ -46,14 +47,14 @@ class DiskController : public IODevice
     // Return the disk drive associated with identifer,
     // in the form of <deviceName>"-"<driveNumber>.
     // Drive numbers start at "1".
-    virtual GenericDiskDrive *findDrive(std::string ident) = 0;
+    virtual GenericDiskDrive* findDrive(std::string ident) = 0;
 
     // Return the "standard" name for disk drive 'index' (0-n).
     // This is the same name as will match in findDrive().
     // Default if not overriden is getDeviceName()+"-"+<index+1>.
     virtual std::string getDriveName(int index) = 0;
 
-    virtual std::string dumpDebug() = 0;
+    virtual std::string dumpDebug()             = 0;
 
   protected:
 

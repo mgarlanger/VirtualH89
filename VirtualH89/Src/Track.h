@@ -30,26 +30,26 @@ class Track
     {
         density_Unknown,
         singleDensity,
-        FM = singleDensity,
+        FM  = singleDensity,
         doubleDensity,
         MFM = doubleDensity
     };
 
   private:
-    BYTE   sideNum_m;
-    BYTE   trackNum_m;
-    //BYTE   numSectors_m;
-    std::vector <Sector *> sectors_m;
+    BYTE                  sideNum_m;
+    BYTE                  trackNum_m;
+    // BYTE   numSectors_m;
+    std::vector <Sector*> sectors_m;
 
 
-    Density density_m;
-    DataRate dataRate_m;
+    Density               density_m;
+    DataRate              dataRate_m;
 
   public:
     Track(BYTE sideNum, BYTE trackNum);
     virtual ~Track();
 
-    bool addSector(Sector *sector);
+    bool addSector(Sector* sector);
 
     void setDensity(Density density);
     void setDataRate(DataRate datarate);

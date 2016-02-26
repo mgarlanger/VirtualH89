@@ -7,16 +7,17 @@
 /// \author Douglas Miller
 ///
 
-#include <strings.h>
+#include "GenericSASIDrive.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
-#include "WallClock.h"
 #include "logger.h"
-#include "GenericSASIDrive.h"
 
 /* Expected drive characteristic by drive: (XEBEC S1410 manual)
  * Drive        cyl  hd red-wr precomp
@@ -49,29 +50,29 @@
 #if 0
 int GenericSASIDrive::params[NUM_DRV_TYPE][4]
 {
-    [XEBEC_ST506] =  { 153, 4, 128,  64 },
-    [XEBEC_ST412] =  { 306, 4, 128,  64 },
-    [XEBEC_CM5206] = { 256, 2, 256, 256 },
-    [XEBEC_CM5410] = { 256, 4, 256, 256 },
-    [XEBEC_CM5616] = { 256, 6, 256, 256 },
-    [XEBEC_RO201] =  { 321, 2, 132,   0 },
-    [XEBEC_RO202] =  { 321, 4, 132,   0 },
-    [XEBEC_RO203] =  { 321, 6, 132,   0 },
-    [XEBEC_RO204] =  { 321, 8, 132,   0 },
+    [XEBEC_ST506]  = {153, 4, 128, 64},
+    [XEBEC_ST412]  = {306, 4, 128, 64},
+    [XEBEC_CM5206] = {256, 2, 256, 256},
+    [XEBEC_CM5410] = {256, 4, 256, 256},
+    [XEBEC_CM5616] = {256, 6, 256, 256},
+    [XEBEC_RO201]  = {321, 2, 132, 0},
+    [XEBEC_RO202]  = {321, 4, 132, 0},
+    [XEBEC_RO203]  = {321, 6, 132, 0},
+    [XEBEC_RO204]  = {321, 8, 132, 0},
 };
 #endif
 int GenericSASIDrive::params[NUM_DRV_TYPE][4]
 {
-    /* INVALID=0 */    {   0, 0,   0,   0 },
-    /*[XEBEC_ST506]*/  { 153, 4, 128,  64 },
-    /*[XEBEC_ST412]*/  { 306, 4, 128,  64 },
-    /*[XEBEC_CM5206]*/ { 256, 2, 256, 256 },
-    /*[XEBEC_CM5410]*/ { 256, 4, 256, 256 },
-    /*[XEBEC_CM5616]*/ { 256, 6, 256, 256 },
-    /*[XEBEC_RO201]*/  { 321, 2, 132,   0 },
-    /*[XEBEC_RO202]*/  { 321, 4, 132,   0 },
-    /*[XEBEC_RO203]*/  { 321, 6, 132,   0 },
-    /*[XEBEC_RO204]*/  { 321, 8, 132,   0 },
+    /* INVALID=0    */ {0, 0, 0, 0},
+    /*[XEBEC_ST506] */ {153, 4, 128, 64},
+    /*[XEBEC_ST412] */ {306, 4, 128, 64},
+    /*[XEBEC_CM5206]*/ {256, 2, 256, 256},
+    /*[XEBEC_CM5410]*/ {256, 4, 256, 256},
+    /*[XEBEC_CM5616]*/ {256, 6, 256, 256},
+    /*[XEBEC_RO201] */ {321, 2, 132, 0},
+    /*[XEBEC_RO202] */ {321, 4, 132, 0},
+    /*[XEBEC_RO203] */ {321, 6, 132, 0},
+    /*[XEBEC_RO204] */ {321, 8, 132, 0},
 };
 
 bool GenericSASIDrive::checkHeader(BYTE *buf, int n)
@@ -125,21 +126,19 @@ bool GenericSASIDrive::checkHeader(BYTE *buf, int n)
 
 GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, int sectorSize)
 {
-    driveType = type;
-    driveMedia = strdup(media.c_str());
-    driveCnum = cnum;
+    driveType   = type;
+    driveMedia  = strdup(media.c_str());
+    driveCnum   = cnum;
     driveSecLen = sectorSize;
 
     if (sectorSize == 256)
     {
         sectorsPerTrack = 32;
     }
-
     else if (sectorSize == 512)
     {
         sectorsPerTrack = 17;
     }
-
     else
     {
         // not supported, but do something...
@@ -147,18 +146,17 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         {
             sectorsPerTrack = 0;
         }
-
         else
         {
             sectorsPerTrack = 8192 / sectorSize;
         }
     }
 
-    capacity = params[type][0] * params[type][1] * sectorsPerTrack * sectorSize;
-    dataBuf = new BYTE[sectorSize + 4]; // space for ECC for "long" commands
+    capacity   = params[type][0] * params[type][1] * sectorsPerTrack * sectorSize;
+    dataBuf    = new BYTE[sectorSize + 4]; // space for ECC for "long" commands
     dataLength = sectorSize;
 
-    driveFd = open(driveMedia, O_RDWR | O_CREAT, 0666);
+    driveFd    = open(driveMedia, O_RDWR | O_CREAT, 0666);
 
     if (driveFd < 0)
     {
@@ -188,7 +186,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         lseek(driveFd, capacity, SEEK_SET); // i.e. END - sizeof(buf)
         write(driveFd, buf, l);
     }
-
     else
     {
         // first, trying reading the last 128 bytes...
@@ -213,7 +210,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         }
 
         if (mediaSpt != sectorsPerTrack || mediaSsz != driveSecLen ||
-                params[type][0] != mediaCyl || params[type][1] != mediaHead)
+            params[type][0] != mediaCyl || params[type][1] != mediaHead)
         {
             // TODO: fatal or warning?
             debugss(ssMMS77320, ERROR, "Media/Drive mismatch: %s\n", driveMedia);
@@ -226,7 +223,8 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     }
 }
 
-GenericSASIDrive *GenericSASIDrive::getInstance(std::string type, std::string media, int cnum)
+GenericSASIDrive*
+GenericSASIDrive::getInstance(std::string type, std::string media, int cnum)
 {
     DriveType etype;
 
@@ -234,47 +232,38 @@ GenericSASIDrive *GenericSASIDrive::getInstance(std::string type, std::string me
     {
         etype = XEBEC_ST506;
     }
-
     else if (type.compare("XEBEC_ST412") == 0)
     {
         etype = XEBEC_ST412;
     }
-
     else if (type.compare("XEBEC_CM5206") == 0)
     {
         etype = XEBEC_CM5206;
     }
-
     else if (type.compare("XEBEC_CM5410") == 0)
     {
         etype = XEBEC_CM5410;
     }
-
     else if (type.compare("XEBEC_CM5616") == 0)
     {
         etype = XEBEC_CM5616;
     }
-
     else if (type.compare("XEBEC_RO201") == 0)
     {
         etype = XEBEC_RO201;
     }
-
     else if (type.compare("XEBEC_RO202") == 0)
     {
         etype = XEBEC_RO202;
     }
-
     else if (type.compare("XEBEC_RO203") == 0)
     {
         etype = XEBEC_RO203;
     }
-
     else if (type.compare("XEBEC_RO204") == 0)
     {
         etype = XEBEC_RO204;
     }
-
     else
     {
         debugss(ssMMS77320, ERROR, "Invalid controller/drive combination: %s\n", type.c_str());
@@ -293,7 +282,7 @@ GenericSASIDrive *GenericSASIDrive::getInstance(std::string type, std::string me
         331         ANI     00001100B       ; WHAT'S PORT 78 SET FOR ?
         332         CPI     00001000B       ;  IF Z67, THEN THIS IS IT
         333         RNZ
-    */
+     */
 
 //         DB      0,153,4,0,128,0,64,11   ; DRIVE CHARACTERISTIC DATA
 //  =   0099, 04, 0080, 0064, 0b
@@ -317,69 +306,71 @@ GenericSASIDrive::~GenericSASIDrive()
 
 
 /*
-Typical sequence:
+   Typical sequence:
 
-"Hail" controller:
+   "Hail" controller:
                 wait !BSY (while poking data reg)
                 SEL
                 wait BSY
                 RUN
 
-Send command:
+   Send command:
                 wait until REQ+CMD+POUT+BSY
                 out next cmd byte
                 loop
 
-Read command                        Write command
+   Read command                        Write command
                if loose POUT, goto status
                 wait for !CMD (loop)
-  inir 128 bytes                      outir 128 bytes
+   inir 128 bytes                      outir 128 bytes
                 loop
 
-Status phase:
+   Status phase:
                  check MSG+REQ+CMD+POUT
                  if REQ+CMD then input data and loop
                  if not MSG+REQ+CMD loop (no data read)
                  input (discard) data
                  return previous data byte (has error status)
 
-MSG    REQ    CMD    POUT    BSY
----------------------------------
- X      X      X      X       -       OK to begin
-                                      SEL
- X      X      X      X      BSY      controller ready
-                                      RUN
+   MSG    REQ    CMD    POUT    BSY
+   ---------------------------------
+   X      X      X      X       -       OK to begin
+                                        SEL
+   X      X      X      X      BSY      controller ready
+                                        RUN
 
- X     REQ    CMD    POUT    BSY      OK to send command
-                                      OUT cmd byte (ACK)
-                                      loop
+   X     REQ    CMD    POUT    BSY      OK to send command
+                                        OUT cmd byte (ACK)
+                                        loop
 
- X     REQ    CMD     -      BSY      done with data (status begins)
- X     REQ     -      X      BSY      OK to send/get data (bulk 128 bytes)
-                                      IN/OUT data byte (ACK)
+   X     REQ    CMD     -      BSY      done with data (status begins)
+   X     REQ     -      X      BSY      OK to send/get data (bulk 128 bytes)
+                                        IN/OUT data byte (ACK)
 
- -     REQ    CMD     -       X       OK get status byte
-                                      IN status byte (ACK)
+   -     REQ    CMD     -       X       OK get status byte
+                                        IN status byte (ACK)
 
-MSG    REQ    CMD     -       X       OK last status byte (prev has error)
-                                      IN status byte (ACK)
-presumably resturns to:
- X     REQ    CMD    POUT    BSY      OK to send command.
+   MSG    REQ    CMD     -       X      OK last status byte (prev has error)
+                                        IN status byte (ACK)
+   presumably resturns to:
+   X     REQ    CMD    POUT    BSY      OK to send command.
 
-*/
+ */
 
-void GenericSASIDrive::deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     // User is switch controllers/drive, do any cleanup.
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl &= ~ctl_Cmd_o_c;
-    ctrl &= ~ctl_Out_o_c;
-    ctrl &= ~ctl_Req_o_c;
-    ctrl &= ~ctl_Busy_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    &= ~ctl_Cmd_o_c;
+    ctrl    &= ~ctl_Out_o_c;
+    ctrl    &= ~ctl_Req_o_c;
+    ctrl    &= ~ctl_Busy_o_c;
     curState = IDLE;
 }
 
-void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     ctrl &= ~ctl_Req_o_c;
     ctrl &= ~ctl_Ack_i_c;
@@ -390,9 +381,9 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 
         if (cmdIx >= cmdLength)
         {
-            curState = IDLE; // default? should get set to something else.
-            ctrl &= ~ctl_Cmd_o_c;
-            cmdIx = 0;
+            curState   = IDLE; // default? should get set to something else.
+            ctrl      &= ~ctl_Cmd_o_c;
+            cmdIx      = 0;
             blockCount = 0;
             debugss(ssGenericSASIDrive, INFO, "Command: %02x %02x %02x %02x %02x %02x\n",
                     cmdBuf[0], cmdBuf[1], cmdBuf[2], cmdBuf[3], cmdBuf[4], cmdBuf[5]);
@@ -404,7 +395,6 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else if (curState == STATUS)
     {
         if (stsIx < stsLength)
@@ -422,21 +412,20 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         }
 
         // must start over at SEL again...
-        ctrl &= ~ctl_Msg_o_c;
-        ctrl &= ~ctl_Busy_o_c; // it sppears this must go low...
-        ctrl &= ~ctl_Cmd_o_c;
-        ctrl &= ~ctl_Out_o_c;
-        ctrl &= ~ctl_Req_o_c;
+        ctrl    &= ~ctl_Msg_o_c;
+        ctrl    &= ~ctl_Busy_o_c; // it sppears this must go low...
+        ctrl    &= ~ctl_Cmd_o_c;
+        ctrl    &= ~ctl_Out_o_c;
+        ctrl    &= ~ctl_Req_o_c;
         curState = IDLE;
     }
-
     else if (curState == SENSE)
     {
         if (senseIx < senseLength)
         {
             dataIn = senseBuf[senseIx++];
-            ctrl |= ctl_Req_o_c;
-            ctrl &= ~ctl_Ack_i_c;
+            ctrl  |= ctl_Req_o_c;
+            ctrl  &= ~ctl_Ack_i_c;
             return;
         }
 
@@ -445,14 +434,13 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ack(dataIn, dataOut, ctrl);
 
     }
-
     else if (curState == DATA_IN)
     {
         if (dataIx < dataLength)
         {
             dataIn = dataBuf[dataIx++];
-            ctrl |= ctl_Req_o_c;
-            ctrl &= ~ctl_Ack_i_c;
+            ctrl  |= ctl_Req_o_c;
+            ctrl  &= ~ctl_Ack_i_c;
             return;
         }
 
@@ -469,7 +457,6 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ack(dataIn, dataOut, ctrl);
 
     }
-
     else if (curState == DRIVECB)
     {
         dcbBuf[dcbIx++] = dataOut;
@@ -484,7 +471,6 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else if (curState == DATA_OUT)
     {
         dataBuf[dataIx++] = dataOut;
@@ -499,7 +485,6 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
-
     else
     {
         // must be IDLE, and host is trying to sync-up with us.
@@ -512,17 +497,19 @@ void GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
     }
 }
 
-void GenericSASIDrive::resetSASI(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::resetSASI(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl &= ~ctl_Cmd_o_c;
-    ctrl &= ~ctl_Out_o_c;
-    ctrl &= ~ctl_Req_o_c;
-    ctrl &= ~ctl_Busy_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    &= ~ctl_Cmd_o_c;
+    ctrl    &= ~ctl_Out_o_c;
+    ctrl    &= ~ctl_Req_o_c;
+    ctrl    &= ~ctl_Busy_o_c;
     curState = IDLE;
 }
 
-void GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     // validate data bit with cnum...
     int i = ffs(dataOut);
@@ -538,78 +525,86 @@ void GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
     }
 }
 
-void GenericSASIDrive::run(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::run(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
-    ctrl |= ctl_Busy_o_c;
-    ctrl |= ctl_Cmd_o_c;
-    ctrl |= ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
-    cmdIx = 0;
+    ctrl    |= ctl_Busy_o_c;
+    ctrl    |= ctl_Cmd_o_c;
+    ctrl    |= ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
+    cmdIx    = 0;
     curState = COMMAND;
 }
 
-void GenericSASIDrive::startStatus(BYTE& ctrl)
+void
+GenericSASIDrive::startStatus(BYTE& ctrl)
 {
-    stsIx = 0;
+    stsIx    = 0;
     curState = STATUS;
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl |= ctl_Cmd_o_c;
-    ctrl &= ~ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    |= ctl_Cmd_o_c;
+    ctrl    &= ~ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
 }
 
-void GenericSASIDrive::startSense(BYTE& ctrl)
+void
+GenericSASIDrive::startSense(BYTE& ctrl)
 {
-    senseIx = 0;
+    senseIx  = 0;
     curState = SENSE;
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl |= ctl_Cmd_o_c;
-    ctrl &= ~ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    |= ctl_Cmd_o_c;
+    ctrl    &= ~ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
 }
 
-void GenericSASIDrive::startDataIn(BYTE& ctrl)
+void
+GenericSASIDrive::startDataIn(BYTE& ctrl)
 {
-    dataIx = 0;
+    dataIx   = 0;
     curState = DATA_IN;
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl &= ~ctl_Cmd_o_c;
-    ctrl &= ~ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    &= ~ctl_Cmd_o_c;
+    ctrl    &= ~ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
 }
 
-void GenericSASIDrive::startDataOut(BYTE& ctrl)
+void
+GenericSASIDrive::startDataOut(BYTE& ctrl)
 {
-    dataIx = 0;
+    dataIx   = 0;
     curState = DATA_OUT;
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl &= ~ctl_Cmd_o_c;
-    ctrl |= ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    &= ~ctl_Cmd_o_c;
+    ctrl    |= ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
 }
 
-void GenericSASIDrive::startError(BYTE& ctrl, BYTE err)
+void
+GenericSASIDrive::startError(BYTE& ctrl, BYTE err)
 {
-    stsBuf[0] = 0b00000010;
-    stsBuf[1] = 0;
+    stsBuf[0]   = 0b00000010;
+    stsBuf[1]   = 0;
     senseBuf[0] = err;
     startStatus(ctrl);
 }
 
-void GenericSASIDrive::startDCB(BYTE& ctrl)
+void
+GenericSASIDrive::startDCB(BYTE& ctrl)
 {
-    dcbIx = 0;
+    dcbIx    = 0;
     curState = DRIVECB;
-    ctrl &= ~ctl_Msg_o_c;
-    ctrl &= ~ctl_Cmd_o_c;
-    ctrl |= ctl_Out_o_c;
-    ctrl |= ctl_Req_o_c;
+    ctrl    &= ~ctl_Msg_o_c;
+    ctrl    &= ~ctl_Cmd_o_c;
+    ctrl    |= ctl_Out_o_c;
+    ctrl    |= ctl_Req_o_c;
 }
 
-void GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
-    int e;
+    long  e;
 
     if (cmdBuf[0] != cmd_ReqSense_c)
     {
@@ -618,209 +613,211 @@ void GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 
     switch (cmdBuf[0])
     {
-    case cmd_TestDriveReady_c:
-    case cmd_Recal_c:
-    case cmd_RAMDiag_c:
-    case cmd_DriveDiag_c:
-    case cmd_CtrlIntDiag_c:
-        // no-op: just return success
-        stsBuf[0] = 0;
-        stsBuf[1] = 0;
-        stsIx = 0;
-        startStatus(ctrl);
-        ack(dataIn, dataOut, ctrl);
-        break;
-
-    case cmd_ReqSense_c:
-        // sense data was set by previous command...
-        senseIx = 0;
-        startSense(ctrl);
-        ack(dataIn, dataOut, ctrl);
-        break;
-
-    case cmd_Read_c:
-    case cmd_ReadLong_c:
-        if (driveFd < 0)
-        {
-            startError(ctrl, 0x84); // drive not ready + addr valid
+        case cmd_TestDriveReady_c:
+        case cmd_Recal_c:
+        case cmd_RAMDiag_c:
+        case cmd_DriveDiag_c:
+        case cmd_CtrlIntDiag_c:
+            // no-op: just return success
+            stsBuf[0] = 0;
+            stsBuf[1] = 0;
+            stsIx     = 0;
+            startStatus(ctrl);
             ack(dataIn, dataOut, ctrl);
             break;
-        }
 
-        memcpy(senseBuf + 1, cmdBuf + 1, 3);
-        off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
-               blockCount) * driveSecLen;
-
-        if (off >= capacity)
-        {
-            startError(ctrl, 0x21); // illegal disk address
+        case cmd_ReqSense_c:
+            // sense data was set by previous command...
+            senseIx = 0;
+            startSense(ctrl);
             ack(dataIn, dataOut, ctrl);
             break;
-        }
 
-        lseek(driveFd, off + dataOffset, SEEK_SET);
-        e = read(driveFd, dataBuf, dataLength);
+        case cmd_Read_c:
+        case cmd_ReadLong_c:
+            if (driveFd < 0)
+            {
+                startError(ctrl, 0x84); // drive not ready + addr valid
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
 
-        if (e != dataLength)
-        {
-            startError(ctrl, 0x94); // target sector not found + addr valid
+            memcpy(senseBuf + 1, cmdBuf + 1, 3);
+            off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
+                   blockCount) * driveSecLen;
+
+            if (off >= capacity)
+            {
+                startError(ctrl, 0x21); // illegal disk address
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
+
+            lseek(driveFd, off + dataOffset, SEEK_SET);
+            e = read(driveFd, dataBuf, dataLength);
+
+            if (e != dataLength)
+            {
+                startError(ctrl, 0x94); // target sector not found + addr valid
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
+
+            dataLength = driveSecLen;
+
+            if (cmdBuf[0] == cmd_ReadLong_c)
+            {
+                dataLength       += 4;
+                // TODO: must we compute ECC?
+                dataBuf[dataIx++] = 0;
+                dataBuf[dataIx++] = 0;
+                dataBuf[dataIx++] = 0;
+                dataBuf[dataIx++] = 0;
+            }
+
+            startDataIn(ctrl);
+            dataIx = 0;
+            // a little risky to recurse here, but startDataIn() should
+            // ensure we can't loop.
             ack(dataIn, dataOut, ctrl);
             break;
-        }
 
-        dataLength = driveSecLen;
+        case cmd_Write_c:
+        case cmd_WriteLong_c:
+            if (driveFd < 0)
+            {
+                startError(ctrl, 0x84); // drive not ready + addr valid
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
 
-        if (cmdBuf[0] == cmd_ReadLong_c)
-        {
-            dataLength += 4;
-            // TODO: must we compute ECC?
-            dataBuf[dataIx++] = 0;
-            dataBuf[dataIx++] = 0;
-            dataBuf[dataIx++] = 0;
-            dataBuf[dataIx++] = 0;
-        }
+            memcpy(senseBuf + 1, cmdBuf + 1, 3);
+            dataLength = driveSecLen;
 
-        startDataIn(ctrl);
-        dataIx = 0;
-        // a little risky to recurse here, but startDataIn() should
-        // ensure we can't loop.
-        ack(dataIn, dataOut, ctrl);
-        break;
+            if (cmdBuf[0] == cmd_ReadLong_c)
+            {
+                dataLength += 4;
+            }
 
-    case cmd_Write_c:
-    case cmd_WriteLong_c:
-        if (driveFd < 0)
-        {
-            startError(ctrl, 0x84); // drive not ready + addr valid
+            dataIx = 0;
+            // could validate address...
+            startDataOut(ctrl);
+            break;
+
+        case cmd_WriteSecBuf_c:
+            dataIx     = 0;
+            dataLength = driveSecLen;
+            startDataOut(ctrl);
+            break;
+
+        case cmd_ReadSecBuf_c:
+            dataIx     = 0;
+            dataLength = driveSecLen;
+            startDataIn(ctrl);
             ack(dataIn, dataOut, ctrl);
             break;
-        }
 
-        memcpy(senseBuf + 1, cmdBuf + 1, 3);
-        dataLength = driveSecLen;
+        case cmd_InitDriveChar_c:
+            startDCB(ctrl);
+            break;
 
-        if (cmdBuf[0] == cmd_ReadLong_c)
-        {
-            dataLength += 4;
-        }
+        case cmd_FormatDrive_c:
+        case cmd_FormatTrack_c:
+        case cmd_FormatBadTrack_c:
+        case cmd_CheckTrackFmt_c:
+        case cmd_Seek_c:
+        case cmd_FormatAltTrack_c:
+            // validate address, but otherwise just return success.
+            blockCount = 0;
+            off        = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
+                          blockCount) * driveSecLen;
 
-        dataIx = 0;
-        // could validate address...
-        startDataOut(ctrl);
-        break;
+            if (off >= capacity)
+            {
+                startError(ctrl, 0x21); // illegal disk address
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
 
-    case cmd_WriteSecBuf_c:
-        dataIx = 0;
-        dataLength = driveSecLen;
-        startDataOut(ctrl);
-        break;
-
-    case cmd_ReadSecBuf_c:
-        dataIx = 0;
-        dataLength = driveSecLen;
-        startDataIn(ctrl);
-        ack(dataIn, dataOut, ctrl);
-        break;
-
-    case cmd_InitDriveChar_c:
-        startDCB(ctrl);
-        break;
-
-    case cmd_FormatDrive_c:
-    case cmd_FormatTrack_c:
-    case cmd_FormatBadTrack_c:
-    case cmd_CheckTrackFmt_c:
-    case cmd_Seek_c:
-    case cmd_FormatAltTrack_c:
-        // validate address, but otherwise just return success.
-        blockCount = 0;
-        off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
-               blockCount) * driveSecLen;
-
-        if (off >= capacity)
-        {
-            startError(ctrl, 0x21); // illegal disk address
+            stsBuf[0] = 0;
+            stsBuf[1] = 0;
+            stsIx     = 0;
+            startStatus(ctrl);
             ack(dataIn, dataOut, ctrl);
             break;
-        }
 
-        stsBuf[0] = 0;
-        stsBuf[1] = 0;
-        stsIx = 0;
-        startStatus(ctrl);
-        ack(dataIn, dataOut, ctrl);
-        break;
+        case cmd_ReadECCLen_c:
+            // TODO: transfer 1 data byte, but this command is only valid
+            // after a correctable ECC data error 0x18, which we never return.
+            stsBuf[0] = 0;
+            stsBuf[1] = 0;
+            stsIx     = 0;
+            startStatus(ctrl);
+            ack(dataIn, dataOut, ctrl);
+            break;
 
-    case cmd_ReadECCLen_c:
-        // TODO: transfer 1 data byte, but this command is only valid
-        // after a correctable ECC data error 0x18, which we never return.
-        stsBuf[0] = 0;
-        stsBuf[1] = 0;
-        stsIx = 0;
-        startStatus(ctrl);
-        ack(dataIn, dataOut, ctrl);
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
 
 }
 
-void GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
-    int e;
+    long  e;
 
     switch (cmdBuf[0])
     {
-    case cmd_Write_c:
-        off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
-               blockCount) * driveSecLen;
+        case cmd_Write_c:
+            off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
+                   blockCount) * driveSecLen;
 
-        if (off >= capacity)
-        {
-            startError(ctrl, 0x21); // illegal disk address
-            ack(dataIn, dataOut, ctrl);
+            if (off >= capacity)
+            {
+                startError(ctrl, 0x21); // illegal disk address
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
+
+            lseek(driveFd, off + dataOffset, SEEK_SET);
+            e = write(driveFd, dataBuf, dataLength);
+
+            if (e != dataLength)
+            {
+                startError(ctrl, 0x94); // target sector not found + addr valid
+                ack(dataIn, dataOut, ctrl);
+                break;
+            }
+
+            if (++blockCount >= cmdBuf[4])
+            {
+                startStatus(ctrl);
+                break;
+            }
+
             break;
-        }
 
-        lseek(driveFd, off + dataOffset, SEEK_SET);
-        e = write(driveFd, dataBuf, dataLength);
-
-        if (e != dataLength)
-        {
-            startError(ctrl, 0x94); // target sector not found + addr valid
-            ack(dataIn, dataOut, ctrl);
-            break;
-        }
-
-        if (++blockCount >= cmdBuf[4])
-        {
+        case cmd_WriteSecBuf_c:
+            // just leave sector buf with data for subsequent command(s)
             startStatus(ctrl);
             break;
-        }
 
-        break;
+        case cmd_WriteLong_c:
+            break;
 
-    case cmd_WriteSecBuf_c:
-        // just leave sector buf with data for subsequent command(s)
-        startStatus(ctrl);
-        break;
-
-    case cmd_WriteLong_c:
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
 }
 
-void GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+void
+GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     switch (cmdBuf[0])
     {
-    case cmd_InitDriveChar_c:
+        case cmd_InitDriveChar_c:
         {
             // validate? update params?
             int cyl = (dcbBuf[0] << 8) | dcbBuf[1];
@@ -830,8 +827,8 @@ void GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
             int ebl = dcbBuf[7] & 0x0f;
 
             if (cyl != params[driveType][0] || hds != params[driveType][1] ||
-                    rwc != params[driveType][2] ||
-                    wpc != params[driveType][3])
+                rwc != params[driveType][2] ||
+                wpc != params[driveType][3])
             {
                 debugss(ssMMS77320, ERROR, "Host drive characteristics "
                         " mismatch\n");
@@ -845,12 +842,13 @@ void GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
         }
         break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
-std::string GenericSASIDrive::getMediaName()
+std::string
+GenericSASIDrive::getMediaName()
 {
     return (driveMedia != NULL ? driveMedia : "");
 }

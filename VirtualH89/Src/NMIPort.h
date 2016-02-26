@@ -10,7 +10,6 @@
 #ifndef NMIPORT_H_
 #define NMIPORT_H_
 
-#include "config.h"
 #include "IODevice.h"
 
 ///
@@ -28,7 +27,8 @@ class NMIPort: public virtual IODevice
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr, BYTE val);
-    void reset() {}
+    void reset() {
+    }
   private:
 
 };

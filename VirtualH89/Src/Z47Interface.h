@@ -13,12 +13,10 @@
 #include "DiskController.h"
 #include "ClockUser.h"
 #include "ParallelPortConnection.h"
-#include <vector>
-#include <string>
 
 class Z47Interface: public virtual DiskController,
-    public virtual ClockUser,
-    public virtual ParallelPortConnection
+                    public virtual ClockUser,
+                    public virtual ParallelPortConnection
 {
   public:
     Z47Interface(int baseAddr);
@@ -29,22 +27,22 @@ class Z47Interface: public virtual DiskController,
 
     virtual void reset(void);
     virtual void notification(unsigned int cycleCount);
-    void connectDriveLink(ParallelLink *link);
+    void connectDriveLink(ParallelLink* link);
 
     virtual void raiseSignal(SignalType sigType);
     virtual void lowerSignal(SignalType sigType);
     virtual void pulseSignal(SignalType sigType);
 
     // TODO: implement this
-    std::vector<GenericDiskDrive *> getDiskDrives()
+    std::vector<GenericDiskDrive*> getDiskDrives()
     {
-        return *(new std::vector<GenericDiskDrive *>());
+        return *(new std::vector<GenericDiskDrive*>());
     }
     std::string getDeviceName()
     {
         return "Z47";
     }
-    GenericDiskDrive *findDrive(std::string ident)
+    GenericDiskDrive* findDrive(std::string ident)
     {
         return NULL;
     }
@@ -59,7 +57,7 @@ class Z47Interface: public virtual DiskController,
     }
 
   private:
-    static const BYTE H47_NumPorts_c             = 2;
+    static const BYTE H47_NumPorts_c = 2;
 
     ///
     /// 0170 (0x78) base port. (or could be 0174) if in the right-hand slot
@@ -83,19 +81,19 @@ class Z47Interface: public virtual DiskController,
     //
     // Commands
     //
-    static const BYTE cmd_U137BSet_c             = 0x01;
-    static const BYTE cmd_MasterReset_c          = 0x02;
-    static const BYTE cmd_InterruptsEnabled_c    = 0x40;
-    static const BYTE cmd_Undefined_c            = ~(cmd_U137BSet_c |
-            cmd_MasterReset_c |
-            cmd_InterruptsEnabled_c);
+    static const BYTE cmd_U137BSet_c          = 0x01;
+    static const BYTE cmd_MasterReset_c       = 0x02;
+    static const BYTE cmd_InterruptsEnabled_c = 0x40;
+    static const BYTE cmd_Undefined_c         = ~(cmd_U137BSet_c |
+                                                  cmd_MasterReset_c |
+                                                  cmd_InterruptsEnabled_c);
 
-    bool interruptsEnabled_m;
-    bool DTR_m;
-    bool DDOut_m;
-    bool Busy_m;
-    bool Error_m;
-    bool Done_m;
+    bool              interruptsEnabled_m;
+    bool              DTR_m;
+    bool              DDOut_m;
+    bool              Busy_m;
+    bool              Error_m;
+    bool              Done_m;
 
     void writeStatus(BYTE cmd);
     void writeData(BYTE data);
@@ -103,7 +101,7 @@ class Z47Interface: public virtual DiskController,
     void readStatus(BYTE& status);
     void readData(BYTE& data);
 
-    ParallelLink *linkToDrive_m;
+    ParallelLink* linkToDrive_m;
 };
 
 #endif // Z47INTERFACE_H_

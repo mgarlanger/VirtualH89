@@ -4,15 +4,16 @@
 ///  \author Mark Garlanger
 ///
 
-#include "logger.h"
 #include "AddressBus.h"
+
+#include "logger.h"
 #include "Memory.h"
 #include "InterruptController.h"
 
 /// \todo  - allow both RAM and ROM in the first 8k and support reading ROM and writing to
 ///         RAM at the same time.
 
-AddressBus::AddressBus(InterruptController *ic): ic_m(ic)
+AddressBus::AddressBus(InterruptController* ic): ic_m(ic)
 {
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 
@@ -28,7 +29,8 @@ AddressBus::~AddressBus()
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
 }
 
-BYTE AddressBus::readByte(WORD addr, bool interruptAck)
+BYTE
+AddressBus::readByte(WORD addr, bool interruptAck)
 {
 
     if (interruptAck)
@@ -46,7 +48,6 @@ BYTE AddressBus::readByte(WORD addr, bool interruptAck)
     {
         return (mem[index]->readByte(addr));
     }
-
     else
     {
         // read from non-existent memory.
@@ -58,7 +59,8 @@ BYTE AddressBus::readByte(WORD addr, bool interruptAck)
     }
 }
 
-void AddressBus::writeByte(WORD addr, BYTE val)
+void
+AddressBus::writeByte(WORD addr, BYTE val)
 {
     BYTE index = addr >> pageSizeBits_c;
 
@@ -69,7 +71,6 @@ void AddressBus::writeByte(WORD addr, BYTE val)
     {
         mem[index]->writeByte(addr, val);
     }
-
     else
     {
         // otherwise just drop the byte...
@@ -80,14 +81,15 @@ void AddressBus::writeByte(WORD addr, BYTE val)
 
 
 
-void AddressBus::installMemory(Memory *memory)
+void
+AddressBus::installMemory(Memory* memory)
 {
     WORD base = memory->getBaseAddress();
     int  size = memory->getSize();
 
     debugss(ssAddressBus, INFO, "%s: Base = %d  size = %d\n", __FUNCTION__, base, size);
 
-    BYTE index = base >> pageSizeBits_c;
+    BYTE index    = base >> pageSizeBits_c;
     BYTE numIndex = (size >> pageSizeBits_c);
 
     debugss(ssAddressBus, VERBOSE, "    index = %d   numIndex = %d\n", index, numIndex);
@@ -115,7 +117,8 @@ void AddressBus::installMemory(Memory *memory)
     }
 }
 
-void AddressBus::clearMemory(BYTE data)
+void
+AddressBus::clearMemory(BYTE data)
 {
     debugss(ssAddressBus, INFO, "%s: data(%d)", __FUNCTION__, data);
 
@@ -125,12 +128,14 @@ void AddressBus::clearMemory(BYTE data)
     }
 }
 
-InterruptController *AddressBus::getIntrCtrlr()
+InterruptController*
+AddressBus::getIntrCtrlr()
 {
     return ic_m;
 }
 
-void AddressBus::setIntrCtrlr(InterruptController *ic)
+void
+AddressBus::setIntrCtrlr(InterruptController* ic)
 {
     ic_m = ic;
 }

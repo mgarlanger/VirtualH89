@@ -6,10 +6,11 @@
 /// \brief Implements framework to handle all the I/O devices on the H89.
 ///
 
-#include "config.h"
+#include "h89-io.h"
 
 #include "logger.h"
-#include "h89-io.h"
+#include "DiskController.h"
+
 
 H89_IO::H89_IO()
 {
@@ -26,17 +27,20 @@ H89_IO::~H89_IO()
     debugss(ssIO, INFO, "%s\n", __FUNCTION__);
 }
 
-std::vector<DiskController *>& H89_IO::getDiskDevices()
+std::vector<DiskController*>&
+H89_IO::getDiskDevices()
 {
     return dsk_devs;
 }
-bool H89_IO::addDiskDevice(DiskController *device)
+bool
+H89_IO::addDiskDevice(DiskController* device)
 {
     dsk_devs.push_back(device);
     return addDevice(device);
 }
 
-bool H89_IO::addDevice(IODevice *device)
+bool
+H89_IO::addDevice(IODevice* device)
 {
     debugss(ssIO, INFO, "%s\n", __FUNCTION__);
 
@@ -82,7 +86,8 @@ bool H89_IO::addDevice(IODevice *device)
     return (true);
 }
 
-bool H89_IO::removeDevice(IODevice *device)
+bool
+H89_IO::removeDevice(IODevice* device)
 {
     bool retVal = true;
 
@@ -103,7 +108,6 @@ bool H89_IO::removeDevice(IODevice *device)
                     // TODO: call destructor? (i.e. "delete iodevices[port];"?)
                     iodevices[port] = 0;
                 }
-
                 else
                 {
                     // Doesn't match what is attempting to be removed.
@@ -113,7 +117,6 @@ bool H89_IO::removeDevice(IODevice *device)
                 }
             }
         }
-
         else
         {
             // no ports.
@@ -122,7 +125,6 @@ bool H89_IO::removeDevice(IODevice *device)
             retVal = false;
         }
     }
-
     else
     {
         // NULL device passed in
@@ -134,7 +136,8 @@ bool H89_IO::removeDevice(IODevice *device)
     return (retVal);
 }
 
-void H89_IO::reset()
+void
+H89_IO::reset()
 {
     for (int port = 0; port < 256; ++port)
     {
@@ -145,7 +148,8 @@ void H89_IO::reset()
     }
 }
 
-BYTE H89_IO::in(BYTE addr)
+BYTE
+H89_IO::in(BYTE addr)
 {
     BYTE val = 0xff;
 
@@ -155,7 +159,6 @@ BYTE H89_IO::in(BYTE addr)
     {
         val = iodevices[addr]->in(addr);
     }
-
     else
     {
         // undefined in
@@ -166,7 +169,8 @@ BYTE H89_IO::in(BYTE addr)
     return (val);
 }
 
-void H89_IO::out(BYTE addr, BYTE val)
+void
+H89_IO::out(BYTE addr, BYTE val)
 {
     debugss(ssIO, ALL, "%s: (%03o) = 0x%02x\n", __FUNCTION__, addr, val);
 
@@ -174,7 +178,6 @@ void H89_IO::out(BYTE addr, BYTE val)
     {
         iodevices[addr]->out(addr, val);
     }
-
     else
     {
         debugss(ssIO, WARNING, "%s: undefined port (%03o) = 0x%02x\n", __FUNCTION__,

@@ -16,20 +16,20 @@
 class SignalHandler
 {
   public:
-    static SignalHandler *instance(void);
+    static SignalHandler* instance(void);
 
-    EventHandler *registerHandler(int signum, EventHandler *evtHandler);
+    EventHandler* registerHandler(int signum, EventHandler* evtHandler);
     int removeHandler(int signum);
 
   private:
     SignalHandler(void);
     ~SignalHandler(void);
 
-    static SignalHandler *_inst;
+    static SignalHandler* _inst;
 
     static void dispatcher(int signum);
 
-    static EventHandler *signalHandlers[NSIG];
+    static EventHandler*  signalHandlers[NSIG];
 };
 
 #endif // SIGNALHANDLER_H_

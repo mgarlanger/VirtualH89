@@ -7,31 +7,33 @@
 ///
 
 #include "ParallelLink.h"
+
 #include "ParallelPortConnection.h"
 #include "logger.h"
 
 ParallelLink::ParallelLink(): data_m(0xff),
-    dataFromHost_m(false),
-    dataFromDrive_m(false),
-    busy_m(false),
-    DTR_m(false),
-    MRST_m(false),
-    DDOut_m(false),
-    DTAK_m(false),
-    error_m(false),
-    host_m(0),
-    device_m(0)
+                              dataFromHost_m(false),
+                              dataFromDrive_m(false),
+                              busy_m(false),
+                              DTR_m(false),
+                              MRST_m(false),
+                              DDOut_m(false),
+                              DTAK_m(false),
+                              error_m(false),
+                              host_m(0),
+                              device_m(0)
 {
-    // TODO Auto-generated constructor stub
+
 
 }
 
 ParallelLink::~ParallelLink()
 {
-    // TODO Auto-generated destructor stub
+
 }
 
-void ParallelLink::sendHostData(BYTE data)
+void
+ParallelLink::sendHostData(BYTE data)
 {
     debugss(ssParallel, INFO, "%s: Entering: %d\n", __FUNCTION__, data);
 
@@ -43,19 +45,19 @@ void ParallelLink::sendHostData(BYTE data)
                     __FUNCTION__, dataFromDrive_m, dataFromHost_m);
         }
 
-        data_m = data;
+        data_m          = data;
         dataFromDrive_m = true;
 
         setDTR(true);
     }
-
     else
     {
         debugss(ssParallel, ERROR, "%s: Host not connected.\n", __FUNCTION__);
     }
 }
 
-void ParallelLink::sendDriveData(BYTE data)
+void
+ParallelLink::sendDriveData(BYTE data)
 {
     debugss(ssParallel, INFO, "%s: Entering: %d\n", __FUNCTION__, data);
 
@@ -67,53 +69,55 @@ void ParallelLink::sendDriveData(BYTE data)
                     __FUNCTION__, dataFromDrive_m, dataFromHost_m);
         }
 
-        data_m = data;
+        data_m         = data;
         dataFromHost_m = true;
         setDTAK(true);
     }
-
     else
     {
         debugss(ssParallel, FATAL, "%s: Drive not connected.\n", __FUNCTION__);
     }
 }
 
-void ParallelLink::readDataBusByHost(BYTE& data)
+void
+ParallelLink::readDataBusByHost(BYTE& data)
 {
     debugss(ssParallel, INFO, "%s: Entering, returning: 0x%02x\n", __FUNCTION__, data_m);
 
     if (dataFromDrive_m)
     {
-        data = data_m;
+        data            = data_m;
         dataFromDrive_m = false;
     }
-
     else
     {
-        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__, dataFromHost_m);
+        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
+                dataFromHost_m);
     }
 }
 
 
-void ParallelLink::readDataBusByDrive(BYTE& data)
+void
+ParallelLink::readDataBusByDrive(BYTE& data)
 {
     debugss(ssParallel, INFO, "%s: Entering, returning: 0x%02x\n", __FUNCTION__, data_m);
 
     if (dataFromHost_m)
     {
-        data = data_m;
+        data           = data_m;
         dataFromHost_m = false;
     }
-
     else
     {
-        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__, dataFromDrive_m);
+        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
+                dataFromDrive_m);
     }
 }
 
 
 
-void ParallelLink::setBusy(bool val)
+void
+ParallelLink::setBusy(bool val)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -123,7 +127,6 @@ void ParallelLink::setBusy(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_Busy);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_Busy);
@@ -133,13 +136,15 @@ void ParallelLink::setBusy(bool val)
     busy_m = val;
 }
 
-bool ParallelLink::readBusy()
+bool
+ParallelLink::readBusy()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
     return busy_m;
 }
 
-void ParallelLink::setDTR(bool val)
+void
+ParallelLink::setDTR(bool val)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -149,13 +154,11 @@ void ParallelLink::setDTR(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_DTR);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_DTR);
         }
     }
-
     else
     {
         debugss(ssParallel, ERROR, "%s: host_m is NULL\n", __FUNCTION__);
@@ -165,13 +168,15 @@ void ParallelLink::setDTR(bool val)
     DTR_m = val;
 }
 
-bool ParallelLink::readDTR()
+bool
+ParallelLink::readDTR()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
     return DTR_m;
 }
 
-void ParallelLink::masterReset()
+void
+ParallelLink::masterReset()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -181,7 +186,8 @@ void ParallelLink::masterReset()
     }
 }
 
-void ParallelLink::setDDOut(bool val)
+void
+ParallelLink::setDDOut(bool val)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -191,7 +197,6 @@ void ParallelLink::setDDOut(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_DDOUT);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_DDOUT);
@@ -203,14 +208,16 @@ void ParallelLink::setDDOut(bool val)
     DDOut_m = val;
 }
 
-bool ParallelLink::readDDOut()
+bool
+ParallelLink::readDDOut()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
     return DDOut_m;
 }
 
 
-void ParallelLink::setDTAK(bool val)
+void
+ParallelLink::setDTAK(bool val)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -220,7 +227,6 @@ void ParallelLink::setDTAK(bool val)
         {
             device_m->raiseSignal(ParallelPortConnection::st_DTAK);
         }
-
         else
         {
             device_m->lowerSignal(ParallelPortConnection::st_DTAK);
@@ -230,13 +236,15 @@ void ParallelLink::setDTAK(bool val)
     DTAK_m = val;
 }
 
-bool ParallelLink::readDTAK()
+bool
+ParallelLink::readDTAK()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
     return DTAK_m;
 }
 
-void ParallelLink::setError(bool val)
+void
+ParallelLink::setError(bool val)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -246,7 +254,6 @@ void ParallelLink::setError(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_Error);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_Error);
@@ -256,13 +263,15 @@ void ParallelLink::setError(bool val)
     error_m = val;
 }
 
-bool ParallelLink::readError()
+bool
+ParallelLink::readError()
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
     return error_m;
 }
 
-void ParallelLink::registerDevice(ParallelPortConnection *device)
+void
+ParallelLink::registerDevice(ParallelPortConnection* device)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -274,7 +283,8 @@ void ParallelLink::registerDevice(ParallelPortConnection *device)
     device_m = device;
 }
 
-void ParallelLink::registerHost(ParallelPortConnection *host)
+void
+ParallelLink::registerHost(ParallelPortConnection* host)
 {
     debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
 
@@ -285,4 +295,3 @@ void ParallelLink::registerHost(ParallelPortConnection *host)
 
     host_m = host;
 }
-

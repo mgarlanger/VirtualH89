@@ -18,14 +18,14 @@ class DiskData
   public:
     enum DiskTypes
     {
-        none_c = 0,
-        fiveHardSectored_c = 1,
-        fiveSoftSectored_c = 2,
+        none_c              = 0,
+        fiveHardSectored_c  = 1,
+        fiveSoftSectored_c  = 2,
         eightSoftSectored_c = 3,
-        hardDisk_c = 4
+        hardDisk_c          = 4
     };
 
-    DiskData(char *name);
+    DiskData(char* name);
     DiskData(DiskTypes type); // what about size, tracks, sides, density, etc...
     virtual ~DiskData();
 
@@ -35,19 +35,19 @@ class DiskData
     virtual bool checkWriteProtect();
 
   protected:
-    bool fileRead_m;
-    bool valid_m;
-    DiskTypes type;
+    bool              fileRead_m;
+    bool              valid_m;
+    DiskTypes         type;
 
-    BYTE *data_m;
-    unsigned int dataSize_m;
-    BYTE majorVersion_m;
-    BYTE minorVersion_m;
-    BYTE pointVersion_m;
+    BYTE*             data_m;
+    long long         dataSize_m;
+    BYTE              majorVersion_m;
+    BYTE              minorVersion_m;
+    BYTE              pointVersion_m;
 
-    BYTE distributionDiskFlag_m;
-    bool writeProtectedFlag_m;
-    BYTE imagingTypeFlag_m;
+    BYTE              distributionDiskFlag_m;
+    bool              writeProtectedFlag_m;
+    BYTE              imagingTypeFlag_m;
 
     static const BYTE mandatoryFlag_c  = 0x80;
 
@@ -66,7 +66,7 @@ class DiskData
     virtual bool readDiskFormat(unsigned int& pos);
     virtual bool readFlags(unsigned int& pos);
     virtual bool readDataBlock(unsigned int& pos);
-    virtual bool readHoleBlock(unsigned int& pos);   /// \todo make this pure virtual ? why?
+    virtual bool readHoleBlock(unsigned int& pos); /// \todo make this pure virtual ? why?
     virtual bool readUnknownBlock(unsigned int& pos);
 };
 

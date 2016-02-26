@@ -9,7 +9,6 @@
 #ifndef Z47CONTROLLER_H_
 #define Z47CONTROLLER_H_
 
-#include "h89Types.h"
 #include "ClockUser.h"
 #include "ParallelPortConnection.h"
 
@@ -25,11 +24,11 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     virtual ~Z47Controller();
 
     bool removeDrive(BYTE unitNum);
-    bool connectDrive(BYTE unitNum, DiskDrive *drive);
+    bool connectDrive(BYTE unitNum, DiskDrive* drive);
 
     virtual void notification(unsigned int cycleCount);
 
-    void connectHostLink(ParallelLink *link);
+    void connectHostLink(ParallelLink* link);
 
 
     virtual void raiseSignal(SignalType sigType);
@@ -57,7 +56,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     /// Byte   Direction    Value
     ///  0      to H47       0x00
     ///
-    static const BYTE cmd_Boot_c                            = 0x00;
+    static const BYTE cmd_Boot_c = 0x00;
 
     /// Read Controller Status (RSTS) Command
     ///
@@ -67,32 +66,32 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  0      to H47       0x01
     ///  1      to Host     <Status>
     ///
-    static const BYTE cmd_ReadCntrlStat_c                   = 0x01;
+    static const BYTE cmd_ReadCntrlStat_c             = 0x01;
 
     /// Bad Track Overflow - (after initialize) More than 2 bad tracks found on media.
-    static const BYTE stat_Cntrl_Bad_Track_Overflow_c       = 0x01;
+    static const BYTE stat_Cntrl_Bad_Track_Overflow_c = 0x01;
 
     /// Illegal Command - CMD code specified is not in defined set.
-    static const BYTE stat_Cntrl_Illegal_Command_c          = 0x02;
+    static const BYTE stat_Cntrl_Illegal_Command_c    = 0x02;
 
     /// Late Data - Host did not respond in time to DTR*. Data was lost
-    static const BYTE stat_Cntrl_Late_Data_c                = 0x04;
+    static const BYTE stat_Cntrl_Late_Data_c          = 0x04;
 
     /// CRC Error - CRC computation error on ID or data field
-    static const BYTE stat_Cntrl_CRC_Error_c                = 0x08;
+    static const BYTE stat_Cntrl_CRC_Error_c          = 0x08;
 
     /// No Record Found - Track or Sector not found in 2 revolutions.
-    static const BYTE stat_Cntrl_No_Record_Found_c          = 0x10;
+    static const BYTE stat_Cntrl_No_Record_Found_c    = 0x10;
 
     /// Deleted Data - Data field with deleted data mark encountered during last read.
-    static const BYTE stat_Cntrl_Deleted_Data_c             = 0x20;
+    static const BYTE stat_Cntrl_Deleted_Data_c       = 0x20;
 
     /// Write Protected - Attempt made to write on a protected media.
-    static const BYTE stat_Cntrl_Write_Protected_c          = 0x40;
+    static const BYTE stat_Cntrl_Write_Protected_c    = 0x40;
 
     /// Drive Not Ready - Operation was attempted on a drive that was not ready, or ready
     /// was lost during an operation
-    static const BYTE stat_Cntrl_Drive_Not_Ready_c          = 0x80;
+    static const BYTE stat_Cntrl_Drive_Not_Ready_c = 0x80;
 
 
     /// Read Auxiliary Status Command
@@ -104,23 +103,23 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  1      to H47       <side/drive>
     ///  2      to Host      <Auxilliary Status>
     ///
-    static const BYTE cmd_ReadAuxStat_c                     = 0x02;
+    static const BYTE cmd_ReadAuxStat_c = 0x02;
 
     /// Return data
     /// Sector Length bits from I.D. field (TRK 1 - 76)
-    static const BYTE stat_Aux_SectorLengthId_Trk01_Mask_c  = 0x03;
+    static const BYTE stat_Aux_SectorLengthId_Trk01_Mask_c = 0x03;
 
     /// Sector Length bits from I.D. field (TRK 0)
-    static const BYTE stat_Aux_SectorLengthId_Trk00_Mask_c  = 0x0C;
+    static const BYTE stat_Aux_SectorLengthId_Trk00_Mask_c = 0x0C;
 
     /// Side 1 Available
-    static const BYTE stat_Aux_Side1_Available_c            = 0x10;
+    static const BYTE stat_Aux_Side1_Available_c           = 0x10;
 
     /// Double Density (TRK 1 - 76)
-    static const BYTE stat_Aux_DoubleDensity_Trk01_c        = 0x20;
+    static const BYTE stat_Aux_DoubleDensity_Trk01_c       = 0x20;
 
     /// Double Density (TRK 0)
-    static const BYTE stat_Aux_DoubleDensity_Trk00_c        = 0x40;
+    static const BYTE stat_Aux_DoubleDensity_Trk00_c       = 0x40;
 
 
     /// Load Sector Count Command (LDSC)
@@ -138,7 +137,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  1      to H47       <Sector Count MSB>
     ///  2      to H47       <Sector Count LSB>
     ///
-    static const BYTE cmd_LoadSectorCount_c                 = 0x03;
+    static const BYTE cmd_LoadSectorCount_c = 0x03;
 
 
     /// Read Last Address Command (RADR)
@@ -151,7 +150,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  1      to Host      <Track>
     ///  2      to Host      <Side/Drive/Sector>
     ///
-    static const BYTE cmd_ReadLastAddr_c                    = 0x04;
+    static const BYTE cmd_ReadLastAddr_c = 0x04;
 
 
     /// Read Sectors (RD) Command
@@ -167,7 +166,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  *      to Host      <Data>
     ///
-    static const BYTE cmd_ReadSectors_c                     = 0x05;
+    static const BYTE cmd_ReadSectors_c = 0x05;
 
 
     /// Write Sectors Command
@@ -182,7 +181,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  3      to H47       <Data>
     ///
-    static const BYTE cmd_WriteSectors_c                    = 0x06;
+    static const BYTE cmd_WriteSectors_c = 0x06;
 
 
     /// Read Sectors Buffered (RDB) Command
@@ -198,7 +197,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  *      to Host      <Data>
     ///
-    static const BYTE cmd_ReadSectorsBuffered_c             = 0x07;
+    static const BYTE cmd_ReadSectorsBuffered_c = 0x07;
 
 
     /// Write Sectors Buffered Command
@@ -213,7 +212,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  *      to H47       <Data>
     ///
-    static const BYTE cmd_WriteSectorsBuffered_c            = 0x08;
+    static const BYTE cmd_WriteSectorsBuffered_c = 0x08;
 
 
     /// Write Sectors and Delete Command
@@ -228,7 +227,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  *      to H47       <Data>
     ///
-    static const BYTE cmd_WriteSectorsAndDelete_c           = 0x09;
+    static const BYTE cmd_WriteSectorsAndDelete_c = 0x09;
 
 
     /// Write Sectors and Delete Buffered Command
@@ -243,7 +242,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  2      to H47       <Side/Drive/Sector>
     ///  *      to H47       <Data>
     ///
-    static const BYTE cmd_WriteSectorsBufferedAndDelete_c   = 0x0a;
+    static const BYTE cmd_WriteSectorsBufferedAndDelete_c = 0x0a;
 
 
     /// Copy Command
@@ -258,7 +257,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  3      to H47       <Destination Track>
     ///  4      to H47       <Destination Side/Drive/Sector>
     ///
-    static const BYTE cmd_Copy_c                            = 0x0b;
+    static const BYTE cmd_Copy_c = 0x0b;
 
 
     /// Format IBM Single Density Command
@@ -272,7 +271,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  0      to H47       0x0c
     ///  1      to H47       <Side/Drive/Number Sectors in TK01-TK76>
     ///
-    static const BYTE cmd_FormatIBM_SD_c                    = 0x0c;
+    static const BYTE cmd_FormatIBM_SD_c = 0x0c;
 
 
     /// Format Single Density Command
@@ -291,7 +290,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  0      to H47       0x0d
     ///  1      to H47       <Side/Drive/Number Sectors in TK00-TK76>
     ///
-    static const BYTE cmd_Format_SD_c                       = 0x0d;
+    static const BYTE cmd_Format_SD_c = 0x0d;
 
 
     /// Format IBM Double Density Command
@@ -305,7 +304,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  0      to H47       0x0e
     ///  1      to H47       <Side/Drive/Number Sectors in TK01-TK76>
     ///
-    static const BYTE cmd_FormatIBM_DD_c                    = 0x0e;
+    static const BYTE cmd_FormatIBM_DD_c = 0x0e;
 
 
     /// Format Double Density Command
@@ -324,41 +323,41 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     ///  0      to H47       0x0f
     ///  1      to H47       <Side/Drive/Number Sectors in TK00-TK76>
     ///
-    static const BYTE cmd_Format_DD_c                       = 0x0f;
+    static const BYTE cmd_Format_DD_c                 = 0x0f;
 
 
-    static const BYTE cmd_ReadReadyStatus_c                 = 0x10;
+    static const BYTE cmd_ReadReadyStatus_c           = 0x10;
 
-    static const BYTE stat_Ready_Drive0NotReady_c           = 0x01;
-    static const BYTE stat_Ready_Drive1NotReady_c           = 0x02;
-    static const BYTE stat_Ready_Drive2NotReady_c           = 0x04;
-    static const BYTE stat_Ready_Drive3NotReady_c           = 0x08;
-    static const BYTE stat_Ready_Drive0ReadyChanged_c       = 0x10;
-    static const BYTE stat_Ready_Drive1ReadyChanged_c       = 0x20;
-    static const BYTE stat_Ready_Drive2ReadyChanged_c       = 0x40;
-    static const BYTE stat_Ready_Drive3ReadyChanged_c       = 0x80;
+    static const BYTE stat_Ready_Drive0NotReady_c     = 0x01;
+    static const BYTE stat_Ready_Drive1NotReady_c     = 0x02;
+    static const BYTE stat_Ready_Drive2NotReady_c     = 0x04;
+    static const BYTE stat_Ready_Drive3NotReady_c     = 0x08;
+    static const BYTE stat_Ready_Drive0ReadyChanged_c = 0x10;
+    static const BYTE stat_Ready_Drive1ReadyChanged_c = 0x20;
+    static const BYTE stat_Ready_Drive2ReadyChanged_c = 0x40;
+    static const BYTE stat_Ready_Drive3ReadyChanged_c = 0x80;
 
     // special debug commands
 
     /// Special Debug Function 0 Command
     /// Read Ready Status
     /// Note the overlap with Read Ready Status.
-    static const BYTE cmd_SpecialFunction0_c                = 0x10;
+    static const BYTE cmd_SpecialFunction0_c = 0x10;
 
     /// Special Debug Function 1 Command
-    static const BYTE cmd_SpecialFunction1_c                = 0x11;
+    static const BYTE cmd_SpecialFunction1_c = 0x11;
 
     /// Special Debug Function 2 Command
-    static const BYTE cmd_SpecialFunction2_c                = 0x12;
+    static const BYTE cmd_SpecialFunction2_c = 0x12;
 
     /// Special Debug Function 3 Command
-    static const BYTE cmd_SpecialFunction3_c                = 0x13;
+    static const BYTE cmd_SpecialFunction3_c = 0x13;
 
     /// Special Debug Function 4 Command
-    static const BYTE cmd_SpecialFunction4_c                = 0x14;
+    static const BYTE cmd_SpecialFunction4_c = 0x14;
 
     /// Special Debug Function 5 Command
-    static const BYTE cmd_SpecialFunction5_c                = 0x15;
+    static const BYTE cmd_SpecialFunction5_c = 0x15;
 
     // special Heath Functions
 
@@ -411,7 +410,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
         invalidDisk_c = numDrives_c
     };
 
-    Drives curDisk;
+    Drives            curDisk;
 
     static const WORD sectorSize128_c  = 128;
     static const WORD sectorSize256_c  = 256;
@@ -429,7 +428,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
         st_Link_AwaitingTransmitComplete_c,
         st_Link_AwaitingReadyState_c,
         st_Link_AwaitingControllerComplete_c,
-        st_Link_HoldingDTR_c  //- manual says that DTR is held for 80 nSec, but that must be for
+        st_Link_HoldingDTR_c // - manual says that DTR is held for 80 nSec, but that must be for
         //                        a hardware requirement, since at 2 MHz, 80 nSec is much less than
         //                        one cpu clock. But to avoid calling back on the host as it is calling
         //                        on the drive we will lower it on the next notification.
@@ -466,54 +465,54 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     };
 
 
-    ControllerState curState;
-    unsigned int statePosition_m;
-    unsigned long long countDown_m;
+    ControllerState            curState;
+    unsigned int               statePosition_m;
+    unsigned long long         countDown_m;
 
 
     static const unsigned long coundDown_Default_c = 200;
 
     void processCmd(BYTE val);
-    const char *getStateStr(ControllerState state);
+    const char* getStateStr(ControllerState state);
 
     void reset();
 
-    DiskDrive    *drives_m[numDrives_c];
-    ParallelLink *linkToHost_m;
+    DiskDrive*        drives_m[numDrives_c];
+    ParallelLink*     linkToHost_m;
 
-    BYTE readyState;
-    WORD sectorCount;
+    BYTE              readyState;
+    WORD              sectorCount;
 
-    bool driveNotReady_m;
-    bool diskWriteProtected_m;
-    bool deletedData_m;
-    bool noRecordFound_m;
-    bool crcError_m;
-    bool lateData_m;
-    bool invalidCommandReceived_m;
-    bool badTrackOverflow_m;
+    bool              driveNotReady_m;
+    bool              diskWriteProtected_m;
+    bool              deletedData_m;
+    bool              noRecordFound_m;
+    bool              crcError_m;
+    bool              lateData_m;
+    bool              invalidCommandReceived_m;
+    bool              badTrackOverflow_m;
 
-    BYTE dataToTransmit_m;
+    BYTE              dataToTransmit_m;
 
     // Specified drive/side/track from host.
-    BYTE drive_m;
-    BYTE side_m;
-    BYTE track_m;
-    BYTE sector_m;
+    BYTE              drive_m;
+    BYTE              side_m;
+    BYTE              track_m;
+    BYTE              sector_m;
 
     void decodeSideDriveSector(BYTE val);
-    static const BYTE sideMask_c = 0x80;
-    static const BYTE sideShift_c = 7;
+    static const BYTE sideMask_c    = 0x80;
+    static const BYTE sideShift_c   = 7;
 
-    static const BYTE driveMask_c = 0x60;
-    static const BYTE driveShift_c = 5;
+    static const BYTE driveMask_c   = 0x60;
+    static const BYTE driveShift_c  = 5;
 
-    static const BYTE sectorMask_c = 0x1F;
+    static const BYTE sectorMask_c  = 0x1F;
     static const BYTE sectorShift_c = 0;
 
     void decodeTrack(BYTE val);
 
-    static const BYTE trackMask_c = 0xFF;
+    static const BYTE trackMask_c  = 0xFF;
     static const BYTE trackShift_c = 0;
 
     void processReadControlStatus(void);
@@ -533,9 +532,9 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     void processData(BYTE val);
 
     BYTE diskData[256256];
-    int diskOffset;
-    int bytesToTransfer;
-    int sectorSize;
+    int  diskOffset;
+    int  bytesToTransfer;
+    int  sectorSize;
 };
 
 #endif // Z47CONTROLLER_H_

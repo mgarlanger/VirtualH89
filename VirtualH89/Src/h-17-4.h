@@ -8,8 +8,6 @@
 #ifndef H_17_4_H_
 #define H_17_4_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "DiskDrive.h"
 
 class FloppyDisk;
@@ -27,21 +25,21 @@ class H_17_4: public DiskDrive
     H_17_4();
     virtual ~H_17_4();
 
-    void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect);
+    void getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect);
 
     void selectSide(BYTE side);
     void step(bool direction);
 
-    BYTE readData(unsigned int pos);
-    void writeData(unsigned int pos, BYTE data);
+    BYTE readData(unsigned long pos);
+    void writeData(unsigned long pos, BYTE data);
 
-    virtual BYTE readSectorData(BYTE sector, unsigned int pos);
-    void insertDisk(FloppyDisk *disk);
+    virtual BYTE readSectorData(BYTE sector, unsigned long pos);
+    void insertDisk(FloppyDisk* disk);
 
   private:
 
-    BYTE side_m;
-    BYTE track_m;
+    BYTE                      side_m;
+    BYTE                      track_m;
 
     static const unsigned int maxTracks_c = 80;
 };

@@ -11,9 +11,9 @@
 
 #include "WallClock.h"
 
-extern FILE *log_out;
+extern FILE* log_out;
 
-extern FILE *console_out;
+extern FILE* console_out;
 
 /// \todo - make the logger a separate thread.
 /// \todo - have logger collapse repeated lines.
@@ -25,9 +25,9 @@ class logger
   private:
     logger();
     ~logger();
-    bool printToFile;
-    bool printToScreen;
-    FILE *logFile;
+    bool  printToFile;
+    bool  printToScreen;
+    FILE* logFile;
 
 };
 
@@ -36,50 +36,50 @@ class logger
 #if DEBUG
 
 #if DEBUG_TO_FILE
-//#define debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
+// #define debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
 
-#define debug(...)         { if(log_out) {fprintf(log_out, __VA_ARGS__); }}
+#define debug(...)         {if (log_out){fprintf(log_out, __VA_ARGS__); }}
 
-#define debugss(subsys, level, args ...)                      \
-        {                                                     \
-            int __val = 0;                                    \
-            if (level <= debugLevel[subsys])                  \
-            {                                                 \
-                if (level < ERROR)                            \
-                {  __val = 31; }         /* Red */            \
-                else if (level < WARNING)                     \
-                { __val = 33; }          /* Yellow */         \
-                else if (level < INFO)                        \
-                { __val = 35; }          /* Magenta */        \
-                else if (level < VERBOSE)                     \
-                { __val = 34; }          /* Blue */           \
-                else                                          \
-                { __val = 32; }          /* Green */          \
-                fprintf(log_out,"\x1b[37m");                  \
-                WallClock::instance()->printTime(log_out);    \
-                fprintf(log_out,"\x1b[36m%s: \x1b[%dm",       \
-                        __PRETTY_FUNCTION__, __val);          \
-                fprintf(log_out, args);                       \
-                fprintf(log_out,"\x1b[0m");                   \
-                fflush(log_out);                              \
-            }                                                 \
-        }
+#define debugss(subsys, level, args ...)               \
+    {                                                  \
+        int __val = 0;                                 \
+        if (level <= debugLevel[subsys])               \
+        {                                              \
+            if (level < ERROR)                         \
+            {__val = 31; } /* Red */                   \
+            else if (level < WARNING)                  \
+            {__val = 33; } /* Yellow */                \
+            else if (level < INFO)                     \
+            {__val = 35; } /* Magenta */               \
+            else if (level < VERBOSE)                  \
+            {__val = 34; } /* Blue */                  \
+            else                                       \
+            {__val = 32; } /* Green */                 \
+            fprintf(log_out, "\x1b[37m");              \
+            WallClock::instance()->printTime(log_out); \
+            fprintf(log_out, "\x1b[36m%s: \x1b[%dm",   \
+                    __PRETTY_FUNCTION__, __val);       \
+            fprintf(log_out, args);                    \
+            fprintf(log_out, "\x1b[0m");               \
+            fflush(log_out);                           \
+        }                                              \
+    }
 
 
 // nts - No TimeStamp
-#define debugss_nts(subsys, level, args ...)          \
-    {                                                 \
-        if (level <= debugLevel[subsys])              \
-        {                                             \
-           fprintf(log_out, args);                    \
-        }                                             \
+#define debugss_nts(subsys, level, args ...) \
+    {                                        \
+        if (level <= debugLevel[subsys])     \
+        {                                    \
+            fprintf(log_out, args);          \
+        }                                    \
     }
 
 #define chkdebuglevel(subsys, level)  ((level <= debugLevel[subsys]))
 
 #else
-#define cond_debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
-#define debug(args ...)              { printf(args); }
+#define cond_debug(cond, ...)   if (cond){printf(__VA_ARGS__); }
+#define debug(args ...)              {printf(args); }
 #endif
 #else
 #define debug(args ...)
@@ -144,12 +144,12 @@ enum subSystems
 ///
 enum logLevel
 {
-    FATAL = 0,
-    ERROR = 10,
+    FATAL   = 0,
+    ERROR   = 10,
     WARNING = 20,
-    INFO = 30,
+    INFO    = 30,
     VERBOSE = 40,
-    ALL = 100
+    ALL     = 100
 };
 
 extern unsigned debugLevel[ssMax];

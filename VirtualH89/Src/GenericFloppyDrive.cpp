@@ -7,13 +7,13 @@
 /// \author Douglas Miller
 ///
 
-#include <strings.h>
+#include "GenericFloppyDrive.h"
 
 #include "WallClock.h"
 #include "logger.h"
 #include "FloppyDisk.h"
-#include "GenericFloppyDrive.h"
 #include "GenericFloppyFormat.h"
+#include "GenericFloppyDisk.h"
 
 GenericFloppyDrive::GenericFloppyDrive(DriveType type)
 {
@@ -24,7 +24,6 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
     {
         numHeads_m = 2;
     }
-
     else
     {
         numHeads_m = 1;
@@ -32,38 +31,37 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
 
     if (type == FDD_8_SS || type == FDD_8_DS)
     {
-        numTracks_m = 77;
-        mediaSize_m = 8;
-        driveRpm_m = 360;
+        numTracks_m          = 77;
+        mediaSize_m          = 8;
+        driveRpm_m           = 360;
         rawSDBytesPerTrack_m = 6400;
     }
-
     else
     {
-        mediaSize_m = 5;
-        driveRpm_m = 300;
+        mediaSize_m          = 5;
+        driveRpm_m           = 300;
         rawSDBytesPerTrack_m = 3200;
 
         if (type == FDD_5_25_SS_DT || type == FDD_5_25_DS_DT || type == FDD_8_DS)
         {
             numTracks_m = 80;
         }
-
         else
         {
             numTracks_m = 40;
         }
     }
 
-    cycleCount_m = 0;
+    cycleCount_m  = 0;
     ticksPerRev_m = (ticksPerSec_m * 60) / driveRpm_m;
-    headSel_m = 0;
-    track_m = 0;
-    motor_m = (mediaSize_m == 8);
-    head_m = (mediaSize_m == 5);
+    headSel_m     = 0;
+    track_m       = 0;
+    motor_m       = (mediaSize_m == 8);
+    head_m        = (mediaSize_m == 5);
 }
 
-GenericFloppyDrive *GenericFloppyDrive::getInstance(std::string type)
+GenericFloppyDrive*
+GenericFloppyDrive::getInstance(std::string type)
 {
     DriveType etype;
 
@@ -71,32 +69,26 @@ GenericFloppyDrive *GenericFloppyDrive::getInstance(std::string type)
     {
         etype = FDD_5_25_SS_ST;
     }
-
     else if (type.compare("FDD_5_25_SS_DT") == 0)
     {
         etype = FDD_5_25_SS_DT;
     }
-
     else if (type.compare("FDD_5_25_DS_ST") == 0)
     {
         etype = FDD_5_25_DS_ST;
     }
-
     else if (type.compare("FDD_5_25_DS_DT") == 0)
     {
         etype = FDD_5_25_DS_DT;
     }
-
     else if (type.compare("FDD_8_SS") == 0)
     {
         etype = FDD_8_SS;
     }
-
     else if (type.compare("FDD_8_DS") == 0)
     {
         etype = FDD_8_DS;
     }
-
     else
     {
         return NULL;
@@ -110,7 +102,8 @@ GenericFloppyDrive::~GenericFloppyDrive()
 }
 
 
-void GenericFloppyDrive::insertDisk(GenericFloppyDisk *disk)
+void
+GenericFloppyDrive::insertDisk(GenericFloppyDisk* disk)
 {
     if (disk_m != NULL)
     {
@@ -120,12 +113,14 @@ void GenericFloppyDrive::insertDisk(GenericFloppyDisk *disk)
     disk_m = disk;
 }
 
-bool GenericFloppyDrive::getTrackZero()
+bool
+GenericFloppyDrive::getTrackZero()
 {
     return (track_m == 0);
 }
 
-void GenericFloppyDrive::step(bool direction)
+void
+GenericFloppyDrive::step(bool direction)
 {
     if (direction)
     {
@@ -136,7 +131,6 @@ void GenericFloppyDrive::step(bool direction)
 
         debugss(ssGenericFloppyDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m > 0)
@@ -148,7 +142,8 @@ void GenericFloppyDrive::step(bool direction)
     }
 }
 
-void GenericFloppyDrive::selectSide(BYTE side)
+void
+GenericFloppyDrive::selectSide(BYTE side)
 {
     headSel_m = side % numHeads_m;
 }
@@ -214,7 +209,8 @@ int GenericFloppyDrive::writeData(bool dd, BYTE track, BYTE side, BYTE sector,
     return result;
 }
 
-void GenericFloppyDrive::notification(unsigned int cycleCount)
+void
+GenericFloppyDrive::notification(unsigned int cycleCount)
 {
     if (disk_m == NULL || !motor_m)
     {
@@ -224,10 +220,11 @@ void GenericFloppyDrive::notification(unsigned int cycleCount)
     cycleCount_m += cycleCount;
     cycleCount_m %= ticksPerRev_m;
     // TODO: what is appropriate width of index pulse?
-    indexPulse_m = (cycleCount_m < 100); // approx 50uS...
+    indexPulse_m  = (cycleCount_m < 100); // approx 50uS...
 }
 
-unsigned long GenericFloppyDrive::getCharPos(bool doubleDensity)
+unsigned long
+GenericFloppyDrive::getCharPos(bool doubleDensity)
 {
     // if disk_m == NULL || !motor_m then cycleCount_m won't be updating
     // and so CharPos also does not update.  Callers checks this.
@@ -242,7 +239,8 @@ unsigned long GenericFloppyDrive::getCharPos(bool doubleDensity)
     return (cycleCount_m / ticksPerByte);
 }
 
-bool GenericFloppyDrive::readAddress(int& track, int& sector, int& side)
+bool
+GenericFloppyDrive::readAddress(int& track, int& sector, int& side)
 {
     if (disk_m == NULL || !motor_m)
     {
@@ -251,13 +249,14 @@ bool GenericFloppyDrive::readAddress(int& track, int& sector, int& side)
 
     // For now, just report what we think is there.
     // TODO: consult media to see if it knows.
-    track = track_m;
+    track  = track_m;
     sector = 0; // TODO: use charPos and media to approximate
-    side = headSel_m;
+    side   = headSel_m;
     return true;
 }
 
-void GenericFloppyDrive::headLoad(bool load)
+void
+GenericFloppyDrive::headLoad(bool load)
 {
     if (mediaSize_m == 8)
     {
@@ -265,7 +264,8 @@ void GenericFloppyDrive::headLoad(bool load)
     }
 }
 
-void GenericFloppyDrive::motor(bool on)
+void
+GenericFloppyDrive::motor(bool on)
 {
     if (mediaSize_m == 5)
     {
@@ -273,17 +273,20 @@ void GenericFloppyDrive::motor(bool on)
     }
 }
 
-bool GenericFloppyDrive::isReady()
+bool
+GenericFloppyDrive::isReady()
 {
     return (disk_m != NULL && disk_m->isReady());
 }
 
-bool GenericFloppyDrive::isWriteProtect()
+bool
+GenericFloppyDrive::isWriteProtect()
 {
     return (disk_m == NULL || disk_m->checkWriteProtect());
 }
 
-std::string GenericFloppyDrive::getMediaName()
+std::string
+GenericFloppyDrive::getMediaName()
 {
     return (disk_m != NULL ? disk_m->getMediaName() : "");
 }

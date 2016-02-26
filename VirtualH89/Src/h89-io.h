@@ -1,5 +1,7 @@
 /// \file h89-io.h
 ///
+/// \brief Interfaces between the CPU and all the I/O devices
+///
 /// \date Mar 7, 2009
 /// \author Mark Garlanger
 ///
@@ -7,12 +9,14 @@
 #ifndef H89_IO_H_
 #define H89_IO_H_
 
+#include <vector>
+
 #include "config.h"
 #include "h89Types.h"
 
 #include "IODevice.h"
-#include "DiskController.h"
-#include <vector>
+
+class DiskController;
 
 ///
 /// \brief %H89 IO Bus
@@ -25,18 +29,18 @@ class H89_IO
     H89_IO();
     ~H89_IO();
 
-    std::vector<DiskController *>& getDiskDevices();
-    bool addDiskDevice(DiskController *device);
-    bool addDevice(IODevice *device);
-    bool removeDevice(IODevice *device);
+    std::vector<DiskController*>& getDiskDevices();
+    bool addDiskDevice(DiskController* device);
+    bool addDevice(IODevice* device);
+    bool removeDevice(IODevice* device);
     void reset();
 
     BYTE in(BYTE addr);
     void out(BYTE addr, BYTE val);
 
   private:
-    IODevice *iodevices[256];
-    std::vector<DiskController *> dsk_devs;
+    IODevice*                    iodevices[256];
+    std::vector<DiskController*> dsk_devs;
 };
 
 #endif // H89_IO_H_
