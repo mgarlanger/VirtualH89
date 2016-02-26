@@ -119,7 +119,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     }
 
     BYTE buf[128];
-    int  x = read(driveFd, buf, sizeof(buf));
+    long x = read(driveFd, buf, sizeof(buf));
 
     // special case: 0 (EOF) means new media - initialize it.
     if (x != 0 && x != sizeof(buf))
@@ -138,7 +138,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
         mediaSsz   = sectorSize;
         mediaSpt   = sectorsPerTrack;
         mediaLat   = 1;
-        int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
+        int l = sprintf((char*) buf, "%ldc%ldh%ldz%ldp%ldl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
@@ -152,8 +152,8 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
 
         while (*b != '\n' && *b != '\0' && b - buf < sizeof(buf))
         {
-            BYTE* e;
-            int   p = strtoul((char*) b, (char**) &e, 0);
+            BYTE*         e;
+            unsigned long p = strtoul((char*) b, (char**) &e, 0);
 
             // TODO: removable flag, others?
             // NOTE: removable media requires many more changes.
@@ -609,7 +609,7 @@ void
 GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
-    int   e;
+    long  e;
 
     if (cmdBuf[0] != cmd_ReqSense_c)
     {
@@ -771,7 +771,7 @@ void
 GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
-    int   e;
+    long  e;
 
     switch (cmdBuf[0])
     {

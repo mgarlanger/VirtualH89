@@ -34,7 +34,7 @@ PropertyUtil::read(std::istream& is, PropertyMapT& map)
         throw std::exception();
     }
 
-    char ch = 0, next = 0;
+    char ch = 0;
 
     ch = is.get();
 

@@ -744,6 +744,10 @@ Z47Controller::processTransmitted()
         case st_WaitingToComplete_c:
             debugss(ssH47, ERROR, "%s - Unsupported - st_WaitingToComplete_c\n", __FUNCTION__);
             break;
+
+        default:
+            debugss(ssH47, ERROR, "%s - default: - %d\n", __FUNCTION__, curState);
+            break;
     }
 }
 
@@ -947,6 +951,11 @@ Z47Controller::processCmd(BYTE cmd)
         case st_Link_AwaitingToTransmit_c:
             debugss(ssH47, INFO, "%s - link transmit state\n", __FUNCTION__);
             break;
+
+        default:
+            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__,
+                    curLinkState);
+
     }
 
 }
@@ -1091,6 +1100,11 @@ Z47Controller::notification(unsigned int cycleCount)
 
             curLinkState = st_Link_AwaitingToReceive_c;
             return;
+
+        default:
+            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__,
+                    curLinkState);
+
     }
 
     if (curState == st_None_c)
@@ -1178,6 +1192,9 @@ Z47Controller::notification(unsigned int cycleCount)
         case st_WaitingToComplete_c:
             debugss(ssH47, ERROR, "%s - Unsupported - st_WaitingToComplete_c\n", __FUNCTION__);
             break;
+
+        default:
+            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__, curState);
 
     }
 

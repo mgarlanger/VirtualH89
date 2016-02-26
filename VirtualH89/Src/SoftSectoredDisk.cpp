@@ -74,7 +74,7 @@ SoftSectoredDisk::~SoftSectoredDisk()
 bool
 SoftSectoredDisk::readData(BYTE side,
                            BYTE track,
-                           unsigned int pos,
+                           unsigned long pos,
                            BYTE& data)
 {
     debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
@@ -106,7 +106,7 @@ SoftSectoredDisk::readData(BYTE side,
     {
         if ((track < tracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%d) = %d\n", __FUNCTION__,
+            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%lu) = %d\n", __FUNCTION__,
                     track, pos, rawImage_m[side][track][pos]);
             data = rawImage_m[side][track][pos];
             return true;
@@ -114,7 +114,7 @@ SoftSectoredDisk::readData(BYTE side,
 
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%d)\n", __FUNCTION__,
+            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%lu)\n", __FUNCTION__,
                     track, pos);
             return false;
         }
@@ -130,7 +130,7 @@ SoftSectoredDisk::readData(BYTE side,
 bool
 SoftSectoredDisk::writeData(BYTE side,
                             BYTE track,
-                            unsigned int pos,
+                            unsigned long pos,
                             BYTE data)
 {
     debugss(ssFloppyDisk, INFO, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
@@ -162,7 +162,7 @@ SoftSectoredDisk::writeData(BYTE side,
     {
         if ((track < tracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%d) = %d\n", __FUNCTION__, track,
+            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%lu) = %d\n", __FUNCTION__, track,
                     pos, rawImage_m[side][track][pos]);
             rawImage_m[side][track][pos] = data;
             return true;
@@ -170,7 +170,7 @@ SoftSectoredDisk::writeData(BYTE side,
 
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%d)\n",
+            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%lu)\n",
                     __FUNCTION__, track, pos);
             return false;
         }
@@ -184,7 +184,7 @@ SoftSectoredDisk::writeData(BYTE side,
 }
 
 void
-SoftSectoredDisk::getControlInfo(unsigned int pos,
+SoftSectoredDisk::getControlInfo(unsigned long pos,
                                  bool& hole,
                                  bool& writeProtect)
 {
@@ -206,9 +206,9 @@ SoftSectoredDisk::getControlInfo(unsigned int pos,
 
 
 bool
-SoftSectoredDisk::defaultHoleStatus(unsigned int pos)
+SoftSectoredDisk::defaultHoleStatus(unsigned long pos)
 {
-    debugss(ssFloppyDisk, ALL, "%s: pos = %d ", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, ALL, "%s: pos = %ld ", __FUNCTION__, pos);
 
     // check for index hole
     if (pos < 128) /// \todo ??? does this need to change based on the density

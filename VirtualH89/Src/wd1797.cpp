@@ -675,7 +675,7 @@ WD1797::notification(unsigned int cycleCount)
 
                 if (drive->getTrackZero())
                 {
-                    statusReg_m != stat_TrackZero_c;
+                    statusReg_m |= stat_TrackZero_c;
                 }
 
                 else
@@ -743,7 +743,7 @@ WD1797::notification(unsigned int cycleCount)
         case stepDoneCmd:
             if (drive->getTrackZero())
             {
-                statusReg_m != stat_TrackZero_c;
+                statusReg_m |= stat_TrackZero_c;
             }
 
             else
@@ -754,6 +754,11 @@ WD1797::notification(unsigned int cycleCount)
             statusReg_m &= ~stat_Busy_c;
             raiseIntrq();
             curCommand_m = noneCmd;
+            break;
+
+        default:
+            debugss(ssWD1797, WARNING, "%s: default1: %d\n", __FUNCTION__,
+                    curCommand_m);
             break;
     }
 
@@ -1006,6 +1011,12 @@ startWritingTrackNow:
         case forceInterruptCmd:
             // TODO: watch for event(s) and raise interrupt when seen...
             break;
+
+        default:
+            debugss(ssWD1797, WARNING, "%s: default2: %d\n", __FUNCTION__,
+                    curCommand_m);
+            break;
+
     }
 
 }

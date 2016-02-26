@@ -8,12 +8,6 @@
 #define CONFIG_H_
 
 /// \todo Determine what needs to be a configuration variable, and what can be removed.
-
-#define USE_PTHREAD 1
-#define CPM 0
-
-
-#define CNTL_C
 // #define BUS_8080
 
 // h17
@@ -24,11 +18,11 @@
 #define NEW_TICKS 1
 #define USE_TABLE 1
 #define INDIVIDUAL_FUNCTIONS 0
+#define PREFIX 1
 
 // Need if dumping all the Z80 logs. Otherwise system is too slow to process all the output. actually 20x
 #define TEN_X_SLOWER 0
 
-#define PREFIX 1
 
 #define MTR90 1
 

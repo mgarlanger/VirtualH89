@@ -526,12 +526,12 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
             statusReg_m |= stat_TrackZero_c;
         }
 
-        if (0) /// check crcError - Don't think it could happen here.
+        if (/* DISABLES CODE */ (0)) /// check crcError - Don't think it could happen here.
         {
             statusReg_m |= stat_CRCError_c;
         }
 
-        if (0) // check seekError - Don't think it could happen here.
+        if (/* DISABLES CODE */ (0)) // check seekError - Don't think it could happen here.
         {
             statusReg_m |= stat_SeekError_c;
         }
@@ -550,7 +550,7 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
             statusReg_m |= stat_WriteProtect_c;
         }
 
-        if (0) // check Not Ready..
+        if (/* DISABLES CODE */ (0)) // check Not Ready..
         {
             /// \todo figure out what this comes from.
             statusReg_m |= stat_NotReady_c;

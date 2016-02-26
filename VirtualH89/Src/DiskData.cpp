@@ -67,7 +67,7 @@ DiskData::parse()
 
     if (dataSize_m < 20) /// \todo determine the minimum size.
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid file size: %d\n", __FUNCTION__,
+        debugss(ssFloppyDisk, ERROR, "%s: Invalid file size: %lld\n", __FUNCTION__,
                 dataSize_m);
         return false;
     }

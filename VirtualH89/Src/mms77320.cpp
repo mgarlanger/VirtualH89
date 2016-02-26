@@ -78,8 +78,8 @@ MMS77320::findDrive(std::string ident)
         return NULL;
     }
 
-    char* e;
-    int   x = strtoul(ident.c_str() + strlen(MMS77320_Name_c) + 1, &e, 10);
+    char*         e;
+    unsigned long x = strtoul(ident.c_str() + strlen(MMS77320_Name_c) + 1, &e, 10);
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {
@@ -95,7 +95,7 @@ MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
     std::map<int, GenericSASIDrive*> mmsdrives;
     std::string                      s;
     int                              port = 0x78;
-    int                              sw   = 0;
+    unsigned int                     sw   = 0;
     int                              intr = 0;
     std::string                      dir  = "";
 
@@ -137,7 +137,7 @@ MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
 
     if (!s.empty())
     {
-        sw = strtoul(s.c_str(), NULL, 2);
+        sw = (unsigned int) strtoul(s.c_str(), NULL, 2);
     }
 
     dir = props["mms77320_dir"];

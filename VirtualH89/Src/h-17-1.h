@@ -25,15 +25,15 @@ class H_17_1: public DiskDrive
     H_17_1();
     virtual ~H_17_1();
 
-    void getControlInfo(unsigned int pos, bool& hole, bool& trackZero, bool& writeProtect);
+    void getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect);
 
     void step(bool direction);
     void selectSide(BYTE side);
 
-    BYTE readData(unsigned int pos);
-    void writeData(unsigned int pos, BYTE data);
+    BYTE readData(unsigned long pos);
+    void writeData(unsigned long pos, BYTE data);
 
-    virtual BYTE readSectorData(BYTE sector, unsigned int pos);
+    virtual BYTE readSectorData(BYTE sector, unsigned long pos);
     void insertDisk(FloppyDisk* disk);
 
 

@@ -25,18 +25,18 @@ class DiskDrive
     virtual void ejectDisk(const char* name);
 
 
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& trackZero,
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& trackZero,
                                 bool& writeProtect) = 0;
 
     virtual void selectSide(BYTE side)              = 0;
     virtual void step(bool direction)               = 0;
 
-    virtual BYTE readData(unsigned int pos)         = 0;
-    virtual void writeData(unsigned int pos,
+    virtual BYTE readData(unsigned long pos)        = 0;
+    virtual void writeData(unsigned long pos,
                            BYTE data)               = 0;
 
     virtual BYTE readSectorData(BYTE sector,
-                                unsigned int pos)   = 0;
+                                unsigned long pos)  = 0;
 
     virtual void loadHead();
     virtual void unLoadHead();

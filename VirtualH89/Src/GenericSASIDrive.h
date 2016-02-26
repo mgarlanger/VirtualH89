@@ -129,11 +129,11 @@ class GenericSASIDrive: public GenericDiskDrive
     int              driveCnum;
     const char*      driveMedia;
     enum DriveType   driveType;
-    int              mediaSpt;
-    int              mediaSsz;
-    int              mediaCyl;
-    int              mediaHead;
-    int              mediaLat;
+    long             mediaSpt;
+    long             mediaSsz;
+    long             mediaCyl;
+    long             mediaHead;
+    long             mediaLat;
 
     int              blockCount;
 

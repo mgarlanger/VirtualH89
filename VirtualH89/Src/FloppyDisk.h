@@ -27,9 +27,9 @@ class FloppyDisk
     FloppyDisk(const char* name);
     virtual ~FloppyDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data)    = 0;
-    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data)    = 0;
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect) = 0;
+    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data)    = 0;
+    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data)    = 0;
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect) = 0;
     virtual void setWriteProtect(bool value);
     virtual bool checkWriteProtect(void);
 

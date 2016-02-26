@@ -82,8 +82,8 @@ MMS77316::findDrive(std::string ident)
         return NULL;
     }
 
-    char* e;
-    int   x = strtoul(ident.c_str() + strlen(MMS77316_Name_c) + 1, &e, 10);
+    char*         e;
+    unsigned long x = strtoul(ident.c_str() + strlen(MMS77316_Name_c) + 1, &e, 10);
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {

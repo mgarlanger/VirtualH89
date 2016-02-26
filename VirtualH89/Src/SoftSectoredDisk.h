@@ -31,9 +31,9 @@ class SoftSectoredDisk: public FloppyDisk
     SoftSectoredDisk();
     virtual ~SoftSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE& data);
-    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& writeProtect);
+    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data);
+    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect);
 
     virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE& data);
     virtual void eject(const char* name);
@@ -56,7 +56,7 @@ class SoftSectoredDisk: public FloppyDisk
     // move these to track, that is how it is encoded in IMD files.
 //    DataRate dataRate_m;
 
-    bool defaultHoleStatus(unsigned int pos);
+    bool defaultHoleStatus(unsigned long pos);
 
     void determineDiskFormat(const char* name, DiskImageFormat& format);
     bool readTD0(const char* name);

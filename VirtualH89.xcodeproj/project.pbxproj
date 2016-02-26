@@ -19,7 +19,6 @@
 		A13C989A1C7A3839000CF03B /* StdioProxyConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C98981C7A3839000CF03B /* StdioProxyConsole.cpp */; };
 		A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989B1C7A3850000CF03B /* RawFloppyImage.cpp */; };
 		A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989E1C7A385C000CF03B /* wd1797.cpp */; };
-		A1A434361C7060430015F838 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = A1A433CD1C7060430015F838 /* README.md */; };
 		A1A434371C7060430015F838 /* AddressBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D01C7060430015F838 /* AddressBus.cpp */; };
 		A1A434381C7060430015F838 /* ClockUser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D41C7060430015F838 /* ClockUser.cpp */; };
 		A1A434391C7060430015F838 /* computer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D61C7060430015F838 /* computer.cpp */; };
@@ -112,12 +111,10 @@
 		A1A433C01C705D310015F838 /* VirtualH89 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VirtualH89; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A433CB1C7060430015F838 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = doxygen.conf; sourceTree = "<group>"; };
 		A1A433CC1C7060430015F838 /* generateDoxy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = generateDoxy; sourceTree = "<group>"; };
-		A1A433CD1C7060430015F838 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A1A433CF1C7060430015F838 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		A1A433D01C7060430015F838 /* AddressBus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AddressBus.cpp; sourceTree = "<group>"; };
 		A1A433D11C7060430015F838 /* AddressBus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressBus.h; sourceTree = "<group>"; };
 		A1A433D21C7060430015F838 /* ascii.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ascii.h; sourceTree = "<group>"; };
-		A1A433D31C7060430015F838 /* astyle.opts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = astyle.opts; sourceTree = "<group>"; };
 		A1A433D41C7060430015F838 /* ClockUser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClockUser.cpp; sourceTree = "<group>"; };
 		A1A433D51C7060430015F838 /* ClockUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClockUser.h; sourceTree = "<group>"; };
 		A1A433D61C7060430015F838 /* computer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = computer.cpp; sourceTree = "<group>"; };
@@ -258,7 +255,6 @@
 			isa = PBXGroup;
 			children = (
 				A1A433CA1C7060430015F838 /* Doxygen */,
-				A1A433CD1C7060430015F838 /* README.md */,
 				A1A433CE1C7060430015F838 /* Src */,
 			);
 			path = VirtualH89;
@@ -305,7 +301,6 @@
 				A1A433D01C7060430015F838 /* AddressBus.cpp */,
 				A1A433D11C7060430015F838 /* AddressBus.h */,
 				A1A433D21C7060430015F838 /* ascii.h */,
-				A1A433D31C7060430015F838 /* astyle.opts */,
 				A1A433D41C7060430015F838 /* ClockUser.cpp */,
 				A1A433D51C7060430015F838 /* ClockUser.h */,
 				A1A433D61C7060430015F838 /* computer.cpp */,
@@ -504,7 +499,6 @@
 				A1A434471C7060430015F838 /* h19.cpp in Sources */,
 				A1A434621C7060430015F838 /* Z47Controller.cpp in Sources */,
 				A1A4343A1C7060430015F838 /* Console.cpp in Sources */,
-				A1A434361C7060430015F838 /* README.md in Sources */,
 				A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */,
 				A1A434601C7060430015F838 /* Track.cpp in Sources */,
 				A1A4343D1C7060430015F838 /* disasm.cpp in Sources */,

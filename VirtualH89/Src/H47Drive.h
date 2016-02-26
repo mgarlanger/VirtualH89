@@ -18,15 +18,15 @@ class H47Drive: public DiskDrive
     H47Drive();
     virtual ~H47Drive();
 
-    virtual void getControlInfo(unsigned int pos, bool& hole, bool& trackZero,
+    virtual void getControlInfo(unsigned long pos, bool& hole, bool& trackZero,
                                 bool& writeProtect);
 
     virtual void selectSide(BYTE side);
     virtual void step(bool direction);
 
-    virtual BYTE readData(unsigned int pos);
-    virtual void writeData(unsigned int pos, BYTE data);
-    virtual BYTE readSectorData(BYTE sector, unsigned int pos);
+    virtual BYTE readData(unsigned long pos);
+    virtual void writeData(unsigned long pos, BYTE data);
+    virtual BYTE readSectorData(BYTE sector, unsigned long pos);
     virtual void insertDisk(FloppyDisk* disk);
 
   private:

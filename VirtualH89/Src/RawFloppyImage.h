@@ -41,10 +41,10 @@ class RawFloppyImage: public GenericFloppyDisk
     RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv);
     ~RawFloppyImage();
 
-    bool readData(BYTE side, BYTE track, unsigned int pos, int& data);
-    bool startWrite(BYTE side, BYTE track, unsigned int pos);
-    bool stopWrite(BYTE side, BYTE track, unsigned int pos);
-    bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
+    bool readData(BYTE side, BYTE track, unsigned long pos, int& data);
+    bool startWrite(BYTE side, BYTE track, unsigned long pos);
+    bool stopWrite(BYTE side, BYTE track, unsigned long pos);
+    bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
     bool isReady();
     void eject(const char* name);
     void dump(void);
@@ -61,8 +61,8 @@ class RawFloppyImage: public GenericFloppyDisk
     bool          hypoTrack_m;  // ST media in DT drive
     bool          hyperTrack_m; // DT media in ST drive
     bool          interlaced_m;
-    int           gapLen_m;
-    int           indexGapLen_m;
+    long          gapLen_m;
+    long          indexGapLen_m;
     unsigned long writePos_m;
     bool          trackWrite_m;
 
