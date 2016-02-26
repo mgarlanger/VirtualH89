@@ -47,7 +47,6 @@ RAM::writeByte(WORD addr, BYTE val)
         debugss(ssRAM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n",
                 __FUNCTION__, addr, baseAddress_m, size_m);
     }
-
     else
     {
         data_m[offset] = val;
@@ -66,7 +65,6 @@ RAM::readByte(WORD addr)
         debugss(ssRAM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n",
                 __FUNCTION__, addr, baseAddress_m, size_m);
     }
-
     else
     {
         val = data_m[offset];

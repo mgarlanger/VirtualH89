@@ -22,7 +22,7 @@ EightInchDisk::EightInchDisk()
 
 }
 
-EightInchDisk::EightInchDisk(const char* name,
+EightInchDisk::EightInchDisk(const char*                       name,
                              SoftSectoredDisk::DiskImageFormat format): SoftSectoredDisk(name,
                                                                                          format)
 {

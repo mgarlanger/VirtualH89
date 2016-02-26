@@ -110,7 +110,6 @@ MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
     {
         port &= ~0x04;
     }
-
     else if (s.compare("jp1b") == 0)
     {
         port |= 0x04;
@@ -122,12 +121,10 @@ MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
     {
         intr = 3;
     }
-
     else if (s.compare("jp2b") == 0)
     {
         intr = 4;
     }
-
     else if (s.compare("jp2c") == 0)
     {
         intr = 5;
@@ -207,7 +204,6 @@ MMS77320::in(BYTE addr)
 
         // TODO: side-effects?
     }
-
     else if (offset == StatusPort_Offset_c)
     {
         val = getStatus(ctrlBus_m);
@@ -221,7 +217,6 @@ MMS77320::in(BYTE addr)
         lowerIntrq();
         // TODO; other side-effects?
     }
-
     else
     {
         debugss(ssMMS77320, ERROR, "MMS77320::in(Unknown - 0x%02x)\n", addr);
@@ -291,7 +286,6 @@ MMS77320::out(BYTE addr, BYTE val)
         }
 
     }
-
     else if (offset == Control1Port_Offset_c)
     {
         val          &= 0x0f;
@@ -313,7 +307,6 @@ MMS77320::out(BYTE addr, BYTE val)
         }
 
     }
-
     else if (offset == Control0Port_Offset_c)
     {
         val &= 0xf0;
@@ -330,14 +323,12 @@ MMS77320::out(BYTE addr, BYTE val)
                 ctrlBus_m &= ~GenericSASIDrive::ctl_Reset_i_c;
                 curDrive_m->run(dataInReg_m, dataOutReg_m, ctrlBus_m);
             }
-
             else if (control0Reg_m & ctrl_ResetStart_c)
             {
                 debugss(ssMMS77320, INFO, "RESET SASI\n");
                 ctrlBus_m |= GenericSASIDrive::ctl_Reset_i_c;
                 curDrive_m->resetSASI(dataInReg_m, dataOutReg_m, ctrlBus_m);
             }
-
             else if (control0Reg_m & ctrl_Select_c)
             {
                 BYTE temp = (1 << (control1Reg_m & ctrl_DriveSel_c));
@@ -346,7 +337,6 @@ MMS77320::out(BYTE addr, BYTE val)
             }
         }
     }
-
     else
     {
         debugss(ssMMS77320, ERROR, "MMS77320::out(Unknown - 0x%02x): %d\n", addr, val);
@@ -378,13 +368,11 @@ MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive* drive)
             drives_m[unitNum] = drive;
             retVal            = true;
         }
-
         else
         {
             debugss(ssMMS77320, ERROR, "%s: drive already connect\n", __FUNCTION__);
         }
     }
-
     else
     {
         debugss(ssMMS77320, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);

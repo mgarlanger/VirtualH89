@@ -25,10 +25,10 @@ class Sector
 
   public:
     Sector();
-    Sector(BYTE headNum,
-           BYTE trackNum,
-           BYTE sectorNum,
-           WORD sectorLength,
+    Sector(BYTE  headNum,
+           BYTE  trackNum,
+           BYTE  sectorNum,
+           WORD  sectorLength,
            BYTE* data);
 
     Sector(BYTE headNum,
@@ -37,10 +37,10 @@ class Sector
            WORD sectorLength,
            BYTE data = 0xe5);
 
-    void initialize(BYTE headNum,
-                    BYTE trackNum,
-                    BYTE sectorNum,
-                    WORD sectorLength,
+    void initialize(BYTE  headNum,
+                    BYTE  trackNum,
+                    BYTE  sectorNum,
+                    WORD  sectorLength,
                     BYTE* data);
 
     virtual ~Sector();

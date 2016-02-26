@@ -24,7 +24,6 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
     {
         numHeads_m = 2;
     }
-
     else
     {
         numHeads_m = 1;
@@ -37,7 +36,6 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
         driveRpm_m           = 360;
         rawSDBytesPerTrack_m = 6400;
     }
-
     else
     {
         mediaSize_m          = 5;
@@ -48,7 +46,6 @@ GenericFloppyDrive::GenericFloppyDrive(DriveType type)
         {
             numTracks_m = 80;
         }
-
         else
         {
             numTracks_m = 40;
@@ -72,32 +69,26 @@ GenericFloppyDrive::getInstance(std::string type)
     {
         etype = FDD_5_25_SS_ST;
     }
-
     else if (type.compare("FDD_5_25_SS_DT") == 0)
     {
         etype = FDD_5_25_SS_DT;
     }
-
     else if (type.compare("FDD_5_25_DS_ST") == 0)
     {
         etype = FDD_5_25_DS_ST;
     }
-
     else if (type.compare("FDD_5_25_DS_DT") == 0)
     {
         etype = FDD_5_25_DS_DT;
     }
-
     else if (type.compare("FDD_8_SS") == 0)
     {
         etype = FDD_8_SS;
     }
-
     else if (type.compare("FDD_8_DS") == 0)
     {
         etype = FDD_8_DS;
     }
-
     else
     {
         return NULL;
@@ -140,7 +131,6 @@ GenericFloppyDrive::step(bool direction)
 
         debugss(ssGenericFloppyDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m > 0)

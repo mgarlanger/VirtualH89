@@ -169,7 +169,6 @@ H19::keypress(char ch)
     {
         processCharacter(ch);
     }
-
     else
     {
         if ((ch & 0x80) != 0)
@@ -183,7 +182,6 @@ H19::keypress(char ch)
             usleep(2000);
             sendData(ch & 0x7f);
         }
-
         else
         {
             sendData(ch);
@@ -334,7 +332,6 @@ H19::processCharacter(char ch)
                 break;
         }
     }
-
     else if (mode == Escape)
     {
         // Assume we go back to Normal, so only the few that don't need to set the mode.
@@ -549,7 +546,6 @@ H19::processCharacter(char ch)
                 break;
         }
     }
-
     else if (mode == SetMode)
     {
         mode = Normal;
@@ -601,7 +597,6 @@ H19::processCharacter(char ch)
                 break;
         }
     }
-
     else if (mode == ResetMode)
     {
         mode = Normal;
@@ -654,7 +649,6 @@ H19::processCharacter(char ch)
                 break;
         }
     }
-
     else if (mode == DCA_1)
     {
         // From actual H19, once the line is specified, the cursor
@@ -666,7 +660,6 @@ H19::processCharacter(char ch)
             // cancel
             mode = Normal;
         }
-
         else
         {
             // \todo handle error conditions
@@ -678,7 +671,6 @@ H19::processCharacter(char ch)
             {
                 PosY = pos - 1;
             }
-
             else
             {
                 /// \todo check to see how a real h19 handles this.
@@ -688,7 +680,6 @@ H19::processCharacter(char ch)
             mode = DCA_2;
         }
     }
-
     else if (mode == DCA_2)
     {
         if (ch == ascii::CAN)
@@ -696,7 +687,6 @@ H19::processCharacter(char ch)
             // cancel
             mode = Normal;
         }
-
         else
         {
             int pos = ch - 31;
@@ -705,7 +695,6 @@ H19::processCharacter(char ch)
             {
                 PosX = pos - 1;
             }
-
             else
             {
                 PosX = (cols - 1);
@@ -744,7 +733,6 @@ H19::displayCharacter(unsigned int ch)
         // Look up symbol
         symbol = graphicLookup[ch];
     }
-
     else
     {
         symbol = ch;
@@ -781,12 +769,10 @@ H19::displayCharacter(unsigned int ch)
             {
                 PosY++;
             }
-
             else if (PosY == (rowsMain - 1))
             {
                 scroll();
             }
-
             else
             {
                 // On a real H19, it just wraps back to column 0, and stays
@@ -794,7 +780,6 @@ H19::displayCharacter(unsigned int ch)
                 assert(PosY == rowsMain);
             }
         }
-
         else
         {
             PosX = (cols - 1);
@@ -837,7 +822,6 @@ H19::processLF()
     {
         ++PosY;
     }
-
     else
     {
         // must be line 24 - have to scroll.
@@ -871,7 +855,6 @@ H19::processTAB()
         PosX   &= 0xf8;
         updated = true;
     }
-
     else if (PosX < (cols - 1))
     {
         PosX++;
@@ -950,7 +933,6 @@ H19::reverseIndex()
         // simply move up a row
         --PosY;
     }
-
     else
     {
         // must be line 0 - have to scroll down.
@@ -1015,7 +997,6 @@ H19::clearDisplay()
         eraseEL();
         /// \todo determine if 'PosX = 0' is needed.
     }
-
     else
     {
         for (unsigned int y = 0; y < rowsMain; ++y)
@@ -1237,7 +1218,6 @@ H19::transmitLines(int start, int end)
                     sendData(ascii::ESC);
                     sendData('p');
                 }
-
                 else
                 {
                     // send turn off reverse
@@ -1256,7 +1236,6 @@ H19::transmitLines(int start, int end)
                     sendData(ascii::ESC);
                     sendData('F');
                 }
-
                 else
                 {
                     // send turn off graphics

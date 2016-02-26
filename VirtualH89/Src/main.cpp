@@ -131,7 +131,6 @@ main(int argc, char* argv[])
     {
         cerr << endl << "Unable to open console.out" << endl;
     }
-
     else if (!quiet)
     {
         cout << "Successfully opened console.out" << endl;
@@ -179,12 +178,10 @@ main(int argc, char* argv[])
     {
         console = new StdioConsole(argc, argv);
     }
-
     else if (gui.compare("proxy") == 0)
     {
         console = new StdioProxyConsole(argc, argv);
     }
-
     else
     {
         console = new H19();

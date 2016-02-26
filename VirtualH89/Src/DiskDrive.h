@@ -26,17 +26,17 @@ class DiskDrive
 
 
     virtual void getControlInfo(unsigned long pos, bool& hole, bool& trackZero,
-                                bool& writeProtect) = 0;
+                                bool& writeProtect)          = 0;
 
-    virtual void selectSide(BYTE side)              = 0;
-    virtual void step(bool direction)               = 0;
+    virtual void selectSide(BYTE side)                       = 0;
+    virtual void step(bool direction)                        = 0;
 
-    virtual BYTE readData(unsigned long pos)        = 0;
+    virtual BYTE readData(unsigned long pos)                 = 0;
     virtual void writeData(unsigned long pos,
-                           BYTE data)               = 0;
+                           BYTE          data)               = 0;
 
-    virtual BYTE readSectorData(BYTE sector,
-                                unsigned long pos)  = 0;
+    virtual BYTE readSectorData(BYTE          sector,
+                                unsigned long pos)           = 0;
 
     virtual void loadHead();
     virtual void unLoadHead();

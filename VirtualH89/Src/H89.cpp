@@ -102,7 +102,6 @@ H89::buildSystem(Console* console)
     {
         gpp = new GeneralPurposePort(s);
     }
-
     else
     {
         gpp = new GeneralPurposePort();
@@ -130,13 +129,11 @@ H89::buildSystem(Console* console)
             m316      = MMS77316::install_MMS77316(props, devslots[x]);
             dev_slots = true;
         }
-
         else if (s.compare("MMS77320") == 0)
         {
             // Also includes (auxiliary) serial ports... TODO
             m320 = MMS77320::install_MMS77320(props, devslots[x]);
         }
-
         else if (s.compare("H17") == 0)
         {
         }

@@ -195,7 +195,6 @@ loop:
                         break;
                 }
             }
-
             else
             {
                 next = is.get();
@@ -267,7 +266,6 @@ PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char* header)
                            << m_hex((ch >> 12) & 0x0f) << m_hex((ch >> 8) & 0x0f)
                            << m_hex((ch >> 4) & 0x0f) << m_hex((ch >> 0) & 0x0f);
                     }
-
                     else
                     {
                         os << ch;

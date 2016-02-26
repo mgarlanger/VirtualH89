@@ -70,7 +70,6 @@ Z47Controller::loadDisk()
             {
                 debugss(ssH47, INFO, "%s: File ended early: %d\n", __FUNCTION__, i);
             }
-
             else
             {
                 debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
@@ -92,7 +91,6 @@ Z47Controller::loadDisk()
         {
             debugss(ssH47, ERROR, "%s: Unable to read file\n", __FUNCTION__);
         }
-
         else
         {
             debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
@@ -101,7 +99,6 @@ Z47Controller::loadDisk()
         fclose(file);
 #endif
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s: unable to open file\n", __FUNCTION__);
@@ -305,7 +302,6 @@ Z47Controller::processReadControlStatus(void)
 
         curLinkState = st_Link_AwaitingToTransmit_c;
     }
-
     else
     {
         /// \todo assert or make the top check an assert
@@ -973,14 +969,12 @@ Z47Controller::connectDrive(BYTE unitNum, DiskDrive* drive)
         {
             drives_m[unitNum] = drive;
         }
-
         else
         {
             debugss(ssH47, ERROR, "%s - drive conflict - %d.\n", __FUNCTION__, unitNum);
             return false;
         }
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
@@ -1007,7 +1001,6 @@ Z47Controller::removeDrive(BYTE unitNum)
         drives_m[unitNum] = 0;
         debugss(ssH47, ERROR, "%s - disk already in use - %d.\n", __FUNCTION__, unitNum);
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
@@ -1211,7 +1204,6 @@ Z47Controller::connectHostLink(ParallelLink* link)
     {
         linkToHost_m->registerDevice(this);
     }
-
     else
     {
         debugss(ssH47, ERROR, "%s - link invalid\n", __FUNCTION__);
@@ -1357,7 +1349,6 @@ Z47Controller::raiseSignal(SignalType sigType)
                 curLinkState = st_Link_HoldingDTR_c;
                 countDown_m  = 1;
             }
-
             else if (curLinkState == st_Link_AwaitingToReceive_c)
             {
                 BYTE val = 0;

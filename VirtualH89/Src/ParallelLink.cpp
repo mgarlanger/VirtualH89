@@ -50,7 +50,6 @@ ParallelLink::sendHostData(BYTE data)
 
         setDTR(true);
     }
-
     else
     {
         debugss(ssParallel, ERROR, "%s: Host not connected.\n", __FUNCTION__);
@@ -74,7 +73,6 @@ ParallelLink::sendDriveData(BYTE data)
         dataFromHost_m = true;
         setDTAK(true);
     }
-
     else
     {
         debugss(ssParallel, FATAL, "%s: Drive not connected.\n", __FUNCTION__);
@@ -91,7 +89,6 @@ ParallelLink::readDataBusByHost(BYTE& data)
         data            = data_m;
         dataFromDrive_m = false;
     }
-
     else
     {
         debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
@@ -110,7 +107,6 @@ ParallelLink::readDataBusByDrive(BYTE& data)
         data           = data_m;
         dataFromHost_m = false;
     }
-
     else
     {
         debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
@@ -131,7 +127,6 @@ ParallelLink::setBusy(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_Busy);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_Busy);
@@ -159,13 +154,11 @@ ParallelLink::setDTR(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_DTR);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_DTR);
         }
     }
-
     else
     {
         debugss(ssParallel, ERROR, "%s: host_m is NULL\n", __FUNCTION__);
@@ -204,7 +197,6 @@ ParallelLink::setDDOut(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_DDOUT);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_DDOUT);
@@ -235,7 +227,6 @@ ParallelLink::setDTAK(bool val)
         {
             device_m->raiseSignal(ParallelPortConnection::st_DTAK);
         }
-
         else
         {
             device_m->lowerSignal(ParallelPortConnection::st_DTAK);
@@ -263,7 +254,6 @@ ParallelLink::setError(bool val)
         {
             host_m->raiseSignal(ParallelPortConnection::st_Error);
         }
-
         else
         {
             host_m->lowerSignal(ParallelPortConnection::st_Error);

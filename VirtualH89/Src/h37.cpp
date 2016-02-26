@@ -121,7 +121,6 @@ Z_89_37::in(BYTE addr)
                 debugss(ssH37, INFO, "H37::in(SectorPort)");
                 val = sectorReg_m;
             }
-
             else
             {
                 debugss(ssH37, INFO, "H37::in(StatusPort)");
@@ -137,7 +136,6 @@ Z_89_37::in(BYTE addr)
                 debugss(ssH37, INFO, "H37::in(TrackPort)");
                 val = trackReg_m;
             }
-
             else
             {
                 debugss(ssH37, INFO, "H37::in(DataPort)");
@@ -175,7 +173,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss_nts(ssH37, INFO, " EnableIntReq");
                 intrqAllowed_m = true;
             }
-
             else
             {
                 debugss_nts(ssH37, INFO, " DisableIntReq");
@@ -187,7 +184,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss_nts(ssH37, INFO, " EnableDrqInt");
                 drqAllowed_m = true;
             }
-
             else
             {
                 debugss_nts(ssH37, INFO, " DisableDrqReq");
@@ -199,7 +195,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss_nts(ssH37, INFO, " SetMFM");
                 dataEncoding_m = MFM;
             }
-
             else
             {
                 dataEncoding_m = FM;
@@ -210,7 +205,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss_nts(ssH37, INFO, " MotorsOn");
                 motorOn_m = true;
             }
-
             else
             {
                 motorOn_m = false;
@@ -253,7 +247,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss_nts(ssH37, INFO, "Sector/Track Access\n");
                 sectorTrackAccess_m = true;
             }
-
             else
             {
                 debugss_nts(ssH37, INFO, "Control/Data Access\n");
@@ -268,7 +261,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss(ssH37, INFO, "H37::out(SectorPort): %d\n", val);
                 sectorReg_m = val;
             }
-
             else
             {
                 debugss(ssH37, INFO, "H37::out(CommandPort): %d\n", val);
@@ -285,7 +277,6 @@ Z_89_37::out(BYTE addr, BYTE val)
                 debugss(ssH37, INFO, "H37::out(TrackPort): %d\n", val);
                 trackReg_m = val;
             }
-
             else
             {
                 debugss(ssH37, INFO, "H37::out(DataPort): %d\n", val);
@@ -333,13 +324,11 @@ Z_89_37::processCmd(BYTE cmd)
         // Type I commands
         processCmdTypeI(cmd);
     }
-
     else if ((cmd & 0x40) == 0x00)
     {
         // Type II commands
         processCmdTypeII(cmd);
     }
-
     else
     {
         // must be Type III command
@@ -364,7 +353,6 @@ Z_89_37::processCmdTypeI(BYTE cmd)
         debugss(ssH37, INFO, "%s - Load head at beginning\n", __FUNCTION__);
         loadHead();
     }
-
     else
     {
         debugss(ssH37, INFO, "%s - Unload head at beginning\n", __FUNCTION__);
@@ -384,7 +372,6 @@ Z_89_37::processCmdTypeI(BYTE cmd)
             trackReg_m   = 0xff;
             curCommand_m = restoreCmd;
         }
-
         else
         {
             curCommand_m = seekCmd;
@@ -392,7 +379,6 @@ Z_89_37::processCmdTypeI(BYTE cmd)
 
         seekTo();
     }
-
     else
     {
         // One of the Step commands
@@ -408,7 +394,6 @@ Z_89_37::processCmdTypeI(BYTE cmd)
                 debugss(ssH37, INFO, "%s - Step Out\n", __FUNCTION__);
                 stepDirection_m = dir_out;
             }
-
             else
             {
                 // Step In
@@ -440,7 +425,6 @@ Z_89_37::processCmdTypeII(BYTE cmd)
         curCommand_m = writeSectorCmd;
 
     }
-
     else
     {
         // Read Sector
@@ -469,7 +453,6 @@ Z_89_37::processCmdTypeIII(BYTE cmd)
         curCommand_m = readAddressCmd;
 
     }
-
     else if ((cmd & 0x10) == 0x10)
     {
         // write Track
@@ -477,7 +460,6 @@ Z_89_37::processCmdTypeIII(BYTE cmd)
         curCommand_m = writeTrackCmd;
 
     }
-
     else
     {
         // read Track
@@ -502,7 +484,6 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
         abortCmd();
         statusReg_m &= ~stat_Busy_c;
     }
-
     else
     {
         bool hole = false, trackZero = false, writeProtect = false;
@@ -586,7 +567,6 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
 
         }
     }
-
     else
     {
         debugss(ssH37, INFO, "%s - No Interrupt/ Clear Busy\n", __FUNCTION__);
@@ -609,13 +589,11 @@ Z_89_37::connectDrive(BYTE unitNum, DiskDrive* drive)
             drives_m[unitNum] = drive;
             retVal            = true;
         }
-
         else
         {
             debugss(ssH37, ERROR, "%s: drive already connect\n", __FUNCTION__);
         }
     }
-
     else
     {
         debugss(ssH37, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
@@ -635,7 +613,6 @@ Z_89_37::seekTo()
         debugss(ssH37, INFO, "%s - %d\n", __FUNCTION__, dataReg_m);
 
     }
-
     else
     {
         // track is zero, watch for the track 0 status from the drive.
@@ -667,7 +644,6 @@ Z_89_37::step(void)
             trackReg_m--;
         }
     }
-
     else if (stepDirection_m == dir_in)
     {
         debugss(ssH37, INFO, "%s - step in\n", __FUNCTION__);
@@ -792,7 +768,6 @@ Z_89_37::notification(unsigned int cycleCount)
         debugss(ssH37, ALL, "New character Pos - old: %ld, new: %ld\n", curPos_m, charPos);
         curPos_m = charPos;
     }
-
     else
     {
         // Drive motor is not turned on. Nothing to do.
@@ -804,7 +779,6 @@ Z_89_37::notification(unsigned int cycleCount)
             transmitterBufferEmpty_m = true;
             fillCharTransmitted_m    = true;
         }
-
         else
         {
             transmitterBufferEmpty_m = false;
@@ -841,7 +815,6 @@ Z_89_37::notification(unsigned int cycleCount)
                 debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
                         curDrive_m, data);
             }
-
             else
             {
                 debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
@@ -900,7 +873,6 @@ Z_89_37::notification(unsigned int cycleCount)
                 debugss(ssH17, ALL, "%s: fill char sent Pos: %ld\n",
                         __FUNCTION__, curCharPos);
             }
-
             else
             {
                 data                     = transmitterHoldingRegister_m;
@@ -913,7 +885,6 @@ Z_89_37::notification(unsigned int cycleCount)
             {
                 drives_m[curDrive_m]->writeData(curCharPos, data);
             }
-
             else
             {
                 debugss(ssH17, INFO, "%s: No Valid Drive - Pos: %ld\n", __FUNCTION__, curCharPos);
@@ -970,7 +941,6 @@ Z_89_37::notification(unsigned int cycleCount)
 
                     raiseDrq();
                 }
-
                 else
                 {
                     /// \todo generate error

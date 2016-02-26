@@ -1331,7 +1331,6 @@ Z80::COND_FLAGS(bool cond, BYTE flags)
     {
         SET_FLAGS(flags);
     }
-
     else
     {
         CLEAR_FLAGS(flags);
@@ -1411,7 +1410,6 @@ Z80::Z80(int clockRate, int ticksPerSecond): CPU(),
         ClockRate_m      = clockRate;
         ticksPerSecond_m = ticksPerSecond;
     }
-
     else
     {
         // Assume a 4MHz processor with a 10ms clock interrupt.
@@ -1483,7 +1481,6 @@ Z80::addClockTicks()
                 ticksPerClock_m);
         ticks += ticksPerClock_m;
     }
-
     else
     {
         // else just set it, otherwise we run the risk of accumulating too many ticks if
@@ -1522,7 +1519,6 @@ Z80::setSpeed(bool fast)
         ClockRate_m     = 2048000 * speedUpFactor_c;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
-
     else
     {
 #if NEW_TICKS
@@ -1824,7 +1820,6 @@ Z80::execute(WORD numInst)
             PC        = 0x66;
             mode      = cm_running;
         }
-
         else if ((int_type & Intr_INT) && (IFF1))
         {
             // ISR required to enable interrupts (EI).
@@ -1872,7 +1867,6 @@ Z80::execute(WORD numInst)
         {
             traceInstructions(); // debug("\n");
         }
-
         else
         {
             traceInstructions();
@@ -2073,7 +2067,6 @@ Z80::op_ccf(void)
         SET_FLAGS(H_FLAG);
         CLEAR_FLAGS(C_FLAG);
     }
-
     else
     {
         CLEAR_FLAGS(H_FLAG);
@@ -2182,7 +2175,6 @@ Z80::op_daa(void)
 
         tmp_a -= adjustment;
     }
-
     else
     {
         // Addition
@@ -4537,7 +4529,6 @@ Z80::op_djnz(void) // DJNZ
         ticks -= 3;
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4580,7 +4571,6 @@ Z80::op_jp_cc(void)
     {
         PC = READnn();
     }
-
     else
     {
         PC += 2;
@@ -4603,7 +4593,6 @@ Z80::op_call_cc(void)
 
         ticks -= 5;
     }
-
     else
     {
         PC    += 2;
@@ -4638,7 +4627,6 @@ Z80::op_jr_z(void) // JR Z,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4658,7 +4646,6 @@ Z80::op_jr_nz(void) // JR NZ,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4676,7 +4663,6 @@ Z80::op_jr_c(void) // JR C,n
     {
         op_jr();
     }
-
     else
     {
         PC++;
@@ -4694,7 +4680,6 @@ Z80::op_jr_nc(void) // JR NC,n
     {
         op_jr();
     }
-
     else
     {
         PC++;

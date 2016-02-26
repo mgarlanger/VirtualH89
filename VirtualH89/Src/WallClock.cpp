@@ -48,7 +48,6 @@ WallClock::addTimerEvent()
     {
         clock_m += ticks_m;
     }
-
     else
     {
         /// \todo determine if we need to notify all users here too for (4096 - ticks_m)

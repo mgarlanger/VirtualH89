@@ -37,9 +37,9 @@ H_17_4::insertDisk(FloppyDisk* disk)
 
 void
 H_17_4::getControlInfo(unsigned long pos,
-                       bool& hole,
-                       bool& trackZero,
-                       bool& writeProtect)
+                       bool&         hole,
+                       bool&         trackZero,
+                       bool&         writeProtect)
 {
     debugss(ssH17_4, INFO, "%s - pos: %ld\n", __FUNCTION__, pos);
 
@@ -49,7 +49,6 @@ H_17_4::getControlInfo(unsigned long pos,
     {
         disk_m->getControlInfo(pos, hole, writeProtect);
     }
-
     else
     {
         debugss(ssH17_4, INFO, "%s no disk_m\n", __FUNCTION__);
@@ -70,7 +69,6 @@ H_17_4::step(bool direction)
 
         debugss(ssH17_4, WARNING, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m)
@@ -96,7 +94,6 @@ H_17_4::selectSide(BYTE side)
     {
         side_m = side;
     }
-
     else
     {
         debugss(ssH17, ERROR, "%s: Invalid Side: %d\n", __FUNCTION__, side);
@@ -113,7 +110,6 @@ H_17_4::readData(unsigned long pos)
     {
         debugss(ssH17_4, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
-
     else
     {
         debugss(ssH17_4, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
@@ -142,7 +138,6 @@ H_17_4::readSectorData(BYTE sector, unsigned long pos)
     {
         debugss(ssH17_4, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
     }
-
     else
     {
         debugss(ssH17_4, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);

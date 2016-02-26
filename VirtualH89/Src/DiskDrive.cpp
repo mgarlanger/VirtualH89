@@ -78,7 +78,6 @@ DiskDrive::step(bool direction)
 
         debugss(ssDiskDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
     }
-
     else
     {
         if (track_m)

@@ -118,7 +118,6 @@ StdioProxyConsole::run()
             c &= 0x7f;
             keypress(c);
         }
-
         else if (c == 0x0a)
         {
             if (x >= sizeof(buf))
@@ -133,7 +132,6 @@ StdioProxyConsole::run()
             fputc('\n', stdout);
             fflush(stdout);
         }
-
         else
         {
             if (x < sizeof(buf))

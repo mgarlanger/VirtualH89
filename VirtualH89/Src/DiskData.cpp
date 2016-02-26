@@ -113,7 +113,6 @@ DiskData::parse()
         pos++;
         readDiskFormat(pos);
     }
-
     else
     {
         // disk Format Type is missing - not an error, assume standard
@@ -131,7 +130,6 @@ DiskData::parse()
             return false;
         }
     }
-
     else
     {
         // no flag block, assume default.
@@ -146,7 +144,6 @@ DiskData::parse()
                 return false;
             }
         }
-
         else
         {
             if (!readUnknownBlock(pos))

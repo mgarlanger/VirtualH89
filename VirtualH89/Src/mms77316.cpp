@@ -217,7 +217,6 @@ MMS77316::in(BYTE addr)
 
         val = WD1797::in(addr);
     }
-
     else
     {
         debugss(ssMMS77316, ERROR, "MMS77316::in(Unknown - 0x%02x)\n", addr);
@@ -249,7 +248,6 @@ MMS77316::out(BYTE addr, BYTE val)
 
         WD1797::out(addr, val);
     }
-
     else if (offset == ControlPort_Offset_c)
     {
         debugss(ssMMS77316, INFO, "MMS77316::out(ControlPort) %02x\n", val);
@@ -275,7 +273,6 @@ MMS77316::out(BYTE addr, BYTE val)
 
         debugss_nts(ssMMS77316, INFO, "\n");
     }
-
     else
     {
         debugss(ssMMS77316, ERROR, "MMS77316::out(Unknown - 0x%02x): %d\n", addr, val);
@@ -307,13 +304,11 @@ MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive* drive)
             drives_m[unitNum] = drive;
             retVal            = true;
         }
-
         else
         {
             debugss(ssMMS77316, ERROR, "%s: drive already connect\n", __FUNCTION__);
         }
     }
-
     else
     {
         debugss(ssMMS77316, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
