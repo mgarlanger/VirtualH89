@@ -281,12 +281,12 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
 
     if (interlaced_m)
     {
-        bufferOffset_m = ((track * numSides_m + side) * numSectors_m + sector) * secSize_m;
+        bufferOffset_m = ((track * numSides_m + side) * numSectors_m + sector - 1) * secSize_m;
     }
 
     else
     {
-        bufferOffset_m = ((side * numTracks_m + track) * numSectors_m + sector) * secSize_m;
+        bufferOffset_m = ((side * numTracks_m + track) * numSectors_m + sector - 1) * secSize_m;
     }
 
     lseek(imageFd_m, bufferOffset_m, SEEK_SET);
