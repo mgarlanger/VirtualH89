@@ -23,8 +23,12 @@
 
 
 void
-RawFloppyImage::getAddrMark(BYTE* tp, int nbytes,
-                            int& id_tk, int& id_sd, int& id_sc, int& id_sl)
+RawFloppyImage::getAddrMark(BYTE* tp,
+                            int   nbytes,
+                            int&  id_tk,
+                            int&  id_sd,
+                            int&  id_sc,
+                            int&  id_sl)
 {
     id_tk = -1;
     id_sd = -1;
@@ -72,22 +76,22 @@ RawFloppyImage::dump()
 }
 
 // TODO: If constructor fails, the drive should not mount this disk!
-RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv):
-    GenericFloppyDisk(),
-    imageName_m(NULL),
-    imageFd_m(-1),
-    trackBuffer_m(NULL),
-    bufferedTrack_m(-1),
-    bufferedSide_m(-1),
-    bufferOffset_m(0),
-    bufferDirty_m(false),
-    hypoTrack_m(false),
-    hyperTrack_m(false),
-    interlaced_m(false),
-    gapLen_m(0),
-    indexGapLen_m(0),
-    writePos_m(-1),
-    trackWrite_m(false)
+RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
+                               std::vector<std::string> argv): GenericFloppyDisk(),
+                                                               imageName_m(NULL),
+                                                               imageFd_m(-1),
+                                                               trackBuffer_m(NULL),
+                                                               bufferedTrack_m(-1),
+                                                               bufferedSide_m(-1),
+                                                               bufferOffset_m(0),
+                                                               bufferDirty_m(false),
+                                                               hypoTrack_m(false),
+                                                               hyperTrack_m(false),
+                                                               interlaced_m(false),
+                                                               gapLen_m(0),
+                                                               indexGapLen_m(0),
+                                                               writePos_m(-1),
+                                                               trackWrite_m(false)
 {
     if (argv.size() < 1)
     {
@@ -489,7 +493,8 @@ RawFloppyImage::~RawFloppyImage()
 }
 
 bool
-RawFloppyImage::cacheTrack(int side, int track)
+RawFloppyImage::cacheTrack(int side,
+                           int track)
 {
     if (bufferedSide_m == side && bufferedTrack_m == track)
     {
@@ -555,7 +560,10 @@ RawFloppyImage::cacheTrack(int side, int track)
 }
 
 bool
-RawFloppyImage::readData(BYTE side, BYTE track, unsigned long pos, int& data)
+RawFloppyImage::readData(BYTE          side,
+                         BYTE          track,
+                         unsigned long pos,
+                         int&          data)
 {
     BYTE d;
 
@@ -595,7 +603,9 @@ RawFloppyImage::readData(BYTE side, BYTE track, unsigned long pos, int& data)
 }
 
 bool
-RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned long pos)
+RawFloppyImage::startWrite(BYTE          side,
+                           BYTE          track,
+                           unsigned long pos)
 {
     if (pos < indexGapLen_m / 2)
     {
@@ -615,7 +625,9 @@ RawFloppyImage::startWrite(BYTE side, BYTE track, unsigned long pos)
 }
 
 bool
-RawFloppyImage::stopWrite(BYTE side, BYTE track, unsigned long pos)
+RawFloppyImage::stopWrite(BYTE          side,
+                          BYTE          track,
+                          unsigned long pos)
 {
     debugss(ssRawFloppyImage, INFO, "stopWrite pos=%lu writePos=%lu\n", pos, writePos_m);
     writePos_m = -1;

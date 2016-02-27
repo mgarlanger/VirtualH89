@@ -21,11 +21,13 @@ class SerialPortDevice;
 class INS8250: public IODevice
 {
   public:
-    INS8250(BYTE baseAddr, int IntLevel = -1);
+    INS8250(BYTE baseAddr,
+            int  IntLevel = -1);
     virtual ~INS8250();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
     virtual bool attachDevice(SerialPortDevice* dev);
 

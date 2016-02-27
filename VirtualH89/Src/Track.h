@@ -46,7 +46,8 @@ class Track
     DataRate              dataRate_m;
 
   public:
-    Track(BYTE sideNum, BYTE trackNum);
+    Track(BYTE sideNum,
+          BYTE trackNum);
     virtual ~Track();
 
     bool addSector(Sector* sector);
@@ -56,7 +57,9 @@ class Track
 
     void dump();
 
-    bool readSectorData(BYTE sector, WORD pos, BYTE& data);
+    bool readSectorData(BYTE  sector,
+                        WORD  pos,
+                        BYTE& data);
 };
 
 #endif // TRACK_H_

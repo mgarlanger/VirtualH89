@@ -29,7 +29,8 @@ class GeneralPurposePort: public virtual IODevice
     virtual ~GeneralPurposePort();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
     virtual std::string dumpDebug();
     void reset();

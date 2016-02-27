@@ -959,7 +959,8 @@ Z47Controller::processCmd(BYTE cmd)
 
 
 bool
-Z47Controller::connectDrive(BYTE unitNum, DiskDrive* drive)
+Z47Controller::connectDrive(BYTE       unitNum,
+                            DiskDrive* drive)
 {
     debugss(ssH47, ALL, "%s - %d - %p\n", __FUNCTION__, unitNum, drive);
 

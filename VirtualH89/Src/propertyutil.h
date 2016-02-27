@@ -22,14 +22,23 @@ class PropertyUtil
     typedef PropertyMapT::value_type value_type;
     typedef PropertyMapT::iterator iterator;
 
-    static void read(const char* filename, PropertyMapT& map);
-    static void read(std::istream& is, PropertyMapT& map);
-    static void write(const char* filename, PropertyMapT& map, const char* header = NULL);
-    static void write(std::ostream& os, PropertyMapT& map, const char* header = NULL);
-    static void print(std::ostream& os, PropertyMapT& map);
+    static void read(const char*   filename,
+                     PropertyMapT& map);
+    static void read(std::istream& is,
+                     PropertyMapT& map);
+    static void write(const char*   filename,
+                      PropertyMapT& map,
+                      const char*   header = NULL);
+    static void write(std::ostream& os,
+                      PropertyMapT& map,
+                      const char*   header = NULL);
+    static void print(std::ostream& os,
+                      PropertyMapT& map);
     static std::vector<std::string> splitArgs(std::string prop);
-    static std::string combineArgs(std::vector<std::string> args, int start = 0);
-    static std::vector<std::string> shiftArgs(std::vector<std::string> args, int start);
+    static std::string combineArgs(std::vector<std::string> args,
+                                   int                      start = 0);
+    static std::vector<std::string> shiftArgs(std::vector<std::string> args,
+                                              int                      start);
     static std::string sprintf(const char* fmt ...);
 
   private:

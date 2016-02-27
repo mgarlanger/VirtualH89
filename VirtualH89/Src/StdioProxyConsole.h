@@ -24,7 +24,8 @@ class H89Operator;
 class StdioProxyConsole: public Console
 {
   public:
-    StdioProxyConsole(int argc, char** argv);
+    StdioProxyConsole(int    argc,
+                      char** argv);
     virtual ~StdioProxyConsole();
 
     virtual void init();

@@ -33,10 +33,11 @@ static const int TimerInterval_c = 2000;
 static const int TimerInterval_c = 10000;
 #endif
 
-H89Timer::H89Timer(CPU* cpu, unsigned char intlvl): cpu_m(cpu),
-                                                    intEnabled_m(false),
-                                                    count_m(0),
-                                                    intLevel(intlvl)
+H89Timer::H89Timer(CPU*          cpu,
+                   unsigned char intlvl): cpu_m(cpu),
+                                          intEnabled_m(false),
+                                          count_m(0),
+                                          intLevel(intlvl)
 {
     // We need to start up the timer since it performs two tasks, it always provide the cpu
     // with extra clock ticks to accurately emulate the speed of the processor.

@@ -37,7 +37,8 @@ class Memory
     /// \param addr address to write to.
     /// \param val value to write.
     ///
-    virtual void writeByte(WORD addr, BYTE val) = 0;
+    virtual void writeByte(WORD addr,
+                           BYTE val) = 0;
 
 
     ///

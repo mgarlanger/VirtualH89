@@ -261,7 +261,8 @@ class Z80: public CPU
     inline void SET_FLAGS(BYTE flags);
     inline void CLEAR_FLAGS(BYTE flags);
     inline bool CHECK_FLAGS(BYTE flags);
-    inline void COND_FLAGS(bool cond, BYTE flags);
+    inline void COND_FLAGS(bool cond,
+                           BYTE flags);
 
     /// \todo - determine which way to keep.
     inline void SET_ZSP_FLAGS(BYTE val);
@@ -285,7 +286,8 @@ class Z80: public CPU
         return (ab_m->readByte(addr));
     };
 
-    inline void writeMEM(WORD addr, BYTE val)
+    inline void writeMEM(WORD addr,
+                         BYTE val)
     {
         ab_m->writeByte(addr, val);
         ticks -= 3;
@@ -296,7 +298,8 @@ class Z80: public CPU
         return ((readMEM(addr + 1) << 8) | readMEM(addr));
     }
 
-    inline void writeWord(WORD addr, WORD value)
+    inline void writeWord(WORD addr,
+                          WORD value)
     {
         writeMEM(addr++, value & 0xff);
         writeMEM(addr, value >> 8);
@@ -470,7 +473,8 @@ class Z80: public CPU
     void op_rb_n(BYTE& val);
     void op_rb_n_x(void);
     void op_rb_n_ihl(void);
-    void op_tb_n(BYTE m, BYTE bit);
+    void op_tb_n(BYTE m,
+                 BYTE bit);
     void op_tb_n_x(void);
     void op_tb_n_ihl(void);
 

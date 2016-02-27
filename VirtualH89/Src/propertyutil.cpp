@@ -13,7 +13,8 @@
 #include <memory>
 
 void
-PropertyUtil::read(const char* filename, PropertyMapT& map)
+PropertyUtil::read(const char*   filename,
+                   PropertyMapT& map)
 {
     std::ifstream file(filename);
 
@@ -27,7 +28,8 @@ PropertyUtil::read(const char* filename, PropertyMapT& map)
 }
 
 void
-PropertyUtil::read(std::istream& is, PropertyMapT& map)
+PropertyUtil::read(std::istream& is,
+                   PropertyMapT& map)
 {
     if (!is)
     {
@@ -211,7 +213,9 @@ loop:
 }
 
 void
-PropertyUtil::write(const char* filename, PropertyMapT& map, const char* header)
+PropertyUtil::write(const char*   filename,
+                    PropertyMapT& map,
+                    const char*   header)
 {
     std::ofstream file(filename);
     write(file, map, header);
@@ -219,7 +223,9 @@ PropertyUtil::write(const char* filename, PropertyMapT& map, const char* header)
 }
 
 void
-PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char* header)
+PropertyUtil::write(std::ostream& os,
+                    PropertyMapT& map,
+                    const char*   header)
 {
     if (header != NULL)
     {
@@ -280,7 +286,8 @@ PropertyUtil::write(std::ostream& os, PropertyMapT& map, const char* header)
 }
 
 void
-PropertyUtil::print(std::ostream& os, PropertyMapT& map)
+PropertyUtil::print(std::ostream& os,
+                    PropertyMapT& map)
 {
     iterator it = map.begin(), end = map.end();
 
@@ -305,7 +312,8 @@ std::vector<std::string> PropertyUtil::splitArgs(std::string prop)
 }
 
 std::string
-PropertyUtil::combineArgs(std::vector<std::string> args, int start)
+PropertyUtil::combineArgs(std::vector<std::string> args,
+                          int                      start)
 {
     std::string str;
 
@@ -322,7 +330,8 @@ PropertyUtil::combineArgs(std::vector<std::string> args, int start)
     return str;
 }
 
-std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args, int start)
+std::vector<std::string> PropertyUtil::shiftArgs(std::vector<std::string> args,
+                                                 int                      start)
 {
     std::vector<std::string> oargs;
 

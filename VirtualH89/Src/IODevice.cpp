@@ -6,8 +6,9 @@
 
 #include "IODevice.h"
 
-IODevice::IODevice(BYTE base, BYTE numPorts): baseAddress_m(base),
-                                              numPorts_m(numPorts)
+IODevice::IODevice(BYTE base,
+                   BYTE numPorts): baseAddress_m(base),
+                                   numPorts_m(numPorts)
 {
 
 }

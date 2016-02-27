@@ -36,13 +36,13 @@ GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPor
 
 }
 
-GeneralPurposePort::GeneralPurposePort(std::string settings):
-    IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
-    mms128k_Unlocked(false),
-    mms128k_Unlock_Pos(0),
-    curSide_m(-1),
-    portBits_m(0),
-    fast_m(false)
+GeneralPurposePort::GeneralPurposePort(std::string settings): IODevice(GPP_BaseAddress_c,
+                                                                       GPP_NumPorts_c),
+                                                              mms128k_Unlocked(false),
+                                                              mms128k_Unlock_Pos(0),
+                                                              curSide_m(-1),
+                                                              portBits_m(0),
+                                                              fast_m(false)
 {
     // TODO: verify a binary string and/or handle other formats/nmenonics.
     dipsw_m = strtol(settings.c_str(), NULL, 2);
@@ -155,7 +155,8 @@ GeneralPurposePort::in(BYTE addr)
 }
 
 void
-GeneralPurposePort::out(BYTE addr, BYTE val)
+GeneralPurposePort::out(BYTE addr,
+                        BYTE val)
 {
     if (verifyPort(addr))
     {

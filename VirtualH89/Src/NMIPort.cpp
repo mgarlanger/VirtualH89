@@ -10,7 +10,8 @@
 #include "H89.h"
 #include "logger.h"
 
-NMIPort::NMIPort(BYTE base, BYTE size): IODevice(base, size)
+NMIPort::NMIPort(BYTE base,
+                 BYTE size): IODevice(base, size)
 {
 
 }
@@ -31,7 +32,8 @@ NMIPort::in(BYTE addr)
 }
 
 void
-NMIPort::out(BYTE addr, BYTE val)
+NMIPort::out(BYTE addr,
+             BYTE val)
 {
     debugss(ssIO, INFO, "%s: Out: %d\n", __FUNCTION__, addr);
     h89.raiseNMI();

@@ -67,7 +67,8 @@ class WallClock
 
     void printTime(FILE* file);
 
-    bool addCallback(ClockUser* user, unsigned long long timeUs);
+    bool addCallback(ClockUser*         user,
+                     unsigned long long timeUs);
 };
 
 #endif // WALLCLOCK_H_

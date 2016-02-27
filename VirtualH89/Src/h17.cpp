@@ -160,7 +160,8 @@ H17::in(BYTE addr)
 }
 
 void
-H17::out(BYTE addr, BYTE val)
+H17::out(BYTE addr,
+         BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -308,7 +309,8 @@ H17::out(BYTE addr, BYTE val)
 }
 
 bool
-H17::connectDrive(BYTE unitNum, DiskDrive* drive)
+H17::connectDrive(BYTE       unitNum,
+                  DiskDrive* drive)
 {
     bool retVal = false;
 

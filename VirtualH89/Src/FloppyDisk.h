@@ -27,17 +27,29 @@ class FloppyDisk
     FloppyDisk(const char* name);
     virtual ~FloppyDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data)    = 0;
-    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data)    = 0;
-    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect) = 0;
+    virtual bool readData(BYTE          side,
+                          BYTE          track,
+                          unsigned long pos,
+                          BYTE&         data) = 0;
+    virtual bool writeData(BYTE          side,
+                           BYTE          track,
+                           unsigned long pos,
+                           BYTE          data)               = 0;
+    virtual void getControlInfo(unsigned long pos,
+                                bool&         hole,
+                                bool&         writeProtect)  = 0;
     virtual void setWriteProtect(bool value);
     virtual bool checkWriteProtect(void);
 
-    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE& data) = 0;
+    virtual bool readSectorData(BYTE  side,
+                                BYTE  track,
+                                BYTE  sector,
+                                WORD  pos,
+                                BYTE& data) = 0;
 
-    virtual void eject(const char* name)                                                  = 0;
+    virtual void eject(const char* name)    = 0;
 
-    virtual void dump(void)                                                               = 0;
+    virtual void dump(void)                 = 0;
 
     virtual void setMaxTrack(BYTE maxTrack);
     virtual void setMaxPosition(unsigned int maxPosition);

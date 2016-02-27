@@ -23,7 +23,8 @@ class Z47Interface: public virtual DiskController,
     virtual ~Z47Interface();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
     virtual void reset(void);
     virtual void notification(unsigned int cycleCount);

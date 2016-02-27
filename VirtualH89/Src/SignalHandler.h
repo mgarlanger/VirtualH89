@@ -18,7 +18,8 @@ class SignalHandler
   public:
     static SignalHandler* instance(void);
 
-    EventHandler* registerHandler(int signum, EventHandler* evtHandler);
+    EventHandler* registerHandler(int           signum,
+                                  EventHandler* evtHandler);
     int removeHandler(int signum);
 
   private:

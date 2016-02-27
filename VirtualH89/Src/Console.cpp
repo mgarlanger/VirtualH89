@@ -7,7 +7,8 @@
 
 #include "Console.h"
 
-Console::Console(int argc, char** argv)
+Console::Console(int    argc,
+                 char** argv)
 {
 
 }
