@@ -352,7 +352,8 @@ char               Opcode_Str[64];
 
 
 void
-get_opcodes(WORD addr, int len)
+get_opcodes(WORD addr,
+            int  len)
 {
 #if OCTAL
 
@@ -449,7 +450,8 @@ disass(WORD addr)
 ///  disassemble 1 byte op-codes
 ///
 static int
-opout(const char* s, WORD)
+opout(const char* s,
+      WORD)
 {
     sprintf(Disass_Str, "%s", s);
     return (1);
@@ -459,7 +461,8 @@ opout(const char* s, WORD)
 ///  disassemble 2 byte op-codes of type "Op n"
 ///
 static int
-nout(const char* s, WORD addr)
+nout(const char* s,
+     WORD        addr)
 {
 
 #if OCTAL
@@ -474,7 +477,8 @@ nout(const char* s, WORD addr)
 ///  disassemble 2 byte op-codes with indirect addressing
 ///
 static int
-iout(const char* s, WORD addr)
+iout(const char* s,
+     WORD        addr)
 {
     sprintf(Disass_Str, s, readMemory(addr + 1));
     return (2);
@@ -484,7 +488,8 @@ iout(const char* s, WORD addr)
 ///  disassemble 2 byte op-codes with relative addressing
 ///
 static int
-rout(const char* s, WORD addr)
+rout(const char* s,
+     WORD        addr)
 {
     sprintf(Disass_Str, "%s%04X", s, addr + ((signed char) readMemory(addr + 1)) + 2);
     return (2);
@@ -494,7 +499,8 @@ rout(const char* s, WORD addr)
 ///  disassemble 3 byte op-codes of type "Op nn"
 ///
 static int
-nnout(const char* s, WORD addr)
+nnout(const char* s,
+      WORD        addr)
 {
     int i;
 
@@ -507,7 +513,8 @@ nnout(const char* s, WORD addr)
 ///  disassemble 3 byte op-codes with indirect addressing
 ///
 static int
-inout(const char* s, WORD addr)
+inout(const char* s,
+      WORD        addr)
 {
     int i;
 
@@ -520,7 +527,8 @@ inout(const char* s, WORD addr)
 ///  disassemble multi byte op-codes with prefix 0xcb
 ///
 static int
-cbop(const char* s, WORD addr)
+cbop(const char* s,
+     WORD        addr)
 {
     int b2;
 
@@ -587,7 +595,8 @@ cbop(const char* s, WORD addr)
 ///  disassemble multi byte op-codes with prefix 0xed
 ///
 static int
-edop(const char* s, WORD addr)
+edop(const char* s,
+     WORD        addr)
 {
     int b2, i;
     int len = 2;
@@ -846,7 +855,8 @@ edop(const char* s, WORD addr)
 ///
 /// \todo fix the offset + x to show current number +-
 static int
-ddfd(const char* s, WORD addr)
+ddfd(const char* s,
+     WORD        addr)
 {
     int         b2;
     const char* ireg;

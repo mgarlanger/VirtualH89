@@ -31,7 +31,8 @@ SignalHandler::instance(void)
 }
 
 EventHandler*
-SignalHandler::registerHandler(int signum, EventHandler* evtHandler)
+SignalHandler::registerHandler(int           signum,
+                               EventHandler* evtHandler)
 {
     static struct sigaction newact;
 

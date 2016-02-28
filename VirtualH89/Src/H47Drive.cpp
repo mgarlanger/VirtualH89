@@ -35,7 +35,10 @@ H47Drive::insertDisk(FloppyDisk* disk)
 }
 
 void
-H47Drive::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect)
+H47Drive::getControlInfo(unsigned long pos,
+                         bool&         hole,
+                         bool&         trackZero,
+                         bool&         writeProtect)
 {
 
 }
@@ -78,13 +81,15 @@ H47Drive::readData(unsigned long pos)
 }
 
 void
-H47Drive::writeData(unsigned long pos, BYTE data)
+H47Drive::writeData(unsigned long pos,
+                    BYTE          data)
 {
 
 }
 
 BYTE
-H47Drive::readSectorData(BYTE sector, unsigned long pos)
+H47Drive::readSectorData(BYTE          sector,
+                         unsigned long pos)
 {
 
     return 0;

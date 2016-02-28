@@ -202,6 +202,7 @@ DiskData::readDiskFormat(unsigned int& pos)
 
     return true;
 }
+
 bool
 DiskData::readFlags(unsigned int& pos)
 {

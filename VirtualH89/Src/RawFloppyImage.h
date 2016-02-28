@@ -38,13 +38,24 @@ class GenericDiskDrive;
 class RawFloppyImage: public GenericFloppyDisk
 {
   public:
-    RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv);
+    RawFloppyImage(GenericDiskDrive*        drive,
+                   std::vector<std::string> argv);
     ~RawFloppyImage();
 
-    bool readData(BYTE side, BYTE track, unsigned long pos, int& data);
-    bool startWrite(BYTE side, BYTE track, unsigned long pos);
-    bool stopWrite(BYTE side, BYTE track, unsigned long pos);
-    bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
+    bool readData(BYTE          side,
+                  BYTE          track,
+                  unsigned long pos,
+                  int&          data);
+    bool startWrite(BYTE          side,
+                    BYTE          track,
+                    unsigned long pos);
+    bool stopWrite(BYTE          side,
+                   BYTE          track,
+                   unsigned long pos);
+    bool writeData(BYTE          side,
+                   BYTE          track,
+                   unsigned long pos,
+                   BYTE          data);
     bool isReady();
     void eject(const char* name);
     void dump(void);
@@ -66,8 +77,14 @@ class RawFloppyImage: public GenericFloppyDisk
     unsigned long writePos_m;
     bool          trackWrite_m;
 
-    void getAddrMark(BYTE* tp, int nbytes, int& id_tk, int& id_sd, int& id_sc, int& id_sl);
-    bool cacheTrack(int side, int track);
+    void getAddrMark(BYTE* tp,
+                     int   nbytes,
+                     int&  id_tk,
+                     int&  id_sd,
+                     int&  id_sc,
+                     int&  id_sl);
+    bool cacheTrack(int side,
+                    int track);
 
   protected:
 

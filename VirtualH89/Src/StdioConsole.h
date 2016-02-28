@@ -18,7 +18,8 @@
 class StdioConsole: public Console
 {
   public:
-    StdioConsole(int argc, char** argv);
+    StdioConsole(int    argc,
+                 char** argv);
     virtual ~StdioConsole();
 
     virtual void init();

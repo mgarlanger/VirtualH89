@@ -229,9 +229,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A13C98A11C8027B5000CF03B /* Src */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Src;
+			sourceTree = "<group>";
+		};
 		A1A433B71C705D310015F838 = {
 			isa = PBXGroup;
 			children = (
+				A13C98A11C8027B5000CF03B /* Src */,
 				A1A4346C1C719B560015F838 /* SDL2.framework */,
 				A1A434671C7063CF0015F838 /* GLUT.framework */,
 				A1A434651C7063C40015F838 /* OpenGL.framework */,

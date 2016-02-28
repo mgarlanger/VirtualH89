@@ -26,7 +26,8 @@ class IODevice
     ///   \param base Base address for the I/O device
     ///   \param numPorts The number of addresses used by the device.
     ///
-    IODevice(BYTE base, BYTE numPorts);
+    IODevice(BYTE base,
+             BYTE numPorts);
     virtual ~IODevice();
 
     ///

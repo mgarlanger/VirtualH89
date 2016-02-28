@@ -36,7 +36,8 @@ class H89_IO
     void reset();
 
     BYTE in(BYTE addr);
-    void out(BYTE addr, BYTE val);
+    void out(BYTE addr,
+             BYTE val);
 
   private:
     IODevice*                    iodevices[256];

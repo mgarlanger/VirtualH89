@@ -30,7 +30,8 @@ AddressBus::~AddressBus()
 }
 
 BYTE
-AddressBus::readByte(WORD addr, bool interruptAck)
+AddressBus::readByte(WORD addr,
+                     bool interruptAck)
 {
 
     if (interruptAck)
@@ -60,7 +61,8 @@ AddressBus::readByte(WORD addr, bool interruptAck)
 }
 
 void
-AddressBus::writeByte(WORD addr, BYTE val)
+AddressBus::writeByte(WORD addr,
+                      BYTE val)
 {
     BYTE index = addr >> pageSizeBits_c;
 

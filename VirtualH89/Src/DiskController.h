@@ -34,7 +34,8 @@ class DiskController: public IODevice
     ///   \param base Base address for the I/O device
     ///   \param numPorts The number of addresses used by the device.
     ///
-    DiskController(BYTE base, BYTE numPorts);
+    DiskController(BYTE base,
+                   BYTE numPorts);
     virtual ~DiskController();
 
     // Return list of all connected disk drives.

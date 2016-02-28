@@ -32,12 +32,15 @@ class MMS77316: public DiskController, WD1797
     MMS77316(int baseAddr);
     virtual ~MMS77316();
 
-    static MMS77316* install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot);
+    static MMS77316* install_MMS77316(PropertyUtil::PropertyMapT& props,
+                                      std::string                 slot);
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, GenericFloppyDrive* drive);
+    virtual bool connectDrive(BYTE                unitNum,
+                              GenericFloppyDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
     virtual GenericFloppyDrive* getDrive(BYTE unitNum);
 

@@ -178,7 +178,8 @@ Sector::getSectorNum()
 }
 
 bool
-Sector::readData(WORD pos, BYTE& data)
+Sector::readData(WORD  pos,
+                 BYTE& data)
 {
     debugss(ssFloppyDisk, INFO, "%s: pos: %d\n", __FUNCTION__, pos);
 
@@ -195,7 +196,8 @@ Sector::readData(WORD pos, BYTE& data)
 }
 
 bool
-Sector::writeData(WORD pos, BYTE data)
+Sector::writeData(WORD pos,
+                  BYTE data)
 {
     debugss(ssFloppyDisk, INFO, "%s: pos: %d\n", __FUNCTION__, pos);
 

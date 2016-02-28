@@ -24,7 +24,8 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     virtual ~Z47Controller();
 
     bool removeDrive(BYTE unitNum);
-    bool connectDrive(BYTE unitNum, DiskDrive* drive);
+    bool connectDrive(BYTE       unitNum,
+                      DiskDrive* drive);
 
     virtual void notification(unsigned int cycleCount);
 

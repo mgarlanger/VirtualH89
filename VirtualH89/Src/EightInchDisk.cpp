@@ -110,21 +110,29 @@ EightInchDisk::readRaw8(const char* name)
 
 #if 0
 bool
-EightInchDisk::readData(BYTE side, BYTE track, unsigned int pos, BYTE& data)
+EightInchDisk::readData(BYTE         side,
+                        BYTE         track,
+                        unsigned int pos,
+                        BYTE&        data)
 {
 
     return false;
 }
 
 bool
-EightInchDisk::writeData(BYTE side, BYTE track, unsigned int pos, BYTE data)
+EightInchDisk::writeData(BYTE         side,
+                         BYTE         track,
+                         unsigned int pos,
+                         BYTE         data)
 {
 
     return false;
 }
 
 void
-EightInchDisk::getControlInfo(unsigned int pos, bool& hole, bool& writeProtect)
+EightInchDisk::getControlInfo(unsigned int pos,
+                              bool&        hole,
+                              bool&        writeProtect)
 {
 
 }
@@ -143,7 +151,11 @@ EightInchDisk::checkWriteProtect(void)
 }
 
 bool
-EightInchDisk::readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE& data)
+EightInchDisk::readSectorData(BYTE         side,
+                              BYTE         track,
+                              BYTE         sector,
+                              unsigned int pos,
+                              BYTE&        data)
 {
 
     return false;

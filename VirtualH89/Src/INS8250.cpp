@@ -14,26 +14,27 @@
 #include "SerialPortDevice.h"
 
 
-INS8250::INS8250(BYTE base, int intLevel): IODevice(base, 8),
-                                           DLAB_m(false),
-                                           ERBFI_m(false),
-                                           receiveInterruptPending(false),
-                                           OE_m(false),
-                                           PE_m(false),
-                                           FE_m(false),
-                                           device_m(0),
-                                           rxByteAvail(false),
-                                           txByteAvail(false),
-                                           lsBaudDiv(0),
-                                           msBaudDiv(0),
-                                           baud_m(0),
-                                           lastTransmit(0),
-                                           saveIER(0),
-                                           saveIIR(0),
-                                           saveLCR(0),
-                                           saveMCR(0),
-                                           saveLSR(0),
-                                           saveMSR(MSB_ClearToSend | MSB_DataSetReady)
+INS8250::INS8250(BYTE base,
+                 int  intLevel): IODevice(base, 8),
+                                 DLAB_m(false),
+                                 ERBFI_m(false),
+                                 receiveInterruptPending(false),
+                                 OE_m(false),
+                                 PE_m(false),
+                                 FE_m(false),
+                                 device_m(0),
+                                 rxByteAvail(false),
+                                 txByteAvail(false),
+                                 lsBaudDiv(0),
+                                 msBaudDiv(0),
+                                 baud_m(0),
+                                 lastTransmit(0),
+                                 saveIER(0),
+                                 saveIIR(0),
+                                 saveLCR(0),
+                                 saveMCR(0),
+                                 saveLSR(0),
+                                 saveMSR(MSB_ClearToSend | MSB_DataSetReady)
 
 {
     intLevel_m = intLevel;
@@ -193,7 +194,8 @@ INS8250::in(BYTE addr)
 }
 
 void
-INS8250::out(BYTE addr, BYTE val)
+INS8250::out(BYTE addr,
+             BYTE val)
 {
     if (verifyPort(addr))
     {

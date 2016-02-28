@@ -33,7 +33,10 @@ H_17_1::insertDisk(FloppyDisk* disk)
 }
 
 void
-H_17_1::getControlInfo(unsigned long pos, bool& hole, bool& trackZero, bool& writeProtect)
+H_17_1::getControlInfo(unsigned long pos,
+                       bool&         hole,
+                       bool&         trackZero,
+                       bool&         writeProtect)
 {
     // Track info comes from the drive, the hole and write-protect is determined
     // by the actual disk
@@ -100,7 +103,8 @@ H_17_1::readData(unsigned long pos)
 }
 
 void
-H_17_1::writeData(unsigned long pos, BYTE data)
+H_17_1::writeData(unsigned long pos,
+                  BYTE          data)
 {
     if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
     {
@@ -109,7 +113,8 @@ H_17_1::writeData(unsigned long pos, BYTE data)
 }
 
 BYTE
-H_17_1::readSectorData(BYTE sector, unsigned long pos)
+H_17_1::readSectorData(BYTE          sector,
+                       unsigned long pos)
 {
     BYTE data = 0;
 

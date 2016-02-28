@@ -18,7 +18,8 @@
 /// \brief StdioConsole
 ///
 ///
-StdioConsole::StdioConsole(int argc, char** argv): Console(argc, argv)
+StdioConsole::StdioConsole(int    argc,
+                           char** argv): Console(argc, argv)
 {
 }
 

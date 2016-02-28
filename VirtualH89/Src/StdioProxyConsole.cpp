@@ -29,7 +29,8 @@
 /// \brief StdioProxyConsole
 ///
 ///
-StdioProxyConsole::StdioProxyConsole(int argc, char** argv): Console(argc, argv)
+StdioProxyConsole::StdioProxyConsole(int    argc,
+                                     char** argv): Console(argc, argv)
 {
     int          c;
     extern char* optarg;

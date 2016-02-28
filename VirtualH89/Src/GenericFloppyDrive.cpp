@@ -150,7 +150,8 @@ GenericFloppyDrive::selectSide(BYTE side)
 
 // negative data is "missing clock" detection.
 int
-GenericFloppyDrive::readData(bool dd, unsigned long pos)
+GenericFloppyDrive::readData(bool          dd,
+                             unsigned long pos)
 {
     int data = 0;
 
@@ -174,7 +175,8 @@ GenericFloppyDrive::readData(bool dd, unsigned long pos)
 }
 
 bool
-GenericFloppyDrive::startWrite(bool dd, unsigned long pos)
+GenericFloppyDrive::startWrite(bool          dd,
+                               unsigned long pos)
 {
     if (!disk_m)
     {
@@ -190,7 +192,8 @@ GenericFloppyDrive::startWrite(bool dd, unsigned long pos)
 }
 
 bool
-GenericFloppyDrive::stopWrite(bool dd, unsigned long pos)
+GenericFloppyDrive::stopWrite(bool          dd,
+                              unsigned long pos)
 {
     if (!disk_m)
     {
@@ -206,7 +209,9 @@ GenericFloppyDrive::stopWrite(bool dd, unsigned long pos)
 }
 
 bool
-GenericFloppyDrive::writeData(bool dd, unsigned long pos, BYTE data)
+GenericFloppyDrive::writeData(bool          dd,
+                              unsigned long pos,
+                              BYTE          data)
 {
     if (!disk_m)
     {
@@ -258,7 +263,9 @@ GenericFloppyDrive::getCharPos(bool doubleDensity)
 }
 
 bool
-GenericFloppyDrive::readAddress(int& track, int& sector, int& side)
+GenericFloppyDrive::readAddress(int& track,
+                                int& sector,
+                                int& side)
 {
     if (disk_m == NULL || !motor_m)
     {

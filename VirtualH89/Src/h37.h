@@ -27,9 +27,11 @@ class Z_89_37: public DiskController, ClockUser
     virtual ~Z_89_37();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, DiskDrive* drive);
+    virtual bool connectDrive(BYTE       unitNum,
+                              DiskDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void reset(void);

@@ -119,7 +119,8 @@ H_17_4::readData(unsigned long pos)
 }
 
 void
-H_17_4::writeData(unsigned long pos, BYTE data)
+H_17_4::writeData(unsigned long pos,
+                  BYTE          data)
 {
     debugss(ssH17_4, INFO, "%s: pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
 
@@ -130,7 +131,8 @@ H_17_4::writeData(unsigned long pos, BYTE data)
 }
 
 BYTE
-H_17_4::readSectorData(BYTE sector, unsigned long pos)
+H_17_4::readSectorData(BYTE          sector,
+                       unsigned long pos)
 {
     BYTE data = 0;
 

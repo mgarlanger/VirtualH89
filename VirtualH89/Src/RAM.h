@@ -26,7 +26,8 @@ class RAM: public virtual Memory
     RAM(int size);
     virtual ~RAM();
 
-    virtual void writeByte(WORD addr, BYTE val);
+    virtual void writeByte(WORD addr,
+                           BYTE val);
     virtual BYTE readByte(WORD addr);
 
     virtual void writeProtect(bool wp);

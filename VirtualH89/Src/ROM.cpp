@@ -31,7 +31,8 @@ ROM::~ROM()
 }
 
 ROM*
-ROM::getROM(const char* filename, WORD addr)
+ROM::getROM(const char* filename,
+            WORD        addr)
 {
     std::ifstream     file;
     unsigned int      fileSize;
@@ -69,7 +70,8 @@ ROM::getROM(const char* filename, WORD addr)
 }
 
 void
-ROM::initialize(BYTE* block, WORD size)
+ROM::initialize(BYTE* block,
+                WORD  size)
 {
     debugss(ssROM, INFO, "%s: size(%d)\n", __FUNCTION__, size);
 
@@ -90,7 +92,8 @@ ROM::initialize(BYTE* block, WORD size)
 
 
 void
-ROM::writeByte(WORD addr, BYTE val)
+ROM::writeByte(WORD addr,
+               BYTE val)
 {
     // can't write to ROM.
     /// \todo update to set the RAM.

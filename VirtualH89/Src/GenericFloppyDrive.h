@@ -39,15 +39,22 @@ class GenericFloppyDrive: public GenericDiskDrive
 
     static GenericFloppyDrive* getInstance(std::string type);
     bool getTrackZero();
-    bool readAddress(int& track, int& sector, int& side);
+    bool readAddress(int& track,
+                     int& sector,
+                     int& side);
 
     void step(bool direction);
     void selectSide(BYTE side);
 
-    int readData(bool doubleDensity, unsigned long pos);
-    bool startWrite(bool doubleDensity, unsigned long pos);
-    bool stopWrite(bool doubleDensity, unsigned long pos);
-    bool writeData(bool doubleDensity, unsigned long pos, BYTE data);
+    int readData(bool          doubleDensity,
+                 unsigned long pos);
+    bool startWrite(bool          doubleDensity,
+                    unsigned long pos);
+    bool stopWrite(bool          doubleDensity,
+                   unsigned long pos);
+    bool writeData(bool          doubleDensity,
+                   unsigned long pos,
+                   BYTE          data);
 
     void insertDisk(GenericFloppyDisk* disk);
 

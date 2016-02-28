@@ -93,7 +93,8 @@ MMS77316::findDrive(std::string ident)
 }
 
 MMS77316*
-MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props, std::string slot)
+MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props,
+                           std::string                 slot)
 {
     std::map<int, GenericFloppyDrive*> mmsdrives;
     std::string                        s;
@@ -226,7 +227,8 @@ MMS77316::in(BYTE addr)
 }
 
 void
-MMS77316::out(BYTE addr, BYTE val)
+MMS77316::out(BYTE addr,
+              BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -290,7 +292,8 @@ MMS77316::getDrive(BYTE unitNum)
 }
 
 bool
-MMS77316::connectDrive(BYTE unitNum, GenericFloppyDrive* drive)
+MMS77316::connectDrive(BYTE                unitNum,
+                       GenericFloppyDrive* drive)
 {
     bool retVal = false;
 

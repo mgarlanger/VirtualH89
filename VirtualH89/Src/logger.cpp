@@ -62,7 +62,8 @@ setDebugLevel()
 }
 
 void
-setDebug(subSystems ss, logLevel level)
+setDebug(subSystems ss,
+         logLevel   level)
 {
     debugLevel[ss] = level;
 }

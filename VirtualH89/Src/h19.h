@@ -48,10 +48,15 @@ class H19: public Console // , public BaseThread
 
   private:
     static void glDisplay();
-    static void reshape(int w, int h);
+    static void reshape(int w,
+                        int h);
     static void timer(int i);
-    static void keyboard(unsigned char key, int x, int y);
-    static void special(int key, int x, int y);
+    static void keyboard(unsigned char key,
+                         int           x,
+                         int           y);
+    static void special(int key,
+                        int x,
+                        int y);
     static H19*               h19; // for static callback funcs
     static const unsigned int screenRefresh_c = 1000 / 60;
     static unsigned int       screenRefresh;
@@ -154,7 +159,8 @@ class H19: public Console // , public BaseThread
     virtual void processCR();
     virtual void processEnableLine25();
 
-    virtual void transmitLines(int start, int end);
+    virtual void transmitLines(int start,
+                               int end);
     virtual void transmitLine25();
     virtual void transmitPage();
     virtual void displayCharacter(unsigned int ch);
