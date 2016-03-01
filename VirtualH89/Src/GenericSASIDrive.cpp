@@ -172,7 +172,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
     // special case: 0 (EOF) means new media - initialize it.
     if (end == 0)
     {
-        dataOffset = sectorSize;
         mediaCyl   = params[type][0];
         mediaHead  = params[type][1];
         mediaSsz   = sectorSize;
