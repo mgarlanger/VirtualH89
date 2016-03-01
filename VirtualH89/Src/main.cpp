@@ -98,6 +98,16 @@ cpuThreadFunc(void* v)
     return (0);
 }
 
+// This is the getopt string for ALL consumers of argc/argv.
+// Right now, it must be manually kept up to date.
+//
+//	option		owner
+//	-g <gui>	main.cpp
+//	-l		StdioProxyConsole.cpp
+//	-q		main.cpp
+//
+const char *getopts = "g:lq";
+
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int
 main(int argc, char* argv[])
@@ -108,7 +118,7 @@ main(int argc, char* argv[])
     int          quiet = 0;
     setDebugLevel();
 
-    while ((c = getopt(argc, argv, "qg:")) != EOF)
+    while ((c = getopt(argc, argv, getopts)) != EOF)
     {
         switch (c)
         {

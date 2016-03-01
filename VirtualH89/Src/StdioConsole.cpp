@@ -15,6 +15,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+extern const char *getopts;
+
 /// \brief StdioConsole
 ///
 ///
