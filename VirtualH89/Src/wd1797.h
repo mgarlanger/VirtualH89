@@ -9,8 +9,8 @@
 #ifndef WD1797_H_
 #define WD1797_H_
 
-#include "IODevice.h"
 #include "ClockUser.h"
+#include "h89Types.h"
 
 class GenericFloppyDrive;
 
@@ -25,7 +25,7 @@ class GenericFloppyDrive;
 class WD1797: public ClockUser
 {
   public:
-    WD1797(int baseAddr);
+    WD1797(int baseAddr = 0);
     virtual ~WD1797();
 
     virtual BYTE in(BYTE addr);
