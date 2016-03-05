@@ -106,7 +106,7 @@ cpuThreadFunc(void* v)
 //	-l		StdioProxyConsole.cpp
 //	-q		main.cpp
 //
-const char *getopts = "g:lq";
+const char* getopts = "g:lq";
 
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int

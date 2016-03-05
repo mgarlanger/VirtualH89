@@ -7,7 +7,7 @@
 
 #include "Console.h"
 
-extern const char *getopts;
+extern const char* getopts;
 
 Console::Console(int    argc,
                  char** argv)

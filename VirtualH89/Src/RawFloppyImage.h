@@ -45,12 +45,12 @@ class RawFloppyImage: public GenericFloppyDisk
     bool readData(BYTE track,
                   BYTE side,
                   BYTE sector,
-                  int inSector,
+                  int  inSector,
                   int& data);
     bool writeData(BYTE track,
                    BYTE side,
                    BYTE sector,
-                   int inSector,
+                   int  inSector,
                    BYTE data,
                    bool dataReady,
                    int& result);

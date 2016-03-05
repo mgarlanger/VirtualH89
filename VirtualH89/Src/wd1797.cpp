@@ -779,7 +779,8 @@ WD1797::notification(unsigned int cycleCount)
 
             missCount_m = 0;
             drive->selectSide(side_m);
-            data = drive->readData(doubleDensity(), trackReg_m, side_m, sectorReg_m, sectorPos_m);
+            data        = drive->readData(
+                doubleDensity(), trackReg_m, side_m, sectorReg_m, sectorPos_m);
 
             if (data == GenericFloppyFormat::NO_DATA)
             {
@@ -833,7 +834,7 @@ WD1797::notification(unsigned int cycleCount)
             missCount_m = 0;
             drive->selectSide(side_m);
             // sector '0xfd' indicates a read address
-            data = drive->readData(doubleDensity(), trackReg_m, side_m, 0xfd, sectorPos_m);
+            data        = drive->readData(doubleDensity(), trackReg_m, side_m, 0xfd, sectorPos_m);
 
             if (data == GenericFloppyFormat::NO_DATA)
             {
@@ -943,7 +944,7 @@ WD1797::notification(unsigned int cycleCount)
 
             missCount_m = 0;
             drive->selectSide(side_m);
-            data = drive->readData(doubleDensity(), trackReg_m, side_m, 0xff, sectorPos_m);
+            data        = drive->readData(doubleDensity(), trackReg_m, side_m, 0xff, sectorPos_m);
 
             if (data == GenericFloppyFormat::NO_DATA)
             {

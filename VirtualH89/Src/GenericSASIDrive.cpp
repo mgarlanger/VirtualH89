@@ -125,10 +125,10 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
     return (m == 0x1f);
 }
 
-GenericSASIDrive::GenericSASIDrive(DriveType type,
+GenericSASIDrive::GenericSASIDrive(DriveType   type,
                                    std::string media,
-                                   int cnum,
-                                   int sectorSize)
+                                   int         cnum,
+                                   int         sectorSize)
 {
     driveType   = type;
     driveMedia  = strdup(media.c_str());
@@ -175,11 +175,11 @@ GenericSASIDrive::GenericSASIDrive(DriveType type,
     // special case: 0 (EOF) means new media - initialize it.
     if (end == 0)
     {
-        mediaCyl   = params[type][0];
-        mediaHead  = params[type][1];
-        mediaSsz   = sectorSize;
-        mediaSpt   = sectorsPerTrack;
-        mediaLat   = 1;
+        mediaCyl  = params[type][0];
+        mediaHead = params[type][1];
+        mediaSsz  = sectorSize;
+        mediaSpt  = sectorsPerTrack;
+        mediaLat  = 1;
         memset(buf, 0, sizeof(buf));
         int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);

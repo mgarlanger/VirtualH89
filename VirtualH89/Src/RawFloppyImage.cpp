@@ -76,7 +76,7 @@ RawFloppyImage::dump()
 }
 
 // TODO: If constructor fails, the drive should not mount this disk!
-RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive,
+RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                                std::vector<std::string> argv): GenericFloppyDisk(),
                                                                imageName_m(NULL),
                                                                imageFd_m(-1),
@@ -645,7 +645,7 @@ bool
 RawFloppyImage::readData(BYTE track,
                          BYTE side,
                          BYTE sector,
-                         int inSector,
+                         int  inSector,
                          int& data)
 {
     if (!cacheTrack(side, track))
@@ -711,7 +711,7 @@ bool
 RawFloppyImage::writeData(BYTE track,
                           BYTE side,
                           BYTE sector,
-                          int inSector,
+                          int  inSector,
                           BYTE data,
                           bool dataReady,
                           int& result)

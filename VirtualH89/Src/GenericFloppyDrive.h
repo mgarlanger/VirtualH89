@@ -50,12 +50,12 @@ class GenericFloppyDrive: public GenericDiskDrive
                  BYTE track,
                  BYTE side,
                  BYTE sector,
-                 int inSector);
+                 int  inSector);
     int writeData(bool doubleDensity,
                   BYTE track,
                   BYTE side,
                   BYTE sector,
-                  int inSector,
+                  int  inSector,
                   BYTE data,
                   bool dataReady);
 

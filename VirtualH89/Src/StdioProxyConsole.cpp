@@ -26,19 +26,19 @@
 #include "logger.h"
 #include "H89Operator.h"
 
-extern const char *getopts;
+extern const char* getopts;
 
 /// \brief StdioProxyConsole
 ///
 ///
 StdioProxyConsole::StdioProxyConsole(int    argc,
                                      char** argv):
-		Console(argc, argv),
-		logConsole(false)
+    Console(argc, argv),
+    logConsole(false)
 {
     int          c;
     extern char* optarg;
-    extern int optind;
+    extern int   optind;
 
     // TODO: properly share getopt string so both main and this
     // (and other modules) can ignore eachother's options...
@@ -97,11 +97,13 @@ StdioProxyConsole::receiveData(BYTE ch)
 {
     fputc(ch | 0x80, stdout);
     fflush(stdout);
-    if (logConsole) {
-	fputc(ch, console_out);
-	if (ch == '\n') {
-		fflush(console_out);
-	}
+    if (logConsole)
+    {
+        fputc(ch, console_out);
+        if (ch == '\n')
+        {
+            fflush(console_out);
+        }
     }
 }
 

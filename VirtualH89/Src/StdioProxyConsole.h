@@ -40,7 +40,7 @@ class StdioProxyConsole: public Console
 
   private:
     H89Operator* op_m;
-    bool logConsole;
+    bool         logConsole;
 };
 
 #endif // STDIOPROXYCONSOLE_H_

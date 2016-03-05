@@ -154,7 +154,7 @@ GenericFloppyDrive::readData(bool dd,
                              BYTE track,
                              BYTE side,
                              BYTE sector,
-                             int inSector)
+                             int  inSector)
 {
     int data = 0;
 
@@ -189,7 +189,7 @@ GenericFloppyDrive::writeData(bool dd,
                               BYTE track,
                               BYTE side,
                               BYTE sector,
-                              int inSector,
+                              int  inSector,
                               BYTE data,
                               bool dataReady)
 {
