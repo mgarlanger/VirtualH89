@@ -1,7 +1,23 @@
+<<<<<<< Updated upstream
 /VirtualH89/Debug
 /VirtualH89/Release
 /VirtualH89/Docs
 /VirtualH89/Doxygen/warn.log
 /build
 /check
-
+.DS_Store
+.Trashes
+*.swp
+DerivedData/
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+*.xccheckout
+xcuserdata/
+*.moved-aside
