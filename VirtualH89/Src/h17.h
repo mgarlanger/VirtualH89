@@ -29,9 +29,11 @@ class H17: public DiskController, public ClockUser
     virtual ~H17();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, DiskDrive* drive);
+    virtual bool connectDrive(BYTE       unitNum,
+                              DiskDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void selectSide(BYTE side);

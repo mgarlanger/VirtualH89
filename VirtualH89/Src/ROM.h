@@ -23,10 +23,13 @@ class ROM: public virtual Memory
   public:
     ROM(int size);
     virtual ~ROM();
-    static ROM* getROM(const char* file, WORD addr);
+    static ROM* getROM(const char* file,
+                       WORD        addr);
 
-    virtual void initialize(BYTE* block, WORD size);
-    virtual void writeByte(WORD addr, BYTE val);
+    virtual void initialize(BYTE* block,
+                            WORD  size);
+    virtual void writeByte(WORD addr,
+                           BYTE val);
     virtual BYTE readByte(WORD addr);
 };
 

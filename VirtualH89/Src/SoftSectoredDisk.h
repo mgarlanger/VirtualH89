@@ -27,15 +27,28 @@ class SoftSectoredDisk: public FloppyDisk
         dif_8RAW
     };
 
-    SoftSectoredDisk(const char* name, DiskImageFormat format);
+    SoftSectoredDisk(const char*     name,
+                     DiskImageFormat format);
     SoftSectoredDisk();
     virtual ~SoftSectoredDisk();
 
-    virtual bool readData(BYTE side, BYTE track, unsigned long pos, BYTE& data);
-    virtual bool writeData(BYTE side, BYTE track, unsigned long pos, BYTE data);
-    virtual void getControlInfo(unsigned long pos, bool& hole, bool& writeProtect);
+    virtual bool readData(BYTE          side,
+                          BYTE          track,
+                          unsigned long pos,
+                          BYTE&         data);
+    virtual bool writeData(BYTE          side,
+                           BYTE          track,
+                           unsigned long pos,
+                           BYTE          data);
+    virtual void getControlInfo(unsigned long pos,
+                                bool&         hole,
+                                bool&         writeProtect);
 
-    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, WORD pos, BYTE& data);
+    virtual bool readSectorData(BYTE  side,
+                                BYTE  track,
+                                BYTE  sector,
+                                WORD  pos,
+                                BYTE& data);
     virtual void eject(const char* name);
 
   private:
@@ -58,7 +71,8 @@ class SoftSectoredDisk: public FloppyDisk
 
     bool defaultHoleStatus(unsigned long pos);
 
-    void determineDiskFormat(const char* name, DiskImageFormat& format);
+    void determineDiskFormat(const char*      name,
+                             DiskImageFormat& format);
     bool readTD0(const char* name);
     bool readIMD(const char* name);
     bool readRaw(const char* name);

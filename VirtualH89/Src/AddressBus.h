@@ -49,8 +49,10 @@ class AddressBus
     void setIntrCtrlr(InterruptController* ic);
     // Wanted to use the [] operator, but unfortunately it can't be used since the
     // emulated CPU may need to handle writing and reading differently.
-    BYTE readByte(WORD addr, bool interruptAck = false);
-    void writeByte(WORD addr, BYTE val);
+    BYTE readByte(WORD addr,
+                  bool interruptAck = false);
+    void writeByte(WORD addr,
+                   BYTE val);
 
 };
 

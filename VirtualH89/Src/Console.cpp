@@ -9,7 +9,8 @@
 
 extern const char *getopts;
 
-Console::Console(int argc, char** argv)
+Console::Console(int    argc,
+                 char** argv)
 {
 
 }

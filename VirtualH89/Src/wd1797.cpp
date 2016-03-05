@@ -152,7 +152,8 @@ WD1797::in(BYTE addr)
 }
 
 void
-WD1797::out(BYTE addr, BYTE val)
+WD1797::out(BYTE addr,
+            BYTE val)
 {
     BYTE offset = addr - basePort_m;
 

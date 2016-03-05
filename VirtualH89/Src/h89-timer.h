@@ -21,7 +21,8 @@ class InterruptController;
 class H89Timer: public EventHandler
 {
   public:
-    H89Timer(CPU* cpu, unsigned char intlvl = 1);
+    H89Timer(CPU*          cpu,
+             unsigned char intlvl = 1);
     H89Timer(unsigned char intlvl = 1);
     virtual ~H89Timer();
     virtual void setCPU(CPU* cpu);

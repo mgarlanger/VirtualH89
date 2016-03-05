@@ -110,7 +110,8 @@ const char *getopts = "g:lq";
 
 /// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int
-main(int argc, char* argv[])
+main(int   argc,
+     char* argv[])
 {
     int          c;
     extern char* optarg;

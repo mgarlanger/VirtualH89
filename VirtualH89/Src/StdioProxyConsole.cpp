@@ -31,9 +31,10 @@ extern const char *getopts;
 /// \brief StdioProxyConsole
 ///
 ///
-StdioProxyConsole::StdioProxyConsole(int argc, char** argv):
-	Console(argc, argv),
-	logConsole(false)
+StdioProxyConsole::StdioProxyConsole(int    argc,
+                                     char** argv):
+		Console(argc, argv),
+		logConsole(false)
 {
     int          c;
     extern char* optarg;

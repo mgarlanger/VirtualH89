@@ -29,15 +29,20 @@ class MMS77320: public DiskController
   public:
     static const int numDisks_c = 8;
 
-    MMS77320(int baseAddr, int intLevel, int switches);
+    MMS77320(int baseAddr,
+             int intLevel,
+             int switches);
     virtual ~MMS77320();
 
-    static MMS77320* install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot);
+    static MMS77320* install_MMS77320(PropertyUtil::PropertyMapT& props,
+                                      std::string                 slot);
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
-    virtual bool connectDrive(BYTE unitNum, GenericSASIDrive* drive);
+    virtual bool connectDrive(BYTE              unitNum,
+                              GenericSASIDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
     virtual GenericSASIDrive* getDrive(BYTE unitNum);
 

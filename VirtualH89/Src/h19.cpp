@@ -1179,7 +1179,8 @@ H19::processEnableLine25()
 }
 
 void
-H19::transmitLines(int start, int end)
+H19::transmitLines(int start,
+                   int end)
 {
     /// \todo verify this table.
     static char   characterLookup[0x80] =
@@ -1307,7 +1308,8 @@ H19::getBaudRate()
 
 
 void
-H19::reshape(int w, int h)
+H19::reshape(int w,
+             int h)
 {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
@@ -1341,13 +1343,17 @@ H19::timer(int i)
 }
 
 void
-H19::keyboard(unsigned char key, int x, int y)
+H19::keyboard(unsigned char key,
+              int           x,
+              int           y)
 {
     h19->keypress(key);
 }
 
 void
-H19::special(int key, int x, int y)
+H19::special(int key,
+             int x,
+             int y)
 {
     // NOTE: GLUT has already differentiated exact keystrokes
     // based on modern keyboard standards. Here we just encode

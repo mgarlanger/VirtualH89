@@ -29,7 +29,8 @@ class WD1797: public ClockUser
     virtual ~WD1797();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
 
     virtual void reset(void);
     void notification(unsigned int cycleCount);

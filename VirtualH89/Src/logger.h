@@ -156,7 +156,8 @@ extern unsigned debugLevel[ssMax];
 
 void setDebugLevel();
 
-void setDebug(subSystems ss, logLevel level);
+void setDebug(subSystems ss,
+              logLevel   level);
 
 
 #endif // LOGGER_H_

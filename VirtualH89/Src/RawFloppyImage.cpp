@@ -23,8 +23,12 @@
 
 
 void
-RawFloppyImage::getAddrMark(BYTE* tp, int nbytes,
-                            int& id_tk, int& id_sd, int& id_sc, int& id_sl)
+RawFloppyImage::getAddrMark(BYTE* tp,
+                            int   nbytes,
+                            int&  id_tk,
+                            int&  id_sd,
+                            int&  id_sc,
+                            int&  id_sl)
 {
     id_tk = -1;
     id_sd = -1;
@@ -72,24 +76,24 @@ RawFloppyImage::dump()
 }
 
 // TODO: If constructor fails, the drive should not mount this disk!
-RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv):
-    GenericFloppyDisk(),
-    imageName_m(NULL),
-    imageFd_m(-1),
-    trackBuffer_m(NULL),
-    bufferedTrack_m(-1),
-    bufferedSide_m(-1),
-    bufferOffset_m(0),
-    bufferDirty_m(false),
-    hypoTrack_m(false),
-    hyperTrack_m(false),
-    interlaced_m(false),
-    gapLen_m(0),
-    indexGapLen_m(0),
-    writePos_m(-1),
-    trackWrite_m(false),
-    dataPos_m(0),
-    dataLen_m(0)
+RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive,
+                               std::vector<std::string> argv): GenericFloppyDisk(),
+                                                               imageName_m(NULL),
+                                                               imageFd_m(-1),
+                                                               trackBuffer_m(NULL),
+                                                               bufferedTrack_m(-1),
+                                                               bufferedSide_m(-1),
+                                                               bufferOffset_m(0),
+                                                               bufferDirty_m(false),
+                                                               hypoTrack_m(false),
+                                                               hyperTrack_m(false),
+                                                               interlaced_m(false),
+                                                               gapLen_m(0),
+                                                               indexGapLen_m(0),
+                                                               writePos_m(-1),
+                                                               trackWrite_m(false),
+                                                               dataPos_m(0),
+                                                               dataLen_m(0)
 {
     if (argv.size() < 1)
     {
@@ -491,7 +495,8 @@ RawFloppyImage::~RawFloppyImage()
 }
 
 bool
-RawFloppyImage::cacheTrack(int side, int track)
+RawFloppyImage::cacheTrack(int side,
+                           int track)
 {
     if (bufferedSide_m == side && bufferedTrack_m == track)
     {
@@ -610,7 +615,9 @@ RawFloppyImage::findMark(int mark)
 }
 
 bool
-RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
+RawFloppyImage::locateSector(BYTE track,
+                             BYTE side,
+                             BYTE sector)
 {
     if (findMark(GenericFloppyFormat::ID_AM))
     {
@@ -635,7 +642,11 @@ RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
 }
 
 bool
-RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
+RawFloppyImage::readData(BYTE track,
+                         BYTE side,
+                         BYTE sector,
+                         int inSector,
+                         int& data)
 {
     if (!cacheTrack(side, track))
     {
@@ -697,8 +708,13 @@ RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& 
 }
 
 bool
-RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector,
-                          int inSector, BYTE data, bool dataReady, int& result)
+RawFloppyImage::writeData(BYTE track,
+                          BYTE side,
+                          BYTE sector,
+                          int inSector,
+                          BYTE data,
+                          bool dataReady,
+                          int& result)
 {
     if (checkWriteProtect())
     {

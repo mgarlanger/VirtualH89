@@ -29,7 +29,8 @@ RAM::~RAM()
 
 
 void
-RAM::writeByte(WORD addr, BYTE val)
+RAM::writeByte(WORD addr,
+               BYTE val)
 {
     debugss(ssRAM, ALL, "%s: addr(%d) - %d\n", __FUNCTION__, addr, val);
 

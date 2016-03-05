@@ -49,8 +49,10 @@ class Sector
     void setReadError(bool val);
 
     BYTE getSectorNum();
-    bool readData(WORD pos, BYTE& data);
-    bool writeData(WORD pos, BYTE data);
+    bool readData(WORD  pos,
+                  BYTE& data);
+    bool writeData(WORD pos,
+                   BYTE data);
 
     void dump();
 };

@@ -58,7 +58,8 @@ Z47Interface::in(BYTE addr)
 }
 
 void
-Z47Interface::out(BYTE addr, BYTE val)
+Z47Interface::out(BYTE addr,
+                  BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 

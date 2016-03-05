@@ -156,7 +156,8 @@ Z_89_37::in(BYTE addr)
 }
 
 void
-Z_89_37::out(BYTE addr, BYTE val)
+Z_89_37::out(BYTE addr,
+             BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -576,7 +577,8 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
 }
 
 bool
-Z_89_37::connectDrive(BYTE unitNum, DiskDrive* drive)
+Z_89_37::connectDrive(BYTE       unitNum,
+                      DiskDrive* drive)
 {
     bool retVal = false;
 

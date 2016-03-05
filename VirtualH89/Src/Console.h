@@ -20,7 +20,8 @@
 class Console: public Terminal
 {
   public:
-    Console(int argc, char** argv);
+    Console(int    argc,
+            char** argv);
     virtual ~Console();
 
     virtual void run()   = 0;

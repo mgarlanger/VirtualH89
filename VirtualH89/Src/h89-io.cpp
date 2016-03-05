@@ -170,7 +170,8 @@ H89_IO::in(BYTE addr)
 }
 
 void
-H89_IO::out(BYTE addr, BYTE val)
+H89_IO::out(BYTE addr,
+            BYTE val)
 {
     debugss(ssIO, ALL, "%s: (%03o) = 0x%02x\n", __FUNCTION__, addr, val);
 

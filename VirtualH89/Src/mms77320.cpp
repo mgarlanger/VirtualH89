@@ -24,16 +24,17 @@ MMS77320::getCurDrive()
     return drives_m[control1Reg_m & ctrl_DriveSel_c];
 }
 
-MMS77320::MMS77320(int baseAddr, int intLevel, int switches): DiskController(baseAddr,
-                                                                             MMS77320_NumPorts_c),
-                                                              control0Reg_m(0),
-                                                              control1Reg_m(-1),
-                                                              dataOutReg_m(0),
-                                                              dataInReg_m(0),
-                                                              statusReg_m(0),
-                                                              ctrlBus_m(0),
-                                                              switchReg_m(switches),
-                                                              intLevel_m(intLevel)
+MMS77320::MMS77320(int baseAddr,
+                   int intLevel,
+                   int switches): DiskController(baseAddr, MMS77320_NumPorts_c),
+                                  control0Reg_m(0),
+                                  control1Reg_m(-1),
+                                  dataOutReg_m(0),
+                                  dataInReg_m(0),
+                                  statusReg_m(0),
+                                  ctrlBus_m(0),
+                                  switchReg_m(switches),
+                                  intLevel_m(intLevel)
 {
     for (int x = 0; x < numDisks_c; ++x)
     {
@@ -92,7 +93,8 @@ MMS77320::findDrive(std::string ident)
 }
 
 MMS77320*
-MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props, std::string slot)
+MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props,
+                           std::string                 slot)
 {
     std::map<int, GenericSASIDrive*> mmsdrives;
     std::string                      s;
@@ -274,7 +276,8 @@ MMS77320::getStatus(BYTE ctl)
 }
 
 void
-MMS77320::out(BYTE addr, BYTE val)
+MMS77320::out(BYTE addr,
+              BYTE val)
 {
     BYTE offset = getPortOffset(addr);
 
@@ -361,7 +364,8 @@ MMS77320::getDrive(BYTE unitNum)
 }
 
 bool
-MMS77320::connectDrive(BYTE unitNum, GenericSASIDrive* drive)
+MMS77320::connectDrive(BYTE              unitNum,
+                       GenericSASIDrive* drive)
 {
     bool retVal = false;
 

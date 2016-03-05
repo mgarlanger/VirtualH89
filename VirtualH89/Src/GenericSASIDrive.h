@@ -40,9 +40,14 @@ class GenericSASIDrive: public GenericDiskDrive
         NUM_DRV_TYPE
     };
 
-    GenericSASIDrive(DriveType type, std::string media, int cnum, int sectorSize);
+    GenericSASIDrive(DriveType   type,
+                     std::string media,
+                     int         cnum,
+                     int         sectorSize);
     virtual ~GenericSASIDrive();
-    static GenericSASIDrive* getInstance(std::string type, std::string path, int unitNum);
+    static GenericSASIDrive* getInstance(std::string type,
+                                         std::string path,
+                                         int         unitNum);
 
     // not used:
     int getRawBytesPerTrack()
@@ -63,12 +68,24 @@ class GenericSASIDrive: public GenericDiskDrive
     std::string getMediaName();
 
     // These are called by the host to indicate change events on ctl bits.
-    void resetSASI(BYTE& data, BYTE& dataOut, BYTE& ctl);
-    void select(BYTE& data, BYTE& dataOut, BYTE& ctl);
-    void run(BYTE& dataIn, BYTE& dataOut, BYTE& ctl); // this is actually the absense of any bits.
-    void ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctl);
-    void reset(BYTE& dataIn, BYTE& dataOut, BYTE& ctl);
-    void deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
+    void resetSASI(BYTE& data,
+                   BYTE& dataOut,
+                   BYTE& ctl);
+    void select(BYTE& data,
+                BYTE& dataOut,
+                BYTE& ctl);
+    void run(BYTE& dataIn,
+             BYTE& dataOut,
+             BYTE& ctl); // this is actually the absense of any bits.
+    void ack(BYTE& dataIn,
+             BYTE& dataOut,
+             BYTE& ctl);
+    void reset(BYTE& dataIn,
+               BYTE& dataOut,
+               BYTE& ctl);
+    void deselect(BYTE& dataIn,
+                  BYTE& dataOut,
+                  BYTE& ctrl);
 
     int getCtlBits();
     void setCtlBits(int bits);
@@ -111,11 +128,18 @@ class GenericSASIDrive: public GenericDiskDrive
     void startSense(BYTE& ctrl);
     void startDataIn(BYTE& ctrl);
     void startDataOut(BYTE& ctrl);
-    void startError(BYTE& ctrl, BYTE err);
+    void startError(BYTE& ctrl,
+                    BYTE  err);
     void startDCB(BYTE& ctrl);
-    void processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
-    void processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
-    void processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
+    void processCmd(BYTE& dataIn,
+                    BYTE& dataOut,
+                    BYTE& ctrl);
+    void processData(BYTE& dataIn,
+                     BYTE& dataOut,
+                     BYTE& ctrl);
+    void processDCB(BYTE& dataIn,
+                    BYTE& dataOut,
+                    BYTE& ctrl);
 
     enum State
     {

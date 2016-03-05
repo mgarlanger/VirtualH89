@@ -66,7 +66,9 @@ class H89: public Computer
     NMIPort*             nmi2;
 
     INS8250*             consolePort;
-    INS8250*             lpPort, * modemPort, * auxPort;
+    INS8250*             lpPort;
+    INS8250*             modemPort;
+    INS8250*             auxPort;
 
     H17*                 h17;
     Console*             console;

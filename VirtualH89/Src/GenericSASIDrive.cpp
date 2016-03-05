@@ -125,7 +125,10 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
     return (m == 0x1f);
 }
 
-GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, int sectorSize)
+GenericSASIDrive::GenericSASIDrive(DriveType type,
+                                   std::string media,
+                                   int cnum,
+                                   int sectorSize)
 {
     driveType   = type;
     driveMedia  = strdup(media.c_str());
@@ -224,7 +227,9 @@ GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum, 
 }
 
 GenericSASIDrive*
-GenericSASIDrive::getInstance(std::string type, std::string media, int cnum)
+GenericSASIDrive::getInstance(std::string type,
+                              std::string media,
+                              int         cnum)
 {
     DriveType etype;
 
@@ -358,7 +363,9 @@ GenericSASIDrive::~GenericSASIDrive()
  */
 
 void
-GenericSASIDrive::deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::deselect(BYTE& dataIn,
+                           BYTE& dataOut,
+                           BYTE& ctrl)
 {
     // User is switch controllers/drive, do any cleanup.
     ctrl    &= ~ctl_Msg_o_c;
@@ -370,7 +377,9 @@ GenericSASIDrive::deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::ack(BYTE& dataIn,
+                      BYTE& dataOut,
+                      BYTE& ctrl)
 {
     ctrl &= ~ctl_Req_o_c;
     ctrl &= ~ctl_Ack_i_c;
@@ -498,7 +507,9 @@ GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::resetSASI(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::resetSASI(BYTE& dataIn,
+                            BYTE& dataOut,
+                            BYTE& ctrl)
 {
     ctrl    &= ~ctl_Msg_o_c;
     ctrl    &= ~ctl_Cmd_o_c;
@@ -509,7 +520,9 @@ GenericSASIDrive::resetSASI(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::select(BYTE& dataIn,
+                         BYTE& dataOut,
+                         BYTE& ctrl)
 {
     // validate data bit with cnum...
     int i = ffs(dataOut);
@@ -526,7 +539,9 @@ GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::run(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::run(BYTE& dataIn,
+                      BYTE& dataOut,
+                      BYTE& ctrl)
 {
     ctrl    |= ctl_Busy_o_c;
     ctrl    |= ctl_Cmd_o_c;
@@ -581,7 +596,8 @@ GenericSASIDrive::startDataOut(BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::startError(BYTE& ctrl, BYTE err)
+GenericSASIDrive::startError(BYTE& ctrl,
+                             BYTE  err)
 {
     stsBuf[0]   = 0b00000010;
     stsBuf[1]   = 0;
@@ -601,7 +617,9 @@ GenericSASIDrive::startDCB(BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::processCmd(BYTE& dataIn,
+                             BYTE& dataOut,
+                             BYTE& ctrl)
 {
     off_t off;
     long  e;
@@ -763,7 +781,9 @@ GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::processData(BYTE& dataIn,
+                              BYTE& dataOut,
+                              BYTE& ctrl)
 {
     off_t off;
     long  e;
@@ -813,7 +833,9 @@ GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
+GenericSASIDrive::processDCB(BYTE& dataIn,
+                             BYTE& dataOut,
+                             BYTE& ctrl)
 {
     switch (cmdBuf[0])
     {

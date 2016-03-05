@@ -12,7 +12,8 @@
 #include <sstream>
 
 
-DiskController::DiskController(BYTE base, BYTE numPorts): IODevice(base, numPorts)
+DiskController::DiskController(BYTE base,
+                               BYTE numPorts): IODevice(base, numPorts)
 {
 
 }

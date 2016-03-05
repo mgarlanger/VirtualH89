@@ -24,7 +24,8 @@ class CPU
 {
   public:
     static const unsigned long NO_INTR_INST = ((unsigned long) -1);
-    typedef unsigned long intrCheck (void* arg, int level);
+    typedef unsigned long intrCheck (void* arg,
+                                     int   level);
   private:
 
   public:

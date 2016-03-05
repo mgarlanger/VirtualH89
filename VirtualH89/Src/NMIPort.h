@@ -22,11 +22,13 @@
 class NMIPort: public virtual IODevice
 {
   public:
-    NMIPort(BYTE base, BYTE size);
+    NMIPort(BYTE base,
+            BYTE size);
     virtual ~NMIPort();
 
     virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr, BYTE val);
+    virtual void out(BYTE addr,
+                     BYTE val);
     void reset() {
     }
   private:

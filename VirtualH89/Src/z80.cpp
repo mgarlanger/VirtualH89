@@ -1325,7 +1325,8 @@ Z80::CHECK_FLAGS(BYTE flags)
 };
 
 inline void
-Z80::COND_FLAGS(bool cond, BYTE flags)
+Z80::COND_FLAGS(bool cond,
+                BYTE flags)
 {
     if (cond)
     {
@@ -1362,42 +1363,43 @@ Z80::SET_ZSP_FLAGS(BYTE val)
 /// @param clockRate Speed of the Z80 in cycles per second.
 /// @param ticksPerSecond Number of interrupts per second for the clock
 ///
-Z80::Z80(int clockRate, int ticksPerSecond): CPU(),
-                                             A(af.hi),
-                                             sA(af.shi),
-                                             F(af.lo),
-                                             AF(af.val),
-                                             B(bc.hi),
-                                             C(bc.lo),
-                                             BC(bc.val),
-                                             D(de.hi),
-                                             E(de.lo),
-                                             DE(de.val),
-                                             H(hl.hi),
-                                             L(hl.lo),
-                                             HL(hl.val),
-                                             sHL(hl.sval),
-                                             W(wz.hi),
-                                             sW(wz.shi),
-                                             Z(wz.lo),
-                                             WZ(wz.val),
-                                             IXl(ix.lo),
-                                             IXh(ix.hi),
-                                             IX(ix.val),
-                                             IYl(iy.lo),
-                                             IYh(iy.hi),
-                                             IY(iy.val),
-                                             SP(sp.val),
-                                             INT_Line(false), // never used
-                                             intLevel_m(0),   // never used
-                                             processingIntr(false),
-                                             ticks(0),
-                                             lastInstTicks(0),
-                                             curInstByte(0),
-                                             mode(cm_reset),
-                                             prefix(ip_none),
-                                             resetReq(false), // never used
-                                             IM(0)
+Z80::Z80(int clockRate,
+         int ticksPerSecond): CPU(),
+                              A(af.hi),
+                              sA(af.shi),
+                              F(af.lo),
+                              AF(af.val),
+                              B(bc.hi),
+                              C(bc.lo),
+                              BC(bc.val),
+                              D(de.hi),
+                              E(de.lo),
+                              DE(de.val),
+                              H(hl.hi),
+                              L(hl.lo),
+                              HL(hl.val),
+                              sHL(hl.sval),
+                              W(wz.hi),
+                              sW(wz.shi),
+                              Z(wz.lo),
+                              WZ(wz.val),
+                              IXl(ix.lo),
+                              IXh(ix.hi),
+                              IX(ix.val),
+                              IYl(iy.lo),
+                              IYh(iy.hi),
+                              IY(iy.val),
+                              SP(sp.val),
+                              INT_Line(false), // never used
+                              intLevel_m(0),   // never used
+                              processingIntr(false),
+                              ticks(0),
+                              lastInstTicks(0),
+                              curInstByte(0),
+                              mode(cm_reset),
+                              prefix(ip_none),
+                              resetReq(false), // never used
+                              IM(0)
 
 {
     debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,
@@ -5153,7 +5155,8 @@ Z80::op_rb_n_ihl(void)
 /// \retval none
 ///
 void
-Z80::op_tb_n(BYTE m, BYTE bit)
+Z80::op_tb_n(BYTE m,
+             BYTE bit)
 {
     CLEAR_FLAGS(N_FLAG);
     SET_FLAGS(H_FLAG);

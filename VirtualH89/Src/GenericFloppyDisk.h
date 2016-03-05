@@ -36,13 +36,22 @@ class GenericFloppyDisk
         return doubleDensity_m;
     }
 
-    virtual bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data) = 0;
-    virtual bool writeData(BYTE track, BYTE side, BYTE sector, int inSector,
-                           BYTE data, bool dataReady, int& result)                     = 0;
-    virtual bool isReady()                                                             = 0;
-    virtual void eject(const char* name)                                               = 0;
-    virtual void dump(void)                                                            = 0;
-    virtual std::string getMediaName()                                                 = 0;
+    virtual bool readData(BYTE track,
+                          BYTE side,
+                          BYTE sector,
+                          int inSector,
+                          int& data) = 0;
+    virtual bool writeData(BYTE track,
+                           BYTE side,
+                           BYTE sector,
+                           int inSector,
+                           BYTE data,
+                           bool dataReady,
+                           int& result) = 0;
+    virtual bool isReady()              = 0;
+    virtual void eject(const char* name) = 0;
+    virtual void dump(void)              = 0;
+    virtual std::string getMediaName()   = 0;
 
   private:
 
