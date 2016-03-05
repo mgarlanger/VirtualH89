@@ -1,6 +1,9 @@
 /// \file z80.h
 ///
-/// \brief Virtual Z-80 processor. Clock accurate.
+/// \brief Virtual Z-80 processor.
+///
+/// Clock accurate, all undocumented functions implemented.
+/// Undocumented flags NOT implemented.
 ///
 /// \date Mar 7, 2009
 ///
@@ -15,14 +18,15 @@
 #include <pthread.h>
 
 #include "cpu.h"
-#include "AddressBus.h"
+
+class AddressBus;
 
 
 ///
 /// \brief  Zilog %Z80 %CPU simulator.
 ///
 /// Complete Z80 CPU simulator based on Z80Pack. The original code was converted
-/// to C++ and more of the undocumented opcodes have been implemented. Also, fixed
+/// to C++ and all of the undocumented opcodes have been implemented. Also, fixed
 /// a few of the flags for opcodes like DAA.
 ///
 class Z80: public CPU
@@ -101,13 +105,12 @@ class Z80: public CPU
     bool                  IFF0, IFF1, IFF2; // Use a new flag - IFF0 -
                                             //   to easily handle the one instruction before EI takes effect
     unsigned int          R;                // Z80 refresh register
+    BYTE                  Rprime;
 
     unsigned long int     ClockRate_m;
     unsigned long int     ticksPerSecond_m;
     unsigned long int     ticksPerClock_m;
 
-    bool                  INT_Line;
-    BYTE                  intLevel_m;
     bool                  processingIntr;
 
     volatile sig_atomic_t ticks;
@@ -136,7 +139,6 @@ class Z80: public CPU
     cpuMode                   mode;
 
     instructionPrefix         prefix;
-    bool                      resetReq;
 
     BYTE                      IM;
     int                       cpu_state, int_type;
@@ -165,14 +167,10 @@ class Z80: public CPU
     virtual void setAddressBus(AddressBus* ab);
     virtual void setSpeed(bool fast);
 
-    /// \todo - fix this for general case with any instruction on the address bus
     virtual void raiseINT();
     virtual void lowerINT();
 
-    /// \todo - remove these vvvvvvvv
-//  virtual void setCPUStates(BYTE error, BYTE state);
     void traceInstructions(void);
-    // -- remove ^^^^^
 
   protected:
     /// Signed Flag
@@ -192,134 +190,82 @@ class Z80: public CPU
     /// Carry Flag
     static const BYTE C_FLAG  = 0x01;
 
-#if PARITY_TABLE
-    ///
-    ///  Table to determine parity flag as fast as possible
-    ///
-    ///  This table holds the value that the Parity Flag should be set to base on the
-    ///  index byte.
-    ///
-    static const BYTE parity[256];
-#endif
 
-#if USE_TABLE
     ///
     /// Table to contains the values for Z, S, and P flags. This is done to reduce
     /// duplicated code and to be slightly faster, than the individual settings of
     ///  the flags.
     ///
     static const BYTE ZSP[256];
-#endif
 
 
 
-    // Register related
-    inline BYTE& getReg8(BYTE val);
+    // 8-bit Register related
+    BYTE& getReg8(BYTE val);
 
-    inline BYTE& getCoreReg8(BYTE val);
+    BYTE& getCoreReg8(BYTE val);
 
-    inline BYTE getReg8Val(BYTE val);
+    BYTE getReg8Val(BYTE val);
 
-    inline BYTE getCoreReg8Val(BYTE val);
+    BYTE getCoreReg8Val(BYTE val);
 
-    // Register related
-    inline WORD& getReg16(BYTE val);
+    // 16-bit Register related
+    WORD& getReg16(BYTE val);
 
-    inline WORD& getCoreReg16(BYTE val);
+    WORD& getCoreReg16(BYTE val);
 
-    inline WORD& getHLReg16(void);
+    WORD& getHLReg16(void);
 
-    inline WORD getHLReg16Val(void);
+    WORD getHLReg16Val(void);
 
-    inline WORD getIxReg16Val(void);
+    WORD getXYReg16Val(void);
 
-    inline WORD getIndirectAddr(void);
+    WORD getIndirectAddr(void);
 
-    inline WORD getReg16Val(BYTE val);
+    WORD getReg16Val(BYTE val);
 
-    inline WORD getCoreReg16Val(BYTE val);
+    WORD getCoreReg16Val(BYTE val);
 
-    inline WORD& getReg16qq(BYTE val);
+    WORD& getReg16qq(BYTE val);
 
-    inline WORD& getCoreReg16qq(BYTE val);
+    WORD& getCoreReg16qq(BYTE val);
 
-    inline WORD getReg16qqVal(BYTE val);
+    WORD getReg16qqVal(BYTE val);
 
-    inline WORD getCoreReg16qqVal(BYTE val);
+    WORD getCoreReg16qqVal(BYTE val);
 
-    inline BYTE getBit(BYTE val);
+    BYTE getBit(BYTE val);
 
-    inline bool checkCondition(BYTE val);
+    bool checkCondition(BYTE val);
 
     // Routines related to the stack.
 
-    inline void PUSH(WORD x);
-    inline void POP(WORD& x);
+    void PUSH(WORD x);
+    void POP(WORD& x);
 
     // Routines related to FLAGS.
 
-    inline void SET_FLAGS(BYTE flags);
-    inline void CLEAR_FLAGS(BYTE flags);
-    inline bool CHECK_FLAGS(BYTE flags);
-    inline void COND_FLAGS(bool cond,
-                           BYTE flags);
+    void SET_FLAGS(BYTE flags);
+    void CLEAR_FLAGS(BYTE flags);
+    bool CHECK_FLAGS(BYTE flags);
+    void UPDATE_FLAGS(BYTE setFlags, BYTE clearFlags);
+    void COND_FLAGS(bool cond,
+                    BYTE flags);
+    void SET_ZSP_FLAGS(BYTE val);
 
-    /// \todo - determine which way to keep.
-    inline void SET_ZSP_FLAGS(BYTE val);
+    /// Memory related instructions
 
     /// \brief read next instruction byte and increment PC, if not processing interrupt
-    inline BYTE readInst(void)
-    {
-        ticks -= 4;
-        BYTE val = ab_m->readByte(PC, processingIntr);
-
-        if (!processingIntr)
-        {
-            ++PC;
-        }
-
-        return val;
-    };
-    inline BYTE readMEM(WORD addr)
-    {
-        ticks -= 3;
-        return (ab_m->readByte(addr));
-    };
-
-    inline void writeMEM(WORD addr,
-                         BYTE val)
-    {
-        ab_m->writeByte(addr, val);
-        ticks -= 3;
-    };
-
-    inline WORD readWord(WORD addr)
-    {
-        return ((readMEM(addr + 1) << 8) | readMEM(addr));
-    }
-
-    inline void writeWord(WORD addr,
-                          WORD value)
-    {
-        writeMEM(addr++, value & 0xff);
-        writeMEM(addr, value >> 8);
-    }
-
-    inline BYTE READn(void)
-    {
-        return (readMEM(PC++));
-    };
-
-    inline SBYTE sREADn(void)
-    {
-        return ((SBYTE) readMEM(PC++));
-    };
-
-    inline WORD READnn(void)
-    {
-        PC += 2;
-        return ((readMEM(PC - 1) << 8) | readMEM(PC - 2));
-    };
+    BYTE readInst(void);
+    BYTE readMEM(WORD addr);
+    void writeMEM(WORD addr,
+                  BYTE val);
+    WORD readWord(WORD addr);
+    void writeWord(WORD addr,
+                   WORD value);
+    BYTE READn(void);
+    SBYTE sREADn(void);
+    WORD READnn(void);
 
   private:
 

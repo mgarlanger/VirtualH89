@@ -9,32 +9,17 @@
 #include "H89.h"
 #include "logger.h"
 #include "DiskDrive.h"
+#include "wd1797.h"
 
-const BYTE Z_89_37::speeds[maxStepSpeeds_c] = {6, 12, 20, 30};
 
 Z_89_37::Z_89_37(int baseAddr): DiskController(baseAddr, H37_NumPorts_c),
-                                trackReg_m(0),
-                                sectorReg_m(0),
-                                dataReg_m(0),
-                                cmdReg_m(0),
-                                statusReg_m(0),
                                 interfaceReg_m(0),
                                 controlReg_m(0),
                                 motorOn_m(false),
                                 dataReady_m(false),
                                 lostDataStatus_m(false),
-                                seekSpeed_m(0),
-                                verifyTrack_m(false),
-                                multiple_m(false),
-                                delay_m(false),
-                                sectorLength_m(0),
-                                side_m(0),
-                                deleteDAM_m(false),
-                                state_m(idleState),
-                                curCommand_m(noneCmd),
                                 sectorTrackAccess_m(false),
                                 dataEncoding_m(FM),
-                                stepDirection_m(dir_out),
                                 curDiskDrive_m(numDisks_c),
                                 intLevel_m(z_89_37_Intr_c),
                                 curPos_m(0),
@@ -43,51 +28,40 @@ Z_89_37::Z_89_37(int baseAddr): DiskController(baseAddr, H37_NumPorts_c),
                                 drqAllowed_m(false),
                                 cycleCount_m(0)
 {
-    drives_m[ds0] = drives_m[ds1] = drives_m[ds2] = drives_m[ds3] = nullptr;
-    WallClock::instance()->registerUser(this);
+    // wd1797 = new WD1797;
+
+    drives_m[ds0] = nullptr;
+    drives_m[ds1] = nullptr;
+    drives_m[ds2] = nullptr;
+    drives_m[ds3] = nullptr;
 }
 
 Z_89_37::~Z_89_37()
 {
-    WallClock::instance()->unregisterUser(this);
+
 }
 
 void
 Z_89_37::reset(void)
 {
-    trackReg_m                                        = 0;
-    sectorReg_m                                       = 0;
-    dataReg_m                                         = 0;
-    cmdReg_m                                          = 0;
-    statusReg_m                                       = 0;
-    interfaceReg_m                                    = 0;
-    controlReg_m                                      = 0;
-    seekSpeed_m                                       = 0;
-    verifyTrack_m                                     = false;
-    multiple_m                                        = false;
-    delay_m                                           = false;
-    sectorLength_m                                    = 0;
-    side_m                                            = 0;
-    deleteDAM_m                                       = false;
-    state_m                                           = idleState;
-    curCommand_m                                      = noneCmd;
-    sectorTrackAccess_m                               = false;
-    dataEncoding_m                                    = FM;
-    stepDirection_m                                   = dir_out;
-    curDiskDrive_m                                    = numDisks_c;
-    intLevel_m                                        = z_89_37_Intr_c;
-    intrqAllowed_m                                    = false;
-    drqAllowed_m                                      = false;
-    cycleCount_m                                      = 0;
+    interfaceReg_m      = 0;
+    controlReg_m        = 0;
+    sectorTrackAccess_m = false;
+    dataEncoding_m      = FM;
+    curDiskDrive_m      = numDisks_c;
+    intLevel_m          = z_89_37_Intr_c;
+    intrqAllowed_m      = false;
+    drqAllowed_m        = false;
+    cycleCount_m        = 0;
 
-    motorOn_m                                         = false;
-    dataReady_m                                       = false;
-    lostDataStatus_m                                  = false;
+    motorOn_m           = false;
+    dataReady_m         = false;
+    lostDataStatus_m    = false;
 
-    drives_m[ds0]                                     = drives_m[ds1]
-                                                      = drives_m[ds2]
-                                                      = drives_m[ds3]
-                                                      = nullptr;
+    drives_m[ds0]       = nullptr;
+    drives_m[ds1]       = nullptr;
+    drives_m[ds2]       = nullptr;
+    drives_m[ds3]       = nullptr;
 }
 
 BYTE
@@ -119,13 +93,13 @@ Z_89_37::in(BYTE addr)
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "H37::in(SectorPort)");
-                val = sectorReg_m;
+                val = wd1797->in(SectorPort_Offset_c);
             }
             else
             {
                 debugss(ssH37, INFO, "H37::in(StatusPort)");
-                val = statusReg_m;
-                lowerIntrq();
+                val = wd1797->in(StatusPort_Offset_c);
+                // lowerIntrq();
             }
 
             break;
@@ -134,12 +108,12 @@ Z_89_37::in(BYTE addr)
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "H37::in(TrackPort)");
-                val = trackReg_m;
+                val = wd1797->in(TrackPort_Offset_c);
             }
             else
             {
                 debugss(ssH37, INFO, "H37::in(DataPort)");
-                val = dataReg_m;
+                val = wd1797->in(DataPort_Offset_c);
 
             }
 
@@ -260,13 +234,13 @@ Z_89_37::out(BYTE addr,
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "H37::out(SectorPort): %d\n", val);
-                sectorReg_m = val;
+
+                wd1797->out(SectorPort_Offset_c, val);
             }
             else
             {
                 debugss(ssH37, INFO, "H37::out(CommandPort): %d\n", val);
-                cmdReg_m = val;
-                processCmd(val);
+                wd1797->out(CommandPort_Offset_c, val);
 
             }
 
@@ -276,15 +250,12 @@ Z_89_37::out(BYTE addr,
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "H37::out(TrackPort): %d\n", val);
-                trackReg_m = val;
+                wd1797->out(TrackPort_Offset_c, val);
             }
             else
             {
                 debugss(ssH37, INFO, "H37::out(DataPort): %d\n", val);
-                dataReg_m   = val;
-
-                dataReady_m = false;
-                lowerDrq();
+                wd1797->out(DataPort_Offset_c, val);
             }
 
             break;
@@ -294,10 +265,10 @@ Z_89_37::out(BYTE addr,
             break;
     }
 }
-
-void
-Z_89_37::processCmd(BYTE cmd)
-{
+/*
+   void
+   Z_89_37::processCmd(BYTE cmd)
+   {
     debugss(ssH37, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
 
     // First check for the Force Interrupt command
@@ -335,11 +306,12 @@ Z_89_37::processCmd(BYTE cmd)
         // must be Type III command
         processCmdTypeIII(cmd);
     }
-}
-
-void
-Z_89_37::processCmdTypeI(BYTE cmd)
-{
+   }
+ */
+/*
+   void
+   Z_89_37::processCmdTypeI(BYTE cmd)
+   {
     verifyTrack_m = ((cmd & cmdop_VerifyTrack_c) == cmdop_VerifyTrack_c);
     seekSpeed_m   = speeds[cmd & cmdop_StepMask_c];
 
@@ -405,11 +377,12 @@ Z_89_37::processCmdTypeI(BYTE cmd)
 
         step();
     }
-}
-
-void
-Z_89_37::processCmdTypeII(BYTE cmd)
-{
+   }
+ */
+/*
+   void
+   Z_89_37::processCmdTypeII(BYTE cmd)
+   {
     multiple_m     = ((cmd & cmdop_MultipleRecord_c) == cmdop_MultipleRecord_c);
     delay_m        = ((cmd & cmdop_Delay_15ms_c) == cmdop_Delay_15ms_c);
     sectorLength_m = ((cmd & cmdop_SectorLength_c) == cmdop_SectorLength_c);
@@ -437,11 +410,11 @@ Z_89_37::processCmdTypeII(BYTE cmd)
         dataReady_m      = false;
         sectorPos_m      = -1000;
     }
-}
-
-void
-Z_89_37::processCmdTypeIII(BYTE cmd)
-{
+   }
+ *//*
+   void
+   Z_89_37::processCmdTypeIII(BYTE cmd)
+   {
     delay_m = ((cmd & cmdop_Delay_15ms_c) == cmdop_Delay_15ms_c);
     side_m  = ((cmd & cmdop_CompareSide_c) >> cmdop_CompareSide_Shift_c);
 
@@ -468,8 +441,9 @@ Z_89_37::processCmdTypeIII(BYTE cmd)
         curCommand_m = readTrackCmd;
 
     }
-}
-
+   }
+ */
+#if 0
 void
 Z_89_37::processCmdTypeIV(BYTE cmd)
 {
@@ -575,6 +549,7 @@ Z_89_37::processCmdTypeIV(BYTE cmd)
         curCommand_m = noneCmd;
     }
 }
+#endif
 
 bool
 Z_89_37::connectDrive(BYTE       unitNum,
@@ -604,72 +579,11 @@ Z_89_37::connectDrive(BYTE       unitNum,
     return (retVal);
 }
 
-void
-Z_89_37::seekTo()
-{
-    debugss(ssH37, INFO, "%s - %d\n", __FUNCTION__, dataReg_m);
-
-    if (dataReg_m)
-    {
-        // non zero
-        debugss(ssH37, INFO, "%s - %d\n", __FUNCTION__, dataReg_m);
-
-    }
-    else
-    {
-        // track is zero, watch for the track 0 status from the drive.
-        statusReg_m |= stat_TrackZero_c;
-
-    }
-
-    statusReg_m &= ~stat_Busy_c;
-
-    trackReg_m   = dataReg_m;
-    // should really delay until raising the intr.
-    /// \todo Get notified when the time is up.
-    raiseIntrq();
-
-}
-
-void
-Z_89_37::step(void)
-{
-    // direction is set in stepDirection_m
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
-
-    if (stepDirection_m == dir_out)
-    {
-        debugss(ssH37, INFO, "%s - step out\n", __FUNCTION__);
-
-        if (trackReg_m)
-        {
-            trackReg_m--;
-        }
-    }
-    else if (stepDirection_m == dir_in)
-    {
-        debugss(ssH37, INFO, "%s - step in\n", __FUNCTION__);
-
-        if (trackReg_m)
-        {
-            trackReg_m++;
-        }
-    }
-}
-
 bool
 Z_89_37::removeDrive(BYTE unitNum)
 {
 
     return (false);
-}
-
-void
-Z_89_37::abortCmd()
-{
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
-
-    curCommand_m = noneCmd;
 }
 
 void
@@ -727,32 +641,10 @@ Z_89_37::lowerDrq()
 
 }
 
-void
-Z_89_37::loadHead()
-{
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
-
-    if ((curDiskDrive_m < numDisks_c) && (drives_m[curDiskDrive_m]))
-    {
-        drives_m[curDiskDrive_m]->loadHead();
-    }
-}
-
-void
-Z_89_37::unloadHead()
-{
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
-
-    if ((curDiskDrive_m < numDisks_c) && (drives_m[curDiskDrive_m]))
-    {
-        drives_m[curDiskDrive_m]->unLoadHead();
-    }
-}
-
-
-void
-Z_89_37::notification(unsigned int cycleCount)
-{
+/*
+   void
+   Z_89_37::notification(unsigned int cycleCount)
+   {
     unsigned long charPos = 0;
 
     if (motorOn_m)
@@ -775,7 +667,7 @@ Z_89_37::notification(unsigned int cycleCount)
         // Drive motor is not turned on. Nothing to do.
         /// \todo determine if we need to use clock to determine when these occur.
         // These are needed for drive detection.
-#if 0
+   #if 0
         if (drives_m[curDiskDrive_m])
         {
             transmitterBufferEmpty_m = true;
@@ -787,7 +679,7 @@ Z_89_37::notification(unsigned int cycleCount)
             fillCharTransmitted_m    = false;
         }
 
-#endif
+   #endif
         return;
     }
 
@@ -797,7 +689,7 @@ Z_89_37::notification(unsigned int cycleCount)
         return;
     }
 
-#if 0
+   #if 0
 
     switch (state_m)
     {
@@ -895,7 +787,7 @@ Z_89_37::notification(unsigned int cycleCount)
             break;
     }
 
-#endif
+   #endif
 
     switch (curCommand_m)
     {
@@ -988,4 +880,5 @@ Z_89_37::notification(unsigned int cycleCount)
             break;
     }
 
-}
+   }
+ */
