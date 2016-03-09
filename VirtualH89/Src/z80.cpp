@@ -1877,7 +1877,9 @@ Z80::execute(WORD numInst)
             // CPU at the correct time.
             sp.tv_sec  = 1;
             sp.tv_nsec = 0;
+            h89.systemMutexRelease();
             nanosleep(&sp, &act);
+            h89.systemMutexAcquire();
             continue;
         }
 
