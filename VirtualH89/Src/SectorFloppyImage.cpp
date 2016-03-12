@@ -129,10 +129,22 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
     GenericFloppyDisk(),
     imageName_m(NULL),
     imageFd_m(-1),
+    secBuf_m(NULL),
+    bufferedTrack_m(-1),
+    bufferedSide_m(-1),
+    bufferedSector_m(-1),
+    bufferOffset_m(0),
     hypoTrack_m(false),
     hyperTrack_m(false),
     interlaced_m(false),
-    trackWrite_m(false)
+    mediaLat_m(0),
+    secLenCode_m(0),
+    gapLen_m(0),
+    indexGapLen_m(0),
+    writePos_m(0),
+    trackWrite_m(false),
+    dataPos_m(0),
+    dataLen_m(0)
 {
     if (argv.size() < 1)
     {

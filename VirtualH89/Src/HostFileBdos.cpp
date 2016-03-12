@@ -11,6 +11,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -26,8 +27,8 @@ HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
     curROVec(0),
     curLogVec(0)
 {
+    memset(&curSearch, 0, sizeof(curSearch));
     // args[0] is our class name, like argv[0] in main().
-
     std::string s;
 
     if (args.size() > 1)
@@ -677,6 +678,22 @@ HostFileBdos::setDefPwd(BYTE* msgbuf, int len)
     msgbuf[0] = 0;
     return 1;
 }
+int HostFileBdos::getTime(BYTE *msgbuf, int len) {
+    time_t now = time(NULL);
+    struct tm tmv;
+    localtime_r(&now, &tmv);
+    // date is UTC, time is local, need to reconcile them...
+    now += tmv.tm_gmtoff;
+    int date = now / 86400 - 2922 + 1;
+    msgbuf[0] = (date & 0x0ff);
+    msgbuf[1] = ((date >> 8) & 0x0ff);
+    msgbuf[2] = ((tmv.tm_hour / 10) << 4) | (tmv.tm_hour % 10);
+    msgbuf[3] = ((tmv.tm_min / 10) << 4) | (tmv.tm_min % 10);
+    msgbuf[4] = ((tmv.tm_sec / 10) << 4) | (tmv.tm_sec % 10);
+    debugss(ssHostFileBdos, INFO, "getTime: %04x %02x %02x %02x\n",
+               msgbuf[0] | (msgbuf[1] << 8), msgbuf[2], msgbuf[3], msgbuf[4]);
+    return 5;
+}
 
 // '0' means not supported
 int (*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
@@ -709,8 +726,8 @@ int (*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
     0,            0,          0,            0,            0,          0,
     0, // 50-5F
     0,            0,          0,            0,            0,          0,
-    0,            0,          0,
-    0,         // 60-69
+    0,            0,          0,         // 60-68
+    getTime,
     setDefPwd, // not really implemented...
     0
 };

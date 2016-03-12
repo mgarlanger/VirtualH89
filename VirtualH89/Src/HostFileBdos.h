@@ -132,6 +132,7 @@ class HostFileBdos: public NetworkServer
     BDOS_FUNC(setCompAttrs);
     BDOS_FUNC(getServCfg);
     BDOS_FUNC(setDefPwd);
+    BDOS_FUNC(getTime);
 
     // Utility functions
     int cpmDrive(char* buf, int drive);

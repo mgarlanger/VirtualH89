@@ -128,7 +128,29 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 GenericSASIDrive::GenericSASIDrive(DriveType   type,
                                    std::string media,
                                    int         cnum,
-                                   int         sectorSize)
+                                   int         sectorSize) :
+       curState(IDLE),
+       driveFd(-1),
+       driveSecLen(0),
+       sectorsPerTrack(0),
+       capacity(0),
+       dataOffset(0),
+       driveCode(0),
+       driveCnum(0),
+       driveMedia(NULL),
+       driveType(INVALID),
+       mediaSpt(0),
+       mediaSsz(0),
+       mediaCyl(0),
+       mediaHead(0),
+       mediaLat(0),
+       cmdIx(0),
+       senseIx(0),
+       dcbIx(0),
+       stsIx(0),
+       dataBuf(NULL),
+       dataLength(0),
+       dataIx(0)
 {
     driveType   = type;
     driveMedia  = strdup(media.c_str());

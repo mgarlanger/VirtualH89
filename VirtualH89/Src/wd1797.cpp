@@ -51,15 +51,20 @@ WD1797::WD1797(int baseAddr): ClockUser(),
                               dataReg_m(0),
                               cmdReg_m(0),
                               statusReg_m(0),
-                              intrqRaised_m(false),
                               dataReady_m(false),
+                              intrqRaised_m(false),
+                              drqRaised_m(false),
+                              headLoaded_m(false),
+                              sectorLength_m(0),
+                              lastIndexStatus_m(false),
+                              indexCount_m(0),
+                              stepUpdate_m(false),
+                              stepSettle_m(0),
+                              missCount_m(0),
                               seekSpeed_m(0),
                               verifyTrack_m(false),
                               multiple_m(false),
                               delay_m(false),
-                              sectorLength_m(0),
-                              indexCount_m(0),
-                              lastIndexStatus_m(false),
                               side_m(0),
                               deleteDAM_m(false),
                               state_m(idleState),
@@ -84,27 +89,27 @@ WD1797::reset(void)
     dataReg_m         = 0;
     cmdReg_m          = 0;
     statusReg_m       = 0;
+    dataReady_m = false;
+    intrqRaised_m = false;
+    drqRaised_m = false;
+    headLoaded_m = false;
+    sectorLength_m = 0;
+    lastIndexStatus_m = false;
+    indexCount_m = 0;
+    stepUpdate_m = false;
+    stepSettle_m = 0;
+    missCount_m = 0;
     seekSpeed_m       = 0;
     verifyTrack_m     = false;
     multiple_m        = false;
     delay_m           = false;
-    sectorLength_m    = 0;
     side_m            = 0;
     deleteDAM_m       = false;
     state_m           = idleState;
     curCommand_m      = noneCmd;
     stepDirection_m   = dir_out;
-    headLoaded_m      = false;
-    lastIndexStatus_m = false;
-    indexCount_m      = 0;
-    stepUpdate_m      = false;
-    stepSettle_m      = 0;
-    sectorPos_m       = -11;
     // leave curPos_m alone, diskette is still spinning...
-
-    intrqRaised_m     = false;
-    drqRaised_m       = false;
-    dataReady_m       = false;
+    sectorPos_m       = -11;
 }
 
 BYTE

@@ -37,7 +37,8 @@ MMS77316::getClockPeriod()
 MMS77316::MMS77316(int baseAddr): DiskController(baseAddr, MMS77316_NumPorts_c),
                                   WD1797(baseAddr + Wd1797_Offset_c),
                                   controlReg_m(0),
-                                  intLevel_m(MMS77316_Intr_c)
+                                  intLevel_m(MMS77316_Intr_c),
+                                  drqCount_m(0)
 {
     for (int x = 0; x < numDisks_c; ++x)
     {

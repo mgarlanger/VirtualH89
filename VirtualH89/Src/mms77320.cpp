@@ -27,13 +27,14 @@ MMS77320::getCurDrive()
 MMS77320::MMS77320(int baseAddr,
                    int intLevel,
                    int switches): DiskController(baseAddr, MMS77320_NumPorts_c),
-                                  control0Reg_m(0),
-                                  control1Reg_m(-1),
                                   dataOutReg_m(0),
                                   dataInReg_m(0),
+                                  control0Reg_m(0),
+                                  control1Reg_m(-1),
                                   statusReg_m(0),
-                                  ctrlBus_m(0),
                                   switchReg_m(switches),
+                                  ctrlBus_m(0),
+                                  curDrive_m(NULL),
                                   intLevel_m(intLevel)
 {
     for (int x = 0; x < numDisks_c; ++x)
@@ -181,12 +182,13 @@ MMS77320::~MMS77320()
 void
 MMS77320::reset(void)
 {
-    control0Reg_m = 0;
-    control1Reg_m = -1;
     dataOutReg_m  = 0;
     dataInReg_m   = 0;
+    control0Reg_m = 0;
+    control1Reg_m = -1;
     statusReg_m   = 0;
     ctrlBus_m     = 0;
+    curDrive_m = NULL;
     h89.lowerINT(intLevel_m);
     // TODO: reset all drives?
 }
