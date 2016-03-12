@@ -104,6 +104,7 @@ H89Operator::executeCommand(std::string cmd)
 
     if (args[0].compare("quit") == 0)
     {
+        h89.systemMutexRelease();
         exit(0);
     }
 
