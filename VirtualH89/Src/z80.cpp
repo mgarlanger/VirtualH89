@@ -1780,12 +1780,6 @@ Z80::execute(WORD numInst)
         if (int_type & Intr_NMI)
         {
             debugss(ssZ80, VERBOSE, "NMI Raised\n");
-            // if CPU is currently halted it needs to increment PC before processing
-            // interrupt
-            if (mode == cm_halt)
-            {
-                ++PC;
-            }
             int_type &= ~Intr_NMI;
             IFF0      = IFF1 = false;
             PUSH(PC);
@@ -1795,12 +1789,6 @@ Z80::execute(WORD numInst)
         }
         else if ((int_type & Intr_INT) && (IFF1))
         {
-            // if CPU is currently halted it needs to increment PC before processing
-            // interrupt
-            if (mode == cm_halt)
-            {
-                ++PC;
-            }
             // ISR required to enable interrupts (EI).
             IFF2 = IFF1 = IFF0 = false;
             mode = cm_running;
