@@ -15,7 +15,6 @@
 
 // z80
 #define TWOMSEC 1
-#define USE_TABLE 1
 
 // Need if dumping all the Z80 logs. Otherwise system is too slow to process
 // all the output -  actually 20x

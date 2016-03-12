@@ -16,36 +16,12 @@
 
 #include "logger.h"
 #include "H89.h"
+#include "AddressBus.h"
 #include "WallClock.h"
 #include "disasm.h"
 #include "h89-io.h"
 #include "propertyutil.h"
 
-// typedef int (Z80::*opCodeMethod)(void);
-
-#if PARITY_TABLE
-/// Precalculated Parity table based on byte value.
-///
-const BYTE Z80::parity[256] =
-{
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1
-};
-#endif
 
 /// Precalculated flag values for Z, S, & P
 ///
@@ -905,6 +881,72 @@ const Z80::opCodeMethod Z80::op_xxcb[32] =
     &Z80::op_sb_n_xx_d  /* 0xfe */
 };
 
+
+inline BYTE
+Z80::readInst(void)
+{
+    ticks -= 4;
+    BYTE val = ab_m->readByte(PC, processingIntr);
+
+    if (!processingIntr)
+    {
+        ++PC;
+    }
+
+    R++; // increment refresh register
+
+    return val;
+};
+
+inline BYTE
+Z80::readMEM(WORD addr)
+{
+    ticks -= 3;
+    return (ab_m->readByte(addr));
+};
+
+inline void
+Z80::writeMEM(WORD addr,
+              BYTE val)
+{
+    ab_m->writeByte(addr, val);
+    ticks -= 3;
+};
+
+inline WORD
+Z80::readWord(WORD addr)
+{
+    return ((readMEM(addr + 1) << 8) | readMEM(addr));
+}
+
+inline void
+Z80::writeWord(WORD addr,
+               WORD value)
+{
+    writeMEM(addr++, value & 0xff);
+    writeMEM(addr, value >> 8);
+}
+
+inline BYTE
+Z80::READn(void)
+{
+    return (readMEM(PC++));
+};
+
+inline SBYTE
+Z80::sREADn(void)
+{
+    return ((SBYTE) readMEM(PC++));
+};
+
+inline WORD
+Z80::READnn(void)
+{
+    PC += 2;
+    return ((readMEM(PC - 1) << 8) | readMEM(PC - 2));
+};
+
+
 #define COMMON_GET 1
 
 inline BYTE&
@@ -1111,7 +1153,7 @@ Z80::getHLReg16(void)
 }
 
 inline WORD
-Z80::getIxReg16Val(void)
+Z80::getXYReg16Val(void)
 {
     switch (prefix)
     {
@@ -1318,6 +1360,12 @@ Z80::CLEAR_FLAGS(BYTE flags)
     F &= ~flags;
 };
 
+inline void
+Z80::UPDATE_FLAGS(BYTE setFlags,
+                  BYTE clearFlags)
+{
+    F = (F & ~clearFlags) | setFlags;
+}
 inline bool
 Z80::CHECK_FLAGS(BYTE flags)
 {
@@ -1338,26 +1386,24 @@ Z80::COND_FLAGS(bool cond,
     }
 };
 
-/// \todo - determine which way to keep.
+
+///
+/// \brief update the Z, S, and P flags
+///
+/// Implemented as a table look-up and bit-mask
+///
+/// @param val Byte value to base flags on
+///
 inline void
 Z80::SET_ZSP_FLAGS(BYTE val)
 {
-#if USE_TABLE
     // Mask off the bits.
     CLEAR_FLAGS(Z_FLAG | S_FLAG | P_FLAG);
+    
     // Set bits from pre-generated table
     F |= ZSP[val];
-#else
-    COND_FLAGS((!val), Z_FLAG);
-    COND_FLAGS((val & 0x80), S_FLAG);
-    // destructive, so have to do this check last
-    val ^= val >> 1;
-    val ^= val >> 2;
-    val ^= val >> 4;
-    val ^= 1;
-    COND_FLAGS(val & 0x01, P_FLAG);
-#endif
 };
+
 
 ///
 /// @param clockRate Speed of the Z80 in cycles per second.
@@ -1391,15 +1437,12 @@ Z80::Z80(int clockRate,
                               IYh(iy.hi),
                               IY(iy.val),
                               SP(sp.val),
-                              INT_Line(false), // never used
-                              intLevel_m(0),   // never used
                               processingIntr(false),
                               ticks(0),
                               lastInstTicks(0),
                               curInstByte(0),
                               mode(cm_reset),
                               prefix(ip_none),
-                              resetReq(false), // never used
                               speedUpFactor_m(40),
                               fast_m(false),
                               IM(0)
@@ -1428,8 +1471,6 @@ Z80::Z80(int clockRate,
 
     reset();
 
-    mode = cm_running;
-
 }
 
 ///
@@ -1452,6 +1493,7 @@ Z80::reset(void)
 
     PC            = 0;
     R             = 0;
+    Rprime        = 0;
     I             = 0;
     IFF0          = IFF1 = IFF2 = false;
     IM            = 0;
@@ -1461,9 +1503,8 @@ Z80::reset(void)
     prefix        = ip_none;
     curInstByte   = 0;
     lastInstTicks = 0;
-    resetReq      = true; // never used
     int_type      = 0;
-    mode          = cm_reset;
+    mode          = cm_running;
     ticks         = 0;
     fast_m        = false;
     // TODO: reset speedup...
@@ -1476,7 +1517,6 @@ Z80::reset(void)
 void
 Z80::addClockTicks()
 {
-    // debugss(ssZ80, ALL, "%s\n", __FUNCTION__);
 
     // if ticks is negative, add the new quota.
     if (ticks < 0)
@@ -1557,7 +1597,6 @@ Z80::raiseINT()
 {
     debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
 
-    INT_Line  = true;
     int_type |= Intr_INT;
 }
 
@@ -1572,7 +1611,6 @@ Z80::lowerINT()
     debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
 
     int_type &= ~Intr_INT;
-    INT_Line  = false;
 
 }
 
@@ -1602,80 +1640,17 @@ Z80::setAddressBus(AddressBus* ab)
     ab_m = ab;
 }
 
-#if 0
-void
-Z80::setCPUStates(BYTE error, BYTE state)
-{
-    // printf("Setting ERROR/STATES\n\n\n");
-    cpu_error = error;
-    cpu_state = state;
-
-}
-#endif
 
 void
 Z80::traceInstructions(void)
 {
-#if 0
-#if 0
-    static int tks = 0;
-
-    // if (tks != ticks)
-    {
-        fprintf(opcode_out, " ticks = %d\n", ticks);
-        //  fprintf(opcode_out, " ticksPerSecond = %d\n", ticksPerSecond_m);
-        tks = ticks;
-    }
-    return;
-#endif
-
-    unsigned char* p;
-
-    p = &mem[PC];
-//  fprintf(opcode_out, "%04x %04x %04x %04x %04x %04x ",
-//         PC, AF, BC, DE, HL, SP);
-//  fprintf(opcode_out, "%04x: ", PC);
-    fprintf(opcode_out, "%04x %04x %04x %04x %04x\n",
-            AF, BC, DE, HL, SP);
-    fprintf(opcode_out, "%03o.%03o (%02x.%02x): ", (PC >> 8), PC & 0xff, (PC >> 8),
-            PC & 0xff);
-
-    disass(&p, PC);
-#endif
-#if 0
-    fprintf(opcode_out, "%04x %04x %04x %04x %04x %04x ", PC, AF, BC, DE, HL, SP);
-    fprintf(opcode_out, "PC: %03o.%03o (%02x.%02x): %03o %03o %03o\n", (PC >> 8), PC & 0xff,
-            (PC >> 8), PC & 0xff,
-            readMEM(PC),
-            readMEM(PC + 1),
-            readMEM(PC + 2));
-#else
-//  fprintf(opcode_out, "%03o.%03o %04x %04x %04x %04x %04x %04x ", PC >> 8, PC & 0xff,
-//    PC, AF, BC, DE, HL, SP);
-//  debug(" %04x %04x %04x %04x %04x %04x : ", PC, AF, BC, DE, HL, SP);
-#if 1
-
-    // debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
-    //          PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
     if (chkdebuglevel(ssZ80, ALL))
     {
-#if 0
-        debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x\n",
+        debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
                 PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
-#else
+        disass(PC);
 
-        if (1)
-        {
-            debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
-                    PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
-            disass(PC);
-        }
-
-#endif
     }
-
-#endif
-#endif
 }
 
 /// Single step the virtual CPU
@@ -1805,17 +1780,31 @@ Z80::execute(WORD numInst)
         if (int_type & Intr_NMI)
         {
             debugss(ssZ80, VERBOSE, "NMI Raised\n");
+            // if CPU is currently halted it needs to increment PC before processing
+            // interrupt
+            if (mode == cm_halt)
+            {
+                ++PC;
+            }
             int_type &= ~Intr_NMI;
             IFF0      = IFF1 = false;
             PUSH(PC);
             PC        = 0x66;
             mode      = cm_running;
+            R++; // increment refresh register
         }
         else if ((int_type & Intr_INT) && (IFF1))
         {
+            // if CPU is currently halted it needs to increment PC before processing
+            // interrupt
+            if (mode == cm_halt)
+            {
+                ++PC;
+            }
             // ISR required to enable interrupts (EI).
             IFF2 = IFF1 = IFF0 = false;
             mode = cm_running;
+            R++; // increment refresh register
 
             switch (IM)
             {
@@ -1852,19 +1841,10 @@ Z80::execute(WORD numInst)
 
         IFF1 = IFF0;
 
-#if NOTNOW
-        debug("%04o.%04o", (PC >> 8), PC & 0xff);
-
-        if (PC < 8192)
-        {
-            traceInstructions(); // debug("\n");
-        }
-        else
-        {
-            traceInstructions();
-        }
-
+#if TEN_X_SLOWER
+        traceInstructions();
 #endif
+
 
         // check to see if the clock has any ticks left
         if (ticks <= 0)
@@ -1886,27 +1866,22 @@ Z80::execute(WORD numInst)
         // If in halt, we just do a NOP, without any PC changes.
         if (mode == cm_halt)
         {
+            // use up 4 clocks
             ticks        -= 4;
-            lastInstTicks = ticks; // don't double-bill next instruction
+            // store current timestamp
+            lastInstTicks = ticks;
+            // inform any devices wanting clock info
             WallClock::instance()->addTicks(4);
             continue;
         }
 
-        // traceInstructions();
+
         lastInstByte  = curInst[0] = readInst();
         (this->*op_code[curInst[0]])();
         unsigned int val = lastInstTicks - ticks;
         lastInstTicks = ticks;
         WallClock::instance()->addTicks(val);
 
-#if ACCURATE_R
-        // incrementing R doesn't affect bit 7,
-        R = (R | 0x80) | ((R + 1) & 0x7F);
-        // could also just use R++ and save another R', then when needing R,
-        // R = (R' & 0x80) | (R & 0x7f).
-#else
-        R++; /* increment refresh register */
-#endif
 
 #ifdef WANT_GUI
         check_gui_break();
@@ -2218,8 +2193,10 @@ Z80::op_daa(void)
 void
 Z80::op_ei(void)
 {
-    /*IFF1 = */ IFF2 = true;
-    IFF0             = true;
+    IFF2 = true;
+
+    // Keep IFF1 false, it will be set to true after the next instruction by IFF0
+    IFF0 = true;
 
 }
 
@@ -2780,7 +2757,7 @@ Z80::op_ld_xx_nn(void)
 }
 
 ///
-/// \brief
+/// \brief LD SP, HL
 ///
 /// <pre>
 /// Operation: SP <- HL
@@ -2812,7 +2789,7 @@ Z80::op_ld_sp_hl(void)
 }
 
 ///
-/// \brief
+/// \brief LD  HL, (nn)
 ///
 /// <pre>
 ///
@@ -2968,7 +2945,7 @@ Z80::op_dec_xx(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_add_reg16(WORD& res, WORD val)
 {
     unsigned int sum = res + val;
@@ -2983,6 +2960,11 @@ Z80::op_add_reg16(WORD& res, WORD val)
 }
 
 
+///
+/// \brief  ADD HL, ss
+///
+/// \ref op_add_reg16
+///
 void
 Z80::op_add_hl_xx(void)
 {
@@ -3062,7 +3044,7 @@ Z80::op_add_hl_xx(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_and(BYTE val)
 {
     A &= val;
@@ -3072,6 +3054,10 @@ Z80::op_and(BYTE val)
     SET_ZSP_FLAGS(A);
 }
 
+/// \brief AND <reg>
+///
+/// \ref op_and
+///
 /// \retval none
 void
 Z80::op_and_x(void)
@@ -3079,6 +3065,12 @@ Z80::op_and_x(void)
     op_and(getReg8Val(lastInstByte));
 }
 
+
+///
+/// \brief AND   (HL)
+///
+/// \ref op_and
+///
 /// \retval none
 void
 Z80::op_and_ihl(void)
@@ -3086,6 +3078,11 @@ Z80::op_and_ihl(void)
     op_and(readMEM(getIndirectAddr()));
 }
 
+///
+/// \brief AND   n
+///
+/// \ref op_and
+///
 /// \retval none
 void
 Z80::op_and_n(void)
@@ -3167,7 +3164,7 @@ Z80::op_and_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_or(BYTE val)
 {
     A |= val;
@@ -3176,6 +3173,12 @@ Z80::op_or(BYTE val)
     CLEAR_FLAGS(H_FLAG | N_FLAG | C_FLAG);
 }
 
+
+///
+/// \brief  OR <reg>
+///
+/// \ref op_or
+///
 /// \retval none
 ///
 void
@@ -3184,6 +3187,11 @@ Z80::op_or_x(void)
     op_or(getReg8Val(lastInstByte));
 }
 
+///
+/// \brief OR   (HL)
+///
+/// \ref op_or
+///
 /// \retval none
 ///
 void
@@ -3192,6 +3200,11 @@ Z80::op_or_ihl(void)
     op_or(readMEM(getIndirectAddr()));
 }
 
+///
+/// \brief  OR   n
+///
+/// \ref op_or
+///
 /// \retval none
 ///
 void
@@ -3274,7 +3287,7 @@ Z80::op_or_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_xor(BYTE val)
 {
     A ^= val;
@@ -3283,6 +3296,11 @@ Z80::op_xor(BYTE val)
     CLEAR_FLAGS(H_FLAG | N_FLAG | C_FLAG);
 }
 
+///
+/// \brief  XOR  <reg>
+///
+/// @ref op_xor
+///
 /// \retval none
 ///
 void
@@ -3291,6 +3309,11 @@ Z80::op_xor_x(void)
     op_xor(getReg8Val(lastInstByte));
 }
 
+///
+/// \brief XOR  (HL)
+///
+/// @ref op_xor
+///
 /// \retval none
 ///
 void
@@ -3299,6 +3322,11 @@ Z80::op_xor_ihl(void)
     op_xor(readMEM(getIndirectAddr()));
 }
 
+///
+/// \brief  XOR    n
+///
+/// @ref op_xor
+///
 /// \retval none
 ///
 void
@@ -3351,7 +3379,7 @@ Z80::op_xor_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_add(BYTE val)
 {
     SWORD i;
@@ -3367,6 +3395,10 @@ Z80::op_add(BYTE val)
     CLEAR_FLAGS(N_FLAG);
 }
 
+/// \brief  ADD   A,<reg>
+///
+/// \ref op_add
+///
 /// \retval none
 ///
 void
@@ -3375,6 +3407,10 @@ Z80::op_add_x(void)
     op_add(getReg8Val(lastInstByte));
 }
 
+/// \brief  ADD   A,(HL)
+///
+/// \ref op_add
+///
 /// \retval none
 ///
 void
@@ -3383,6 +3419,10 @@ Z80::op_add_ihl(void)
     op_add(readMEM(getIndirectAddr()));
 }
 
+/// \brief  ADD    A,n
+///
+/// \ref op_add
+///
 /// \retval none
 ///
 void
@@ -3465,7 +3505,7 @@ Z80::op_add_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_adc(BYTE val)
 {
     SWORD i;
@@ -3482,6 +3522,10 @@ Z80::op_adc(BYTE val)
     CLEAR_FLAGS(N_FLAG);
 }
 
+/// \brief  ADC   A,<reg>
+///
+/// \ref op_adc
+///
 /// \retval none
 ///
 void
@@ -3490,6 +3534,10 @@ Z80::op_adc_x(void)
     op_adc(getReg8Val(lastInstByte));
 }
 
+/// \brief  ADC  A,(HL)
+///
+/// \ref op_adc
+///
 /// \retval none
 ///
 void
@@ -3498,6 +3546,10 @@ Z80::op_adc_ihl(void)
     op_adc(readMEM(getIndirectAddr()));
 }
 
+/// \brief  ADC   A,(n)
+///
+/// \ref op_adc
+///
 /// \retval none
 ///
 void
@@ -3579,7 +3631,7 @@ Z80::op_adc_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_sub(BYTE val)
 {
     SWORD i;
@@ -3595,6 +3647,10 @@ Z80::op_sub(BYTE val)
     SET_FLAGS(N_FLAG);
 }
 
+/// \brief  SUB   A,<reg>
+///
+/// \ref op_sub
+///
 /// \retval none
 ///
 void
@@ -3603,6 +3659,10 @@ Z80::op_sub_x(void)
     op_sub(getReg8Val(lastInstByte));
 }
 
+/// \brief  SUB   A,(HL)
+///
+/// \ref op_sub
+///
 /// \retval none
 ///
 void
@@ -3611,6 +3671,10 @@ Z80::op_sub_ihl(void)
     op_sub(readMEM(getIndirectAddr()));
 }
 
+/// \brief  SUB   A,n
+///
+/// \ref op_sub
+///
 /// \retval none
 ///
 void
@@ -3693,7 +3757,7 @@ Z80::op_sub_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_sbc(BYTE val)
 {
     SWORD i;
@@ -3710,6 +3774,10 @@ Z80::op_sbc(BYTE val)
     SET_FLAGS(N_FLAG);
 }
 
+/// \brief  SBC   A,<reg>
+///
+/// \ref op_sbc
+///
 /// \retval none
 ///
 void
@@ -3718,6 +3786,10 @@ Z80::op_sbc_x(void)
     op_sbc(getReg8Val(lastInstByte));
 }
 
+/// \brief  SBC   A,(HL)
+///
+/// \ref op_sbc
+///
 /// \retval none
 ///
 void
@@ -3726,6 +3798,10 @@ Z80::op_sbc_ihl(void)
     op_sbc(readMEM(getIndirectAddr()));
 }
 
+/// \brief  SBC   A,n
+///
+/// \ref op_sbc
+///
 /// \retval none
 ///
 void
@@ -3807,7 +3883,7 @@ Z80::op_sbc_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_cp(BYTE val)
 {
     SWORD i;
@@ -3823,6 +3899,10 @@ Z80::op_cp(BYTE val)
     SET_FLAGS(N_FLAG);
 }
 
+/// \brief  CP   <reg>
+///
+/// \ref op_cp
+///
 /// \retval none
 ///
 void
@@ -3831,6 +3911,10 @@ Z80::op_cp_x(void)
     op_cp(getReg8Val(lastInstByte));
 }
 
+/// \brief  CP   (HL)
+///
+/// \ref op_cp
+///
 /// \retval none
 ///
 void
@@ -3839,6 +3923,10 @@ Z80::op_cp_ihl(void)
     op_cp(readMEM(getIndirectAddr()));
 }
 
+/// \brief  CP    n
+///
+/// \ref op_cp
+///
 /// \retval none
 ///
 void
@@ -3913,7 +4001,7 @@ Z80::op_cp_n(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_inc(BYTE& val)
 {
     COND_FLAGS(((val & 0xf) == 0xf), H_FLAG);
@@ -3926,6 +4014,10 @@ Z80::op_inc(BYTE& val)
     CLEAR_FLAGS(N_FLAG);
 }
 
+/// \brief  INC   <reg>
+///
+/// \ref op_inc
+///
 /// \retval none
 ///
 void
@@ -3934,6 +4026,10 @@ Z80::op_inc_x(void)
     op_inc(getReg8(lastInstByte >> 3));
 }
 
+/// \brief  INC   (HL)
+///
+/// \ref op_inc
+///
 /// \retval none
 ///
 void
@@ -4015,7 +4111,7 @@ Z80::op_inc_ihl(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_dec(BYTE& val)
 {
     COND_FLAGS(((val & 0xf) == 0), H_FLAG);
@@ -4028,6 +4124,10 @@ Z80::op_dec(BYTE& val)
     SET_FLAGS(N_FLAG);
 }
 
+/// \brief  DEC   <reg>
+///
+/// \ref op_dec
+///
 /// \retval none
 ///
 void
@@ -4036,6 +4136,10 @@ Z80::op_dec_x(void)
     op_dec(getReg8(lastInstByte >> 3));
 }
 
+/// \brief  DEC   (HL)
+///
+/// \ref op_dec
+///
 /// \retval none
 ///
 void
@@ -4492,6 +4596,8 @@ Z80::op_jp(void) // JP
     PC = READnn();
 }
 
+/// \brief JP  HL
+///
 /// \retval none
 ///
 void
@@ -4759,7 +4865,7 @@ Z80::op_cb_handle(void)
             lastInstByte          = curInst[2] = readInst();
             sW                    = (signed char) curInst[2];
 
-            xxcb_effectiveAddress = getIxReg16Val() + sW;
+            xxcb_effectiveAddress = getXYReg16Val() + sW;
 
             lastInstByte          = curInst[3] = readInst();
 
@@ -4775,11 +4881,13 @@ Z80::op_cb_handle(void)
     }
 }
 
-/// \todo - document SRL - Shift Right Logical
+/// \brief  SRL - Shift Right Logical
+///
+/// \todo - document
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_srl(BYTE& m)
 {
     COND_FLAGS((m & 1), C_FLAG);
@@ -4790,6 +4898,11 @@ Z80::op_srl(BYTE& m)
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  SRL   <reg>
+///
+/// \ref op_srl
+///
 /// \retval none
 ///
 void
@@ -4798,10 +4911,15 @@ Z80::op_srl_x(void)
     op_srl(getReg8(lastInstByte));
 }
 
+///
+/// \brief  SRL   (HL)
+///
+/// \ref op_srl
+///
 /// \retval none
 ///
 void
-Z80::op_srl_ihl(void) // SRL (HL)
+Z80::op_srl_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -4813,11 +4931,13 @@ Z80::op_srl_ihl(void) // SRL (HL)
     ticks -= 1;
 }
 
-/// \todo - document SLA - Shift Left Arithmetic
+/// \brief SLA - Shift Left Arithmetic
+///
+/// \todo - document
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_sla(BYTE& m)
 {
     COND_FLAGS((m & 0x80), C_FLAG);
@@ -4828,6 +4948,11 @@ Z80::op_sla(BYTE& m)
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  SLA   <reg>
+///
+/// \ref op_sla
+///
 /// \retval none
 ///
 void
@@ -4836,10 +4961,15 @@ Z80::op_sla_x(void)
     op_sla(getReg8(lastInstByte));
 }
 
+///
+/// \brief  SLA   (HL)
+///
+/// \ref op_sla
+///
 /// \retval none
 ///
 void
-Z80::op_sla_ihl(void) // SLA (HL)
+Z80::op_sla_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -4851,14 +4981,16 @@ Z80::op_sla_ihl(void) // SLA (HL)
     ticks -= 1;
 }
 
-/// \todo - undocumented SLL - Shift Left Logical
+/// \brief undocumented SLL - Shift Left Logical
+///
+/// \todo - documented
 /// same as SLA but bit 0 is set.
-/// UNVERIFIED - coded based on "The Undocumented Z80 Documented", vers. 0.91
+/// coded based on "The Undocumented Z80 Documented", vers. 0.91
 ///
 /// \retval none
 ///
-void
-Z80::op_undoc_sll(BYTE& m) // SLL m
+inline void
+Z80::op_undoc_sll(BYTE& m)
 {
     COND_FLAGS((m & 0x80), C_FLAG);
 
@@ -4870,6 +5002,10 @@ Z80::op_undoc_sll(BYTE& m) // SLL m
 }
 
 ///
+/// \brief  SLL   <reg>
+///
+/// \ref op_undoc_sll
+///
 /// \retval none
 ///
 void
@@ -4878,7 +5014,11 @@ Z80::op_sll_x(void)
     op_undoc_sll(getReg8(lastInstByte));
 }
 
-/// SLL (HL)
+///
+/// \brief  SLL   (HL)
+///
+/// \ref op_undoc_sll
+///
 /// \retval none
 ///
 void
@@ -4894,12 +5034,14 @@ Z80::op_sll_ihl(void)
     ticks -= 1;
 }
 
-/// \todo - document RL - Rotate Left
+/// \brief RL - Rotate Left
+///
+/// \todo - document
 ///
 /// \retval none
 ///
-void
-Z80::op_rl(BYTE& m) // RL m
+inline void
+Z80::op_rl(BYTE& m)
 {
     BYTE carry = CHECK_FLAGS(C_FLAG) ? 0x01 : 0x00;
 
@@ -4912,6 +5054,11 @@ Z80::op_rl(BYTE& m) // RL m
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  RL   <reg>
+///
+/// \ref op_rl
+///
 /// \retval none
 ///
 void
@@ -4920,10 +5067,15 @@ Z80::op_rl_x(void)
     op_rl(getReg8(lastInstByte));
 }
 
+///
+/// \brief  RL   (HL)
+///
+/// \ref op_rl
+///
 /// \retval none
 ///
 void
-Z80::op_rl_ihl(void) // RL (HL)
+Z80::op_rl_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -4935,13 +5087,14 @@ Z80::op_rl_ihl(void) // RL (HL)
     ticks -= 1;
 }
 
+/// \brief  RR - Rotate Right
 ///
-/// \todo - document RR - Rotate Right
+/// \todo - document
 ///
 /// \retval none
 ///
-void
-Z80::op_rr(BYTE& m) // RR m
+inline void
+Z80::op_rr(BYTE& m)
 {
     BYTE carry = CHECK_FLAGS(C_FLAG) ? 0x80 : 0x00;
 
@@ -4954,6 +5107,11 @@ Z80::op_rr(BYTE& m) // RR m
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  RR   <reg>
+///
+/// \ref op_rr
+///
 /// \retval none
 ///
 void
@@ -4962,10 +5120,15 @@ Z80::op_rr_x(void)
     op_rr(getReg8(lastInstByte));
 }
 
+///
+/// \brief  RR   (HL)
+///
+/// \ref op_rr
+///
 /// \retval none
 ///
 void
-Z80::op_rr_ihl(void) /* RR (HL) */
+Z80::op_rr_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -4977,12 +5140,14 @@ Z80::op_rr_ihl(void) /* RR (HL) */
     ticks -= 1;
 }
 
-/// \todo document RRC - Rotate Right Circular
+/// \brief RRC - Rotate Right Circular
+///
+/// \todo document
 ///
 /// \retval none
 ///
-void
-Z80::op_rrc(BYTE& m) /* RRC m */
+inline void
+Z80::op_rrc(BYTE& m)
 {
     BYTE carry = (m & 0x01) ? 0x80 : 0x00;
 
@@ -4995,6 +5160,11 @@ Z80::op_rrc(BYTE& m) /* RRC m */
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  RRC   <reg>
+///
+/// \ref op_rrc
+///
 /// \retval none
 ///
 void
@@ -5003,10 +5173,15 @@ Z80::op_rrc_x(void)
     op_rrc(getReg8(lastInstByte));
 }
 
+///
+/// \brief  RRC   (HL)
+///
+/// \ref op_rrc
+///
 /// \retval none
 ///
 void
-Z80::op_rrc_ihl(void) // RRC (HL)
+Z80::op_rrc_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -5018,12 +5193,14 @@ Z80::op_rrc_ihl(void) // RRC (HL)
     ticks -= 1;
 }
 
-/// \todo - document RLC - Rotate Left Circular
+/// \brief RLC - Rotate Left Circular
+///
+/// \todo - document
 ///
 /// \retval none
 ///
-void
-Z80::op_rlc(BYTE& m) // RLC m
+inline void
+Z80::op_rlc(BYTE& m)
 {
     BYTE carry = (m & 0x80) ? 0x01 : 0x00;
 
@@ -5036,6 +5213,12 @@ Z80::op_rlc(BYTE& m) // RLC m
     SET_ZSP_FLAGS(m);
 }
 
+
+///
+/// \brief  RLC  <reg>
+///
+/// \ref op_rlc
+///
 /// \retval none
 ///
 void
@@ -5044,10 +5227,15 @@ Z80::op_rlc_x(void)
     op_rlc(getReg8(lastInstByte));
 }
 
+///
+/// \brief  RLC   (HL)
+///
+/// \ref op_rlc
+///
 /// \retval none
 ///
 void
-Z80::op_rlc_ihl(void) // RLC (HL)
+Z80::op_rlc_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -5059,11 +5247,14 @@ Z80::op_rlc_ihl(void) // RLC (HL)
     ticks -= 1;
 }
 
-/// \todo - document SRA - Shift Right Arithmetic
+/// \brief  SRA - Shift Right Arithmetic
+///
+/// \todo - document
+///
 /// \retval none
 ///
 void
-Z80::op_sra(BYTE& m) // SRA m
+Z80::op_sra(BYTE& m)
 {
     BYTE i = m & 0x80;
 
@@ -5076,6 +5267,11 @@ Z80::op_sra(BYTE& m) // SRA m
     SET_ZSP_FLAGS(m);
 }
 
+///
+/// \brief  SRA  <reg>
+///
+/// \ref op_sra
+///
 /// \retval none
 ///
 void
@@ -5084,10 +5280,15 @@ Z80::op_sra_x(void)
     op_sra(getReg8(lastInstByte));
 }
 
+///
+/// \brief  SRA  (HL)
+///
+/// \ref op_sra
+///
 /// \retval none
 ///
 void
-Z80::op_sra_ihl(void) // SRA (HL)
+Z80::op_sra_ihl(void)
 {
     WORD addr = getIndirectAddr();
     BYTE val;
@@ -5099,15 +5300,23 @@ Z80::op_sra_ihl(void) // SRA (HL)
     ticks -= 1;
 }
 
-/// \todo - document SET
+/// \brief  SET - set bit
+///
+/// \todo - document
+///
 /// \retval none
 ///
-void
+inline void
 Z80::op_sb_n(BYTE& val)
 {
     val |= getBit(lastInstByte);
 }
 
+///
+/// \brief  SET  <reg>
+///
+/// \ref op_sb_n
+///
 /// \retval none
 ///
 void
@@ -5116,6 +5325,11 @@ Z80::op_sb_n_x(void)
     op_sb_n(getReg8(lastInstByte));
 }
 
+///
+/// \brief  SET  (HL)
+///
+/// \ref op_sb_n
+///
 /// \retval none
 ///
 void
@@ -5131,16 +5345,24 @@ Z80::op_sb_n_ihl(void)
     ticks -= 1;
 }
 
-/// \todo - document RES
+///
+/// \brief RES  - reset bit
+///
+/// \todo - document
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_rb_n(BYTE& val)
 {
     val &= ~getBit(lastInstByte);
 }
 
+///
+/// \brief  RES  <reg>
+///
+/// \ref op_rb_n
+///
 /// \retval none
 ///
 void
@@ -5149,6 +5371,11 @@ Z80::op_rb_n_x(void)
     op_rb_n(getReg8(lastInstByte));
 }
 
+///
+/// \brief  RES  (HL)
+///
+/// \ref op_rb_n
+///
 /// \retval none
 ///
 void
@@ -5164,9 +5391,14 @@ Z80::op_rb_n_ihl(void)
     ticks -= 1;
 }
 
+///
+/// \brief BIT  - test bit
+///
+/// \todo - document
+///
 /// \retval none
 ///
-void
+inline void
 Z80::op_tb_n(BYTE m,
              BYTE bit)
 {
@@ -5179,6 +5411,11 @@ Z80::op_tb_n(BYTE m,
     COND_FLAGS((m & 0x80), S_FLAG);
 }
 
+///
+/// \brief  BIT  <reg>
+///
+/// \ref op_tb_n
+///
 /// \retval none
 ///
 void
@@ -5187,6 +5424,11 @@ Z80::op_tb_n_x(void)
     op_tb_n(getReg8(lastInstByte), getBit(lastInstByte));
 }
 
+///
+/// \brief  BIT  (HL)
+///
+/// \ref op_tb_n
+///
 /// \retval none
 ///
 void
@@ -5199,7 +5441,7 @@ Z80::op_tb_n_ihl(void)
 
 
 ///
-/// DD Prefix instructions
+/// \brief Handle DD Prefix instructions
 ///
 ///
 /// \retval none
@@ -5215,7 +5457,7 @@ Z80::op_dd_handle(void)
 }
 
 ///
-/// ED Prefix instructions.
+/// \brief Handle ED Prefix instructions.
 ///
 /// \retval none
 ///
@@ -5481,7 +5723,7 @@ Z80::op_neg(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_in_ic(BYTE& reg)
 {
     reg = (h89.getIO()).in(C);
@@ -5550,7 +5792,7 @@ Z80::op_out_c_0(void)
 /// \retval none
 ///
 void
-Z80::op_ini(void) // INI
+Z80::op_ini(void)
 {
     writeMEM(HL, (h89.getIO()).in(C));
 
@@ -5718,7 +5960,7 @@ Z80::op_ld_a_i(void)
 void
 Z80::op_ld_a_r(void)
 {
-    A = (BYTE) R;
+    A = (Rprime & 0x80) | (R & 0x7f);
 
     CLEAR_FLAGS(N_FLAG | H_FLAG);
     COND_FLAGS((IFF2), P_FLAG);
@@ -5749,6 +5991,7 @@ Z80::op_ld_i_a(void)
 void
 Z80::op_ld_r_a(void)
 {
+    Rprime = A;
     R      = A;
 
     ticks -= 1;
@@ -5779,10 +6022,9 @@ Z80::op_ld_inn_xx(void)
 /// \brief ADC HL,xx
 ///
 ///
-///
 /// \retval none
 ///
-void
+inline void
 Z80::op_adc16(WORD op)
 {
     WORD  carry = (CHECK_FLAGS(C_FLAG)) ? 1 : 0;
@@ -5825,7 +6067,7 @@ Z80::op_adc_hl_xx(void)
 ///
 /// \retval none
 ///
-void
+inline void
 Z80::op_sbc16(WORD op)
 {
     WORD  carry = (CHECK_FLAGS(C_FLAG)) ? 1 : 0;
@@ -6077,7 +6319,7 @@ Z80::op_rrd_ihl(void)
 //
 
 ///
-/// \brief
+/// \brief Handle FD Prefix Instructions
 ///
 ///
 /// \retval none
@@ -6094,10 +6336,10 @@ Z80::op_fd_handle(void)
 
 //
 // Prefix DD CB or FD CB
-//
+// Actual Operands are either IX or IY
 
 ///
-/// \brief BIT n,(Ix+d)
+/// \brief BIT n,(XY+d)
 ///
 /// \retval none
 ///
@@ -6111,7 +6353,7 @@ Z80::op_tb_n_xx_d(void)
 
 
 ///
-/// \brief RES n,(Ix+d)
+/// \brief RES n,(XY+d)
 ///
 /// \retval none
 ///
@@ -6134,7 +6376,7 @@ Z80::op_rb_n_xx_d(void)
 }
 
 ///
-/// \brief SET n,(Ix+d)
+/// \brief SET n,(XY+d)
 ///
 /// \retval none
 ///
@@ -6158,7 +6400,7 @@ Z80::op_sb_n_xx_d(void)
 
 /// Generic helper routine for both the DDCB and FDCB instructions.
 ///
-void
+inline void
 Z80::op_xxx_xx_d(xd_cbMethod operation)
 {
     BYTE val;
@@ -6178,7 +6420,7 @@ Z80::op_xxx_xx_d(xd_cbMethod operation)
 
 
 ///
-/// \brief RLC (Ix+d)
+/// \brief RLC (XY+d)
 ///
 /// \retval none
 ///
@@ -6189,7 +6431,7 @@ Z80::op_rlc_xx_d(void)
 }
 
 ///
-/// \brief RRC (Ix+d)
+/// \brief RRC (XY+d)
 ///
 /// \retval none
 ///
@@ -6200,7 +6442,7 @@ Z80::op_rrc_xx_d(void)
 }
 
 ///
-/// \brief RL (Ix+d)
+/// \brief RL (XY+d)
 ///
 /// \retval none
 ///
@@ -6211,7 +6453,7 @@ Z80::op_rl_xx_d(void)
 }
 
 ///
-/// \brief RR (Ix+d)
+/// \brief RR (XY+d)
 ///
 /// \retval none
 ///
@@ -6222,7 +6464,7 @@ Z80::op_rr_xx_d(void)
 }
 
 ///
-/// \brief SLA (Ix+d)
+/// \brief SLA (XY+d)
 ///
 /// \retval none
 ///
@@ -6233,7 +6475,7 @@ Z80::op_sla_xx_d(void)
 }
 
 ///
-/// \brief SRA (Ix+d)
+/// \brief SRA (XY+d)
 ///
 /// \retval none
 ///
@@ -6244,7 +6486,7 @@ Z80::op_sra_xx_d(void)
 }
 
 ///
-/// \brief SRL (Ix+d)
+/// \brief SRL (XY+d)
 ///
 /// \retval none
 ///
@@ -6255,7 +6497,7 @@ Z80::op_srl_xx_d(void)
 }
 
 ///
-/// \brief SLL (Ix+d)
+/// \brief SLL (XY+d)
 ///
 /// \retval none
 ///

@@ -165,6 +165,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     if (fd < 0)
     {
         debugss(ssRawFloppyImage, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
+        free((void*) name);
         return;
     }
 
@@ -179,6 +180,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         debugss(ssRawFloppyImage, ERROR, "%s: unable to allocate track buffer of %ld bytes\n",
                 __FUNCTION__, nbytes);
         close(fd);
+        free((void*) name);
         return;
     }
 
@@ -188,6 +190,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     {
         debugss(ssRawFloppyImage, ERROR, "%s: unable to read a track\n", __FUNCTION__);
         close(fd);
+        free((void*) name);
         return;
     }
 
@@ -488,6 +491,7 @@ RawFloppyImage::~RawFloppyImage()
     }
 
     debugss(ssRawFloppyImage, INFO, "unmounted %s\n", imageName_m);
+    free((void*) imageName_m);
     // flush data...
     cacheTrack(-1, -1);
     close(imageFd_m); // check errors?
