@@ -38,25 +38,16 @@ H89Timer::H89Timer(CPU*          cpu,
                                           cpu_m(cpu),
                                           intEnabled_m(false),
                                           count_m(0),
-                                          intLevel(intlvl)
+                                          intLevel(intlvl),
+                                          thread(0)
 {
     // We need to start up the timer since it performs two tasks, it always provide the cpu
     // with extra clock ticks to accurately emulate the speed of the processor.
     // Plus, if interrupts are enabled, it will interrupt the cpu with the timer tick.
 
-    static struct itimerval tim;
-
     debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
-
-    tim.it_value.tv_sec     = 0;
-    tim.it_value.tv_usec    = TimerInterval_c;
-
-    tim.it_interval.tv_sec  = 0;
-    tim.it_interval.tv_usec = TimerInterval_c;
-
-    setitimer(ITIMER_REAL, &tim, NULL);
     GppListener::addListener(this);
 }
 
@@ -64,26 +55,12 @@ H89Timer::H89Timer(CPU*          cpu,
 H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
                                           intEnabled_m(false),
                                           count_m(0),
-                                          intLevel(intlvl)
+                                          intLevel(intlvl),
+                                          thread(0)
 {
-    static struct itimerval tim;
-
     debugss(ssTimer, INFO, "%s: cpu_m(NULL)\n", __FUNCTION__);
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
-
-    tim.it_value.tv_sec      = 0;
-    tim.it_value.tv_usec     = TimerInterval_c;
-
-    tim.it_interval.tv_sec   = 0;
-    tim.it_interval.tv_usec  = TimerInterval_c;
-
-#if TEN_X_SLOWER
-    tim.it_value.tv_usec    *= 20;
-    tim.it_interval.tv_usec *= 20;
-#endif
-
-    setitimer(ITIMER_REAL, &tim, NULL);
 }
 
 void
@@ -114,6 +91,28 @@ H89Timer::reset()
     count_m      = 0;
 }
 
+void
+H89Timer::start()
+{
+    static struct itimerval tim;
+
+    thread = pthread_self();
+
+    tim.it_value.tv_sec     = 0;
+    tim.it_value.tv_usec    = TimerInterval_c;
+
+    tim.it_interval.tv_sec  = 0;
+    tim.it_interval.tv_usec = TimerInterval_c;
+
+#if TEN_X_SLOWER
+    tim.it_value.tv_usec    *= 20;
+    tim.it_interval.tv_usec *= 20;
+#endif
+
+    setitimer(ITIMER_REAL, &tim, NULL);
+
+}
+
 int
 H89Timer::handleSignal(int signum)
 {
@@ -124,6 +123,14 @@ H89Timer::handleSignal(int signum)
         debugss(ssTimer, ERROR, "%s: signum != SIGALRM: %d\n", __FUNCTION__, signum);
 
         return (0);
+    }
+    if (thread == 0) {
+	// can't do much else for now.
+	return 0;
+    }
+    if (thread != pthread_self()) {
+	pthread_kill(thread, SIGALRM);
+	return 0;
     }
 
     count_m++;

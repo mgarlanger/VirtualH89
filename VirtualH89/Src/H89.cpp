@@ -470,6 +470,12 @@ H89::buildSystem(Console* console)
 
 H89::~H89()
 {
+    // Acquire system mutex before starting to tear-down
+    // everything.  This avoids a race where the CPU might be using
+    // objects that are being destroyed.
+    //
+    systemMutexAcquire();
+
     // eject all the disk files
     std::vector<DiskController*> dsks = h89io->getDiskDevices();
 
@@ -580,6 +586,7 @@ BYTE
 H89::run()
 {
     cpu->reset();
+    timer->start();
 
     return (cpu->execute());
 }

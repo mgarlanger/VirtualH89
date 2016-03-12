@@ -7,6 +7,8 @@
 #ifndef H89TIMER_H_
 #define H89TIMER_H_
 
+#include <pthread.h>
+
 #include "EventHandler.h"
 #include "GppListener.h"
 
@@ -30,6 +32,7 @@ class H89Timer: public EventHandler, public GppListener
     virtual int handleSignal(int signum);
 
     void reset();
+    void start();
 
   private:
     virtual void gppNewValue(BYTE gpo);
@@ -39,6 +42,7 @@ class H89Timer: public EventHandler, public GppListener
 
     int               count_m;
     unsigned char     intLevel;
+    pthread_t         thread;
 
 };
 
