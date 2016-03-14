@@ -19,7 +19,7 @@ const int pageSizeBits_c = 10;
 const int pageSize_c     = 1L << pageSizeBits_c;
 const int numOfPages_c   = memorySize_c / pageSize_c;
 
-class Memory;
+class MemoryDecoder;
 class InterruptController;
 
 /// \class AddressBus
@@ -31,10 +31,7 @@ class InterruptController;
 class AddressBus
 {
   private:
-    /// \todo - should I have a read and a write memory separate to handle the lower
-    ///         8k RAM/ROM, so that writes get written out to memory... but how do
-    ///         I handle less than 64k of memory... ?? start at 8k and have it wrap around???
-    Memory*              mem[numOfPages_c];
+    MemoryDecoder*       mem;
     InterruptController* ic_m;
 
   public:
@@ -42,7 +39,7 @@ class AddressBus
     virtual ~AddressBus();
 
     // setup memory
-    void installMemory(Memory* mem);
+    void installMemory(MemoryDecoder* mem);
     virtual void clearMemory(BYTE data = 0);
 
     InterruptController* getIntrCtrlr();
@@ -53,6 +50,7 @@ class AddressBus
                   bool interruptAck = false);
     void writeByte(WORD addr,
                    BYTE val);
+    void reset();
 
 };
 

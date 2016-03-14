@@ -6,13 +6,15 @@
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///
 
-#include "mms77316.h"
+#include <string.h>
 
+#include "mms77316.h"
 
 #include "H89.h"
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
+#include "SectorFloppyImage.h"
 #include "InterruptController.h"
 #include "MMS316IntrCtrlr.h"
 #include "AddressBus.h"
@@ -35,7 +37,8 @@ MMS77316::getClockPeriod()
 MMS77316::MMS77316(int baseAddr): DiskController(baseAddr, MMS77316_NumPorts_c),
                                   WD1797(baseAddr + Wd1797_Offset_c),
                                   controlReg_m(0),
-                                  intLevel_m(MMS77316_Intr_c)
+                                  intLevel_m(MMS77316_Intr_c),
+                                  drqCount_m(0)
 {
     for (int x = 0; x < numDisks_c; ++x)
     {
@@ -140,7 +143,7 @@ MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props,
 
             if (drv != NULL)
             {
-                drv->insertDisk(new RawFloppyImage(drv, PropertyUtil::splitArgs(s)));
+                drv->insertDisk(SectorFloppyImage::getDiskette(drv, PropertyUtil::splitArgs(s)));
             }
         }
     }

@@ -59,6 +59,9 @@ setDebugLevel()
     debugLevel[ssRawFloppyImage]      = defaultLevel;
     debugLevel[ssMMS77320]            = defaultLevel;
     debugLevel[ssGenericSASIDrive]    = defaultLevel;
+    debugLevel[ssHostFileBdos]        = defaultLevel;
+    debugLevel[ssCPNetDevice]         = defaultLevel;
+    debugLevel[ssSectorFloppyImage]   = defaultLevel;
 }
 
 void

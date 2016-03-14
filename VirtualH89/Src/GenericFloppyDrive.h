@@ -46,15 +46,18 @@ class GenericFloppyDrive: public GenericDiskDrive
     void step(bool direction);
     void selectSide(BYTE side);
 
-    int readData(bool          doubleDensity,
-                 unsigned long pos);
-    bool startWrite(bool          doubleDensity,
-                    unsigned long pos);
-    bool stopWrite(bool          doubleDensity,
-                   unsigned long pos);
-    bool writeData(bool          doubleDensity,
-                   unsigned long pos,
-                   BYTE          data);
+    int readData(bool doubleDensity,
+                 BYTE track,
+                 BYTE side,
+                 BYTE sector,
+                 int  inSector);
+    int writeData(bool doubleDensity,
+                  BYTE track,
+                  BYTE side,
+                  BYTE sector,
+                  int  inSector,
+                  BYTE data,
+                  bool dataReady);
 
     void insertDisk(GenericFloppyDisk* disk);
 

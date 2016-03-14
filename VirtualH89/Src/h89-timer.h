@@ -7,7 +7,10 @@
 #ifndef H89TIMER_H_
 #define H89TIMER_H_
 
+#include <pthread.h>
+
 #include "EventHandler.h"
+#include "GppListener.h"
 
 class CPU;
 class InterruptController;
@@ -18,7 +21,7 @@ class InterruptController;
 /// \brief %H89 2 mSec timer
 ///
 ///
-class H89Timer: public EventHandler
+class H89Timer: public EventHandler, public GppListener
 {
   public:
     H89Timer(CPU*          cpu,
@@ -28,16 +31,18 @@ class H89Timer: public EventHandler
     virtual void setCPU(CPU* cpu);
     virtual int handleSignal(int signum);
 
-    virtual void enableINT();
-    virtual void disableINT();
     void reset();
+    void start();
 
   private:
-    CPU*          cpu_m;
-    bool          intEnabled_m;
+    virtual void gppNewValue(BYTE gpo);
+    static const BYTE h89timer_gpp2msIntEnBit_c = 0b00000010;
+    CPU*              cpu_m;
+    bool              intEnabled_m;
 
-    int           count_m;
-    unsigned char intLevel;
+    int               count_m;
+    unsigned char     intLevel;
+    pthread_t         thread;
 
 };
 

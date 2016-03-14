@@ -26,22 +26,30 @@
 #include "logger.h"
 #include "H89Operator.h"
 
+extern const char* getopts;
+
 /// \brief StdioProxyConsole
 ///
 ///
 StdioProxyConsole::StdioProxyConsole(int    argc,
-                                     char** argv): Console(argc, argv)
+                                     char** argv):
+    Console(argc, argv),
+    logConsole(false)
 {
     int          c;
     extern char* optarg;
+    extern int   optind;
 
-    // TODO: interpret args to get pipe/fifo for commands.
-    while ((c = getopt(argc, argv, "d:")) != EOF)
+    // TODO: properly share getopt string so both main and this
+    // (and other modules) can ignore eachother's options...
+
+    optind = 1;
+    while ((c = getopt(argc, argv, getopts)) != EOF)
     {
         switch (c)
         {
-            case 'd':
-                sleep((unsigned int) strtol(optarg, NULL, 0));
+            case 'l':
+                logConsole = true;
                 break;
         }
     }
@@ -72,7 +80,7 @@ void
 StdioProxyConsole::keypress(char ch)
 {
     // try not to overrun the UART, but do not wait too long.
-    int timeout = 2000;
+    int timeout = 4000;
     int sleep   = 100;
 
     while (!sendReady() && timeout > 0)
@@ -89,6 +97,14 @@ StdioProxyConsole::receiveData(BYTE ch)
 {
     fputc(ch | 0x80, stdout);
     fflush(stdout);
+    if (logConsole)
+    {
+        fputc(ch, console_out);
+        if (ch == '\n')
+        {
+            fflush(console_out);
+        }
+    }
 }
 
 bool

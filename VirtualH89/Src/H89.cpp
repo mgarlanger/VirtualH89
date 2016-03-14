@@ -7,7 +7,12 @@
 #include "H89.h"
 #include "H89-roms.h"
 #include "ROM.h"
-#include "RAM.h"
+#include "HDOSMemory8K.h"
+#include "MemoryLayout.h"
+#include "H88MemoryLayout.h"
+#include "H88MemoryDecoder.h"
+#include "H89MemoryDecoder.h"
+#include "MMS77318MemoryDecoder.h"
 #include "z80.h"
 #include "AddressBus.h"
 #include "InterruptController.h"
@@ -30,6 +35,7 @@
 #include "HardSectoredDisk.h"
 #include "SoftSectoredDisk.h"
 #include "EightInchDisk.h"
+#include "CPNetDevice.h"
 #include "Console.h"
 #include "logger.h"
 #include "propertyutil.h"
@@ -90,7 +96,6 @@ H89::buildSystem(Console* console)
     interruptController = new InterruptController(cpu);
     ab                  = new AddressBus(interruptController);
     cpu->setAddressBus(ab);
-    cpu->setSpeed(false);
     timer               = new H89Timer(cpu);
     h89io               = new H89_IO;
 
@@ -107,13 +112,105 @@ H89::buildSystem(Console* console)
         gpp = new GeneralPurposePort();
     }
 
-    h17      = nullptr;
+    monitorROM = NULL;
+    s          = props["monitor_rom"];
+
+    if (!s.empty())
+    {
+        monitorROM = ROM::getROM(s.c_str(), 0);
+    }
+
+    if (monitorROM == NULL)
+    {
+#if MTR90
+        monitorROM = new ROM(4096);
+        monitorROM->setBaseAddress(0);
+        monitorROM->initialize(&MTR90_2_ROM[0], 4096);
+#else
+        monitorROM = new ROM(2048);
+        monitorROM->setBaseAddress(0);
+        monitorROM->initialize(&MTR89_ROM[0], 2048);
+#endif
+    }
+
+    h17ROM = new ROM(2048);
+    h17ROM->setBaseAddress(6 * 1024);
+    h17ROM->initialize(&H17_ROM[0], 2048);
+
+    std::vector<std::string> memslots     = {"slot_p501", "slot_p502", "slot_p503"};
+    bool                     have16K      = false;
+    bool                     haveMMS77318 = false;
+    // in reality, only P503 can contain the 16K/128K add-on board.
+    for (int x = 0; x < memslots.size(); ++x)
+    {
+        s = props[memslots[x]];
+        if (s.compare("MMS77311") == 0 || s.compare("WH-88-16") == 0)
+        {
+            have16K      = true;
+            haveMMS77318 = false;
+        }
+        else if (s.compare("MMS77318") == 0)
+        {
+            have16K      = false;
+            haveMMS77318 = true;
+        }
+    }
+    int speedup = 0;
+    s = props["z80_speedup_option"];
+    if (!s.empty())
+    {
+        speedup = strtoul(s.c_str(), NULL, 10);
+        if (speedup < 0 || speedup > 40)
+        {
+            debugss(ssH89, ERROR, "Illegal CPU speedup factor %d, disabling\n", speedup);
+            speedup = 0;
+        }
+        else if (haveMMS77318)
+        {
+            debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n", speedup);
+            speedup = 0;
+        }
+    }
+    if (speedup > 0)
+    {
+        cpu->setSpeedup(speedup);
+    }
+    if (!haveMMS77318)
+    {
+        cpu->enableFast();
+    }
+
+    HDOS = new HDOSMemory8K();
+    HDOS->installROM(monitorROM);
+    HDOS->installROM(h17ROM);
+    HDOS->enableRAM(0x1400, 1024);
+
+    MemoryDecoder* memDecoder;
+    // All sytems have the core 48K + ROM.
+    MemoryLayout*  h89_0 = new H88MemoryLayout(HDOS); // creates 48K RAM at 0x2000...
+    if (have16K)
+    {
+        memDecoder = new H89MemoryDecoder(h89_0);
+    }
+    else if (haveMMS77318)
+    {
+        memDecoder = new MMS77318MemoryDecoder(h89_0);
+    }
+    else
+    {
+        memDecoder = new H88MemoryDecoder(h89_0);
+    }
+
+    ab->installMemory(memDecoder);
+
+    H17* h17 = nullptr;
     h37      = nullptr;
     z47If    = nullptr;
     z47Cntrl = nullptr;
     z47Link  = nullptr;
     MMS77316*                m316      = NULL;
     MMS77320*                m320      = NULL;
+    CPNetDevice*             cpn       = CPNetDevice::install_CPNetDevice(props);
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
     std::vector<std::string> devslots  = {"slot_p504", "slot_p505", "slot_p506"};
@@ -129,11 +226,13 @@ H89::buildSystem(Console* console)
             m316      = MMS77316::install_MMS77316(props, devslots[x]);
             dev_slots = true;
         }
+
         else if (s.compare("MMS77320") == 0)
         {
             // Also includes (auxiliary) serial ports... TODO
             m320 = MMS77320::install_MMS77320(props, devslots[x]);
         }
+
         else if (s.compare("H17") == 0)
         {
         }
@@ -284,50 +383,6 @@ H89::buildSystem(Console* console)
 #endif
     }
 
-    monitorROM = NULL;
-    s          = props["monitor_rom"];
-
-    if (!s.empty())
-    {
-        monitorROM = ROM::getROM(s.c_str(), 0);
-    }
-
-    if (monitorROM == NULL)
-    {
-#if MTR90
-        monitorROM = new ROM(4096);
-        monitorROM->setBaseAddress(0);
-        monitorROM->initialize(&MTR90_2_ROM[0], 4096);
-#else
-        monitorROM = new ROM(2048);
-        monitorROM->setBaseAddress(0);
-        monitorROM->initialize(&MTR89_ROM[0], 2048);
-#endif
-    }
-
-    h17ROM = new ROM(2048);
-    h17ROM->setBaseAddress(6 * 1024);
-    h17ROM->initialize(&H17_ROM[0], 2048);
-
-    h17RAM = new RAM(1024);
-    h17RAM->setBaseAddress(5 * 1024);
-    /// TODO determine whether the default h17RAM is write-protected or write-enabled at boot.
-
-    CPM8k = new RAM(8 * 1024);
-    CPM8k->setBaseAddress(0);
-
-    /// \todo - consolidate RAM into a single object
-    // memory = new RAM(16 * 1024);
-    // memory = new RAM(0xE000);
-    // memory = new RAM(48 * 1024);
-    memory = new RAM(56 * 1024);
-    memory->setBaseAddress(8 * 1024);
-
-    ab->installMemory(monitorROM);
-    ab->installMemory(h17RAM);
-    ab->installMemory(h17ROM);
-    ab->installMemory(memory);
-
     consolePort->attachDevice(console);
 
     h89io->addDevice(gpp);
@@ -340,6 +395,11 @@ H89::buildSystem(Console* console)
         h89io->addDevice(lpPort);
         h89io->addDevice(auxPort);
         h89io->addDevice(modemPort);
+    }
+
+    if (cpn != NULL)
+    {
+        h89io->addDevice(cpn);
     }
 
     if (m316 != NULL)
@@ -410,6 +470,12 @@ H89::buildSystem(Console* console)
 
 H89::~H89()
 {
+    // Acquire system mutex before starting to tear-down
+    // everything.  This avoids a race where the CPU might be using
+    // objects that are being destroyed.
+    //
+    systemMutexAcquire();
+
     // eject all the disk files
     std::vector<DiskController*> dsks = h89io->getDiskDevices();
 
@@ -436,8 +502,8 @@ H89::~H89()
 void
 H89::reset()
 {
-    enableROM();      // resetting GPP does (may do) this...
     cpu->reset();
+    getAddressBus().reset();
     console->reset(); // TODO: does H89 reset really also reset H19?
     h89io->reset();
     timer->reset();
@@ -455,50 +521,15 @@ H89::init()
 }
 
 void
-H89::enableROM()
-{
-    ab->installMemory(monitorROM);
-    ab->installMemory(h17RAM);
-    ab->installMemory(h17ROM);
-}
-
-void
-H89::disableROM()
-{
-    ab->installMemory(CPM8k);
-}
-
-void
 H89::writeProtectH17RAM()
 {
-    h17RAM->writeProtect(true);
+    HDOS->writeProtect(0x1400, 1024);
 }
 
 void
 H89::writeEnableH17RAM()
 {
-    h17RAM->writeProtect(false);
-}
-
-void
-H89::selectSideH17(BYTE side)
-{
-    if (h17 != NULL)
-    {
-        h17->selectSide(side);
-    }
-}
-
-void
-H89::setSpeed(bool fast)
-{
-    cpu->setSpeed(fast);
-}
-
-H89Timer&
-H89::getTimer()
-{
-    return (*timer);
+    HDOS->writeEnable(0x1400, 1024);
 }
 
 void
@@ -555,6 +586,7 @@ BYTE
 H89::run()
 {
     cpu->reset();
+    timer->start();
 
     return (cpu->execute());
 }
@@ -575,6 +607,12 @@ CPU&
 H89::getCPU()
 {
     return (*cpu);
+}
+
+GeneralPurposePort&
+H89::getGPP()
+{
+    return (*gpp);
 }
 
 std::string

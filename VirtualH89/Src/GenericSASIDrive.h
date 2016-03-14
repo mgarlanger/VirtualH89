@@ -54,6 +54,14 @@ class GenericSASIDrive: public GenericDiskDrive
     {
         return 0;
     }
+    int getNumTracks()
+    {
+        return 0;
+    }
+    bool isReady()
+    {
+        return true;
+    }
     void insertDisk(GenericFloppyDisk* disk) {
     }
 
@@ -115,6 +123,7 @@ class GenericSASIDrive: public GenericDiskDrive
     static const BYTE cmd_WriteLong_c      = 0xe6;
 
   private:
+    bool checkHeader(BYTE* b, int n);
     void startStatus(BYTE& ctrl);
     void startSense(BYTE& ctrl);
     void startDataIn(BYTE& ctrl);

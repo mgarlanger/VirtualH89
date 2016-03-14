@@ -1411,6 +1411,7 @@ Z80::SET_ZSP_FLAGS(BYTE val)
 ///
 Z80::Z80(int clockRate,
          int ticksPerSecond): CPU(),
+                              GppListener(z80_gppSpeedSelBit_c),
                               A(af.hi),
                               sA(af.shi),
                               F(af.lo),
@@ -1442,6 +1443,8 @@ Z80::Z80(int clockRate,
                               curInstByte(0),
                               mode(cm_reset),
                               prefix(ip_none),
+                              speedUpFactor_m(40),
+                              fast_m(false),
                               IM(0)
 
 {
@@ -1503,6 +1506,8 @@ Z80::reset(void)
     int_type      = 0;
     mode          = cm_running;
     ticks         = 0;
+    fast_m        = false;
+    // TODO: reset speedup...
     addClockTicks();
 }
 
@@ -1533,37 +1538,42 @@ Z80::addClockTicks()
 }
 
 void
-Z80::setSpeed(bool fast)
-{
-    debugss(ssZ80, WARNING, "%s: - %d\n", __FUNCTION__, fast);
+Z80::setSpeedup(int factor) {
+    speedUpFactor_m = factor;
+}
 
-    if (fast)
+void
+Z80::enableFast() {
+    GppListener::addListener(this);
+}
+
+void
+Z80::gppNewValue(BYTE gpo) {
+    fast_m = ((gpo & z80_gppSpeedSelBit_c) != 0);
+    debugss(ssZ80, WARNING, "%s: fast_m = %d\n", __FUNCTION__, fast_m);
+
+    if (fast_m)
     {
-
         if (ticks > 0)
         {
-            ticks        *= speedUpFactor_c;
+            ticks        *= speedUpFactor_m;
             lastInstTicks = ticks;
         }
-
-        ClockRate_m     = 2048000 * speedUpFactor_c;
+        ClockRate_m     = 2048000 * speedUpFactor_m;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
     else
     {
-
         if (ticks > 0)
         {
-            ticks        /= speedUpFactor_c;
+            ticks        /= speedUpFactor_m;
             lastInstTicks = ticks;
         }
-
         ClockRate_m     = 2048000;
         ticksPerClock_m = ClockRate_m / ticksPerSecond_m;
     }
 
     WallClock::instance()->updateTicksPerSecond(ClockRate_m);
-
 }
 
 ///
@@ -1770,12 +1780,6 @@ Z80::execute(WORD numInst)
         if (int_type & Intr_NMI)
         {
             debugss(ssZ80, VERBOSE, "NMI Raised\n");
-            // if CPU is currently halted it needs to increment PC before processing
-            // interrupt
-            if (mode == cm_halt)
-            {
-                ++PC;
-            }
             int_type &= ~Intr_NMI;
             IFF0      = IFF1 = false;
             PUSH(PC);
@@ -1785,12 +1789,6 @@ Z80::execute(WORD numInst)
         }
         else if ((int_type & Intr_INT) && (IFF1))
         {
-            // if CPU is currently halted it needs to increment PC before processing
-            // interrupt
-            if (mode == cm_halt)
-            {
-                ++PC;
-            }
             // ISR required to enable interrupts (EI).
             IFF2 = IFF1 = IFF0 = false;
             mode = cm_running;
@@ -1847,7 +1845,9 @@ Z80::execute(WORD numInst)
             // CPU at the correct time.
             sp.tv_sec  = 1;
             sp.tv_nsec = 0;
+            h89.systemMutexRelease();
             nanosleep(&sp, &act);
+            h89.systemMutexAcquire();
             continue;
         }
 
