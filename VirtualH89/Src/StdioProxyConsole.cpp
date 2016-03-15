@@ -31,18 +31,14 @@ extern const char* getopts;
 /// \brief StdioProxyConsole
 ///
 ///
-StdioProxyConsole::StdioProxyConsole(int    argc,
-                                     char** argv):
+StdioProxyConsole::StdioProxyConsole(int argc, char** argv):
     Console(argc, argv),
     logConsole(false)
 {
-    int          c;
-    extern char* optarg;
-    extern int   optind;
-
+    int        c;
+    extern int optind;
     // TODO: properly share getopt string so both main and this
     // (and other modules) can ignore eachother's options...
-
     optind = 1;
     while ((c = getopt(argc, argv, getopts)) != EOF)
     {
@@ -53,27 +49,31 @@ StdioProxyConsole::StdioProxyConsole(int    argc,
                 break;
         }
     }
-
     op_m = new H89Operator();
 }
 
-StdioProxyConsole::~StdioProxyConsole() {
+StdioProxyConsole::~StdioProxyConsole()
+{
 }
 
 void
-StdioProxyConsole::init() {
+StdioProxyConsole::init()
+{
 }
 
 void
-StdioProxyConsole::reset() {
+StdioProxyConsole::reset()
+{
 }
 
 void
-StdioProxyConsole::display() {
+StdioProxyConsole::display()
+{
 }
 
 void
-StdioProxyConsole::processCharacter(char ch) {
+StdioProxyConsole::processCharacter(char ch)
+{
 }
 
 void
@@ -82,13 +82,11 @@ StdioProxyConsole::keypress(char ch)
     // try not to overrun the UART, but do not wait too long.
     int timeout = 4000;
     int sleep   = 100;
-
     while (!sendReady() && timeout > 0)
     {
         usleep(sleep);
         timeout -= sleep;
     }
-
     sendData(ch);
 }
 
@@ -122,9 +120,9 @@ StdioProxyConsole::getBaudRate()
 void
 StdioProxyConsole::run()
 {
-    static char buf[1024];
-    int         x = 0;
-    int         c;
+    static char  buf[1024];
+    unsigned int x = 0;
+    int          c;
 
     // setbuf(stdin, NULL);
 
@@ -141,7 +139,6 @@ StdioProxyConsole::run()
             {
                 x = sizeof(buf) - 1;
             }
-
             buf[x] = '\0';
             x      = 0;
             std::string resp = op_m->handleCommand(buf);

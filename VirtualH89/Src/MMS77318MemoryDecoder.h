@@ -29,7 +29,7 @@ class MMS77318MemoryDecoder: public MemoryDecoder
                                              h89_gppBnkSelBit1_c |
                                              h89_gppBnkSelBit2_c);
     static const BYTE h89_gppUnlockBits_c = 0b00001100;
-    int               lockState;
+    unsigned int      lockState;
     static BYTE       lockSeq[];
 };
 

@@ -23,17 +23,12 @@
 
 
 void
-RawFloppyImage::getAddrMark(BYTE* tp,
-                            int   nbytes,
-                            int&  id_tk,
-                            int&  id_sd,
-                            int&  id_sc,
-                            int&  id_sl)
+RawFloppyImage::getAddrMark(BYTE* tp, int nbytes, int& id_tk, int& id_sd,
+                            int& id_sc, int& id_sl)
 {
     id_tk = -1;
     id_sd = -1;
     int indexes = 0;
-
     while (nbytes > 0)
     {
         if (*tp == GenericFloppyFormat::INDEX_AM_BYTE)
@@ -44,7 +39,6 @@ RawFloppyImage::getAddrMark(BYTE* tp,
                 debugss(ssRawFloppyImage, WARNING, "%s: no sectors found\n", __FUNCTION__);
                 break;
             }
-
             ++indexes;
         }
         else if (*tp == GenericFloppyFormat::ID_AM_BYTE)
@@ -55,7 +49,6 @@ RawFloppyImage::getAddrMark(BYTE* tp,
             id_sl = tp[4];
             break;
         }
-
         ++tp;
         --nbytes;
     }
@@ -76,24 +69,24 @@ RawFloppyImage::dump()
 }
 
 // TODO: If constructor fails, the drive should not mount this disk!
-RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
-                               std::vector<std::string> argv): GenericFloppyDisk(),
-                                                               imageName_m(NULL),
-                                                               imageFd_m(-1),
-                                                               trackBuffer_m(NULL),
-                                                               bufferedTrack_m(-1),
-                                                               bufferedSide_m(-1),
-                                                               bufferOffset_m(0),
-                                                               bufferDirty_m(false),
-                                                               hypoTrack_m(false),
-                                                               hyperTrack_m(false),
-                                                               interlaced_m(false),
-                                                               gapLen_m(0),
-                                                               indexGapLen_m(0),
-                                                               writePos_m(-1),
-                                                               trackWrite_m(false),
-                                                               dataPos_m(0),
-                                                               dataLen_m(0)
+RawFloppyImage::RawFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv):
+    GenericFloppyDisk(),
+    imageName_m(NULL),
+    imageFd_m(-1),
+    trackBuffer_m(NULL),
+    bufferedTrack_m(-1),
+    bufferedSide_m(-1),
+    bufferOffset_m(0),
+    bufferDirty_m(false),
+    hypoTrack_m(false),
+    hyperTrack_m(false),
+    interlaced_m(false),
+    gapLen_m(0),
+    indexGapLen_m(0),
+    writePos_m(-1),
+    trackWrite_m(false),
+    dataPos_m(0),
+    dataLen_m(0)
 {
     if (argv.size() < 1)
     {
@@ -101,15 +94,15 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         return;
     }
 
-    const char* name  = strdup(argv[0].c_str());
+    char* name  = strdup(argv[0].c_str());
 
     // Now look for hints on disk format...
-    bool        sd    = false, dd = false;
-    bool        ss    = false, ds = false;
-    bool        st    = false, dt = false;
-    int         media = 0;
+    bool  sd    = false, dd = false;
+    bool  ss    = false, ds = false;
+    bool  st    = false, dt = false;
+    int   media = 0;
 
-    for (int x = 1; x < argv.size(); ++x)
+    for (unsigned int x = 1; x < argv.size(); ++x)
     {
         if (argv[x].compare("sd") == 0)
         {
@@ -153,47 +146,39 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                     argv[x].c_str());
         }
     }
-
     if (!writeProtect_m && access(name, W_OK) != 0)
     {
         debugss(ssRawFloppyImage, WARNING, "Image not writeable: %s\n", name);
         writeProtect_m = true;
     }
-
     int fd = open(name, writeProtect_m ? O_RDONLY : O_RDWR);
-
     if (fd < 0)
     {
         debugss(ssRawFloppyImage, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
-        free((void*) name);
+        free(name);
         return;
     }
-
     // First examine at least one track, but we don't know the format...
     // So get enough data for 1.5 DD tracks on this drive...
     long nbytes = drive->getRawBytesPerTrack() * 2;
     nbytes       += nbytes / 2;
     trackBuffer_m = new BYTE[nbytes];
-
     if (trackBuffer_m == NULL)
     {
         debugss(ssRawFloppyImage, ERROR, "%s: unable to allocate track buffer of %ld bytes\n",
                 __FUNCTION__, nbytes);
         close(fd);
-        free((void*) name);
+        free(name);
         return;
     }
-
     long n = read(fd, trackBuffer_m, nbytes);
-
     if (n != nbytes)
     {
         debugss(ssRawFloppyImage, ERROR, "%s: unable to read a track\n", __FUNCTION__);
         close(fd);
-        free((void*) name);
+        free(name);
         return;
     }
-
     BYTE* tp     = trackBuffer_m;
     BYTE* idx    = NULL;
     BYTE* dat    = NULL;
@@ -207,7 +192,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     int   id_sd  = -1;
     int   id_sc  = -1;
     int   id_sl  = -1;
-
     while (nbytes > 0)
     {
         if (*tp == GenericFloppyFormat::INDEX_AM_BYTE)
@@ -235,7 +219,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent track number %d (%d)\n",
                         __FUNCTION__, tp[1], id_tk);
             }
-
             if (id_sd == -1)
             {
                 id_sd = tp[2];
@@ -245,16 +228,13 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent side number %d (%d)\n",
                         __FUNCTION__, tp[2], id_sd);
             }
-
             int sl = tp[4] & 0x03;
             sl = (128 << sl);
-
             if (seclen != 0 && sl != seclen)
             {
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent sector length %d (%d)\n",
                         __FUNCTION__, sl, seclen);
             }
-
             seclen = sl;
         }
         else if (*tp == GenericFloppyFormat::DATA_AM_BYTE)
@@ -273,17 +253,14 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                 debugss(ssRawFloppyImage, WARNING, "%s: inconsistent data gap %ld (%ld)\n",
                         __FUNCTION__, tp + 1 - end, gaplen);
             }
-
             ++numsec;
             tp     += seclen;
             nbytes -= seclen;
             end     = tp + 1;
         }
-
         ++tp;
         --nbytes;
     }
-
     if (trklen == 0 || seclen == 0 || gaplen == 0 || numsec == 0 ||
         id_tk != 0 || id_sd != 0)
     {
@@ -292,7 +269,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         close(fd);
         return;
     }
-
     // Now check next track (we have partial, at least) at first ID_AM and see
     // about any clues to track/side arrangement.
     if (nbytes > 0 && *tp == GenericFloppyFormat::INDEX_AM_BYTE)
@@ -300,9 +276,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         ++tp;
         --nbytes;
     }
-
     getAddrMark(tp, (int) nbytes, id_tk, id_sd, id_sc, id_sl);
-
     // it's really an error if not found... must be more than one track.
     if (id_tk >= 0 && id_sd >= 0)
     {
@@ -323,21 +297,18 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             debugss(ssRawFloppyImage, ERROR, "%s: invalid track/side layout\n", __FUNCTION__);
         }
     }
-
     trackLen_m = trklen;
     struct stat stb;
     fstat(fd, &stb);
     long long   est_trks = stb.st_size / trackLen_m;
     debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %lld, trklen=%ld\n",
-            __FUNCTION__,
-            est_trks, trackLen_m);
+            __FUNCTION__, est_trks, trackLen_m);
 
     if (est_trks == 77 || est_trks == 154)
     {
         // if interlaced, we know already.
         mediaSize_m = 8;
         numTracks_m = 77;
-
         if (est_trks > 77)
         {
             numSides_m = 2;
@@ -366,9 +337,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     {
         debugss(ssRawFloppyImage, ERROR, "%s: invalid image size\n", __FUNCTION__);
     }
-
     imageFd_m = fd; // need this for cacheTrack()...
-
     if (mediaSize_m == 5 && est_trks == 80 && !interlaced_m)
     {
         // hypoTrack_m, hyperTrack_m still false, numTracks_m == 0, but must have trackLen_m
@@ -377,7 +346,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             tp     = trackBuffer_m;
             nbytes = trackLen_m;
             getAddrMark(tp, (int) nbytes, id_tk, id_sd, id_sc, id_sl);
-
             if (id_tk >= 0 && id_sd >= 0)
             {
                 if (id_tk == 40 && id_sd == 0)
@@ -406,7 +374,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             }
         }
     }
-
     numSectors_m  = numsec;
     gapLen_m      = gaplen;
     indexGapLen_m = idxgap;
@@ -433,7 +400,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     {
         debugss(ssRawFloppyImage, ERROR, "%s: invalid track length\n", __FUNCTION__);
     }
-
     if (numTracks_m == 0)
     {
         if (dt && mediaSize_m == 5)
@@ -454,7 +420,6 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                     __FUNCTION__);
         }
     }
-
     if (numSides_m == 0)
     {
         if (ds)
@@ -470,9 +435,12 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             debugss(ssRawFloppyImage, ERROR, "%s: can't determine number of sides\n", __FUNCTION__);
         }
     }
-
+    if (media != 0 && media != mediaSize_m)
+    {
+        debugss(ssRawFloppyImage, WARNING, "Media size determined to be %d but hint said %d\n",
+                mediaSize_m, media);
+    }
     // TODO: keep oversized buffer or free and alloc exact size needed?
-
     imageName_m     = name;
     bufferedTrack_m = -1;
     bufferedSide_m  = -1;
@@ -489,9 +457,8 @@ RawFloppyImage::~RawFloppyImage()
     {
         return;
     }
-
     debugss(ssRawFloppyImage, INFO, "unmounted %s\n", imageName_m);
-    free((void*) imageName_m);
+    free(imageName_m);
     // flush data...
     cacheTrack(-1, -1);
     close(imageFd_m); // check errors?
@@ -506,18 +473,21 @@ RawFloppyImage::cacheTrack(int side,
     {
         return true;
     }
-
     if (imageFd_m < 0)
     {
         return false;
     }
-
     if (bufferDirty_m && bufferedSide_m != -1 && bufferedTrack_m != -1)
     {
         // Must write to disk...
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
         long rd = write(imageFd_m, trackBuffer_m, trackLen_m);
-        // TODO: what to do if this failed? Also might not know unitl close().
+        if (rd != trackLen_m)
+        {
+            debugss(ssRawFloppyImage, ERROR, "Cache flush write failed, "
+                    "trk %d sid %d, data lost\n",
+                    bufferedTrack_m, bufferedSide_m);
+        }
         bufferDirty_m = false;
     }
 
@@ -526,7 +496,6 @@ RawFloppyImage::cacheTrack(int side,
         // just flush only.
         return true;
     }
-
     if (hypoTrack_m)
     {
         if ((track & 1) != 0)
@@ -549,17 +518,14 @@ RawFloppyImage::cacheTrack(int side,
     {
         bufferOffset_m = (side * numTracks_m + track) * trackLen_m;
     }
-
     lseek(imageFd_m, bufferOffset_m, SEEK_SET);
     long rd = read(imageFd_m, trackBuffer_m, trackLen_m);
-
     if (rd != trackLen_m)
     {
         bufferedSide_m  = -1;
         bufferedTrack_m = -1;
         return false;
     }
-
     headPos_m       = 0;
     bufferedSide_m  = side;
     bufferedTrack_m = track;
@@ -570,7 +536,6 @@ bool
 RawFloppyImage::findMark(int mark)
 {
     int indexCount = 0;
-
     while (indexCount < 2)
     {
         BYTE d = trackBuffer_m[headPos_m++];
@@ -591,37 +556,29 @@ RawFloppyImage::findMark(int mark)
             {
                 return true;
             }
-
             headPos_m += 6;
         }
-
         else if (d == GenericFloppyFormat::DATA_AM_BYTE)
         {
             if (mark == GenericFloppyFormat::DATA_AM)
             {
                 return true;
             }
-
             headPos_m += secSize_m + 2;
-
             if (mark == GenericFloppyFormat::CRC)
             {
                 return true;
             }
-
             // should never get here, should always start before addr,
             // and find what we're looknig for before this.
             break;
         }
     }
-
     return false;
 }
 
 bool
-RawFloppyImage::locateSector(BYTE track,
-                             BYTE side,
-                             BYTE sector)
+RawFloppyImage::locateSector(BYTE track, BYTE side, BYTE sector)
 {
     if (findMark(GenericFloppyFormat::ID_AM))
     {
@@ -633,31 +590,23 @@ RawFloppyImage::locateSector(BYTE track,
             findMark(GenericFloppyFormat::CRC);
             return false;
         }
-
         headPos_m += 6;
-
         if (findMark(GenericFloppyFormat::DATA_AM))
         {
             return true;
         }
     }
-
     return false;
 }
 
 bool
-RawFloppyImage::readData(BYTE track,
-                         BYTE side,
-                         BYTE sector,
-                         int  inSector,
-                         int& data)
+RawFloppyImage::readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data)
 {
     if (!cacheTrack(side, track))
     {
         // Just treat like unformatted disk/track.
         return false;
     }
-
     if (inSector < 0)
     {
         if (sector == 0xfd) // read address
@@ -671,11 +620,9 @@ RawFloppyImage::readData(BYTE track,
                 debugss(ssRawFloppyImage, INFO, "read address %d %d\n", dataPos_m, dataLen_m);
                 return true;
             }
-
             data = GenericFloppyFormat::ERROR;
             return true;
         }
-
         else if (sector == 0xff) // read track
         {
             dataPos_m = 0;
@@ -684,7 +631,6 @@ RawFloppyImage::readData(BYTE track,
             debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
             return true;
         }
-
         else if (locateSector(track, side, sector))
         {
             dataPos_m  = headPos_m;
@@ -693,11 +639,9 @@ RawFloppyImage::readData(BYTE track,
             data       = GenericFloppyFormat::DATA_AM;
             return true;
         }
-
         data = GenericFloppyFormat::NO_DATA;
         return true;
     }
-
     if (dataPos_m < dataLen_m)
     {
         data = trackBuffer_m[dataPos_m++];
@@ -707,35 +651,26 @@ RawFloppyImage::readData(BYTE track,
         debugss(ssRawFloppyImage, INFO, "data done %d %d %d\n", track, side, sector);
         data = GenericFloppyFormat::CRC;
     }
-
     return true;
 }
 
 bool
-RawFloppyImage::writeData(BYTE track,
-                          BYTE side,
-                          BYTE sector,
-                          int  inSector,
-                          BYTE data,
-                          bool dataReady,
-                          int& result)
+RawFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSector,
+                          BYTE data, bool dataReady, int& result)
 {
     if (checkWriteProtect())
     {
         return false;
     }
-
     if (trackWrite_m)
     {
         return false;
     }
-
     if (!cacheTrack(side, track))
     {
         // Just treat like unformatted disk/track.
         return false;
     }
-
     if (inSector < 0)
     {
         if (sector == 0xff || sector == 0xfe) // write track
@@ -762,7 +697,6 @@ RawFloppyImage::writeData(BYTE track,
             return true;
 #endif
         }
-
         else if (locateSector(track, side, sector))
         {
             dataPos_m  = headPos_m;
@@ -771,18 +705,15 @@ RawFloppyImage::writeData(BYTE track,
             result     = GenericFloppyFormat::DATA_AM;
             return true;
         }
-
         result = GenericFloppyFormat::NO_DATA;
         return true;
     }
-
     if (dataPos_m < dataLen_m)
     {
         if (!dataReady)
         {
             result = GenericFloppyFormat::NO_DATA;
         }
-
         else
         {
             trackBuffer_m[dataPos_m++] = data;
@@ -790,12 +721,10 @@ RawFloppyImage::writeData(BYTE track,
             result                     = data;
         }
     }
-
     else
     {
         result = GenericFloppyFormat::CRC;
     }
-
     debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", inSector, data);
     return true;
 }
@@ -803,7 +732,7 @@ RawFloppyImage::writeData(BYTE track,
 bool
 RawFloppyImage::isReady()
 {
-    return (imageFd_m >= 0);
+    return imageFd_m >= 0;
 }
 
 std::string
@@ -813,6 +742,5 @@ RawFloppyImage::getMediaName()
     {
         return "BAD";
     }
-
     return imageName_m;
 }

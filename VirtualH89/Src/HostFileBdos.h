@@ -32,7 +32,6 @@ class HostFileBdos: public NetworkServer
 
     virtual int checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len);
     virtual int sendMsg(BYTE* msgbuf, int len);
-
   private:
     const char* dir;
     BYTE        serverId;
@@ -91,7 +90,7 @@ class HostFileBdos: public NetworkServer
     static const int DEF_BLS     = (1 << DEF_BLS_SH);
     static const int DEF_NBLOCKS = 128; // keep alloc vec small, disk size 2M
 
-    static int (*bdosFunctions[256])(HostFileBdos*, BYTE*, int);
+    static int(*bdosFunctions[256])(HostFileBdos*, BYTE*, int);
 
     WORD             curDma;
     void*            curDmaReal;
@@ -140,7 +139,7 @@ class HostFileBdos: public NetworkServer
     int cpmPath(char* buf, int drive, int user, char* file);
     char* cpmNameFound(struct search::find* find);
     char* cpmPathFound(struct search::find* find);
-    char* cpmFindInit(struct search::find* find);
+    void cpmFindInit(struct search::find* find);
     char* cpmFind(struct search::find* find, int drive, char* pattern);
     void getFileName(char* dst, struct fcb* fcb);
     void getAmbFileName(char* dst, struct fcb* fcb, uint8_t usr);
@@ -151,7 +150,6 @@ class HostFileBdos: public NetworkServer
     char* startSearch(struct fcb* fcb, struct search* search, BYTE u);
     void seekFile(struct fcb* fcb);
     int openFileFcb(struct fcb* fcb, BYTE u);
-
 };
 
 #endif // HOSTFILEBDOS_H_

@@ -67,7 +67,6 @@ H89::buildSystem(Console* console)
         {
             PropertyUtil::read(cfg.c_str(), props);
         }
-
         catch (std::exception& e)
         {
         }
@@ -81,7 +80,6 @@ H89::buildSystem(Console* console)
         {
             PropertyUtil::read(cfg.c_str(), props);
         }
-
         catch (std::exception& e)
         {
         }
@@ -111,7 +109,6 @@ H89::buildSystem(Console* console)
     {
         gpp = new GeneralPurposePort();
     }
-
     monitorROM = NULL;
     s          = props["monitor_rom"];
 
@@ -119,7 +116,6 @@ H89::buildSystem(Console* console)
     {
         monitorROM = ROM::getROM(s.c_str(), 0);
     }
-
     if (monitorROM == NULL)
     {
 #if MTR90
@@ -141,7 +137,7 @@ H89::buildSystem(Console* console)
     bool                     have16K      = false;
     bool                     haveMMS77318 = false;
     // in reality, only P503 can contain the 16K/128K add-on board.
-    for (int x = 0; x < memslots.size(); ++x)
+    for (unsigned int x = 0; x < memslots.size(); ++x)
     {
         s = props[memslots[x]];
         if (s.compare("MMS77311") == 0 || s.compare("WH-88-16") == 0)
@@ -159,8 +155,8 @@ H89::buildSystem(Console* console)
     s = props["z80_speedup_option"];
     if (!s.empty())
     {
-        speedup = strtoul(s.c_str(), NULL, 10);
-        if (speedup < 0 || speedup > 40)
+        unsigned long su = strtoul(s.c_str(), NULL, 10);
+        if (su < 0 || su > 40)
         {
             debugss(ssH89, ERROR, "Illegal CPU speedup factor %d, disabling\n", speedup);
             speedup = 0;
@@ -169,6 +165,10 @@ H89::buildSystem(Console* console)
         {
             debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n", speedup);
             speedup = 0;
+        }
+        else
+        {
+            speedup = su & 0x0ff;
         }
     }
     if (speedup > 0)
@@ -179,7 +179,6 @@ H89::buildSystem(Console* console)
     {
         cpu->enableFast();
     }
-
     HDOS = new HDOSMemory8K();
     HDOS->installROM(monitorROM);
     HDOS->installROM(h17ROM);
@@ -200,7 +199,6 @@ H89::buildSystem(Console* console)
     {
         memDecoder = new H88MemoryDecoder(h89_0);
     }
-
     ab->installMemory(memDecoder);
 
     H17* h17 = nullptr;
@@ -217,7 +215,7 @@ H89::buildSystem(Console* console)
     bool                     dev_slots = false;
     bool                     ser_slots = true;
 
-    for (int x = 0; x < devslots.size(); ++x)
+    for (unsigned int x = 0; x < devslots.size(); ++x)
     {
         s = props[devslots[x]];
 
@@ -226,13 +224,11 @@ H89::buildSystem(Console* console)
             m316      = MMS77316::install_MMS77316(props, devslots[x]);
             dev_slots = true;
         }
-
         else if (s.compare("MMS77320") == 0)
         {
             // Also includes (auxiliary) serial ports... TODO
             m320 = MMS77320::install_MMS77320(props, devslots[x]);
         }
-
         else if (s.compare("H17") == 0)
         {
         }
@@ -282,7 +278,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskA.eightdisk";
         }
-
         eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
         s      = props["z47_disk2"];
 
@@ -290,7 +285,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskB.eightdisk";
         }
-
         eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
 #else
         z47If       = nullptr;
@@ -322,7 +316,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskA.tmpdisk";
         }
-
         hard0 = new HardSectoredDisk(s.c_str());
         s     = props["z17_disk2"];
 
@@ -330,7 +323,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskB.tmpdisk";
         }
-
         hard1 = new HardSectoredDisk(s.c_str());
         s     = props["z17_disk3"];
 
@@ -338,7 +330,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskC.tmpdisk";
         }
-
         hard2 = new HardSectoredDisk(s.c_str());
 
 #if Z37
@@ -348,7 +339,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskA.softdisk";
         }
-
         soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
         s     = props["z37_disk2"];
 
@@ -356,7 +346,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskB.softdisk";
         }
-
         soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
         s     = props["z37_disk3"];
 
@@ -364,7 +353,6 @@ H89::buildSystem(Console* console)
         {
             s = "diskC.softdisk";
         }
-
         soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
         soft3 = 0;
 //    s = props["z37_disk4"];
@@ -401,17 +389,14 @@ H89::buildSystem(Console* console)
     {
         h89io->addDevice(cpn);
     }
-
     if (m316 != NULL)
     {
         h89io->addDiskDevice(m316);
     }
-
     if (m320 != NULL)
     {
         h89io->addDiskDevice(m320);
     }
-
     if (!dev_slots)
     {
         h89io->addDiskDevice(h17);
@@ -479,7 +464,7 @@ H89::~H89()
     // eject all the disk files
     std::vector<DiskController*> dsks = h89io->getDiskDevices();
 
-    for (int x = 0; x < dsks.size(); ++x)
+    for (unsigned int x = 0; x < dsks.size(); ++x)
     {
         DiskController* dev = dsks[x];
 
@@ -579,7 +564,7 @@ H89::waitCPU(void)
 H89_IO&
 H89::getIO()
 {
-    return (*h89io);
+    return *h89io;
 }
 
 BYTE
@@ -588,7 +573,7 @@ H89::run()
     cpu->reset();
     timer->start();
 
-    return (cpu->execute());
+    return cpu->execute();
 }
 
 void
@@ -600,25 +585,26 @@ H89::clearMemory(BYTE data)
 AddressBus&
 H89::getAddressBus()
 {
-    return (*ab);
+    return *ab;
 }
 
 CPU&
 H89::getCPU()
 {
-    return (*cpu);
+    return *cpu;
 }
 
 GeneralPurposePort&
 H89::getGPP()
 {
-    return (*gpp);
+    return *gpp;
 }
 
 std::string
 H89::dumpDebug()
 {
     std::string ret = gpp->dumpDebug();
+
     // Note: INT should be part of H89 (or InterruptController), not CPU...
     // And... the signals are not actually latched on motherboard, only in
     // respective I/O adapters. But for convenience they should be latched
@@ -629,8 +615,10 @@ H89::dumpDebug()
 
 // DEPRECATED
 void
-H89::keypress(BYTE ch) {
+H89::keypress(BYTE ch)
+{
 }
 void
-H89::display() {
+H89::display()
+{
 }

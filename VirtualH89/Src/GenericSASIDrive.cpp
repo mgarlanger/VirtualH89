@@ -48,31 +48,31 @@
  */
 // Grrr... C++ and no designated initializers
 #if 0
-int GenericSASIDrive::params[NUM_DRV_TYPE][4]
+int GenericSASIDrive::params[NUM_DRV_TYPE][4] =
 {
-    [XEBEC_ST506]  = {153, 4, 128, 64},
-    [XEBEC_ST412]  = {306, 4, 128, 64},
+    [XEBEC_ST506]  = {153, 4, 128, 64 },
+    [XEBEC_ST412]  = {306, 4, 128, 64 },
     [XEBEC_CM5206] = {256, 2, 256, 256},
     [XEBEC_CM5410] = {256, 4, 256, 256},
     [XEBEC_CM5616] = {256, 6, 256, 256},
-    [XEBEC_RO201]  = {321, 2, 132, 0},
-    [XEBEC_RO202]  = {321, 4, 132, 0},
-    [XEBEC_RO203]  = {321, 6, 132, 0},
-    [XEBEC_RO204]  = {321, 8, 132, 0},
+    [XEBEC_RO201]  = {321, 2, 132, 0  },
+    [XEBEC_RO202]  = {321, 4, 132, 0  },
+    [XEBEC_RO203]  = {321, 6, 132, 0  },
+    [XEBEC_RO204]  = {321, 8, 132, 0  },
 };
 #endif
-int GenericSASIDrive::params[NUM_DRV_TYPE][4]
+int GenericSASIDrive::params[NUM_DRV_TYPE][4] =
 {
-    /* INVALID=0    */ {0, 0, 0, 0},
-    /*[XEBEC_ST506] */ {153, 4, 128, 64},
-    /*[XEBEC_ST412] */ {306, 4, 128, 64},
+    /* INVALID=0    */ {0,   0, 0,   0  },
+    /*[XEBEC_ST506] */ {153, 4, 128, 64 },
+    /*[XEBEC_ST412] */ {306, 4, 128, 64 },
     /*[XEBEC_CM5206]*/ {256, 2, 256, 256},
     /*[XEBEC_CM5410]*/ {256, 4, 256, 256},
     /*[XEBEC_CM5616]*/ {256, 6, 256, 256},
-    /*[XEBEC_RO201] */ {321, 2, 132, 0},
-    /*[XEBEC_RO202] */ {321, 4, 132, 0},
-    /*[XEBEC_RO203] */ {321, 6, 132, 0},
-    /*[XEBEC_RO204] */ {321, 8, 132, 0},
+    /*[XEBEC_RO201] */ {321, 2, 132, 0  },
+    /*[XEBEC_RO202] */ {321, 4, 132, 0  },
+    /*[XEBEC_RO203] */ {321, 6, 132, 0  },
+    /*[XEBEC_RO204] */ {321, 8, 132, 0  },
 };
 
 bool
@@ -83,36 +83,56 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE* e;
-        int   p = strtoul((char*) b, (char**) &e, 0);
+        BYTE*         e;
+        unsigned long p = strtoul((char*) b, (char**) &e, 0);
 
         // TODO: removable flag, others?
         // NOTE: removable media requires many more changes.
         switch (tolower(*e))
         {
             case 'c':
+                if (p > 0x0ffff)
+                {
+                    break;
+                }
                 m       |= 0x01;
-                mediaCyl = p;
+                mediaCyl = p & 0x0ffff;
                 break;
 
             case 'h':
+                if (p > 0x0f)
+                {
+                    break;
+                }
                 m        |= 0x02;
-                mediaHead = p;
+                mediaHead = p & 0x0f;
                 break;
 
             case 'z':
+                if (p != 128 && p != 256 && p != 512 && p != 1024)
+                {
+                    break;
+                }
                 m       |= 0x04;
-                mediaSsz = p;
+                mediaSsz = p & 0x0fff;
                 break;
 
             case 'p':
+                if (p > 0x0ff)
+                {
+                    break;
+                }
                 m       |= 0x08;
-                mediaSpt = p;
+                mediaSpt = p & 0x0ff;
                 break;
 
             case 'l':
+                if (p > 0x0ff)
+                {
+                    break;
+                }
                 m       |= 0x10;
-                mediaLat = p;
+                mediaLat = p & 0x0ff;
                 break;
 
             default:
@@ -121,36 +141,33 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 
         b = e + 1;
     }
-
-    return (m == 0x1f);
+    return m == 0x1f;
 }
 
-GenericSASIDrive::GenericSASIDrive(DriveType   type,
-                                   std::string media,
-                                   int         cnum,
-                                   int         sectorSize) :
-       curState(IDLE),
-       driveFd(-1),
-       driveSecLen(0),
-       sectorsPerTrack(0),
-       capacity(0),
-       dataOffset(0),
-       driveCode(0),
-       driveCnum(0),
-       driveMedia(NULL),
-       driveType(INVALID),
-       mediaSpt(0),
-       mediaSsz(0),
-       mediaCyl(0),
-       mediaHead(0),
-       mediaLat(0),
-       cmdIx(0),
-       senseIx(0),
-       dcbIx(0),
-       stsIx(0),
-       dataBuf(NULL),
-       dataLength(0),
-       dataIx(0)
+GenericSASIDrive::GenericSASIDrive(DriveType type, std::string media, int cnum,
+                                   int sectorSize):
+    curState(IDLE),
+    driveFd(-1),
+    driveSecLen(0),
+    sectorsPerTrack(0),
+    capacity(0),
+    dataOffset(0),
+    driveCode(0),
+    driveCnum(0),
+    driveMedia(NULL),
+    driveType(INVALID),
+    mediaSpt(0),
+    mediaSsz(0),
+    mediaCyl(0),
+    mediaHead(0),
+    mediaLat(0),
+    cmdIx(0),
+    senseIx(0),
+    dcbIx(0),
+    stsIx(0),
+    dataBuf(NULL),
+    dataLength(0),
+    dataIx(0)
 {
     driveType   = type;
     driveMedia  = strdup(media.c_str());
@@ -203,7 +220,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
         mediaSpt  = sectorsPerTrack;
         mediaLat  = 1;
         memset(buf, 0, sizeof(buf));
-        int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
+        int l = sprintf((char*) buf, "%ldc%ldh%ldz%ldp%ldl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
@@ -217,7 +234,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
         lseek(driveFd, end - sizeof(buf), SEEK_SET);
         int  x    = read(driveFd, buf, sizeof(buf));
         bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
-
         if (!done)
         {
             lseek(driveFd, (off_t) 0, SEEK_SET);
@@ -225,7 +241,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
             done       = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
             dataOffset = mediaSsz;
         }
-
         if (!done)
         {
             debugss(ssMMS77320, ERROR, "Bad media header: %s\n", driveMedia);
@@ -233,7 +248,6 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
             driveFd = -1;
             return;
         }
-
         if (mediaSpt != sectorsPerTrack || mediaSsz != driveSecLen ||
             params[type][0] != mediaCyl || params[type][1] != mediaHead)
         {
@@ -243,15 +257,13 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
             driveFd = -1;
             return;
         }
-
         debugss(ssMMS77320, ERROR, "Mounted existing media %s as %s", driveMedia, buf);
     }
 }
 
 GenericSASIDrive*
-GenericSASIDrive::getInstance(std::string type,
-                              std::string media,
-                              int         cnum)
+GenericSASIDrive::getInstance(std::string type, std::string media,
+                              int cnum)
 {
     DriveType etype;
 
@@ -312,9 +324,9 @@ GenericSASIDrive::getInstance(std::string type,
      */
 
 //         DB      0,153,4,0,128,0,64,11   ; DRIVE CHARACTERISTIC DATA
-//  =   0099, 04, 0080, 0064, 0b
-//  =   153 cyl, 4 heads, 128 red-wr, 100 wr-pre, 11 ecc-burst
-//  =   612 trk. (~16 spt, 512B ea, ?)
+// =   0099, 04, 0080, 0064, 0b
+// =   153 cyl, 4 heads, 128 red-wr, 100 wr-pre, 11 ecc-burst
+// =   612 trk. (~16 spt, 512B ea, ?)
     // ssz = jumper_W2 ? 512 : 256; // XEBEC jumper "W2" a.k.a. "SS" pos "2" or "5"
     int ssz = 512;
     return new GenericSASIDrive(etype, media, cnum, ssz);
@@ -326,7 +338,6 @@ GenericSASIDrive::~GenericSASIDrive()
     {
         return;
     }
-
     close(driveFd);
     driveFd = -1;
 }
@@ -385,9 +396,7 @@ GenericSASIDrive::~GenericSASIDrive()
  */
 
 void
-GenericSASIDrive::deselect(BYTE& dataIn,
-                           BYTE& dataOut,
-                           BYTE& ctrl)
+GenericSASIDrive::deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     // User is switch controllers/drive, do any cleanup.
     ctrl    &= ~ctl_Msg_o_c;
@@ -399,9 +408,7 @@ GenericSASIDrive::deselect(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::ack(BYTE& dataIn,
-                      BYTE& dataOut,
-                      BYTE& ctrl)
+GenericSASIDrive::ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     ctrl &= ~ctl_Req_o_c;
     ctrl &= ~ctl_Ack_i_c;
@@ -409,7 +416,6 @@ GenericSASIDrive::ack(BYTE& dataIn,
     if (curState == COMMAND)
     {
         cmdBuf[cmdIx++] = dataOut;
-
         if (cmdIx >= cmdLength)
         {
             curState   = IDLE; // default? should get set to something else.
@@ -422,7 +428,6 @@ GenericSASIDrive::ack(BYTE& dataIn,
             processCmd(dataIn, dataOut, ctrl);
             return;
         }
-
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
@@ -431,17 +436,14 @@ GenericSASIDrive::ack(BYTE& dataIn,
         if (stsIx < stsLength)
         {
             dataIn = stsBuf[stsIx++];
-
             if (stsIx >= stsLength)
             {
                 ctrl |= ctl_Msg_o_c;
             }
-
             ctrl |= ctl_Req_o_c;
             ctrl &= ~ctl_Ack_i_c;
             return;
         }
-
         // must start over at SEL again...
         ctrl    &= ~ctl_Msg_o_c;
         ctrl    &= ~ctl_Busy_o_c; // it sppears this must go low...
@@ -459,11 +461,9 @@ GenericSASIDrive::ack(BYTE& dataIn,
             ctrl  &= ~ctl_Ack_i_c;
             return;
         }
-
         senseIx = 0;
         startStatus(ctrl);
         ack(dataIn, dataOut, ctrl);
-
     }
     else if (curState == DATA_IN)
     {
@@ -474,45 +474,37 @@ GenericSASIDrive::ack(BYTE& dataIn,
             ctrl  &= ~ctl_Ack_i_c;
             return;
         }
-
         // We must either put some data in the reg or lower BSY...
         dataIx = 0;
-
         if (++blockCount < cmdBuf[4])
         {
             processCmd(dataIn, dataOut, ctrl);
             return;
         }
-
         startStatus(ctrl);
         ack(dataIn, dataOut, ctrl);
-
     }
     else if (curState == DRIVECB)
     {
         dcbBuf[dcbIx++] = dataOut;
-
         if (dcbIx >= dcbLength)
         {
             dcbIx = 0;
             processDCB(dataIn, dataOut, ctrl);
             return;
         }
-
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
     else if (curState == DATA_OUT)
     {
         dataBuf[dataIx++] = dataOut;
-
         if (dataIx >= dataLength)
         {
             dataIx = 0;
             processData(dataIn, dataOut, ctrl);
             return;
         }
-
         ctrl |= ctl_Req_o_c;
         ctrl &= ~ctl_Ack_i_c;
     }
@@ -529,9 +521,7 @@ GenericSASIDrive::ack(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::resetSASI(BYTE& dataIn,
-                            BYTE& dataOut,
-                            BYTE& ctrl)
+GenericSASIDrive::resetSASI(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     ctrl    &= ~ctl_Msg_o_c;
     ctrl    &= ~ctl_Cmd_o_c;
@@ -542,18 +532,14 @@ GenericSASIDrive::resetSASI(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::select(BYTE& dataIn,
-                         BYTE& dataOut,
-                         BYTE& ctrl)
+GenericSASIDrive::select(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     // validate data bit with cnum...
     int i = ffs(dataOut);
-
     if (i == 0)
     {
         return;
     }
-
     if (i - 1 == driveCnum)
     {
         ctrl |= ctl_Busy_o_c;
@@ -561,9 +547,7 @@ GenericSASIDrive::select(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::run(BYTE& dataIn,
-                      BYTE& dataOut,
-                      BYTE& ctrl)
+GenericSASIDrive::run(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     ctrl    |= ctl_Busy_o_c;
     ctrl    |= ctl_Cmd_o_c;
@@ -618,8 +602,7 @@ GenericSASIDrive::startDataOut(BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::startError(BYTE& ctrl,
-                             BYTE  err)
+GenericSASIDrive::startError(BYTE& ctrl, BYTE err)
 {
     stsBuf[0]   = 0b00000010;
     stsBuf[1]   = 0;
@@ -639,9 +622,7 @@ GenericSASIDrive::startDCB(BYTE& ctrl)
 }
 
 void
-GenericSASIDrive::processCmd(BYTE& dataIn,
-                             BYTE& dataOut,
-                             BYTE& ctrl)
+GenericSASIDrive::processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
     long  e;
@@ -650,7 +631,6 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
     {
         memset(senseBuf, 0, 4);
     }
-
     switch (cmdBuf[0])
     {
         case cmd_TestDriveReady_c:
@@ -681,30 +661,24 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             memcpy(senseBuf + 1, cmdBuf + 1, 3);
             off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
                    blockCount) * driveSecLen;
-
             if (off >= capacity)
             {
                 startError(ctrl, 0x21); // illegal disk address
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             lseek(driveFd, off + dataOffset, SEEK_SET);
             e = read(driveFd, dataBuf, dataLength);
-
             if (e != dataLength)
             {
                 startError(ctrl, 0x94); // target sector not found + addr valid
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             dataLength = driveSecLen;
-
             if (cmdBuf[0] == cmd_ReadLong_c)
             {
                 dataLength       += 4;
@@ -714,7 +688,6 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
                 dataBuf[dataIx++] = 0;
                 dataBuf[dataIx++] = 0;
             }
-
             startDataIn(ctrl);
             dataIx = 0;
             // a little risky to recurse here, but startDataIn() should
@@ -730,15 +703,12 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             memcpy(senseBuf + 1, cmdBuf + 1, 3);
             dataLength = driveSecLen;
-
             if (cmdBuf[0] == cmd_ReadLong_c)
             {
                 dataLength += 4;
             }
-
             dataIx = 0;
             // could validate address...
             startDataOut(ctrl);
@@ -778,7 +748,6 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             stsBuf[0] = 0;
             stsBuf[1] = 0;
             stsIx     = 0;
@@ -803,9 +772,7 @@ GenericSASIDrive::processCmd(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::processData(BYTE& dataIn,
-                              BYTE& dataOut,
-                              BYTE& ctrl)
+GenericSASIDrive::processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     off_t off;
     long  e;
@@ -815,30 +782,25 @@ GenericSASIDrive::processData(BYTE& dataIn,
         case cmd_Write_c:
             off = ((((((cmdBuf[1] & 0x1f) << 8) | cmdBuf[2]) << 8) | cmdBuf[3]) +
                    blockCount) * driveSecLen;
-
             if (off >= capacity)
             {
                 startError(ctrl, 0x21); // illegal disk address
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             lseek(driveFd, off + dataOffset, SEEK_SET);
             e = write(driveFd, dataBuf, dataLength);
-
             if (e != dataLength)
             {
                 startError(ctrl, 0x94); // target sector not found + addr valid
                 ack(dataIn, dataOut, ctrl);
                 break;
             }
-
             if (++blockCount >= cmdBuf[4])
             {
                 startStatus(ctrl);
                 break;
             }
-
             break;
 
         case cmd_WriteSecBuf_c:
@@ -855,9 +817,7 @@ GenericSASIDrive::processData(BYTE& dataIn,
 }
 
 void
-GenericSASIDrive::processDCB(BYTE& dataIn,
-                             BYTE& dataOut,
-                             BYTE& ctrl)
+GenericSASIDrive::processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl)
 {
     switch (cmdBuf[0])
     {
@@ -868,11 +828,10 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
             int hds = dcbBuf[2] & 0x0f;
             int rwc = (dcbBuf[3] << 8) | dcbBuf[4];
             int wpc = (dcbBuf[5] << 8) | dcbBuf[6];
-            int ebl = dcbBuf[7] & 0x0f;
+            // Don't care about ECC length = dcbBuf[7] & 0x0f;
 
             if (cyl != params[driveType][0] || hds != params[driveType][1] ||
-                rwc != params[driveType][2] ||
-                wpc != params[driveType][3])
+                rwc != params[driveType][2] || wpc != params[driveType][3])
             {
                 debugss(ssMMS77320, ERROR, "Host drive characteristics "
                         " mismatch\n");
@@ -880,11 +839,9 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
                 // on a different geometry. Can we return an error?
                 // startError(ctrl, 0x??);
             }
-
             startStatus(ctrl);
             ack(dataIn, dataOut, ctrl);
-        }
-        break;
+        } break;
 
         default:
             break;
@@ -894,5 +851,5 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
 std::string
 GenericSASIDrive::getMediaName()
 {
-    return (driveMedia != NULL ? driveMedia : "");
+    return driveMedia != NULL ? driveMedia : "";
 }

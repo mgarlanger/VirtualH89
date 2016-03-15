@@ -10,10 +10,11 @@
 #include "MemoryDecoder.h"
 #include "InterruptController.h"
 
-AddressBus::AddressBus(InterruptController* ic): ic_m(ic), mem(NULL)
+AddressBus::AddressBus(InterruptController* ic):
+    mem(NULL),
+    ic_m(ic)
 {
     debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
-
 }
 
 AddressBus::~AddressBus()
@@ -22,8 +23,7 @@ AddressBus::~AddressBus()
 }
 
 BYTE
-AddressBus::readByte(WORD addr,
-                     bool interruptAck)
+AddressBus::readByte(WORD addr, bool interruptAck)
 {
 
     if (interruptAck)
@@ -43,8 +43,7 @@ AddressBus::readByte(WORD addr,
 }
 
 void
-AddressBus::writeByte(WORD addr,
-                      BYTE val)
+AddressBus::writeByte(WORD addr, BYTE val)
 {
 
     // Could do this entirel inside MemoryLayout, but this way we have
