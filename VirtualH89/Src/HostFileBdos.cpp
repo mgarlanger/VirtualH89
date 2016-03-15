@@ -181,7 +181,7 @@ int
 HostFileBdos::closeFile(BYTE* msgbuf, int len)
 {
     int         rc;
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (!fcb->s1[1])
@@ -212,7 +212,7 @@ HostFileBdos::closeFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::searchNext(BYTE* msgbuf, int len)
 {
-    BYTE  u    = msgbuf[1] & 0x1f;
+    // BYTE u = msgbuf[1] & 0x1f;
     msgbuf[0] = 0;
     char* name = doSearch(&curSearch);
     if (!name)
@@ -289,7 +289,7 @@ HostFileBdos::deleteFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::readSeq(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -332,7 +332,7 @@ HostFileBdos::readSeq(BYTE* msgbuf, int len)
 int
 HostFileBdos::writeSeq(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -452,7 +452,7 @@ HostFileBdos::renameFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::readRand(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -481,7 +481,7 @@ HostFileBdos::readRand(BYTE* msgbuf, int len)
 int
 HostFileBdos::writeRand(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -509,7 +509,7 @@ HostFileBdos::writeRand(BYTE* msgbuf, int len)
 int
 HostFileBdos::setRandRec(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    // BYTE u = msgbuf[0] & 0x1f;
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -719,7 +719,8 @@ HostFileBdos::cpmPathFound(struct search::find* find)
     return find->path;
 }
 
-char*
+// Not used, as init is automatic on Search First.
+void
 HostFileBdos::cpmFindInit(struct search::find* find)
 {
     find->dir = NULL;

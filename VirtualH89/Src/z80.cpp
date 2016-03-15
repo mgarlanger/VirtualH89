@@ -1443,9 +1443,9 @@ Z80::Z80(int clockRate,
                               curInstByte(0),
                               mode(cm_reset),
                               prefix(ip_none),
+                              IM(0),
                               speedUpFactor_m(40),
-                              fast_m(false),
-                              IM(0)
+                              fast_m(false)
 
 {
     debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,

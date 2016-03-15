@@ -34,30 +34,18 @@ class GenericFloppyDrive: public GenericDiskDrive
     };
 
     GenericFloppyDrive(DriveType type);
-
     virtual ~GenericFloppyDrive();
 
     static GenericFloppyDrive* getInstance(std::string type);
     bool getTrackZero();
-    bool readAddress(int& track,
-                     int& sector,
-                     int& side);
+    bool readAddress(int& track, int& sector, int& side);
 
     void step(bool direction);
     void selectSide(BYTE side);
 
-    int readData(bool doubleDensity,
-                 BYTE track,
-                 BYTE side,
-                 BYTE sector,
-                 int  inSector);
-    int writeData(bool doubleDensity,
-                  BYTE track,
-                  BYTE side,
-                  BYTE sector,
-                  int  inSector,
-                  BYTE data,
-                  bool dataReady);
+    int readData(bool doubleDensity, BYTE track, BYTE side, BYTE sector, int inSector);
+    int writeData(bool doubleDensity, BYTE track, BYTE side, BYTE sector, int inSector,
+                  BYTE data, bool dataReady);
 
     void insertDisk(GenericFloppyDisk* disk);
 
@@ -80,9 +68,7 @@ class GenericFloppyDrive: public GenericDiskDrive
     }
     bool isReady();
     bool isWriteProtect();
-
     std::string getMediaName();
-
   private:
     unsigned int       numTracks_m;
     unsigned int       numHeads_m;
@@ -96,7 +82,7 @@ class GenericFloppyDrive: public GenericDiskDrive
 
     GenericFloppyDisk* disk_m;
     int                headSel_m;
-    int                track_m;
+    unsigned int       track_m;
     bool               motor_m;
     bool               head_m;
 };

@@ -62,30 +62,19 @@ class GenericSASIDrive: public GenericDiskDrive
     {
         return true;
     }
-    void insertDisk(GenericFloppyDisk* disk) {
+    void insertDisk(GenericFloppyDisk* disk)
+    {
     }
 
     std::string getMediaName();
 
     // These are called by the host to indicate change events on ctl bits.
-    void resetSASI(BYTE& data,
-                   BYTE& dataOut,
-                   BYTE& ctl);
-    void select(BYTE& data,
-                BYTE& dataOut,
-                BYTE& ctl);
-    void run(BYTE& dataIn,
-             BYTE& dataOut,
-             BYTE& ctl); // this is actually the absense of any bits.
-    void ack(BYTE& dataIn,
-             BYTE& dataOut,
-             BYTE& ctl);
-    void reset(BYTE& dataIn,
-               BYTE& dataOut,
-               BYTE& ctl);
-    void deselect(BYTE& dataIn,
-                  BYTE& dataOut,
-                  BYTE& ctrl);
+    void resetSASI(BYTE& data, BYTE& dataOut, BYTE& ctl);
+    void select(BYTE& data, BYTE& dataOut, BYTE& ctl);
+    void run(BYTE& dataIn, BYTE& dataOut, BYTE& ctl);
+    void ack(BYTE& dataIn, BYTE& dataOut, BYTE& ctl);
+    void reset(BYTE& dataIn, BYTE& dataOut, BYTE& ctl);
+    void deselect(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
 
     int getCtlBits();
     void setCtlBits(int bits);
@@ -128,18 +117,11 @@ class GenericSASIDrive: public GenericDiskDrive
     void startSense(BYTE& ctrl);
     void startDataIn(BYTE& ctrl);
     void startDataOut(BYTE& ctrl);
-    void startError(BYTE& ctrl,
-                    BYTE  err);
+    void startError(BYTE& ctrl, BYTE err);
     void startDCB(BYTE& ctrl);
-    void processCmd(BYTE& dataIn,
-                    BYTE& dataOut,
-                    BYTE& ctrl);
-    void processData(BYTE& dataIn,
-                     BYTE& dataOut,
-                     BYTE& ctrl);
-    void processDCB(BYTE& dataIn,
-                    BYTE& dataOut,
-                    BYTE& ctrl);
+    void processCmd(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
+    void processData(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
+    void processDCB(BYTE& dataIn, BYTE& dataOut, BYTE& ctrl);
 
     enum State
     {
@@ -156,7 +138,7 @@ class GenericSASIDrive: public GenericDiskDrive
     int              driveFd;
     int              driveSecLen;
     int              sectorsPerTrack;
-    unsigned long    capacity;
+    off_t            capacity;
     off_t            dataOffset;
     BYTE             driveCode;
     int              driveCnum;

@@ -28,6 +28,7 @@ class HDOSMemory8K: public RAMemory8K
     }
     void enableRAM(WORD base, WORD len) {
         WORD adr = base & 0x1fff;
+
         if (adr + len > sizeof(mem))
         {
             // error? or just trim?
@@ -44,6 +45,7 @@ class HDOSMemory8K: public RAMemory8K
     void writeProtect(WORD adr, WORD len) {
         int a = (adr >> 10) & 0x07;
         int n = a + (((len + 0x03ff) >> 10) & 0x07);
+
         // TODO: find more-elegant way
         for (; a < n && a < 8; ++a)
         {
@@ -53,6 +55,7 @@ class HDOSMemory8K: public RAMemory8K
     void writeEnable(WORD adr, WORD len) {
         int a = (adr >> 10) & 0x07;
         int n = a + (((len + 0x03ff) >> 10) & 0x07);
+
         // TODO: find more-elegant way
         for (; a < n && a < 8; ++a)
         {
@@ -61,7 +64,8 @@ class HDOSMemory8K: public RAMemory8K
     }
     void installROM(ROM* rom) {
         WORD adr = rom->getBase() & 0x1fff;
-        int  len = rom->getSize();
+        WORD len = rom->getSize();
+
         if (adr + len > sizeof(mem))
         {
             // error? or just trim?

@@ -36,7 +36,8 @@ H89Operator::H89Operator()
 {
 }
 
-H89Operator::~H89Operator() {
+H89Operator::~H89Operator()
+{
 }
 
 GenericDiskDrive*
@@ -44,17 +45,15 @@ H89Operator::findDrive(std::string name)
 {
     std::vector<DiskController*> devs = h89.getIO().getDiskDevices();
 
-    for (int x = 0; x < devs.size(); ++x)
+    for (unsigned int x = 0; x < devs.size(); ++x)
     {
         DiskController*   dev = devs[x];
         GenericDiskDrive* drv = nullptr;
-
         if (dev != NULL && (drv = dev->findDrive(name)) != NULL)
         {
             return drv;
         }
     }
-
     return NULL;
 }
 
@@ -63,16 +62,14 @@ H89Operator::findDiskCtrlr(std::string name)
 {
     std::vector<DiskController*> devs = h89.getIO().getDiskDevices();
 
-    for (int x = 0; x < devs.size(); ++x)
+    for (unsigned int x = 0; x < devs.size(); ++x)
     {
         DiskController* dev = devs[x];
-
         if (dev != NULL && name.compare(dev->getDeviceName()) == 0)
         {
             return dev;
         }
     }
-
     return NULL;
 }
 
@@ -86,7 +83,6 @@ H89Operator::cleanse(std::string resp)
         resp.replace(pos, 1, ";");
         pos += 1;
     }
-
     return resp;
 }
 
@@ -95,48 +91,42 @@ H89Operator::executeCommand(std::string cmd)
 {
     std::string              resp;
     std::vector<std::string> args = PropertyUtil::splitArgs(cmd);
+
     debugss(ssStdioConsole, INFO, "Servicing cmd = %s\n", cmd.c_str());
 
     if (args.size() < 1)
     {
         return "ok";
     }
-
     if (args[0].compare("quit") == 0)
     {
         h89.systemMutexRelease();
         exit(0);
     }
-
     if (args[0].compare("echo") == 0)
     {
         return "ok " + PropertyUtil::combineArgs(args, 1);
     }
-
     if (args[0].compare("reset") == 0)
     {
         h89.reset();
         return "ok";
     }
-
     if (args[0].compare("mount") == 0)
     {
         if (args.size() < 3)
         {
             return "error syntax: " + cmd;
         }
-
         GenericDiskDrive* drv = findDrive(args[1]);
 
         if (drv == NULL)
         {
             return "error nodrive: " + args[1];
         }
-
         drv->insertDisk(SectorFloppyImage::getDiskette(drv, PropertyUtil::shiftArgs(args, 2)));
         return "ok";
     }
-
     if (args[0].compare("getdisks") == 0)
     {
         int                          count = 0;
@@ -144,7 +134,7 @@ H89Operator::executeCommand(std::string cmd)
         std::ostringstream           resp;
         resp << "ok ";
 
-        for (int x = 0; x < devs.size(); ++x)
+        for (unsigned int x = 0; x < devs.size(); ++x)
         {
             DiskController* dev = devs[x];
 
@@ -152,7 +142,7 @@ H89Operator::executeCommand(std::string cmd)
             {
                 std::vector<GenericDiskDrive*> drives = dev->getDiskDrives();
 
-                for (int y = 0; y < drives.size(); ++y)
+                for (unsigned int y = 0; y < drives.size(); ++y)
                 {
                     GenericDiskDrive* drv = drives[y];
 
@@ -170,7 +160,6 @@ H89Operator::executeCommand(std::string cmd)
                 }
             }
         }
-
         return resp.str();
     }
 
@@ -181,27 +170,22 @@ H89Operator::executeCommand(std::string cmd)
             std::string dump = "ok " + h89.getCPU().dumpDebug();
             return cleanse(dump);
         }
-
         if (args[1].compare("mach") == 0)
         {
             std::string dump = "ok " + h89.dumpDebug();
             return cleanse(dump);
         }
-
         if (args[1].compare("disk") == 0 && args.size() > 2)
         {
             DiskController* dev = findDiskCtrlr(args[2]);
-
             if (dev == NULL)
             {
                 return "error no device " + args[2];
             }
-
             std::string dump = "ok " + dev->dumpDebug();
             return cleanse(dump);
         }
     }
-
     return "error badcmd: " + cmd;
 }
 

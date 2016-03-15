@@ -20,7 +20,7 @@ GppListener::addListener(GppListener* lstr) {
 
 void
 GppListener::notifyListeners(BYTE gpo, BYTE diffs) {
-    int x;
+    unsigned int x;
     for (x = 0; x < notifications.size(); ++x)
     {
         if ((notifications[x]->interestedBits & diffs) != 0)
