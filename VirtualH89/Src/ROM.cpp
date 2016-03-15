@@ -13,7 +13,7 @@
 #include <fstream>
 #include "logger.h"
 
-ROM::ROM(int size):
+ROM::ROM(unsigned long size):
     data_m(0),
     base_m(0),
     size_m(size)
@@ -55,7 +55,7 @@ ROM::getROM(const char* filename,
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename,
+        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %lu\n", __FUNCTION__, filename,
                 fileSize);
         return NULL;
     }

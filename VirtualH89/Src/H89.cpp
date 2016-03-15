@@ -155,25 +155,25 @@ H89::buildSystem(Console* console)
             haveMMS77318 = true;
         }
     }
-    int speedup = 0;
+    unsigned long speedup = 0;
     s = props["z80_speedup_option"];
     if (!s.empty())
     {
         speedup = strtoul(s.c_str(), NULL, 10);
-        if (speedup < 0 || speedup > 40)
+        if (speedup > 40)
         {
-            debugss(ssH89, ERROR, "Illegal CPU speedup factor %d, disabling\n", speedup);
+            debugss(ssH89, ERROR, "Illegal CPU speedup factor %lu, disabling\n", speedup);
             speedup = 0;
         }
         else if (haveMMS77318)
         {
-            debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n", speedup);
+            debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n");
             speedup = 0;
         }
     }
     if (speedup > 0)
     {
-        cpu->setSpeedup(speedup);
+        cpu->setSpeedup((int) speedup);
     }
     if (!haveMMS77318)
     {

@@ -56,14 +56,14 @@ class GenericFloppyDisk
   private:
 
   protected:
-    bool writeProtect_m;
-    bool doubleDensity_m;
-    long trackLen_m;
-    int  numTracks_m;
-    int  numSectors_m;
-    int  numSides_m;
-    int  secSize_m;
-    int  mediaSize_m;
+    bool          writeProtect_m;
+    bool          doubleDensity_m;
+    long          trackLen_m;
+    unsigned long numTracks_m;
+    unsigned long numSectors_m;
+    unsigned long numSides_m;
+    unsigned long secSize_m;
+    unsigned long mediaSize_m;
 
 };
 

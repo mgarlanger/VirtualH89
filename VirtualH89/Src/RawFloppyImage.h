@@ -76,7 +76,7 @@ class RawFloppyImage: public GenericFloppyDisk
     bool          trackWrite_m;
     int           headPos_m;
     int           dataPos_m;
-    int           dataLen_m;
+    long          dataLen_m;
 
     void getAddrMark(BYTE* tp,
                      int   nbytes,

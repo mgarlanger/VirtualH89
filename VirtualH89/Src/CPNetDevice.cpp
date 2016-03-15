@@ -91,8 +91,8 @@ CPNetDevice::addServer(BYTE serverId, NetworkServer* server)
 CPNetDevice*
 CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
 {
-    std::string s;
-    int         cid = 0xfe; // OK default if we have no network connections
+    std::string   s;
+    unsigned long cid = 0xfe; // OK default if we have no network connections
 
     s = props["cpnetdevice_port"];
 
@@ -101,13 +101,13 @@ CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
         return NULL;
     }
 
-    int port = strtoul(s.c_str(), NULL, 0);
+    unsigned long port = strtoul(s.c_str(), NULL, 0);
 
     s = props["cpnetdevice_clientid"];
 
     if (!s.empty())
     {
-        int c = strtoul(s.c_str(), NULL, 0);
+        unsigned long c = strtoul(s.c_str(), NULL, 0);
 
         if (c > 0x00 && c < 0xff)
         {
@@ -120,9 +120,9 @@ CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
         }
     }
 
-    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02x, client ID %02x\n",
+    debugss(ssCPNetDevice, ERROR, "Creating CPNetDevice device at port %02lx, client ID %02lx\n",
             port, cid);
-    CPNetDevice*                         cpnd = new CPNetDevice(port, cid);
+    CPNetDevice*                         cpnd = new CPNetDevice((int) port, (int) cid);
 
     PropertyUtil::PropertyMapT::iterator it   = props.begin();
 
@@ -250,6 +250,7 @@ CPNetDevice::in(BYTE adr)
     }
 
     debugss(ssCPNetDevice, ERROR, "Invalid port address %02x\n", adr);
+    return val;
 }
 
 void

@@ -181,7 +181,8 @@ int
 HostFileBdos::closeFile(BYTE* msgbuf, int len)
 {
     int         rc;
-    BYTE        u   = msgbuf[0] & 0x1f;
+
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (!fcb->s1[1])
@@ -212,7 +213,7 @@ HostFileBdos::closeFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::searchNext(BYTE* msgbuf, int len)
 {
-    BYTE  u    = msgbuf[1] & 0x1f;
+    BYTE  u    = msgbuf[1] & 0x1f; // unused
     msgbuf[0] = 0;
     char* name = doSearch(&curSearch);
     if (!name)
@@ -289,7 +290,7 @@ HostFileBdos::deleteFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::readSeq(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -304,7 +305,7 @@ HostFileBdos::readSeq(BYTE* msgbuf, int len)
         len *= 128;
         lseek(fcb->fd, len, SEEK_SET);
     }
-    int rc = read(fcb->fd, &msgbuf[0x25], 128);
+    long rc = read(fcb->fd, &msgbuf[0x25], 128);
     if (fcb->cr > 127)
     {
         fcb->cr   = 0;
@@ -332,7 +333,7 @@ HostFileBdos::readSeq(BYTE* msgbuf, int len)
 int
 HostFileBdos::writeSeq(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -340,7 +341,7 @@ HostFileBdos::writeSeq(BYTE* msgbuf, int len)
         msgbuf[0] = 9;
         return 1;
     }
-    int rc = write(fcb->fd, &msgbuf[0x25], 128);
+    long rc = write(fcb->fd, &msgbuf[0x25], 128);
     if (fcb->cr > 127)
     {
         fcb->cr   = 0;
@@ -452,7 +453,7 @@ HostFileBdos::renameFile(BYTE* msgbuf, int len)
 int
 HostFileBdos::readRand(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -461,7 +462,7 @@ HostFileBdos::readRand(BYTE* msgbuf, int len)
         return 1;
     }
     seekFile(fcb);
-    int rc = read(fcb->fd, &msgbuf[0x25], 128);
+    long rc = read(fcb->fd, &msgbuf[0x25], 128);
     seekFile(fcb);
     if (rc < 0)
     {
@@ -481,7 +482,7 @@ HostFileBdos::readRand(BYTE* msgbuf, int len)
 int
 HostFileBdos::writeRand(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -490,7 +491,7 @@ HostFileBdos::writeRand(BYTE* msgbuf, int len)
         return 1;
     }
     seekFile(fcb);
-    int rc = write(fcb->fd, &msgbuf[0x25], 128);
+    long rc = write(fcb->fd, &msgbuf[0x25], 128);
     seekFile(fcb);
     if (rc < 0)
     {
@@ -509,7 +510,8 @@ HostFileBdos::writeRand(BYTE* msgbuf, int len)
 int
 HostFileBdos::setRandRec(BYTE* msgbuf, int len)
 {
-    BYTE        u   = msgbuf[0] & 0x1f;
+
+    BYTE        u   = msgbuf[0] & 0x1f; // unused
     struct fcb* fcb = (struct fcb*) &msgbuf[1];
     msgbuf[0] = 0;
     if (fcb->fd <= 0)
@@ -630,7 +632,7 @@ HostFileBdos::getTime(BYTE* msgbuf, int len)
     localtime_r(&now, &tmv);
     // date is UTC, time is local, need to reconcile them...
     now      += tmv.tm_gmtoff;
-    int       date = now / 86400 - 2922 + 1;
+    long      date = now / 86400 - 2922 + 1;
     msgbuf[0] = (date & 0x0ff);
     msgbuf[1] = ((date >> 8) & 0x0ff);
     msgbuf[2] = ((tmv.tm_hour / 10) << 4) | (tmv.tm_hour % 10);
@@ -644,37 +646,37 @@ HostFileBdos::getTime(BYTE* msgbuf, int len)
 // '0' means not supported
 int(*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
 {
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0, // 00-0D
-    selectDisk,   openFile,      closeFile,        searchFirst,          searchNext,
-    deleteFile,   readSeq,       writeSeq,         createFile,           renameFile,
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0, // 00-0D
+    selectDisk,   openFile,   closeFile,    searchFirst,  searchNext,
+    deleteFile,   readSeq,    writeSeq,     createFile,   renameFile,
     getLoginVec,
     0,            0, // 19-1A
-    getAllocVec,  writeProt,     getROVec,         setFileAttrs,         getDPB,
+    getAllocVec,  writeProt,  getROVec,     setFileAttrs, getDPB,
     0,               // 20
-    readRand,     writeRand,     compFileSize,     setRandRec,           resetDrive,
-    accessDrive,  freeDrive,     writeRandZF,
-    0,            0,                                  // 29-2A
+    readRand,     writeRand,  compFileSize, setRandRec,   resetDrive,
+    accessDrive,  freeDrive,  writeRandZF,
+    0,            0,                           // 29-2A
     unlockRec,
-    0,            0,             0,                0, // 2C-2F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0,                 0,
-    0,                                                // 30-3F
-    login,        logoff,                             // not really implemented... but must not return error.
-    0,            0,             0,                0, // 42-45
+    0,            0,          0,            0, // 2C-2F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0,                                         // 30-3F
+    login,        logoff,                      // not really implemented... but must not return error.
+    0,            0,          0,            0, // 42-45
     setCompAttrs, getServCfg,
-    0,            0,             0,                0,                    0,                 0,
+    0,            0,          0,            0,            0,          0,
     0,            0, // 48-4F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0,                 0,
-    0,                              // 50-5F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0, // 60-68
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0,                           // 50-5F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0, // 60-68
     getTime,
-    setDefPwd,                      // 6A: not really implemented... (106)
+    setDefPwd,                   // 6A: not really implemented... (106)
     0
 };
 
@@ -723,6 +725,7 @@ char*
 HostFileBdos::cpmFindInit(struct search::find* find)
 {
     find->dir = NULL;
+    return NULL;
 }
 
 char*
