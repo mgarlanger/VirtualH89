@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A13BEE651C96955A00C7E65A /* CPNetDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE631C96955A00C7E65A /* CPNetDevice.cpp */; };
+		A13BEE681C96956800C7E65A /* GppListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE661C96956800C7E65A /* GppListener.cpp */; };
+		A13BEE6D1C96957F00C7E65A /* H88MemoryDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */; };
+		A13BEE701C96959600C7E65A /* H89MemoryDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE6E1C96959600C7E65A /* H89MemoryDecoder.cpp */; };
+		A13BEE741C96959F00C7E65A /* HostFileBdos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE721C96959F00C7E65A /* HostFileBdos.cpp */; };
+		A13BEE7B1C9695B700C7E65A /* MMS77318MemoryDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE791C9695B700C7E65A /* MMS77318MemoryDecoder.cpp */; };
+		A13BEE801C9695C200C7E65A /* NetworkServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE7C1C9695C200C7E65A /* NetworkServer.cpp */; };
+		A13BEE831C9695D100C7E65A /* SectorFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE811C9695D100C7E65A /* SectorFloppyImage.cpp */; };
 		A13C987E1C7A37F7000CF03B /* DiskController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C987C1C7A37F7000CF03B /* DiskController.cpp */; };
 		A13C98881C7A3805000CF03B /* GenericDiskDrive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C987F1C7A3805000CF03B /* GenericDiskDrive.cpp */; };
 		A13C98891C7A3805000CF03B /* GenericFloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C98811C7A3805000CF03B /* GenericFloppyDisk.cpp */; };
@@ -47,12 +55,10 @@
 		A1A434501C7060430015F838 /* IODevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4340B1C7060430015F838 /* IODevice.cpp */; };
 		A1A434511C7060430015F838 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4340E1C7060430015F838 /* logger.cpp */; };
 		A1A434521C7060430015F838 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434101C7060430015F838 /* main.cpp */; };
-		A1A434531C7060430015F838 /* Memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434121C7060430015F838 /* Memory.cpp */; };
 		A1A434541C7060430015F838 /* NMIPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434141C7060430015F838 /* NMIPort.cpp */; };
 		A1A434551C7060430015F838 /* ParallelLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434161C7060430015F838 /* ParallelLink.cpp */; };
 		A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434181C7060430015F838 /* ParallelPortConnection.cpp */; };
 		A1A434571C7060430015F838 /* propertyutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341A1C7060430015F838 /* propertyutil.cpp */; };
-		A1A434581C7060430015F838 /* RAM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341C1C7060430015F838 /* RAM.cpp */; };
 		A1A434591C7060430015F838 /* ROM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A4341E1C7060430015F838 /* ROM.cpp */; };
 		A1A4345A1C7060430015F838 /* Sector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434201C7060430015F838 /* Sector.cpp */; };
 		A1A4345B1C7060430015F838 /* SerialPortDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434221C7060430015F838 /* SerialPortDevice.cpp */; };
@@ -83,6 +89,31 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A13BEE631C96955A00C7E65A /* CPNetDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPNetDevice.cpp; sourceTree = "<group>"; };
+		A13BEE641C96955A00C7E65A /* CPNetDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPNetDevice.h; sourceTree = "<group>"; };
+		A13BEE661C96956800C7E65A /* GppListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GppListener.cpp; sourceTree = "<group>"; };
+		A13BEE671C96956800C7E65A /* GppListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GppListener.h; sourceTree = "<group>"; };
+		A13BEE691C96957500C7E65A /* Z64KMemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z64KMemoryLayout.h; sourceTree = "<group>"; };
+		A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H88MemoryDecoder.cpp; sourceTree = "<group>"; };
+		A13BEE6B1C96957F00C7E65A /* H88MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H88MemoryDecoder.h; sourceTree = "<group>"; };
+		A13BEE6C1C96957F00C7E65A /* H88MemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H88MemoryLayout.h; sourceTree = "<group>"; };
+		A13BEE6E1C96959600C7E65A /* H89MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H89MemoryDecoder.cpp; sourceTree = "<group>"; };
+		A13BEE6F1C96959600C7E65A /* H89MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H89MemoryDecoder.h; sourceTree = "<group>"; };
+		A13BEE711C96959F00C7E65A /* HDOSMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDOSMemory8K.h; sourceTree = "<group>"; };
+		A13BEE721C96959F00C7E65A /* HostFileBdos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HostFileBdos.cpp; sourceTree = "<group>"; };
+		A13BEE731C96959F00C7E65A /* HostFileBdos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HostFileBdos.h; sourceTree = "<group>"; };
+		A13BEE751C9695AC00C7E65A /* Memory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory8K.h; sourceTree = "<group>"; };
+		A13BEE761C9695AC00C7E65A /* Memory64K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory64K.h; sourceTree = "<group>"; };
+		A13BEE771C9695AC00C7E65A /* MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryDecoder.h; sourceTree = "<group>"; };
+		A13BEE781C9695AC00C7E65A /* MemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryLayout.h; sourceTree = "<group>"; };
+		A13BEE791C9695B700C7E65A /* MMS77318MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MMS77318MemoryDecoder.cpp; sourceTree = "<group>"; };
+		A13BEE7A1C9695B700C7E65A /* MMS77318MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMS77318MemoryDecoder.h; sourceTree = "<group>"; };
+		A13BEE7C1C9695C200C7E65A /* NetworkServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkServer.cpp; sourceTree = "<group>"; };
+		A13BEE7D1C9695C200C7E65A /* NetworkServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkServer.h; sourceTree = "<group>"; };
+		A13BEE7E1C9695C200C7E65A /* NilMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilMemory8K.h; sourceTree = "<group>"; };
+		A13BEE7F1C9695C200C7E65A /* RAMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAMemory8K.h; sourceTree = "<group>"; };
+		A13BEE811C9695D100C7E65A /* SectorFloppyImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SectorFloppyImage.cpp; sourceTree = "<group>"; };
+		A13BEE821C9695D100C7E65A /* SectorFloppyImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectorFloppyImage.h; sourceTree = "<group>"; };
 		A13C987C1C7A37F7000CF03B /* DiskController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskController.cpp; sourceTree = "<group>"; };
 		A13C987D1C7A37F7000CF03B /* DiskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskController.h; sourceTree = "<group>"; };
 		A13C987F1C7A3805000CF03B /* GenericDiskDrive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenericDiskDrive.cpp; sourceTree = "<group>"; };
@@ -174,8 +205,6 @@
 		A1A4340F1C7060430015F838 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logger.h; sourceTree = "<group>"; };
 		A1A434101C7060430015F838 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A1A434111C7060430015F838 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		A1A434121C7060430015F838 /* Memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory.cpp; sourceTree = "<group>"; };
-		A1A434131C7060430015F838 /* Memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory.h; sourceTree = "<group>"; };
 		A1A434141C7060430015F838 /* NMIPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NMIPort.cpp; sourceTree = "<group>"; };
 		A1A434151C7060430015F838 /* NMIPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMIPort.h; sourceTree = "<group>"; };
 		A1A434161C7060430015F838 /* ParallelLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParallelLink.cpp; sourceTree = "<group>"; };
@@ -184,8 +213,6 @@
 		A1A434191C7060430015F838 /* ParallelPortConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParallelPortConnection.h; sourceTree = "<group>"; };
 		A1A4341A1C7060430015F838 /* propertyutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = propertyutil.cpp; sourceTree = "<group>"; };
 		A1A4341B1C7060430015F838 /* propertyutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = propertyutil.h; sourceTree = "<group>"; };
-		A1A4341C1C7060430015F838 /* RAM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAM.cpp; sourceTree = "<group>"; };
-		A1A4341D1C7060430015F838 /* RAM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAM.h; sourceTree = "<group>"; };
 		A1A4341E1C7060430015F838 /* ROM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ROM.cpp; sourceTree = "<group>"; };
 		A1A4341F1C7060430015F838 /* ROM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ROM.h; sourceTree = "<group>"; };
 		A1A434201C7060430015F838 /* Sector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sector.cpp; sourceTree = "<group>"; };
@@ -288,6 +315,8 @@
 				A1A433D81C7060430015F838 /* config.h */,
 				A1A433D91C7060430015F838 /* Console.cpp */,
 				A1A433DA1C7060430015F838 /* Console.h */,
+				A13BEE631C96955A00C7E65A /* CPNetDevice.cpp */,
+				A13BEE641C96955A00C7E65A /* CPNetDevice.h */,
 				A1A433DB1C7060430015F838 /* cpu.cpp */,
 				A1A433DC1C7060430015F838 /* cpu.h */,
 				A1A433DD1C7060430015F838 /* crc-ccitt.cpp */,
@@ -317,6 +346,8 @@
 				A13C98851C7A3805000CF03B /* GenericFloppyFormat.h */,
 				A13C98861C7A3805000CF03B /* GenericSASIDrive.cpp */,
 				A13C98871C7A3805000CF03B /* GenericSASIDrive.h */,
+				A13BEE661C96956800C7E65A /* GppListener.cpp */,
+				A13BEE671C96956800C7E65A /* GppListener.h */,
 				A1A433F01C7060430015F838 /* h-17-1.cpp */,
 				A1A433F11C7060430015F838 /* h-17-1.h */,
 				A1A433F21C7060430015F838 /* h-17-4.cpp */,
@@ -330,6 +361,9 @@
 				A1A433FA1C7060430015F838 /* h37.h */,
 				A1A433FB1C7060430015F838 /* H47Drive.cpp */,
 				A1A433FC1C7060430015F838 /* H47Drive.h */,
+				A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */,
+				A13BEE6B1C96957F00C7E65A /* H88MemoryDecoder.h */,
+				A13BEE6C1C96957F00C7E65A /* H88MemoryLayout.h */,
 				A1A433FD1C7060430015F838 /* h89-io.cpp */,
 				A1A433FE1C7060430015F838 /* h89-io.h */,
 				A1A433FF1C7060430015F838 /* H89-roms.h */,
@@ -337,11 +371,16 @@
 				A1A434011C7060430015F838 /* h89-timer.h */,
 				A1A434021C7060430015F838 /* H89.cpp */,
 				A1A434031C7060430015F838 /* H89.h */,
+				A13BEE6E1C96959600C7E65A /* H89MemoryDecoder.cpp */,
+				A13BEE6F1C96959600C7E65A /* H89MemoryDecoder.h */,
 				A13C988C1C7A381E000CF03B /* H89Operator.cpp */,
 				A13C988D1C7A381E000CF03B /* H89Operator.h */,
 				A1A434041C7060430015F838 /* h89Types.h */,
 				A1A434051C7060430015F838 /* HardSectoredDisk.cpp */,
 				A1A434061C7060430015F838 /* HardSectoredDisk.h */,
+				A13BEE711C96959F00C7E65A /* HDOSMemory8K.h */,
+				A13BEE721C96959F00C7E65A /* HostFileBdos.cpp */,
+				A13BEE731C96959F00C7E65A /* HostFileBdos.h */,
 				A1A434071C7060430015F838 /* INS8250.cpp */,
 				A1A434081C7060430015F838 /* INS8250.h */,
 				A1A434091C7060430015F838 /* InterruptController.cpp */,
@@ -353,14 +392,21 @@
 				A1A4340F1C7060430015F838 /* logger.h */,
 				A1A434101C7060430015F838 /* main.cpp */,
 				A1A434111C7060430015F838 /* main.h */,
-				A1A434121C7060430015F838 /* Memory.cpp */,
-				A1A434131C7060430015F838 /* Memory.h */,
+				A13BEE751C9695AC00C7E65A /* Memory8K.h */,
+				A13BEE761C9695AC00C7E65A /* Memory64K.h */,
+				A13BEE771C9695AC00C7E65A /* MemoryDecoder.h */,
+				A13BEE781C9695AC00C7E65A /* MemoryLayout.h */,
 				A13C988F1C7A382D000CF03B /* MMS316IntrCtrlr.cpp */,
 				A13C98901C7A382D000CF03B /* MMS316IntrCtrlr.h */,
 				A13C98911C7A382D000CF03B /* mms77316.cpp */,
 				A13C98921C7A382D000CF03B /* mms77316.h */,
+				A13BEE791C9695B700C7E65A /* MMS77318MemoryDecoder.cpp */,
+				A13BEE7A1C9695B700C7E65A /* MMS77318MemoryDecoder.h */,
 				A13C98931C7A382D000CF03B /* mms77320.cpp */,
 				A13C98941C7A382D000CF03B /* mms77320.h */,
+				A13BEE7C1C9695C200C7E65A /* NetworkServer.cpp */,
+				A13BEE7D1C9695C200C7E65A /* NetworkServer.h */,
+				A13BEE7E1C9695C200C7E65A /* NilMemory8K.h */,
 				A1A434141C7060430015F838 /* NMIPort.cpp */,
 				A1A434151C7060430015F838 /* NMIPort.h */,
 				A1A434161C7060430015F838 /* ParallelLink.cpp */,
@@ -369,14 +415,15 @@
 				A1A434191C7060430015F838 /* ParallelPortConnection.h */,
 				A1A4341A1C7060430015F838 /* propertyutil.cpp */,
 				A1A4341B1C7060430015F838 /* propertyutil.h */,
-				A1A4341C1C7060430015F838 /* RAM.cpp */,
-				A1A4341D1C7060430015F838 /* RAM.h */,
+				A13BEE7F1C9695C200C7E65A /* RAMemory8K.h */,
 				A13C989B1C7A3850000CF03B /* RawFloppyImage.cpp */,
 				A13C989C1C7A3850000CF03B /* RawFloppyImage.h */,
 				A1A4341E1C7060430015F838 /* ROM.cpp */,
 				A1A4341F1C7060430015F838 /* ROM.h */,
 				A1A434201C7060430015F838 /* Sector.cpp */,
 				A1A434211C7060430015F838 /* Sector.h */,
+				A13BEE811C9695D100C7E65A /* SectorFloppyImage.cpp */,
+				A13BEE821C9695D100C7E65A /* SectorFloppyImage.h */,
 				A1A434221C7060430015F838 /* SerialPortDevice.cpp */,
 				A1A434231C7060430015F838 /* SerialPortDevice.h */,
 				A1A434241C7060430015F838 /* SignalHandler.cpp */,
@@ -399,6 +446,7 @@
 				A1A434311C7060430015F838 /* Z47Controller.h */,
 				A1A434321C7060430015F838 /* Z47Interface.cpp */,
 				A1A434331C7060430015F838 /* Z47Interface.h */,
+				A13BEE691C96957500C7E65A /* Z64KMemoryLayout.h */,
 				A1A434341C7060430015F838 /* z80.cpp */,
 				A1A434351C7060430015F838 /* z80.h */,
 			);
@@ -461,9 +509,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1A434581C7060430015F838 /* RAM.cpp in Sources */,
 				A1A4345E1C7060430015F838 /* StdioConsole.cpp in Sources */,
-				A1A434531C7060430015F838 /* Memory.cpp in Sources */,
 				A1A434371C7060430015F838 /* AddressBus.cpp in Sources */,
 				A13C98891C7A3805000CF03B /* GenericFloppyDisk.cpp in Sources */,
 				A13C98951C7A382D000CF03B /* MMS316IntrCtrlr.cpp in Sources */,
@@ -472,13 +518,17 @@
 				A1A434391C7060430015F838 /* computer.cpp in Sources */,
 				A1A434481C7060430015F838 /* h37.cpp in Sources */,
 				A1A4343E1C7060430015F838 /* DiskData.cpp in Sources */,
+				A13BEE681C96956800C7E65A /* GppListener.cpp in Sources */,
 				A1A4345B1C7060430015F838 /* SerialPortDevice.cpp in Sources */,
+				A13BEE741C96959F00C7E65A /* HostFileBdos.cpp in Sources */,
 				A1A434541C7060430015F838 /* NMIPort.cpp in Sources */,
 				A13C98971C7A382D000CF03B /* mms77320.cpp in Sources */,
+				A13BEE6D1C96957F00C7E65A /* H88MemoryDecoder.cpp in Sources */,
 				A1A4344F1C7060430015F838 /* InterruptController.cpp in Sources */,
 				A1A434411C7060430015F838 /* EventHandler.cpp in Sources */,
 				A1A4343C1C7060430015F838 /* crc-ccitt.cpp in Sources */,
 				A1A4344B1C7060430015F838 /* h89-timer.cpp in Sources */,
+				A13BEE831C9695D100C7E65A /* SectorFloppyImage.cpp in Sources */,
 				A1A434571C7060430015F838 /* propertyutil.cpp in Sources */,
 				A1A434521C7060430015F838 /* main.cpp in Sources */,
 				A1A4344E1C7060430015F838 /* INS8250.cpp in Sources */,
@@ -489,6 +539,7 @@
 				A1A4345F1C7060430015F838 /* Terminal.cpp in Sources */,
 				A1A434441C7060430015F838 /* h-17-1.cpp in Sources */,
 				A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */,
+				A13BEE801C9695C200C7E65A /* NetworkServer.cpp in Sources */,
 				A1A4344C1C7060430015F838 /* H89.cpp in Sources */,
 				A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */,
 				A1A434511C7060430015F838 /* logger.cpp in Sources */,
@@ -498,17 +549,20 @@
 				A1A434591C7060430015F838 /* ROM.cpp in Sources */,
 				A1A434501C7060430015F838 /* IODevice.cpp in Sources */,
 				A1A4344D1C7060430015F838 /* HardSectoredDisk.cpp in Sources */,
+				A13BEE651C96955A00C7E65A /* CPNetDevice.cpp in Sources */,
 				A1A434471C7060430015F838 /* h19.cpp in Sources */,
 				A1A434621C7060430015F838 /* Z47Controller.cpp in Sources */,
 				A1A4343A1C7060430015F838 /* Console.cpp in Sources */,
 				A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */,
 				A1A434601C7060430015F838 /* Track.cpp in Sources */,
+				A13BEE7B1C9695B700C7E65A /* MMS77318MemoryDecoder.cpp in Sources */,
 				A1A4343D1C7060430015F838 /* disasm.cpp in Sources */,
 				A13C989A1C7A3839000CF03B /* StdioProxyConsole.cpp in Sources */,
 				A13C98881C7A3805000CF03B /* GenericDiskDrive.cpp in Sources */,
 				A1A434421C7060430015F838 /* FloppyDisk.cpp in Sources */,
 				A1A434461C7060430015F838 /* h17.cpp in Sources */,
 				A1A4344A1C7060430015F838 /* h89-io.cpp in Sources */,
+				A13BEE701C96959600C7E65A /* H89MemoryDecoder.cpp in Sources */,
 				A1A434451C7060430015F838 /* h-17-4.cpp in Sources */,
 				A1A4343B1C7060430015F838 /* cpu.cpp in Sources */,
 				A13C98961C7A382D000CF03B /* mms77316.cpp in Sources */,

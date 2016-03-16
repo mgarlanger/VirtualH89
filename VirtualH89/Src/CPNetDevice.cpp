@@ -250,6 +250,7 @@ CPNetDevice::in(BYTE adr)
     }
 
     debugss(ssCPNetDevice, ERROR, "Invalid port address %02x\n", adr);
+    return val;
 }
 
 void

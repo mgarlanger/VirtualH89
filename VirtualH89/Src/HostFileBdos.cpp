@@ -644,37 +644,37 @@ HostFileBdos::getTime(BYTE* msgbuf, int len)
 // '0' means not supported
 int(*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
 {
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0, // 00-0D
-    selectDisk,   openFile,      closeFile,        searchFirst,          searchNext,
-    deleteFile,   readSeq,       writeSeq,         createFile,           renameFile,
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0, // 00-0D
+    selectDisk,   openFile,   closeFile,    searchFirst,  searchNext,
+    deleteFile,   readSeq,    writeSeq,     createFile,   renameFile,
     getLoginVec,
     0,            0, // 19-1A
-    getAllocVec,  writeProt,     getROVec,         setFileAttrs,         getDPB,
+    getAllocVec,  writeProt,  getROVec,     setFileAttrs, getDPB,
     0,               // 20
-    readRand,     writeRand,     compFileSize,     setRandRec,           resetDrive,
-    accessDrive,  freeDrive,     writeRandZF,
-    0,            0,                                  // 29-2A
+    readRand,     writeRand,  compFileSize, setRandRec,   resetDrive,
+    accessDrive,  freeDrive,  writeRandZF,
+    0,            0,                           // 29-2A
     unlockRec,
-    0,            0,             0,                0, // 2C-2F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0,                 0,
-    0,                                                // 30-3F
-    login,        logoff,                             // not really implemented... but must not return error.
-    0,            0,             0,                0, // 42-45
+    0,            0,          0,            0, // 2C-2F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0,                                         // 30-3F
+    login,        logoff,                      // not really implemented... but must not return error.
+    0,            0,          0,            0, // 42-45
     setCompAttrs, getServCfg,
-    0,            0,             0,                0,                    0,                 0,
+    0,            0,          0,            0,            0,          0,
     0,            0, // 48-4F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0,
-    0,            0,             0,                0,                    0,                 0,
-    0,                              // 50-5F
-    0,            0,             0,                0,                    0,                 0,
-    0,            0,             0, // 60-68
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0,
+    0,            0,          0,            0,            0,          0,
+    0,                           // 50-5F
+    0,            0,          0,            0,            0,          0,
+    0,            0,          0, // 60-68
     getTime,
-    setDefPwd,                      // 6A: not really implemented... (106)
+    setDefPwd,                   // 6A: not really implemented... (106)
     0
 };
 
@@ -723,6 +723,7 @@ char*
 HostFileBdos::cpmFindInit(struct search::find* find)
 {
     find->dir = NULL;
+    return NULL;
 }
 
 char*

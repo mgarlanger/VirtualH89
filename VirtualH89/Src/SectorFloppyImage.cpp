@@ -13,6 +13,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include "SectorFloppyImage.h"
 #include "RawFloppyImage.h"

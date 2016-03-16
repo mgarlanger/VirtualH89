@@ -1399,7 +1399,7 @@ Z80::SET_ZSP_FLAGS(BYTE val)
 {
     // Mask off the bits.
     CLEAR_FLAGS(Z_FLAG | S_FLAG | P_FLAG);
-    
+
     // Set bits from pre-generated table
     F |= ZSP[val];
 };

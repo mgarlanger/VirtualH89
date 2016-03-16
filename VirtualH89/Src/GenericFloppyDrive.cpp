@@ -16,7 +16,7 @@
 #include "GenericFloppyDisk.h"
 
 GenericFloppyDrive::GenericFloppyDrive(DriveType type):
-	disk_m(NULL)
+    disk_m(NULL)
 {
     // Can this change on-the-fly?
     ticksPerSec_m = WallClock::instance()->getTicksPerSecond();

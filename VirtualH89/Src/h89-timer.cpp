@@ -96,13 +96,13 @@ H89Timer::start()
 {
     static struct itimerval tim;
 
-    thread = pthread_self();
+    thread                   = pthread_self();
 
-    tim.it_value.tv_sec     = 0;
-    tim.it_value.tv_usec    = TimerInterval_c;
+    tim.it_value.tv_sec      = 0;
+    tim.it_value.tv_usec     = TimerInterval_c;
 
-    tim.it_interval.tv_sec  = 0;
-    tim.it_interval.tv_usec = TimerInterval_c;
+    tim.it_interval.tv_sec   = 0;
+    tim.it_interval.tv_usec  = TimerInterval_c;
 
 #if TEN_X_SLOWER
     tim.it_value.tv_usec    *= 20;
@@ -124,13 +124,15 @@ H89Timer::handleSignal(int signum)
 
         return (0);
     }
-    if (thread == 0) {
-	// can't do much else for now.
-	return 0;
+    if (thread == 0)
+    {
+        // can't do much else for now.
+        return 0;
     }
-    if (thread != pthread_self()) {
-	pthread_kill(thread, SIGALRM);
-	return 0;
+    if (thread != pthread_self())
+    {
+        pthread_kill(thread, SIGALRM);
+        return 0;
     }
 
     count_m++;
