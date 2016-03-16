@@ -478,7 +478,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     bufferedSide_m  = -1;
     bufferDirty_m   = false;
     debugss(ssRawFloppyImage, ERROR,
-            "mounted %lu\" floppy %s: sides=%lu tracks=%lu spt=%lu DD=%s R%s\n",
+            "mounted %d\" floppy %s: sides=%d tracks=%d spt=%d DD=%s R%s\n",
             mediaSize_m, imageName_m, numSides_m, numTracks_m, numSectors_m,
             doubleDensity_m ? "yes" : "no", writeProtect_m ? "O" : "W");
 }
@@ -516,7 +516,7 @@ RawFloppyImage::cacheTrack(int side,
     {
         // Must write to disk...
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-        long rd = write(imageFd_m, trackBuffer_m, trackLen_m); // unused
+        long rd = write(imageFd_m, trackBuffer_m, trackLen_m);
         // TODO: what to do if this failed? Also might not know unitl close().
         bufferDirty_m = false;
     }
@@ -668,7 +668,7 @@ RawFloppyImage::readData(BYTE track,
                 dataLen_m = dataPos_m + 6;
                 data      = GenericFloppyFormat::ID_AM;
                 findMark(GenericFloppyFormat::CRC);
-                debugss(ssRawFloppyImage, INFO, "read address %d %ld\n", dataPos_m, dataLen_m);
+                debugss(ssRawFloppyImage, INFO, "read address %d %d\n", dataPos_m, dataLen_m);
                 return true;
             }
 
@@ -681,7 +681,7 @@ RawFloppyImage::readData(BYTE track,
             dataPos_m = 0;
             dataLen_m = trackLen_m;
             data      = GenericFloppyFormat::INDEX_AM;
-            debugss(ssRawFloppyImage, INFO, "read track %d %ld\n", dataPos_m, dataLen_m);
+            debugss(ssRawFloppyImage, INFO, "read track %d %d\n", dataPos_m, dataLen_m);
             return true;
         }
 

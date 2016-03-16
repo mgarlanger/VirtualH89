@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-
 #include "SectorFloppyImage.h"
 #include "RawFloppyImage.h"
 #include "logger.h"
@@ -29,8 +28,8 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE*         e;
-        unsigned long p = strtoul((char*) b, (char**) &e, 0);
+        BYTE* e;
+        int   p = strtoul((char*) b, (char**) &e, 0);
 
         switch (tolower(*e))
         {
@@ -190,12 +189,12 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
     }
 
     lseek(fd, end - sizeof(buf), SEEK_SET);
-    long x    = read(fd, buf, sizeof(buf));
+    int  x    = read(fd, buf, sizeof(buf));
     bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
     if (!done)
     {
-        debugss(ssSectorFloppyImage, ERROR, "file is not SectorFloppyImage (%ld,%d) - %s\n", x,
+        debugss(ssSectorFloppyImage, ERROR, "file is not SectorFloppyImage (%d,%d) - %s\n", x,
                 errno,
                 name);
         return;
@@ -204,7 +203,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
     hypoTrack_m  = (drive->getNumTracks() > numTracks_m);
     hyperTrack_m = (drive->getNumTracks() < numTracks_m);
     trackLen_m   = (mediaSize_m == 5 ? 3200 : 6400);
-    secLenCode_m = ffs((int) secSize_m); // 128==8, 1024==11
+    secLenCode_m = ffs(secSize_m); // 128==8, 1024==11
 
     if (secLenCode_m > 0)
     {
@@ -222,7 +221,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
     imageFd_m   = fd;
     imageName_m = name;
     debugss(ssSectorFloppyImage, ERROR,
-            "mounted %lu\" floppy %s: sides=%lu tracks=%lu spt=%lu DD=%s R%s\n",
+            "mounted %d\" floppy %s: sides=%d tracks=%d spt=%d DD=%s R%s\n",
             mediaSize_m, imageName_m, numSides_m, numTracks_m, numSectors_m,
             doubleDensity_m ? "yes" : "no", writeProtect_m ? "O" : "W");
 }
@@ -271,7 +270,7 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
     if (bufferDirty_m && bufferedSide_m != -1 && bufferedTrack_m != -1 && bufferedSector_m != -1)
     {
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-        long rd = write(imageFd_m, secBuf_m, secSize_m); // Unused
+        int rd = write(imageFd_m, secBuf_m, secSize_m);
         bufferDirty_m = false;
     }
 
@@ -306,7 +305,7 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
     }
 
     lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-    long rd = read(imageFd_m, secBuf_m, secSize_m);
+    int rd = read(imageFd_m, secBuf_m, secSize_m);
 
     if (rd != secSize_m)
     {

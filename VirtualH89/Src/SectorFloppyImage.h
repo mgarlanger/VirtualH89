@@ -52,14 +52,14 @@ class SectorFloppyImage: public GenericFloppyDisk
     bool          hypoTrack_m;  // ST media in DT drive
     bool          hyperTrack_m; // DT media in ST drive
     bool          interlaced_m;
-    unsigned long mediaLat_m;
+    int           mediaLat_m;
     BYTE          secLenCode_m;
     int           gapLen_m;
     int           indexGapLen_m;
     unsigned long writePos_m;
     bool          trackWrite_m;
     int           dataPos_m;
-    unsigned long dataLen_m;
+    int           dataLen_m;
 
     bool checkHeader(BYTE* buf, int n);
     bool cacheSector(int side, int track, int sector);

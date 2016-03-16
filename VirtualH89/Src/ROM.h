@@ -24,7 +24,7 @@ class ROM
     WORD  size_m;
 
   public:
-    ROM(unsigned long size);
+    ROM(int size);
     virtual ~ROM();
     static ROM* getROM(const char* file,
                        WORD        addr);

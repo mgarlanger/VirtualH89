@@ -83,8 +83,8 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE*         e;
-        unsigned long p = strtoul((char*) b, (char**) &e, 0);
+        BYTE* e;
+        int   p = strtoul((char*) b, (char**) &e, 0);
 
         // TODO: removable flag, others?
         // NOTE: removable media requires many more changes.
@@ -128,28 +128,29 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 GenericSASIDrive::GenericSASIDrive(DriveType   type,
                                    std::string media,
                                    int         cnum,
-                                   int         sectorSize): curState(IDLE),
-                                                            driveFd(-1),
-                                                            driveSecLen(0),
-                                                            sectorsPerTrack(0),
-                                                            capacity(0),
-                                                            dataOffset(0),
-                                                            driveCode(0),
-                                                            driveCnum(0),
-                                                            driveMedia(NULL),
-                                                            driveType(INVALID),
-                                                            mediaSpt(0),
-                                                            mediaSsz(0),
-                                                            mediaCyl(0),
-                                                            mediaHead(0),
-                                                            mediaLat(0),
-                                                            cmdIx(0),
-                                                            senseIx(0),
-                                                            dcbIx(0),
-                                                            stsIx(0),
-                                                            dataBuf(NULL),
-                                                            dataLength(0),
-                                                            dataIx(0)
+                                   int         sectorSize):
+    curState(IDLE),
+    driveFd(-1),
+    driveSecLen(0),
+    sectorsPerTrack(0),
+    capacity(0),
+    dataOffset(0),
+    driveCode(0),
+    driveCnum(0),
+    driveMedia(NULL),
+    driveType(INVALID),
+    mediaSpt(0),
+    mediaSsz(0),
+    mediaCyl(0),
+    mediaHead(0),
+    mediaLat(0),
+    cmdIx(0),
+    senseIx(0),
+    dcbIx(0),
+    stsIx(0),
+    dataBuf(NULL),
+    dataLength(0),
+    dataIx(0)
 {
     driveType   = type;
     driveMedia  = strdup(media.c_str());
@@ -202,7 +203,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
         mediaSpt  = sectorsPerTrack;
         mediaLat  = 1;
         memset(buf, 0, sizeof(buf));
-        int l = sprintf((char*) buf, "%ldc%ldh%ldz%ldp%ldl\n", mediaCyl, mediaHead,
+        int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
@@ -214,7 +215,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
     {
         // first, trying reading the last 128 bytes...
         lseek(driveFd, end - sizeof(buf), SEEK_SET);
-        long x    = read(driveFd, buf, sizeof(buf));
+        int  x    = read(driveFd, buf, sizeof(buf));
         bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
         if (!done)
@@ -867,7 +868,7 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
             int hds = dcbBuf[2] & 0x0f;
             int rwc = (dcbBuf[3] << 8) | dcbBuf[4];
             int wpc = (dcbBuf[5] << 8) | dcbBuf[6];
-            int ebl = dcbBuf[7] & 0x0f; // unused ?
+            int ebl = dcbBuf[7] & 0x0f;
 
             if (cyl != params[driveType][0] || hds != params[driveType][1] ||
                 rwc != params[driveType][2] ||
