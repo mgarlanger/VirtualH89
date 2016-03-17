@@ -249,8 +249,8 @@ H89::buildSystem(Console* console)
         h17         = new H17(H17_BaseAddress_c);
         // create the floppy drives for the hard-sectored controller.
         driveUnitH0 = new H_17_1;
-        driveUnitH1 = new H_17_4;
-        driveUnitH2 = new H_17_4;
+        driveUnitH1 = new H_17_1;
+        driveUnitH2 = new H_17_1;
 
 #if Z37
         h37         = new Z_89_37(H37_BasePort_c);
