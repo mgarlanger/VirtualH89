@@ -641,42 +641,94 @@ HostFileBdos::getTime(BYTE* msgbuf, int len)
     return 5;
 }
 
+/* *INDENT-OFF* */
 // '0' means not supported
 int(*HostFileBdos::bdosFunctions[256])(HostFileBdos*, BYTE*, int) =
 {
-    0,            0,          0,            0,            0,          0,
-    0,            0,          0,
-    0,            0,          0,            0,            0, // 00-0D
-    selectDisk,   openFile,   closeFile,    searchFirst,  searchNext,
-    deleteFile,   readSeq,    writeSeq,     createFile,   renameFile,
-    getLoginVec,
-    0,            0, // 19-1A
-    getAllocVec,  writeProt,  getROVec,     setFileAttrs, getDPB,
-    0,               // 20
-    readRand,     writeRand,  compFileSize, setRandRec,   resetDrive,
-    accessDrive,  freeDrive,  writeRandZF,
-    0,            0,                           // 29-2A
-    unlockRec,
-    0,            0,          0,            0, // 2C-2F
-    0,            0,          0,            0,            0,          0,
-    0,            0,          0,
-    0,            0,          0,            0,            0,          0,
-    0,                                         // 30-3F
-    login,        logoff,                      // not really implemented... but must not return error.
-    0,            0,          0,            0, // 42-45
-    setCompAttrs, getServCfg,
-    0,            0,          0,            0,            0,          0,
-    0,            0, // 48-4F
-    0,            0,          0,            0,            0,          0,
-    0,            0,          0,
-    0,            0,          0,            0,            0,          0,
-    0,                           // 50-5F
-    0,            0,          0,            0,            0,          0,
-    0,            0,          0, // 60-68
-    getTime,
-    setDefPwd,                   // 6A: not really implemented... (106)
-    0
+    // 0x00
+    0,              0,               0,               0,
+    
+    // 0x04
+    0,              0,               0,               0,
+    
+    // 0x08
+    0,              0,               0,               0,
+    
+    // 0x0C
+    0,              0,               selectDisk,      openFile,
+    
+    // 0x10
+    closeFile,      searchFirst,     searchNext,      deleteFile,
+    
+    // 0x14
+    readSeq,        writeSeq,        createFile,      renameFile,
+    
+    // 0x18
+    getLoginVec,    0,               0,               getAllocVec,
+    
+    // 0x1C
+    writeProt,     getROVec,         setFileAttrs,    getDPB,
+    
+    // 0x20
+    0,             readRand,         writeRand,       compFileSize,
+    
+    // 0x24
+    setRandRec,    resetDrive,       accessDrive,     freeDrive,
+    
+    // 0x28
+    writeRandZF,   0,                0,               unlockRec,
+    
+    // 0x2C
+    0,             0,                0,               0,
+    
+    // 0x30
+    0,             0,                0,               0,
+    
+    // 0x34
+    0,             0,                0,               0,
+    
+    // 0x38
+    0,             0,                0,               0,
+    
+    // 0x3C
+    0,             0,                0,               0,
+    
+    // 0x40   For 0x40 & 0x41 - not really implemented... but must not return error.
+    login,         logoff,           0,               0,
+    
+    // 0x44
+    0,             0,                setCompAttrs,    getServCfg,
+    
+    // 0x48
+    0,             0,                0,               0,
+    
+    // 0x4C
+    0,             0,                0,               0,
+    
+    // 0x50
+    0,             0,                0,               0,
+    
+    // 0x54
+    0,             0,                0,               0,
+    
+    // 0x58
+    0,             0,                0,               0,
+    
+    // 0x5C
+    0,             0,                0,               0,
+    
+    // 0x60
+    0,             0,                0,               0,
+    
+    // 0x64
+    0,             0,                0,               0,
+    
+    // 0x68   For 6A: not really implemented... (106)
+    0,             getTime,          setDefPwd,       0
+    
+    
 };
+/* *INDENT-ON* */
 
 int
 HostFileBdos::cpmDrive(char* buf, int drive)
