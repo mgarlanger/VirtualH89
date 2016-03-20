@@ -10,10 +10,12 @@
 #include "FloppyDisk.h"
 #include "logger.h"
 
+#include "h-17-1.h"
+#include "h-17-4.h"
 
-DiskDrive::DiskDrive(): disk_m(0),
-                        headLoaded_m(false),
-                        numTracks_m(40)
+DiskDrive::DiskDrive(BYTE tracks): disk_m(0),
+                                   headLoaded_m(false),
+                                   numTracks_m(tracks)
 {
 
 }
@@ -23,7 +25,39 @@ DiskDrive::~DiskDrive()
 
 }
 
-#if 0
+
+
+DiskDrive*
+DiskDrive::getInstance(std::string type)
+{
+    DiskDrive* drive = nullptr;
+
+    if ((type.compare("FDD_5_25_SS_ST") == 0) || (type.compare("H17_1") == 0))
+    {
+        debugss(ssDiskDrive, ERROR, "%s - allocating h17-1 drive\n", __FUNCTION__);
+        drive = new H_17_1();
+    }
+    // \todo support ss_dt & ds_st
+//    else if (type.compare("FDD_5_25_SS_DT") == 0)
+//    {
+//        etype = FDD_5_25_SS_DT;
+//    }
+//    else if (type.compare("FDD_5_25_DS_ST") == 0)
+//    {
+//        etype = FDD_5_25_DS_ST;
+//    }
+    else if ((type.compare("FDD_5_25_DS_DT") == 0) || (type.compare("H17_4") == 0))
+    {
+        debugss(ssDiskDrive, ERROR, "%s - allocating h17-4 drive\n", __FUNCTION__);
+        drive = new H_17_4();
+    }
+    else
+    {
+        debugss(ssDiskDrive, ERROR, "%s - unable to allocate drive\n", __FUNCTION__);
+    }
+    return drive;
+}
+
 void
 DiskDrive::insertDisk(FloppyDisk* disk)
 {
@@ -35,7 +69,6 @@ DiskDrive::insertDisk(FloppyDisk* disk)
         disk_m->setMaxTrack(numTracks_m);
     }
 }
-#endif
 
 void
 DiskDrive::ejectDisk(const char* name)
@@ -66,6 +99,7 @@ DiskDrive::getHeadLoadStatus()
     return headLoaded_m;
 }
 
+#if 0
 void
 DiskDrive::step(bool direction)
 {
@@ -88,3 +122,5 @@ DiskDrive::step(bool direction)
         debugss(ssDiskDrive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
     }
 }
+
+#endif

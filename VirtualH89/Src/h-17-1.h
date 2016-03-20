@@ -39,13 +39,12 @@ class H_17_1: public DiskDrive
 
     virtual BYTE readSectorData(BYTE          sector,
                                 unsigned long pos);
-    void insertDisk(FloppyDisk* disk);
 
 
   private:
 
-    const unsigned int  maxTracks_c = 40;
-    const unsigned char head_c      = 0;
+    static const unsigned int  maxTracks_c = 40;
+    static const unsigned char head_c      = 0;
 };
 
 #endif // H_17_1_H_

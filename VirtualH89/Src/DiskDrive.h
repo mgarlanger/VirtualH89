@@ -10,6 +10,8 @@
 #ifndef DISKDRIVE_H_
 #define DISKDRIVE_H_
 
+#include <string>
+
 #include "config.h"
 #include "h89Types.h"
 
@@ -18,10 +20,12 @@ class FloppyDisk;
 class DiskDrive
 {
   public:
-    DiskDrive();
+    static DiskDrive* getInstance(std::string type);
+
+    DiskDrive(BYTE tracks = 40);
     virtual ~DiskDrive();
 
-    virtual void insertDisk(FloppyDisk* disk) = 0;
+    virtual void insertDisk(FloppyDisk* disk);
     virtual void ejectDisk(const char* name);
 
 
@@ -44,13 +48,13 @@ class DiskDrive
     virtual void unLoadHead();
     virtual bool getHeadLoadStatus();
 
+
   protected:
     FloppyDisk* disk_m;
 
     bool        headLoaded_m;
     BYTE        numTracks_m;
     BYTE        track_m = 0;
-
 
 };
 

@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "WallClock.h"
 #include "DiskDrive.h"
+#include "HardSectoredDisk.h"
 
 
 H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
@@ -48,6 +49,50 @@ H17::~H17()
 {
     WallClock::instance()->unregisterUser(this);
 }
+
+
+H17*
+H17::install_H17(BYTE                        baseAddr,
+                 PropertyUtil::PropertyMapT& props,
+                 std::string                 slot)
+{
+    std::string                   s;
+    H17*                          h17 = new H17(baseAddr);
+    debugss(ssH17, ERROR, " h17.install_h17\n");
+
+    for (BYTE i = 0; i < maxDiskDrive_c; ++i)
+    {
+
+        std::string prop = "h17_drive";
+        prop += ('0' + i + 1);
+        s     = props[prop];
+
+        if (!s.empty())
+        {
+
+            DiskDrive* drive = DiskDrive::getInstance(s);
+            if (drive)
+            {
+
+                h17->connectDrive(i, drive);
+                prop  = "h17_disk";
+                prop += ('0' + i + 1);
+                s     = props[prop];
+
+                if (!s.empty())
+                {
+                    HardSectoredDisk* disk = new HardSectoredDisk(s.c_str());
+
+                    drive->insertDisk(disk);
+                }
+
+            }
+        }
+    }
+
+    return h17;
+}
+
 
 void
 H17::gppNewValue(BYTE gpo) {
@@ -302,7 +347,7 @@ H17::out(BYTE addr,
                 else
                 {
                     // all drives have been unselected...
-                    debugss(ssH17, WARNING, " h17.out(Control) - No drive selected\n");
+                    debugss(ssH17, WARNING, " h17.out(Control) - step --No drive selected\n");
                 }
             }
 
@@ -314,6 +359,8 @@ H17::out(BYTE addr,
 
     }
 }
+
+
 
 bool
 H17::connectDrive(BYTE       unitNum,
