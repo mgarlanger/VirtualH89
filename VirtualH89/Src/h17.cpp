@@ -58,7 +58,7 @@ H17::install_H17(BYTE                        baseAddr,
 {
     std::string                   s;
     H17*                          h17 = new H17(baseAddr);
-    debugss(ssH17, ERROR, " h17.install_h17\n");
+    debugss(ssH17, INFO, "%s: entering\n", __FUNCTION__);
 
     for (BYTE i = 0; i < maxDiskDrive_c; ++i)
     {

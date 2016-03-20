@@ -287,5 +287,6 @@ HardSectoredDisk::readSectorData(BYTE  side,
                                  WORD  pos,
                                  BYTE& data)
 {
+    debugss(ssFloppyDisk, ALL, "%s: Not Implemented\n", __FUNCTION__);
     return false;
 }
