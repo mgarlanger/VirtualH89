@@ -10,27 +10,15 @@
 #include "FloppyDisk.h"
 
 
-H_17_1::H_17_1()
+H_17_1::H_17_1(): DiskDrive(maxTracks_c)
 {
-    numTracks_m = maxTracks_c;
+
 }
 
 H_17_1::~H_17_1()
 {
 }
 
-
-void
-H_17_1::insertDisk(FloppyDisk* disk)
-{
-    disk_m = disk;
-
-    // check for a Null disk insertion.
-    if (disk_m)
-    {
-        disk_m->setMaxTrack(numTracks_m);
-    }
-}
 
 void
 H_17_1::getControlInfo(unsigned long pos,

@@ -52,6 +52,7 @@ void
 H89::buildSystem(Console* console)
 {
     PropertyUtil::PropertyMapT props;
+
     // TODO: allow specification of config file via cmdline args.
     std::string                cfg;
     char*                      env = getenv("V89_CONFIG");
@@ -187,7 +188,9 @@ H89::buildSystem(Console* console)
 
     MemoryDecoder* memDecoder;
     // All sytems have the core 48K + ROM.
+    // \TODO Allow for 16K/32K  - also support ORG-0 with less than 64k
     MemoryLayout*  h89_0 = new H88MemoryLayout(HDOS); // creates 48K RAM at 0x2000...
+
     if (have16K)
     {
         memDecoder = new H89MemoryDecoder(h89_0);
@@ -203,11 +206,32 @@ H89::buildSystem(Console* console)
 
     ab->installMemory(memDecoder);
 
+    // H17
     H17* h17 = nullptr;
-    h37      = nullptr;
-    z47If    = nullptr;
-    z47Cntrl = nullptr;
-    z47Link  = nullptr;
+    driveUnitH0 = nullptr;
+    driveUnitH1 = nullptr;
+    driveUnitH2 = nullptr;
+
+    // Z37
+    h37         = nullptr;
+    driveUnitS0 = nullptr;
+    driveUnitS1 = nullptr;
+    driveUnitS2 = nullptr;
+    driveUnitS3 = nullptr;
+    soft0       = nullptr;
+    soft1       = nullptr;
+    soft2       = nullptr;
+    soft3       = nullptr;
+
+    // Z47
+    z47If       = nullptr;
+    z47Cntrl    = nullptr;
+    z47Link     = nullptr;
+    driveUnitE0 = nullptr;
+    driveUnitE1 = nullptr;
+    eight0      = nullptr;
+    eight1      = nullptr;
+
     MMS77316*                m316      = NULL;
     MMS77320*                m320      = NULL;
     CPNetDevice*             cpn       = CPNetDevice::install_CPNetDevice(props);
@@ -235,12 +259,78 @@ H89::buildSystem(Console* console)
 
         else if (s.compare("H17") == 0)
         {
+            h17       = H17::install_H17(H17_BaseAddress_c, props, devslots[x]);
+            h89io->addDiskDevice(h17);
+            dev_slots = true;
+            
         }
         else if (s.compare("H37") == 0)
         {
+            h37         = new Z_89_37(H37_BasePort_c);
+            // create the floppy drives for the soft-sectored controller.
+            driveUnitS0 = new H_17_1;
+            driveUnitS1 = new H_17_1;
+            driveUnitS2 = new H_17_1;
+            driveUnitS3 = new H_17_1;
+
+            s           = props["z37_disk1"];
+
+            if (s.empty())
+            {
+                s = "diskA.softdisk";
+            }
+
+            soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+            s     = props["z37_disk2"];
+
+            if (s.empty())
+            {
+                s = "diskB.softdisk";
+            }
+
+            soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+            s     = props["z37_disk3"];
+
+            if (s.empty())
+            {
+                s = "diskC.softdisk";
+            }
+
+            soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+            soft3 = 0;
+            //    s = props["z37_disk4"];
+            //    if (s.empty()) s = "diskD.softdisk";
+            //    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
         }
         else if (s.compare("H47") == 0)
         {
+            // TODO select port based on slot
+            z47If    = new Z47Interface(Z47_BasePort1_c);
+            z47Cntrl = new Z47Controller();
+            z47Link  = new ParallelLink();
+
+            z47If->connectDriveLink(z47Link);
+            z47Cntrl->connectHostLink(z47Link);
+
+            driveUnitE0 = new H47Drive;
+            driveUnitE1 = new H47Drive;
+            s           = props["z47_disk1"];
+
+            if (s.empty())
+            {
+                s = "diskA.eightdisk";
+            }
+
+            eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+            s      = props["z47_disk2"];
+
+            if (s.empty())
+            {
+                s = "diskB.eightdisk";
+            }
+
+            eight1 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+
         }
     }
 
@@ -252,71 +342,7 @@ H89::buildSystem(Console* console)
         driveUnitH1 = new H_17_1;
         driveUnitH2 = new H_17_1;
 
-#if Z37
-        h37         = new Z_89_37(H37_BasePort_c);
-        // create the floppy drives for the soft-sectored controller.
-        driveUnitS0 = new H_17_1;
-        driveUnitS1 = new H_17_1;
-        driveUnitS2 = new H_17_1;
-        driveUnitS3 = new H_17_1;
-#else
-        driveUnitS0 = nullptr;
-        driveUnitS1 = nullptr;
-        driveUnitS2 = nullptr;
-        driveUnitS3 = nullptr;
-#endif
-
-#if Z47
-        z47If    = new Z47Interface(Z47_BasePort1_c);
-        z47Cntrl = new Z47Controller();
-        z47Link  = new ParallelLink();
-
-        z47If->connectDriveLink(z47Link);
-        z47Cntrl->connectHostLink(z47Link);
-
-        driveUnitE0 = new H47Drive;
-        driveUnitE1 = new H47Drive;
-        s           = props["z47_disk1"];
-
-        if (s.empty())
-        {
-            s = "diskA.eightdisk";
-        }
-
-        eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-        s      = props["z47_disk2"];
-
-        if (s.empty())
-        {
-            s = "diskB.eightdisk";
-        }
-
-        eight1      = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-#else
-        z47If       = nullptr;
-        z47Cntrl    = nullptr;
-        z47Link     = nullptr;
-
-        driveUnitE0 = nullptr;
-        driveUnitE1 = nullptr;
-        eight0      = nullptr;
-        eight1      = nullptr;
-#endif
-    }
-
-    // Serial Ports.
-    consolePort = new INS8250(Serial_Console_c, Serial_Console_Interrupt_c);
-
-    if (!ser_slots)
-    {
-        lpPort    = new INS8250(Serial_LpPort_c);
-        modemPort = new INS8250(Serial_ModemPort_c);
-        auxPort   = new INS8250(Serial_AuxPort_c);
-    }
-
-    if (!dev_slots)
-    {
-        s = props["z17_disk1"];
+        s           = props["h17_disk1"];
 
         if (s.empty())
         {
@@ -324,7 +350,7 @@ H89::buildSystem(Console* console)
         }
 
         hard0 = new HardSectoredDisk(s.c_str());
-        s     = props["z17_disk2"];
+        s     = props["h17_disk2"];
 
         if (s.empty())
         {
@@ -332,7 +358,7 @@ H89::buildSystem(Console* console)
         }
 
         hard1 = new HardSectoredDisk(s.c_str());
-        s     = props["z17_disk3"];
+        s     = props["h17_disk3"];
 
         if (s.empty())
         {
@@ -341,57 +367,36 @@ H89::buildSystem(Console* console)
 
         hard2 = new HardSectoredDisk(s.c_str());
 
-#if Z37
-        s     = props["z37_disk1"];
+        h89io->addDiskDevice(h17);
 
-        if (s.empty())
-        {
-            s = "diskA.softdisk";
-        }
+        // Connect all the floppy drives for the hard-sectored controller.
+        h17->connectDrive(0, driveUnitH0);
+        h17->connectDrive(1, driveUnitH1);
+        h17->connectDrive(2, driveUnitH2);
 
-        soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-        s     = props["z37_disk2"];
+        // Insert all the the disks into the drives.
+        driveUnitH0->insertDisk(hard0);
+        driveUnitH1->insertDisk(hard1);
+        driveUnitH2->insertDisk(hard2);
 
-        if (s.empty())
-        {
-            s = "diskB.softdisk";
-        }
-
-        soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-        s     = props["z37_disk3"];
-
-        if (s.empty())
-        {
-            s = "diskC.softdisk";
-        }
-
-        soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-        soft3 = 0;
-//    s = props["z37_disk4"];
-//    if (s.empty()) s = "diskD.softdisk";
-//    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-
-//    soft0->dump();
-//    soft1->dump();
-//    soft2->dump();
-//    soft3->dump();
-#else
-        soft0 = nullptr;
-        soft1 = nullptr;
-        soft2 = nullptr;
-        soft3 = nullptr;
-#endif
     }
-
-    consolePort->attachDevice(console);
 
     h89io->addDevice(gpp);
     h89io->addDevice(nmi1);
     h89io->addDevice(nmi2);
+
+    // Serial Ports.
+    consolePort = new INS8250(Serial_Console_c, Serial_Console_Interrupt_c);
+    consolePort->attachDevice(console);
+
     h89io->addDevice(consolePort);
 
     if (!ser_slots)
     {
+        lpPort    = new INS8250(Serial_LpPort_c);
+        modemPort = new INS8250(Serial_ModemPort_c);
+        auxPort   = new INS8250(Serial_AuxPort_c);
+
         h89io->addDevice(lpPort);
         h89io->addDevice(auxPort);
         h89io->addDevice(modemPort);
@@ -412,61 +417,8 @@ H89::buildSystem(Console* console)
         h89io->addDiskDevice(m320);
     }
 
-    if (!dev_slots)
-    {
-        h89io->addDiskDevice(h17);
-#if Z37
-        h89io->addDiskDevice(h37);
-#else
-        h89io->addDiskDevice(z47If);
-#endif
-
-        // Connect all the floppy drives for the hard-sectored controller.
-        h17->connectDrive(0, driveUnitH0);
-        h17->connectDrive(1, driveUnitH1);
-        h17->connectDrive(2, driveUnitH2);
-
-        // Insert all the the disks into the drives.
-        driveUnitH0->insertDisk(hard0);
-        driveUnitH1->insertDisk(hard1);
-        driveUnitH2->insertDisk(hard2);
-
-#if Z37
-        // connect all the drives to the soft-sectored controller.
-        h37->connectDrive(0, driveUnitS0);
-        h37->connectDrive(1, driveUnitS1);
-        h37->connectDrive(2, driveUnitS2);
-        h37->connectDrive(3, driveUnitS3);
-#endif
-
-#if Z47
-        //
-        z47Cntrl->connectDrive(0, driveUnitE0);
-        z47Cntrl->connectDrive(1, driveUnitE1);
-#endif
-
-#if Z37
-        // Insert all the disks into the drives.
-        driveUnitS0->insertDisk(soft0);
-        driveUnitS1->insertDisk(soft1);
-        driveUnitS2->insertDisk(soft2);
-        driveUnitS3->insertDisk(soft3);
-#endif
-
-#if Z47
-        driveUnitE0->insertDisk(eight0);
-        driveUnitE1->insertDisk(eight1);
-#endif
-        // driveUnitH0.insertBlankDisk();
-        // driveUnitH1.insertBlankDisk();
-        // driveUnitH2.insertBlankDisk();
-
-        // driveUnitS0.insertBlankDisk();
-        // driveUnitS1.insertBlankDisk();
-        // driveUnitS2.insertBlankDisk();
-        // driveUnitS3.insertBlankDisk();
-    }
 }
+
 
 H89::~H89()
 {
@@ -489,14 +441,6 @@ H89::~H89()
         }
     }
 
-//  driveUnitH0->ejectDisk("saveA.tmpdisk");
-//  driveUnitH1->ejectDisk("saveB.tmpdisk");
-//  driveUnitH2->ejectDisk("saveC.tmpdisk");
-
-//    driveUnitS0->ejectDisk("saveS0.tmpdisk");
-//    driveUnitS1->ejectDisk("saveS1.tmpdisk");
-//    driveUnitS2->ejectDisk("saveS2.tmpdisk");
-//    driveUnitS3->ejectDisk("saveS3.tmpdisk");
 }
 
 void

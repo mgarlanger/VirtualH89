@@ -43,6 +43,12 @@ HardSectoredDisk::HardSectoredDisk(const char* name)
             {
                 trk++;
             }
+            else if ((trk == 0) && (head == 1))
+            {
+                // check to see if we have to adjust side and track.
+                head = 0;
+                trk = 80;
+            }
         }
         while (readCount == 1);
 
@@ -281,5 +287,6 @@ HardSectoredDisk::readSectorData(BYTE  side,
                                  WORD  pos,
                                  BYTE& data)
 {
+    debugss(ssFloppyDisk, ALL, "%s: Not Implemented\n", __FUNCTION__);
     return false;
 }

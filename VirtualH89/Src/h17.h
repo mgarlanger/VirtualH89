@@ -13,6 +13,7 @@
 #include "DiskController.h"
 #include "ClockUser.h"
 #include "GppListener.h"
+#include "propertyutil.h"
 
 class DiskDrive;
 
@@ -28,6 +29,10 @@ class H17: public DiskController, public ClockUser, public GppListener
   public:
     H17(int BaseAddr);
     virtual ~H17();
+
+    static H17* install_H17(BYTE                        basePort,
+                            PropertyUtil::PropertyMapT& props,
+                            std::string                 slot);
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr,
@@ -46,6 +51,7 @@ class H17: public DiskController, public ClockUser, public GppListener
     {
         return *(new std::vector<GenericDiskDrive*>());
     }
+
     std::string getDeviceName()
     {
         return "H17";
@@ -186,7 +192,7 @@ class H17: public DiskController, public ClockUser, public GppListener
     static const BYTE ReceiverOverrun_Flag        = 0x02; // from controller
     static const BYTE ReceiverParityErr_Flag      = 0x04; // from controller, NEVER set
     // on H17
-    static const BYTE SyncDetect_Flag             = 0x08; // ??? - Manual says it, but Heath
+    static const BYTE SyncDetect_Flag             = 0x08; // ??? - Manual defines it, but Heath
     // software didn't use it
     static const BYTE FillCharTransmitted_Flag    = 0x40; // from controller
     static const BYTE TransmitterBufferEmpty_Flag = 0x80; // from controller

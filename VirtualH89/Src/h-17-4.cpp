@@ -11,10 +11,10 @@
 #include "FloppyDisk.h"
 
 
-H_17_4::H_17_4(): side_m(0),
+H_17_4::H_17_4(): DiskDrive(maxTracks_c),
+                  side_m(0),
                   track_m(0)
 {
-    numTracks_m = maxTracks_c;
 
 }
 
@@ -23,17 +23,6 @@ H_17_4::~H_17_4()
 
 }
 
-void
-H_17_4::insertDisk(FloppyDisk* disk)
-{
-    disk_m = disk;
-
-    // check for a Null disk insertion.
-    if (disk_m)
-    {
-        disk_m->setMaxTrack(numTracks_m);
-    }
-}
 
 void
 H_17_4::getControlInfo(unsigned long pos,
@@ -96,7 +85,7 @@ H_17_4::selectSide(BYTE side)
     }
     else
     {
-        debugss(ssH17, ERROR, "%s: Invalid Side: %d\n", __FUNCTION__, side);
+        debugss(ssH17_4, ERROR, "%s: Invalid Side: %d\n", __FUNCTION__, side);
     }
 }
 
