@@ -851,8 +851,8 @@ HostFileBdos::readFStamps(uint8_t* msgbuf, int len)
     stat(pathName, &stb);
     fcb->ext = 0; // no passwords
     // order is important, overwrites seconds field (not present in CP/M 3 timestamps).
-    unix2cpmdate(stb.st_atim.tv_sec, (struct cpmdate*) &fcb->d0[8]);
-    unix2cpmdate(stb.st_mtim.tv_sec, (struct cpmdate*) &fcb->d0[12]);
+    unix2cpmdate(stb.st_atime, (struct cpmdate*) &fcb->d0[8]);
+    unix2cpmdate(stb.st_mtime, (struct cpmdate*) &fcb->d0[12]);
     fcb->cr = 0;
     return 37;
 }
@@ -1209,9 +1209,9 @@ HostFileBdos::commonSearch(struct search* search)
             // extent info is not computed until copyOut.
             int x = search->iter & 0x03; // 0, 1, 2 only
             // order is imperative, overwrite seconds field
-            unix2cpmdate(stb.st_atim.tv_sec,
+            unix2cpmdate(stb.st_atime,
                          (struct cpmdate*) &sFcb.fcbs[x].atim);
-            unix2cpmdate(stb.st_mtim.tv_sec,
+            unix2cpmdate(stb.st_mtime,
                          (struct cpmdate*) &sFcb.fcbs[x].utim);
             sFcb.fcbs[x].pwmode = 0; // clear seconds overrun
         }
