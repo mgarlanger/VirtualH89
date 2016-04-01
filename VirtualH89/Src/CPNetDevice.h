@@ -36,9 +36,10 @@ class CPNetDevice: public IODevice
     int sendMsg(BYTE* msgbuf, int len);
     int checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len);
 
+    static const int  ndosLen = sizeof(struct NetworkServer::ndos);
     BYTE              clientId;
     const char*       dir;
-    BYTE              buffer[256 + sizeof(struct NetworkServer::ndos)];
+    BYTE              buffer[256 + ndosLen];
     struct            NetworkServer::ndos* header;
     int               bufIx;
     int               msgLen;

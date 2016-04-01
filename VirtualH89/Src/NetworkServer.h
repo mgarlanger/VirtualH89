@@ -10,8 +10,7 @@
 #ifndef NETWORKSERVER_H_
 #define NETWORKSERVER_H_
 
-#include "config.h"
-#include "h89Types.h"
+#include <stdint.h>
 
 class NetworkServer
 {
@@ -19,19 +18,18 @@ class NetworkServer
     NetworkServer();
     virtual ~NetworkServer();
 
-    virtual int checkRecvMsg(BYTE clientId, BYTE* msgbuf, int len) = 0;
-    virtual int sendMsg(BYTE* msgbuf, int len)                     = 0;
+    virtual int checkRecvMsg(uint8_t clientId, uint8_t* msgbuf, int len) = 0;
+    virtual int sendMsg(uint8_t* msgbuf, int len)                        = 0;
 
     // This is the standard CP/Net message header.
     struct ndos
     {
-        BYTE mcode; // cmd=00, response=01, for CP/Net
-        BYTE mdid;
-        BYTE msid;
-        BYTE mfunc;
-        BYTE msize; // size is msize+1 (1-256 bytes)
+        uint8_t mcode; // cmd=00, response=01, for CP/Net
+        uint8_t mdid;
+        uint8_t msid;
+        uint8_t mfunc;
+        uint8_t msize; // size is msize+1 (1-256 bytes)
     };
-
   private:
 };
 
