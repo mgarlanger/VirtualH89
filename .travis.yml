@@ -1,0 +1,7 @@
+os:
+  - osx
+
+language: cpp
+
+script: xcodebuild -project VirtualH89.xcodeproj/ -target VirtualH89
+
