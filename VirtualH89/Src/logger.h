@@ -97,6 +97,7 @@ enum subSystems
     ssROM,
     ssZ80,
     ssInterruptController,
+    ssH37InterruptController,
     ssAddressBus,
     ssIO,
     ssH17,
