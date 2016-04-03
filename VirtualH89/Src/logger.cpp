@@ -4,20 +4,22 @@
 /// \author Mark Garlanger
 ///
 
-#include <stdarg.h>
-
 #include "logger.h"
 
+
 unsigned debugLevel[ssMax];
+
 
 logger::logger():  printToFile(false),
                    printToScreen(false),
                    logFile(NULL)
 {
+
 }
 
 logger::~logger()
 {
+
 }
 
 void
@@ -26,6 +28,8 @@ setDebugLevel()
     logLevel defaultLevel = ERROR;
 
     debugLevel[ssH89]                 = defaultLevel; // The overall H89
+    debugLevel[ssMEM]                 = defaultLevel; // Memory class
+    debugLevel[ssRAM]                 = defaultLevel; // RAM accesses
     debugLevel[ssROM]                 = defaultLevel; // ROM accesses
     debugLevel[ssZ80]                 = defaultLevel; // Z80 CPU
     debugLevel[ssInterruptController] = defaultLevel; // Interrupt Controller
@@ -44,7 +48,7 @@ setDebugLevel()
     debugLevel[ss8250]                = defaultLevel; // 8250 Serial Port
     debugLevel[ssTimer]               = defaultLevel; // 2 mSec Timer
     debugLevel[ssWallClock]           = defaultLevel; // Wall Clock.
-    // debugLevel[ssDiskDrive] = defaultLevel;  // Disk Drive
+    // debugLevel[ssDiskDrive]  = defaultLevel;  // Disk Drive
     debugLevel[ssFloppyDisk]          = defaultLevel; // Floppy Disk
     debugLevel[ssGpp]                 = defaultLevel; // General Purpose Port
     debugLevel[ssParallel]            = defaultLevel; // Parallel Port Interface (Z47)
@@ -61,42 +65,8 @@ setDebugLevel()
 }
 
 void
-setDebug(subSystems ss, logLevel level)
+setDebug(subSystems ss,
+         logLevel   level)
 {
     debugLevel[ss] = level;
-}
-
-void
-__debugss(enum subSystems subsys, enum logLevel level, const char* fmt, ...)
-{
-    va_list vl;
-    int     __val = 0;
-    if (level < ERROR)
-    {
-        __val = 31; /* FATAL = Red */
-    }
-    else if (level < WARNING)
-    {
-        __val = 33; /* ERROR = Yellow */
-    }
-    else if (level < INFO)
-    {
-        __val = 35; /* WARNING = Magenta */
-    }
-    else if (level < VERBOSE)
-    {
-        __val = 34; /* INFO = Blue */
-    }
-    else
-    {
-        __val = 32; /* default = Green */
-    }
-    fprintf(log_out, "\x1b[37m");
-    WallClock::instance()->printTime(log_out);
-    fprintf(log_out, "\x1b[36m%s: \x1b[%dm", __PRETTY_FUNCTION__, __val);
-    va_start(vl, fmt);
-    vfprintf(log_out, fmt, vl);
-    va_end(vl);
-    fprintf(log_out, "\x1b[0m");
-    fflush(log_out);
 }
