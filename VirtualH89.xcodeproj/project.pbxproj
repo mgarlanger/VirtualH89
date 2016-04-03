@@ -15,6 +15,7 @@
 		A13BEE7B1C9695B700C7E65A /* MMS77318MemoryDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE791C9695B700C7E65A /* MMS77318MemoryDecoder.cpp */; };
 		A13BEE801C9695C200C7E65A /* NetworkServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE7C1C9695C200C7E65A /* NetworkServer.cpp */; };
 		A13BEE831C9695D100C7E65A /* SectorFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE811C9695D100C7E65A /* SectorFloppyImage.cpp */; };
+		A13BEE861C9A809100C7E65A /* H37InterruptController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13BEE841C9A809100C7E65A /* H37InterruptController.cpp */; };
 		A13C987E1C7A37F7000CF03B /* DiskController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C987C1C7A37F7000CF03B /* DiskController.cpp */; };
 		A13C98881C7A3805000CF03B /* GenericDiskDrive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C987F1C7A3805000CF03B /* GenericDiskDrive.cpp */; };
 		A13C98891C7A3805000CF03B /* GenericFloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C98811C7A3805000CF03B /* GenericFloppyDisk.cpp */; };
@@ -73,7 +74,6 @@
 		A1A434641C7060430015F838 /* z80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434341C7060430015F838 /* z80.cpp */; };
 		A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434651C7063C40015F838 /* OpenGL.framework */; };
 		A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434671C7063CF0015F838 /* GLUT.framework */; };
-		A1A4346D1C719B560015F838 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A4346C1C719B560015F838 /* SDL2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -114,6 +114,8 @@
 		A13BEE7F1C9695C200C7E65A /* RAMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAMemory8K.h; sourceTree = "<group>"; };
 		A13BEE811C9695D100C7E65A /* SectorFloppyImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SectorFloppyImage.cpp; sourceTree = "<group>"; };
 		A13BEE821C9695D100C7E65A /* SectorFloppyImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectorFloppyImage.h; sourceTree = "<group>"; };
+		A13BEE841C9A809100C7E65A /* H37InterruptController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H37InterruptController.cpp; sourceTree = "<group>"; };
+		A13BEE851C9A809100C7E65A /* H37InterruptController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H37InterruptController.h; sourceTree = "<group>"; };
 		A13C987C1C7A37F7000CF03B /* DiskController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskController.cpp; sourceTree = "<group>"; };
 		A13C987D1C7A37F7000CF03B /* DiskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskController.h; sourceTree = "<group>"; };
 		A13C987F1C7A3805000CF03B /* GenericDiskDrive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenericDiskDrive.cpp; sourceTree = "<group>"; };
@@ -247,7 +249,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1A4346D1C719B560015F838 /* SDL2.framework in Frameworks */,
 				A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */,
 				A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */,
 			);
@@ -359,6 +360,8 @@
 				A1A433F81C7060430015F838 /* h19.h */,
 				A1A433F91C7060430015F838 /* h37.cpp */,
 				A1A433FA1C7060430015F838 /* h37.h */,
+				A13BEE841C9A809100C7E65A /* H37InterruptController.cpp */,
+				A13BEE851C9A809100C7E65A /* H37InterruptController.h */,
 				A1A433FB1C7060430015F838 /* H47Drive.cpp */,
 				A1A433FC1C7060430015F838 /* H47Drive.h */,
 				A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */,
@@ -515,6 +518,7 @@
 				A13C98951C7A382D000CF03B /* MMS316IntrCtrlr.cpp in Sources */,
 				A1A434611C7060430015F838 /* WallClock.cpp in Sources */,
 				A1A4345A1C7060430015F838 /* Sector.cpp in Sources */,
+				A13BEE861C9A809100C7E65A /* H37InterruptController.cpp in Sources */,
 				A1A434391C7060430015F838 /* computer.cpp in Sources */,
 				A1A434481C7060430015F838 /* h37.cpp in Sources */,
 				A1A4343E1C7060430015F838 /* DiskData.cpp in Sources */,
