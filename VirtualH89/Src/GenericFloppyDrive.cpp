@@ -130,7 +130,7 @@ GenericFloppyDrive::step(bool direction)
             ++track_m;
         }
 
-        debugss(ssGenericFloppyDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssGenericFloppyDrive, INFO, "in(up) (%d)\n", track_m);
     }
     else
     {
@@ -139,7 +139,7 @@ GenericFloppyDrive::step(bool direction)
             --track_m;
         }
 
-        debugss(ssGenericFloppyDrive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssGenericFloppyDrive, INFO, "out(down) (%d)\n", track_m);
     }
 }
 
@@ -178,7 +178,7 @@ GenericFloppyDrive::readData(bool dd,
     // override FDC track/side with our own - it's the real one
     if (disk_m->readData(track_m, headSel_m, sector, inSector, data))
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: read passed - pos(%d) data(%d)\n", __FUNCTION__,
+        debugss(ssGenericFloppyDrive, INFO, "read passed - pos(%d) data(%d)\n",
                 inSector, data);
     }
 
@@ -217,7 +217,7 @@ GenericFloppyDrive::writeData(bool dd,
     // override FDC track/side with our own - it's the real one
     if (!disk_m->writeData(track_m, headSel_m, sector, inSector, data, dataReady, result))
     {
-        debugss(ssGenericFloppyDrive, INFO, "%s: write failed - pos(%d) data(%d)\n", __FUNCTION__,
+        debugss(ssGenericFloppyDrive, INFO, "write failed - pos(%d) data(%d)\n",
                 inSector, data);
     }
 

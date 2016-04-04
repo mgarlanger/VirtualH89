@@ -371,7 +371,7 @@ MMS77320::connectDrive(BYTE              unitNum,
 {
     bool retVal = false;
 
-    debugss(ssMMS77320, INFO, "%s: unit (%d), drive (%p)\n", __FUNCTION__, unitNum, drive);
+    debugss(ssMMS77320, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
 
     if (unitNum < numDisks_c)
     {
@@ -382,12 +382,12 @@ MMS77320::connectDrive(BYTE              unitNum,
         }
         else
         {
-            debugss(ssMMS77320, ERROR, "%s: drive already connect\n", __FUNCTION__);
+            debugss(ssMMS77320, ERROR, "drive already connect\n");
         }
     }
     else
     {
-        debugss(ssMMS77320, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
+        debugss(ssMMS77320, ERROR, "Invalid unit number (%d)\n", unitNum);
     }
 
     return (retVal);
@@ -402,7 +402,7 @@ MMS77320::removeDrive(BYTE unitNum)
 void
 MMS77320::raiseIntrq()
 {
-    debugss(ssMMS77320, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77320, INFO, "\n");
 
     if (intrqAllowed())
     {
@@ -415,7 +415,7 @@ MMS77320::raiseIntrq()
 void
 MMS77320::lowerIntrq()
 {
-    debugss(ssMMS77320, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77320, INFO, "\n");
     h89.lowerINT(intLevel_m);
 }
 

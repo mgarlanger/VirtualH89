@@ -41,7 +41,7 @@ RawFloppyImage::getAddrMark(BYTE* tp,
             if (indexes > 1)
             {
                 // error...
-                debugss(ssRawFloppyImage, WARNING, "%s: no sectors found\n", __FUNCTION__);
+                debugss(ssRawFloppyImage, WARNING, "no sectors found\n");
                 break;
             }
 
@@ -97,7 +97,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
 {
     if (argv.size() < 1)
     {
-        debugss(ssRawFloppyImage, WARNING, "%s: no file specified\n", __FUNCTION__);
+        debugss(ssRawFloppyImage, WARNING, "no file specified\n");
         return;
     }
 
@@ -149,8 +149,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         }
         else
         {
-            debugss(ssRawFloppyImage, WARNING, "%s: unrecognized hint - %s\n", __FUNCTION__,
-                    argv[x].c_str());
+            debugss(ssRawFloppyImage, WARNING, "unrecognized hint - %s\n", argv[x].c_str());
         }
     }
 
@@ -164,7 +163,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
 
     if (fd < 0)
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
+        debugss(ssRawFloppyImage, ERROR, "unable to open file - %s\n", name);
         free((void*) name);
         return;
     }
@@ -177,8 +176,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
 
     if (trackBuffer_m == NULL)
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: unable to allocate track buffer of %ld bytes\n",
-                __FUNCTION__, nbytes);
+        debugss(ssRawFloppyImage, ERROR, "unable to allocate track buffer of %ld bytes\n", nbytes);
         close(fd);
         free((void*) name);
         return;
@@ -188,7 +186,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
 
     if (n != nbytes)
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: unable to read a track\n", __FUNCTION__);
+        debugss(ssRawFloppyImage, ERROR, "unable to read a track\n");
         close(fd);
         free((void*) name);
         return;
@@ -232,8 +230,8 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             }
             else if (id_tk != tp[1])
             {
-                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent track number %d (%d)\n",
-                        __FUNCTION__, tp[1], id_tk);
+                debugss(ssRawFloppyImage, WARNING, "inconsistent track number %d (%d)\n", tp[1],
+                        id_tk);
             }
 
             if (id_sd == -1)
@@ -242,8 +240,8 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             }
             else if (id_sd != tp[2])
             {
-                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent side number %d (%d)\n",
-                        __FUNCTION__, tp[2], id_sd);
+                debugss(ssRawFloppyImage, WARNING, "inconsistent side number %d (%d)\n", tp[2],
+                        id_sd);
             }
 
             int sl = tp[4] & 0x03;
@@ -251,8 +249,8 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
 
             if (seclen != 0 && sl != seclen)
             {
-                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent sector length %d (%d)\n",
-                        __FUNCTION__, sl, seclen);
+                debugss(ssRawFloppyImage, WARNING, "inconsistent sector length %d (%d)\n", sl,
+                        seclen);
             }
 
             seclen = sl;
@@ -270,8 +268,8 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             }
             else if (gaplen != tp + 1 - end)
             {
-                debugss(ssRawFloppyImage, WARNING, "%s: inconsistent data gap %ld (%ld)\n",
-                        __FUNCTION__, tp + 1 - end, gaplen);
+                debugss(ssRawFloppyImage, WARNING, "inconsistent data gap %ld (%ld)\n",
+                        tp + 1 - end, gaplen);
             }
 
             ++numsec;
@@ -287,7 +285,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     if (trklen == 0 || seclen == 0 || gaplen == 0 || numsec == 0 ||
         id_tk != 0 || id_sd != 0)
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: format not recognized\n", __FUNCTION__);
+        debugss(ssRawFloppyImage, ERROR, "format not recognized\n");
         free((void*) name);
         close(fd);
         return;
@@ -314,13 +312,13 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         else if (id_tk == 0 && id_sd == 1)
         {
             // interlaced image.
-            debugss(ssRawFloppyImage, INFO, "%s: setting interlaced \n", __FUNCTION__);
+            debugss(ssRawFloppyImage, INFO, "setting interlaced \n");
             interlaced_m = true;
             numSides_m   = 2;
         }
         else
         {
-            debugss(ssRawFloppyImage, ERROR, "%s: invalid track/side layout\n", __FUNCTION__);
+            debugss(ssRawFloppyImage, ERROR, "invalid track/side layout\n");
         }
     }
 
@@ -328,8 +326,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     struct stat stb;
     fstat(fd, &stb);
     long long   est_trks = stb.st_size / trackLen_m;
-    debugss(ssRawFloppyImage, INFO, "%s: estimated number of tracks %lld, trklen=%ld\n",
-            __FUNCTION__,
+    debugss(ssRawFloppyImage, INFO, "estimated number of tracks %lld, trklen=%ld\n",
             est_trks, trackLen_m);
 
     if (est_trks == 77 || est_trks == 154)
@@ -364,7 +361,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     }
     else
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: invalid image size\n", __FUNCTION__);
+        debugss(ssRawFloppyImage, ERROR, "invalid image size\n");
     }
 
     imageFd_m = fd; // need this for cacheTrack()...
@@ -394,8 +391,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                 }
                 else
                 {
-                    debugss(ssRawFloppyImage, ERROR, "%s: invalid track/side layout\n",
-                            __FUNCTION__);
+                    debugss(ssRawFloppyImage, ERROR, "invalid track/side layout\n");
                 }
             }
             else
@@ -431,7 +427,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     }
     else
     {
-        debugss(ssRawFloppyImage, ERROR, "%s: invalid track length\n", __FUNCTION__);
+        debugss(ssRawFloppyImage, ERROR, "invalid track length\n");
     }
 
     if (numTracks_m == 0)
@@ -450,8 +446,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         }
         else
         {
-            debugss(ssRawFloppyImage, ERROR, "%s: can't determine number of tracks\n",
-                    __FUNCTION__);
+            debugss(ssRawFloppyImage, ERROR, "can't determine number of tracks\n");
         }
     }
 
@@ -467,7 +462,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         }
         else
         {
-            debugss(ssRawFloppyImage, ERROR, "%s: can't determine number of sides\n", __FUNCTION__);
+            debugss(ssRawFloppyImage, ERROR, "can't determine number of sides\n");
         }
     }
 

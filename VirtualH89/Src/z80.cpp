@@ -981,7 +981,7 @@ Z80::getReg8(BYTE val)
 
             }
 
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
             assert(0);
             return (W);
 
@@ -1000,13 +1000,13 @@ Z80::getReg8(BYTE val)
 
             }
 
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
             assert(0);
             return (Z);
 
         case 6:
             // Should never be called in with this value.
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
             assert(0);
             return (Z);
 
@@ -1015,7 +1015,7 @@ Z80::getReg8(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
     assert(0);
     return (Z);
 }
@@ -1044,7 +1044,7 @@ Z80::getCoreReg8(BYTE val)
             return (L);
 
         case 6:
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
             assert(0);
             return (Z);
 
@@ -1054,7 +1054,7 @@ Z80::getCoreReg8(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x7)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x7)
     assert(0);
     return (Z);
 }
@@ -1097,7 +1097,7 @@ Z80::getReg16(BYTE val)
                     return (HL);
             }
 
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x3)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x3)
             assert(0);
             return (WZ);
 
@@ -1106,7 +1106,7 @@ Z80::getReg16(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x3)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x3)
     assert(0);
     return (WZ);
 }
@@ -1130,7 +1130,7 @@ Z80::getCoreReg16(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 0x3)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 0x3)
     assert(0);
     return (WZ);
 }
@@ -1168,7 +1168,7 @@ Z80::getXYReg16Val(void)
     }
 
     // should not have been called.
-    debugss(ssZ80, FATAL, "%s: Invalid prefix mode", __FUNCTION__)
+    debugss(ssZ80, FATAL, "Invalid prefix mode")
     assert(0);
     return (WZ);
 
@@ -1236,7 +1236,7 @@ Z80::getReg16qq(BYTE val)
             }
 
             // All cases are handled above, can never get to this point, but to quiet the compiler
-            debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 3)
+            debugss(ssZ80, FATAL, "Unknown reg: %d", val & 3)
             assert(0);
             return (WZ);
 
@@ -1245,7 +1245,7 @@ Z80::getReg16qq(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 3)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 3)
     assert(0);
     return (WZ);
 }
@@ -1269,7 +1269,7 @@ Z80::getCoreReg16qq(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown reg: %d", __FUNCTION__, val & 3)
+    debugss(ssZ80, FATAL, "Unknown reg: %d", val & 3)
     assert(0);
     return (WZ);
 }
@@ -1325,7 +1325,7 @@ Z80::checkCondition(BYTE val)
     }
 
     // All cases are handled above, can never get to this point, but to quiet the compiler
-    debugss(ssZ80, FATAL, "%s: Unknown cond: %d", __FUNCTION__, (val >> 3) & 7);
+    debugss(ssZ80, FATAL, "Unknown cond: %d", (val >> 3) & 7);
     assert(0);
     return (false);
 }
@@ -1448,9 +1448,7 @@ Z80::Z80(int clockRate,
                               IM(0)
 
 {
-    debugss(ssZ80, INFO, "%s: Creating Z80 proc, clock (%d), ticks(%d)\n", __FUNCTION__,
-            clockRate,
-            ticksPerSecond);
+    debugss(ssZ80, INFO, "Creating Z80 proc, clock (%d), ticks(%d)\n", clockRate, ticksPerSecond);
 
     if ((clockRate) && (ticksPerSecond))
     {
@@ -1461,7 +1459,7 @@ Z80::Z80(int clockRate,
     else
     {
         // Assume a 4MHz processor with a 10ms clock interrupt.
-        debugss(ssZ80, WARNING, "%s: invalid parameters setting default\n", __FUNCTION__);
+        debugss(ssZ80, WARNING, "invalid parameters setting default\n");
         ClockRate_m      = 4000000;
         ticksPerSecond_m = 100;
         ticksPerClock_m  = 40000;
@@ -1478,7 +1476,7 @@ Z80::Z80(int clockRate,
 ///
 Z80::~Z80()
 {
-    debugss(ssZ80, INFO, "%s\n", __FUNCTION__);
+    debugss(ssZ80, INFO, "\n");
 }
 
 ///
@@ -1489,7 +1487,7 @@ Z80::~Z80()
 void
 Z80::reset(void)
 {
-    debugss(ssZ80, INFO, "%s\n", __FUNCTION__);
+    debugss(ssZ80, INFO, "\n");
 
     PC            = 0;
     R             = 0;
@@ -1521,16 +1519,14 @@ Z80::addClockTicks()
     // if ticks is negative, add the new quota.
     if (ticks < 0)
     {
-        debugss(ssZ80, ALL, "%s: ticks(%d) += ticksPerClock(%lu)\n", __FUNCTION__, ticks,
-                ticksPerClock_m);
+        debugss(ssZ80, ALL, "ticks(%d) += ticksPerClock(%lu)\n", ticks, ticksPerClock_m);
         ticks += ticksPerClock_m;
     }
     else
     {
         // else just set it, otherwise we run the risk of accumulating too many ticks if
         // the CPU was idle waiting for input.
-        debugss(ssZ80, ALL, "%s: ticks(%d) = ticksPerClock(%lu)\n", __FUNCTION__,
-                ticks, ticksPerClock_m);
+        debugss(ssZ80, ALL, "ticks(%d) = ticksPerClock(%lu)\n", ticks, ticksPerClock_m);
         ticks = (sig_atomic_t) ticksPerClock_m;
     }
 
@@ -1550,7 +1546,7 @@ Z80::enableFast() {
 void
 Z80::gppNewValue(BYTE gpo) {
     fast_m = ((gpo & z80_gppSpeedSelBit_c) != 0);
-    debugss(ssZ80, WARNING, "%s: fast_m = %d\n", __FUNCTION__, fast_m);
+    debugss(ssZ80, WARNING, "fast_m = %d\n", fast_m);
 
     if (fast_m)
     {
@@ -1582,7 +1578,7 @@ Z80::gppNewValue(BYTE gpo) {
 void
 Z80::raiseNMI(void)
 {
-    debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
+    debugss(ssZ80, VERBOSE, "\n");
 
     int_type |= Intr_NMI;
 }
@@ -1595,7 +1591,7 @@ Z80::raiseNMI(void)
 void
 Z80::raiseINT()
 {
-    debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
+    debugss(ssZ80, VERBOSE, "\n");
 
     int_type |= Intr_INT;
 }
@@ -1608,7 +1604,7 @@ Z80::raiseINT()
 void
 Z80::lowerINT()
 {
-    debugss(ssZ80, VERBOSE, "%s\n", __FUNCTION__);
+    debugss(ssZ80, VERBOSE, "\n");
 
     int_type &= ~Intr_INT;
 
@@ -1635,7 +1631,7 @@ Z80::waitState(void)
 void
 Z80::setAddressBus(AddressBus* ab)
 {
-    debugss(ssZ80, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssZ80, INFO, "Entering\n");
 
     ab_m = ab;
 }
@@ -1815,13 +1811,13 @@ Z80::execute(WORD numInst)
 
                 case 2:
                     // mode 2 not currently supported.
-                    debugss(ssZ80, FATAL, "%s: Interrupt mode 2 not supported\n", __FUNCTION__);
+                    debugss(ssZ80, FATAL, "Interrupt mode 2 not supported\n");
 
                     /// \todo assert
                     break;
 
                 default:
-                    debugss(ssZ80, FATAL, "%s: Invalid Interrupt Mode: %d\n", __FUNCTION__, IM);
+                    debugss(ssZ80, FATAL, "Invalid Interrupt Mode: %d\n", IM);
 
                     /// \todo assert
             }
@@ -1947,7 +1943,7 @@ Z80::op_nop(void)
 void
 Z80::op_halt(void)
 {
-    debugss(ssZ80, VERBOSE, "%s - iff1 %d iff2 %d\n", __FUNCTION__, IFF1, IFF2);
+    debugss(ssZ80, VERBOSE, "iff1 %d iff2 %d\n", IFF1, IFF2);
 
     mode = cm_halt;
 }

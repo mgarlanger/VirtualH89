@@ -144,8 +144,7 @@ GeneralPurposePort::out(BYTE addr,
 
         if (val & gpp_SingleStepInterrupt_c)
         {
-            debugss(ssGpp, WARNING, "%s: Single Step Interrupt - not implemented.\n",
-                    __FUNCTION__);
+            debugss(ssGpp, WARNING, "Single Step Interrupt - not implemented.\n");
             /// \todo - implement single step interrupt..
         }
 

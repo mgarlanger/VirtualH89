@@ -45,7 +45,7 @@ H89Timer::H89Timer(CPU*          cpu,
     // with extra clock ticks to accurately emulate the speed of the processor.
     // Plus, if interrupts are enabled, it will interrupt the cpu with the timer tick.
 
-    debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
+    debugss(ssTimer, INFO, "\n");
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
     GppListener::addListener(this);
@@ -58,7 +58,7 @@ H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
                                           intLevel(intlvl),
                                           thread(0)
 {
-    debugss(ssTimer, INFO, "%s: cpu_m(NULL)\n", __FUNCTION__);
+    debugss(ssTimer, INFO, "cpu_m(NULL)\n");
 
     SignalHandler::instance()->registerHandler(SIGALRM, this);
 }
@@ -66,7 +66,7 @@ H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
 void
 H89Timer::setCPU(CPU* cpu)
 {
-    debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
+    debugss(ssTimer, INFO, "\n");
 
     cpu_m = cpu;
 }
@@ -75,7 +75,7 @@ H89Timer::~H89Timer()
 {
     static struct itimerval tim;
 
-    debugss(ssTimer, INFO, "%s\n", __FUNCTION__);
+    debugss(ssTimer, INFO, "\n");
 
     SignalHandler::instance()->removeHandler(SIGALRM);
 
@@ -120,7 +120,7 @@ H89Timer::handleSignal(int signum)
 
     if (signum != SIGALRM)
     {
-        debugss(ssTimer, ERROR, "%s: signum != SIGALRM: %d\n", __FUNCTION__, signum);
+        debugss(ssTimer, ERROR, "signum != SIGALRM: %d\n", signum);
 
         return (0);
     }
@@ -141,7 +141,7 @@ H89Timer::handleSignal(int signum)
 
     if (cpu_m)
     {
-        debugss(ssTimer, VERBOSE, "%s: adding clock ticks\n", __FUNCTION__);
+        debugss(ssTimer, VERBOSE, "adding clock ticks\n");
 
         // must always give the CPU more cycles.
         cpu_m->addClockTicks();
@@ -154,14 +154,14 @@ H89Timer::handleSignal(int signum)
         if (intEnabled_m)
 #endif
         {
-            debugss(ssTimer, VERBOSE, "%s: raising Interrupt\n", __FUNCTION__);
+            debugss(ssTimer, VERBOSE, "raising Interrupt\n");
 
             h89.raiseINT(intLevel);
         }
     }
     else
     {
-        debugss(ssTimer, ERROR, "%s: cpu_m is NULL\n", __FUNCTION__);
+        debugss(ssTimer, ERROR, "cpu_m is NULL\n");
     }
 
     return (0);

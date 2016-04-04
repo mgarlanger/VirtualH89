@@ -265,291 +265,7 @@ Z_89_37::out(BYTE addr,
             break;
     }
 }
-/*
-   void
-   Z_89_37::processCmd(BYTE cmd)
-   {
-    debugss(ssH37, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
 
-    // First check for the Force Interrupt command
-    if ((cmd & cmd_Mask_c) == cmd_ForceInterrupt_c)
-    {
-        processCmdTypeIV(cmd);
-        return;
-    }
-
-    // Make sure controller is not already busy. Documentation
-    // did not specify what would happen, for now just ignore
-    // the new command
-    if ((statusReg_m & stat_Busy_c) == stat_Busy_c)
-    {
-        debugss(ssH37, WARNING, "New command while still busy: %d", cmd);
-        // return;
-    }
-
-    // set Busy flag
-    statusReg_m |= stat_Busy_c;
-    debugss(ssH37, INFO, "Setting busy flag\n")
-
-    if ((cmd & 0x80) == 0x00)
-    {
-        // Type I commands
-        processCmdTypeI(cmd);
-    }
-    else if ((cmd & 0x40) == 0x00)
-    {
-        // Type II commands
-        processCmdTypeII(cmd);
-    }
-    else
-    {
-        // must be Type III command
-        processCmdTypeIII(cmd);
-    }
-   }
- */
-/*
-   void
-   Z_89_37::processCmdTypeI(BYTE cmd)
-   {
-    verifyTrack_m = ((cmd & cmdop_VerifyTrack_c) == cmdop_VerifyTrack_c);
-    seekSpeed_m   = speeds[cmd & cmdop_StepMask_c];
-
-    debugss(ssH37, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
-    // reset CRC Error, Seek Error, DRQ, INTRQ
-    statusReg_m &= ~(stat_CRCError_c | stat_SeekError_c);
-    lowerDrq();
-    lowerIntrq();
-
-    if ((cmd & cmdop_HeadLoad_c) == cmdop_HeadLoad_c)
-    {
-        debugss(ssH37, INFO, "%s - Load head at beginning\n", __FUNCTION__);
-        loadHead();
-    }
-    else
-    {
-        debugss(ssH37, INFO, "%s - Unload head at beginning\n", __FUNCTION__);
-        unloadHead();
-    }
-
-    if ((cmd & 0xe0) == 0x00)
-    {
-        debugss(ssH37, INFO, "%s - Seek\n", __FUNCTION__);
-
-        if ((cmd & 0x10) != 0x10)
-        {
-            debugss(ssH37, INFO, "%s - Restore\n", __FUNCTION__);
-
-            // Restore command
-            dataReg_m    = 0;
-            trackReg_m   = 0xff;
-            curCommand_m = restoreCmd;
-        }
-        else
-        {
-            curCommand_m = seekCmd;
-        }
-
-        seekTo();
-    }
-    else
-    {
-        // One of the Step commands
-        debugss(ssH37, INFO, "%s - Step\n", __FUNCTION__);
-        curCommand_m = stepCmd;
-
-        // check for step in or step out.
-        if ((cmd & 0x40) == 0x40)
-        {
-            if ((cmd & 0x20) == 0x20)
-            {
-                // Step Out
-                debugss(ssH37, INFO, "%s - Step Out\n", __FUNCTION__);
-                stepDirection_m = dir_out;
-            }
-            else
-            {
-                // Step In
-                debugss(ssH37, INFO, "%s - Step In\n", __FUNCTION__);
-                stepDirection_m = dir_in;
-            }
-        }
-
-        step();
-    }
-   }
- */
-/*
-   void
-   Z_89_37::processCmdTypeII(BYTE cmd)
-   {
-    multiple_m     = ((cmd & cmdop_MultipleRecord_c) == cmdop_MultipleRecord_c);
-    delay_m        = ((cmd & cmdop_Delay_15ms_c) == cmdop_Delay_15ms_c);
-    sectorLength_m = ((cmd & cmdop_SectorLength_c) == cmdop_SectorLength_c);
-    side_m         = ((cmd & cmdop_CompareSide_c) >> cmdop_CompareSide_Shift_c);
-
-    debugss(ssH37, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
-
-    if ((cmd & 0x20) == 0x20)
-    {
-        // Write Sector
-        deleteDAM_m  = ((cmd & 0x01) == 0x01);
-
-        debugss(ssH37, INFO, "%s - Write Sector - \n", __FUNCTION__);
-        curCommand_m = writeSectorCmd;
-
-    }
-    else
-    {
-        // Read Sector
-        debugss(ssH37, INFO, "%s - Read Sector: %d - multi: %d delay: %d sector: %d side: %d\n",
-                __FUNCTION__, sectorReg_m, multiple_m, delay_m, sectorLength_m, side_m);
-        curCommand_m     = readSectorCmd;
-
-        lostDataStatus_m = false;
-        dataReady_m      = false;
-        sectorPos_m      = -1000;
-    }
-   }
- *//*
-   void
-   Z_89_37::processCmdTypeIII(BYTE cmd)
-   {
-    delay_m = ((cmd & cmdop_Delay_15ms_c) == cmdop_Delay_15ms_c);
-    side_m  = ((cmd & cmdop_CompareSide_c) >> cmdop_CompareSide_Shift_c);
-
-    debugss(ssH37, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
-
-    if ((cmd & 0x20) == 0x00)
-    {
-        // Read Address
-        debugss(ssH37, INFO, "%s - Read Address\n", __FUNCTION__);
-        curCommand_m = readAddressCmd;
-
-    }
-    else if ((cmd & 0x10) == 0x10)
-    {
-        // write Track
-        debugss(ssH37, INFO, "%s - Write Track: %d\n", __FUNCTION__, trackReg_m);
-        curCommand_m = writeTrackCmd;
-
-    }
-    else
-    {
-        // read Track
-        debugss(ssH37, INFO, "%s - Read Track: %d\n", __FUNCTION__, trackReg_m);
-        curCommand_m = readTrackCmd;
-
-    }
-   }
- */
-#if 0
-void
-Z_89_37::processCmdTypeIV(BYTE cmd)
-{
-    debugss(ssH37, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
-
-    curCommand_m = forceInterruptCmd;
-
-    // check to see if previous command is still running
-    if (statusReg_m & stat_Busy_c)
-    {
-        debugss(ssH37, INFO, "%s - Aborting Command\n", __FUNCTION__);
-        // still running, abort command and reset busy
-        abortCmd();
-        statusReg_m &= ~stat_Busy_c;
-    }
-    else
-    {
-        bool hole = false, trackZero = false, writeProtect = false;
-
-        // no Command running, update status.
-        statusReg_m = 0;
-
-        if ((curDiskDrive_m < numDisks_c) && (drives_m[curDiskDrive_m]))
-        {
-            drives_m[curDiskDrive_m]->getControlInfo(curPos_m, hole, trackZero, writeProtect);
-        }
-
-        if (hole) // check indexPulse
-        {
-            statusReg_m |= stat_IndexPulse_c;
-        }
-
-        /// \todo this needs to move the floppy disk drive object
-        if (trackZero)
-        {
-            statusReg_m |= stat_TrackZero_c;
-        }
-
-        if (/* DISABLES CODE */ (0)) /// check crcError - Don't think it could happen here.
-        {
-            statusReg_m |= stat_CRCError_c;
-        }
-
-        if (/* DISABLES CODE */ (0)) // check seekError - Don't think it could happen here.
-        {
-            statusReg_m |= stat_SeekError_c;
-        }
-
-        // check head loaded - check with floppy drive
-        if ((curDiskDrive_m < numDisks_c) &&
-            (drives_m[curDiskDrive_m]) &&
-            (drives_m[curDiskDrive_m]->getHeadLoadStatus()))
-        {
-            statusReg_m |= stat_HeadLoaded_c;
-        }
-
-        // check writeProtected...
-        if (writeProtect)
-        {
-            statusReg_m |= stat_WriteProtect_c;
-        }
-
-        if (/* DISABLES CODE */ (0)) // check Not Ready..
-        {
-            /// \todo figure out what this comes from.
-            statusReg_m |= stat_NotReady_c;
-        }
-
-        debugss(ssH37, INFO, "%s - updating statusReg: %d\n", __FUNCTION__, statusReg_m);
-    }
-
-    if ((cmd & 0x0f) != 0x00)
-    {
-        // at least one bit is set.
-        if ((cmd & cmdop_NotReadyToReady_c) == cmdop_NotReadyToReady_c)
-        {
-            debugss(ssH37, INFO, "%s - Not Ready to Ready\n", __FUNCTION__);
-
-        }
-
-        if ((cmd & cmdop_ReadyToNotReady_c) == cmdop_ReadyToNotReady_c)
-        {
-            debugss(ssH37, INFO, "%s - Ready to Not Ready\n", __FUNCTION__);
-
-        }
-
-        if ((cmd & cmdop_IndexPulse_c) == cmdop_IndexPulse_c)
-        {
-            debugss(ssH37, INFO, "%s - Index Pulse\n", __FUNCTION__);
-
-        }
-
-        if ((cmd & cmdop_ImmediateInterrupt_c) == cmdop_ImmediateInterrupt_c)
-        {
-            debugss(ssH37, INFO, "%s - Immediate Interrupt\n", __FUNCTION__);
-
-        }
-    }
-    else
-    {
-        debugss(ssH37, INFO, "%s - No Interrupt/ Clear Busy\n", __FUNCTION__);
-        statusReg_m &= ~(stat_Busy_c);
-        curCommand_m = noneCmd;
-    }
-}
-#endif
 
 bool
 Z_89_37::connectDrive(BYTE       unitNum,
@@ -557,7 +273,7 @@ Z_89_37::connectDrive(BYTE       unitNum,
 {
     bool retVal = false;
 
-    debugss(ssH37, INFO, "%s: unit (%d), drive (%p)\n", __FUNCTION__, unitNum, drive);
+    debugss(ssH37, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
 
     if (unitNum < numDisks_c)
     {
@@ -568,12 +284,12 @@ Z_89_37::connectDrive(BYTE       unitNum,
         }
         else
         {
-            debugss(ssH37, ERROR, "%s: drive already connect\n", __FUNCTION__);
+            debugss(ssH37, ERROR, "drive already connect\n");
         }
     }
     else
     {
-        debugss(ssH37, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
+        debugss(ssH37, ERROR, "Invalid unit number (%d)\n", unitNum);
     }
 
     return (retVal);
@@ -590,7 +306,7 @@ void
 Z_89_37::raiseIntrq()
 {
     // check if IRQs are allowed.
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
+    debugss(ssH37, INFO, "\n");
 
     if (intrqAllowed_m)
     {
@@ -602,7 +318,7 @@ Z_89_37::raiseIntrq()
 void
 Z_89_37::raiseDrq()
 {
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
+    debugss(ssH37, INFO, "\n");
 
     // check if DRQ is allowed.
     if (drqAllowed_m)
@@ -612,14 +328,14 @@ Z_89_37::raiseDrq()
         return;
     }
 
-    debugss(ssH37, INFO, "%s - not allowed.\n", __FUNCTION__);
+    debugss(ssH37, INFO, "not allowed.\n");
 
 }
 
 void
 Z_89_37::lowerIntrq()
 {
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
+    debugss(ssH37, INFO, "\n");
 
     if (!intrqAllowed_m)
     {
@@ -631,7 +347,7 @@ Z_89_37::lowerIntrq()
 void
 Z_89_37::lowerDrq()
 {
-    debugss(ssH37, INFO, "%s\n", __FUNCTION__);
+    debugss(ssH37, INFO, "\n");
 
     if (!drqAllowed_m)
     {
@@ -640,245 +356,3 @@ Z_89_37::lowerDrq()
     }
 
 }
-
-/*
-   void
-   Z_89_37::notification(unsigned int cycleCount)
-   {
-    unsigned long charPos = 0;
-
-    if (motorOn_m)
-    {
-        cycleCount_m += cycleCount;
-        cycleCount_m %= (bytesPerTrack_c * clocksPerByte_c);
-        charPos       = cycleCount_m / clocksPerByte_c;
-
-        if (charPos == curPos_m)
-        {
-            // Position hasn't changed just return
-            return;
-        }
-
-        debugss(ssH37, ALL, "New character Pos - old: %ld, new: %ld\n", curPos_m, charPos);
-        curPos_m = charPos;
-    }
-    else
-    {
-        // Drive motor is not turned on. Nothing to do.
-        /// \todo determine if we need to use clock to determine when these occur.
-        // These are needed for drive detection.
-   #if 0
-        if (drives_m[curDiskDrive_m])
-        {
-            transmitterBufferEmpty_m = true;
-            fillCharTransmitted_m    = true;
-        }
-        else
-        {
-            transmitterBufferEmpty_m = false;
-            fillCharTransmitted_m    = false;
-        }
-
-   #endif
-        return;
-    }
-
-    if (!(curDiskDrive_m < numDisks_c))
-    {
-        debugss(ssH37, WARNING, "%s: Invalid Drive: %d\n", __FUNCTION__, curDiskDrive_m);
-        return;
-    }
-
-   #if 0
-
-    switch (state_m)
-    {
-        case idleState:
-            debugss(ssH17, INFO, "%s: Idle State\n", __FUNCTION__);
-            /// do nothing
-            break;
-
-        case seekingSyncState:
-
-            // determine if to the next character
-            // check to see if character matches sync, -> set set sync found
-            // also load data buffer.
-            if (drives_m[curDrive_m])
-            {
-                data = drives_m[curDrive_m]->readData(curCharPos);
-                debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
-                        curDrive_m, data);
-            }
-            else
-            {
-                debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
-                        __FUNCTION__, curDrive_m);
-                // should we return here...
-            }
-
-            if (data == syncChar_m)
-            {
-                debugss(ssH17, INFO, "%s: found sync\n", __FUNCTION__);
-                receiverOutputRegister_m = data;
-                syncCharacterReceived_m  = true;
-                receiveDataAvail_m       = true; /// \todo determine if this should be set.
-                state_m                  = readingState;
-            }
-
-            break;
-
-        case readingState:
-
-            // determine if new character is to be moved into receive buffer,
-            //   if so, determine if receive buffer is empty.
-            //     if not, set ReceiverOverrun_Flag
-            //   store new character in receiver buffer
-            //
-            if (receiveDataAvail_m)
-            {
-                debugss(ssH17, INFO, "%s: Receiver Overrun\n", __FUNCTION__);
-                // last data byte was not read, set overrun
-                receiverOverrun_m = true;
-            }
-
-            if (drives_m[curDrive_m])
-            {
-                data = drives_m[curDrive_m]->readData(curCharPos);
-            }
-
-            debugss(ssH17, ALL, "%s: Reading - Pos: %ld Data: %d\n",
-                    __FUNCTION__, curCharPos, data);
-            receiverOutputRegister_m = data;
-            receiveDataAvail_m       = true;
-            break;
-
-        case writingState:
-
-            // Determine if transmitter Holding is empty,
-            //    if so,
-            //         write fill character.
-            //         set fill character transmitted flag.
-            //    else
-            //         transmit from buffer, empty buffer.
-            if (transmitterBufferEmpty_m)
-            {
-                data                  = fillChar_m;
-                fillCharTransmitted_m = true;
-                debugss(ssH17, ALL, "%s: fill char sent Pos: %ld\n",
-                        __FUNCTION__, curCharPos);
-            }
-            else
-            {
-                data                     = transmitterHoldingRegister_m;
-                transmitterBufferEmpty_m = true;
-                debugss(ssH17, ALL, "%s: Writing - Pos: %ld Data: %d\n", __FUNCTION__,
-                        curCharPos, data);
-            }
-
-            if (drives_m[curDrive_m])
-            {
-                drives_m[curDrive_m]->writeData(curCharPos, data);
-            }
-            else
-            {
-                debugss(ssH17, INFO, "%s: No Valid Drive - Pos: %ld\n", __FUNCTION__, curCharPos);
-            }
-
-            break;
-    }
-
-   #endif
-
-    switch (curCommand_m)
-    {
-        case restoreCmd:
-
-            break;
-
-        case seekCmd:
-
-            break;
-
-        case stepCmd:
-
-            break;
-
-        case readSectorCmd:
-            debugss(ssH37, ALL, "%s: sectorPos_m: %d\n", __FUNCTION__,
-                    sectorPos_m);
-
-            if ((sectorPos_m >= 0) && (sectorPos_m < 256))
-            {
-                debugss(ssH37, VERBOSE, "%s: Sector(%d) Read[%d]\n", __FUNCTION__,
-                        sectorReg_m, sectorPos_m);
-
-                if ((curDiskDrive_m < numDisks_c) && (drives_m[curDiskDrive_m]))
-                {
-                    if (dataReady_m)
-                    {
-                        debugss(ssH37, WARNING, "%s: Data Lost: %d\n", __FUNCTION__,
-                                curDiskDrive_m);
-
-                        lostDataStatus_m = true;
-                    }
-
-                    // Since Sectors are stored 0 to (n-1), and controller uses 1 to n, must change
-                    // sectorReg_m to be 0 offset
-                    dataReg_m = drives_m[curDiskDrive_m]->readSectorData(sectorReg_m - 1,
-                                                                         sectorPos_m);
-
-                    debugss(ssH37, VERBOSE, "%s: Sector(%d) Read[%d] = %d\n", __FUNCTION__,
-                            sectorReg_m, sectorPos_m, dataReg_m);
-
-                    dataReady_m  = true;
-                    statusReg_m |= stat_DataRequest_c;
-
-                    raiseDrq();
-                }
-                else
-                {
-                    /// \todo generate error
-                    debugss(ssH37, WARNING, "%s: Not valid drive - %d\n", __FUNCTION__,
-                            curDiskDrive_m);
-
-                }
-            }
-
-            sectorPos_m++;
-
-            if (sectorPos_m == 256)
-            {
-                /// \todo check for multiple sectors.
-                curCommand_m = noneCmd;
-            }
-
-
-            break;
-
-        case writeSectorCmd:
-
-            break;
-
-        case readAddressCmd:
-
-            break;
-
-        case readTrackCmd:
-
-            break;
-
-        case writeTrackCmd:
-
-            break;
-
-        case forceInterruptCmd:
-
-            break;
-
-        case noneCmd:
-
-            break;
-    }
-
-   }
- */

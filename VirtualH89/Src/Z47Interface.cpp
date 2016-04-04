@@ -21,7 +21,7 @@ Z47Interface::Z47Interface(int baseAddr): DiskController(baseAddr, H47_NumPorts_
                                           Done_m(false),
                                           linkToDrive_m(0)
 {
-    debugss(ssH47, ALL, "%s(%d)\n", __FUNCTION__, baseAddr);
+    debugss(ssH47, ALL, "(%d)\n", baseAddr);
 
 }
 
@@ -33,7 +33,7 @@ Z47Interface::~Z47Interface()
 BYTE
 Z47Interface::in(BYTE addr)
 {
-    debugss(ssH47, ALL, "%s(%d)\n", __FUNCTION__, addr);
+    debugss(ssH47, ALL, "(%d)\n", addr);
     BYTE offset = getPortOffset(addr);
     BYTE data   = 0;
 
@@ -41,16 +41,16 @@ Z47Interface::in(BYTE addr)
     {
         case StatusPort_Offset_c:
             readStatus(data);
-            debugss(ssH47, ALL, "%s - StatusPort - 0x%02x\n", __FUNCTION__, data);
+            debugss(ssH47, ALL, "StatusPort - 0x%02x\n", data);
             break;
 
         case DataPort_Offset_c:
             readData(data);
-            debugss(ssH47, ALL, "%s - DataPort - 0x%02x\n", __FUNCTION__, data);
+            debugss(ssH47, ALL, "DataPort - 0x%02x\n", data);
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
+            debugss(ssH47, ERROR, "Unknown Port offset - %d\n", offset);
             break;
     }
 
@@ -63,22 +63,22 @@ Z47Interface::out(BYTE addr,
 {
     BYTE offset = getPortOffset(addr);
 
-    debugss(ssH47, ALL, "%s(%d) = 0x%02x\n", __FUNCTION__, addr, val);
+    debugss(ssH47, ALL, "(%d) = 0x%02x\n", addr, val);
 
     switch (offset)
     {
         case StatusPort_Offset_c:
-            debugss(ssH47, ALL, "%s - StatusPort\n", __FUNCTION__);
+            debugss(ssH47, ALL, "StatusPort\n");
             writeStatus(val);
             break;
 
         case DataPort_Offset_c:
-            debugss(ssH47, ALL, "%s - DataPort\n", __FUNCTION__);
+            debugss(ssH47, ALL, " DataPort\n");
             writeData(val);
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown Port offset - %d\n", __FUNCTION__, offset);
+            debugss(ssH47, ERROR, "Unknown Port offset - %d\n", offset);
             break;
     }
 }
@@ -87,7 +87,7 @@ Z47Interface::out(BYTE addr,
 void
 Z47Interface::reset(void)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     /// \todo Determine what to do for a reset.
 
     if (linkToDrive_m)
@@ -99,29 +99,29 @@ Z47Interface::reset(void)
 void
 Z47Interface::notification(unsigned int cycleCount)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
 }
 
 void
 Z47Interface::writeStatus(BYTE cmd)
 {
-    debugss(ssH47, ALL, "%s: cmd = 0x%02x\n", __FUNCTION__, cmd);
+    debugss(ssH47, ALL, "cmd = 0x%02x\n", cmd);
 
     if ((cmd & cmd_MasterReset_c) == cmd_MasterReset_c)
     {
-        debugss(ssH47, INFO, "%s: Master Reset\n", __FUNCTION__);
+        debugss(ssH47, INFO, "Master Reset\n");
         reset();
     }
 
     if ((cmd & cmd_U137BSet_c) == cmd_U137BSet_c)
     {
-        debugss(ssH47, INFO, "%s: FlipFlop U137B\n", __FUNCTION__);
+        debugss(ssH47, INFO, "FlipFlop U137B\n");
     }
 
     if ((cmd & cmd_InterruptsEnabled_c) == cmd_InterruptsEnabled_c)
     {
-        debugss(ssH47, INFO, "%s: Interrupts Enabled\n", __FUNCTION__);
+        debugss(ssH47, INFO, "Interrupts Enabled\n");
         interruptsEnabled_m = true;
     }
     else
@@ -131,14 +131,14 @@ Z47Interface::writeStatus(BYTE cmd)
 
     if ((cmd & cmd_Undefined_c) != 0)
     {
-        debugss(ssH47, WARNING, "%s: Unexpected command bits: 0x%02x\n", __FUNCTION__, cmd);
+        debugss(ssH47, WARNING, "Unexpected command bits: 0x%02x\n", cmd);
     }
 }
 
 void
 Z47Interface::writeData(BYTE data)
 {
-    debugss(ssH47, ALL, "%s: data = 0x%02x\n", __FUNCTION__, data);
+    debugss(ssH47, ALL, "data = 0x%02x\n", data);
 
     if (linkToDrive_m)
     {
@@ -146,7 +146,7 @@ Z47Interface::writeData(BYTE data)
     }
     else
     {
-        debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "link to Drive not configured\n");
     }
 }
 
@@ -173,7 +173,7 @@ Z47Interface::readStatus(BYTE& data)
 
     data = val;
 
-    debugss(ssH47, ALL, "%s - Status 0x%02x\n", __FUNCTION__, data);
+    debugss(ssH47, ALL, "Status 0x%02x\n", data);
 }
 
 void
@@ -185,14 +185,14 @@ Z47Interface::readData(BYTE& data)
         linkToDrive_m->setDTAK(true);
     }
 
-    debugss(ssH47, ALL, "%s - Data 0x%02x\n", __FUNCTION__, data);
+    debugss(ssH47, ALL, "Data 0x%02x\n", data);
 }
 
 
 void
 Z47Interface::connectDriveLink(ParallelLink* link)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     linkToDrive_m = link;
 
@@ -202,56 +202,56 @@ Z47Interface::connectDriveLink(ParallelLink* link)
     }
     else
     {
-        debugss(ssH47, ERROR, "%s - link to Drive not configured\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "link to Drive not configured\n");
     }
 }
 
 void
 Z47Interface::raiseSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     switch (sigType)
     {
         // Master Reset (Host to Disk System)
         case st_MasterReset:
             // Handle a reset
-            debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid Master Reset received.\n");
             break;
 
         // Data Acknowledge (Host to Disk System)
         case st_DTAK:
             // Handle data acknowledge.
-            debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DTAK received.\n");
             break;
 
         // Data Ready (Disk System to Host)
         case st_DTR:
-            debugss(ssH47, INFO, "%s: DTR raised.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DTR raised.\n");
             DTR_m = true;
             break;
 
         // Disk Drive Out (Disk System to Host)
         case st_DDOUT:
-            debugss(ssH47, INFO, "%s: DDOUT raised.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DDOUT raised.\n");
             DDOut_m = true;
             break;
 
         // Busy (Disk System to Host)
         case st_Busy:
-            debugss(ssH47, INFO, "%s: Busy raised.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Busy raised.\n");
             Busy_m = true;
             Done_m = false;
             break;
 
         // Error (Disk System to Host)
         case st_Error:
-            debugss(ssH47, INFO, "%s: Error raised.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Error raised.\n");
             Error_m = true;
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid sigType received.\n");
             break;
     }
 }
@@ -259,24 +259,24 @@ Z47Interface::raiseSignal(SignalType sigType)
 void
 Z47Interface::lowerSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     switch (sigType)
     {
         // Master Reset (Host to Disk System)
         case st_MasterReset:
             // Handle a reset
-            debugss(ssH47, ERROR, "%s: Invalid Master Reset received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid Master Reset received.\n");
             break;
 
         // Data Acknowledge (Host to Disk System)
         case st_DTAK:
-            debugss(ssH47, ERROR, "%s: Invalid DTAK received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DTAK received.\n");
             break;
 
         // Data Ready (Disk System to Host)
         case st_DTR:
-            debugss(ssH47, INFO, "%s: DTR lowered.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DTR lowered.\n");
             DTR_m = false;
             linkToDrive_m->setDTAK(false);
 
@@ -284,25 +284,25 @@ Z47Interface::lowerSignal(SignalType sigType)
 
         // Disk Drive Out (Disk System to Host)
         case st_DDOUT:
-            debugss(ssH47, INFO, "%s: DDOUT lowered.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DDOUT lowered.\n");
             DDOut_m = false;
             break;
 
         // Busy (Disk System to Host)
         case st_Busy:
-            debugss(ssH47, INFO, "%s: Busy lowered.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Busy lowered.\n");
             Busy_m = false;
             Done_m = true;
             break;
 
         // Error (Disk System to Host)
         case st_Error:
-            debugss(ssH47, INFO, "%s: Error lowered.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Error lowered.\n");
             Error_m = false;
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid sigType received.\n");
             break;
     }
 }
@@ -310,5 +310,5 @@ Z47Interface::lowerSignal(SignalType sigType)
 void
 Z47Interface::pulseSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 }

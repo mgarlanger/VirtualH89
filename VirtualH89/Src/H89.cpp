@@ -262,7 +262,7 @@ H89::buildSystem(Console* console)
             h17       = H17::install_H17(H17_BaseAddress_c, props, devslots[x]);
             h89io->addDiskDevice(h17);
             dev_slots = true;
-            
+
         }
         else if (s.compare("H37") == 0)
         {
@@ -497,14 +497,14 @@ H89::systemMutexRelease()
 void
 H89::raiseINT(int level)
 {
-    debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
+    debugss(ssH89, VERBOSE, "level - %d\n", level);
     getAddressBus().getIntrCtrlr()->raiseInterrupt(level);
 }
 
 void
 H89::lowerINT(int level)
 {
-    debugss(ssH89, VERBOSE, "%s: level - %d\n", __FUNCTION__, level);
+    debugss(ssH89, VERBOSE, "level - %d\n", level);
     getAddressBus().getIntrCtrlr()->lowerInterrupt(level);
 }
 

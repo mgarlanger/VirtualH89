@@ -50,7 +50,7 @@ EightInchDisk::readRaw8(const char* name)
 
     if (!file.is_open())
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Unable to open file: %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, ERROR, "%Unable to open file: %s\n", name);
         return false;
     }
 
@@ -63,7 +63,7 @@ EightInchDisk::readRaw8(const char* name)
 
     file.close();
 
-    debugss(ssFloppyDisk, INFO, "%s: RAW File: %s - Size: %lu\n", __FUNCTION__, name, fileSize);
+    debugss(ssFloppyDisk, INFO, "RAW File: %s - Size: %lu\n", name, fileSize);
 
     switch (fileSize)
     {
@@ -77,7 +77,7 @@ EightInchDisk::readRaw8(const char* name)
 
     if (fileSize != (256 * 10 * 40))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid File Size: %s - %ld\n", __FUNCTION__, name,
+        debugss(ssFloppyDisk, ERROR, "Invalid File Size: %s - %ld\n", name,
                 fileSize);
         delete [] buf;
 

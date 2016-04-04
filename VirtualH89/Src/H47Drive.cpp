@@ -59,7 +59,7 @@ H47Drive::step(bool direction)
             ++track_m;
         }
 
-        debugss(ssH47Drive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssH47Drive, INFO, "in(up) (%d)\n", track_m);
     }
     else
     {
@@ -68,7 +68,7 @@ H47Drive::step(bool direction)
             --track_m;
         }
 
-        debugss(ssH47Drive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssH47Drive, INFO, "out(down) (%d)\n", track_m);
     }
 
 }

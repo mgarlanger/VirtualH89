@@ -61,21 +61,20 @@ DiskData::parse()
 
     if (!fileRead_m)
     {
-        debugss(ssFloppyDisk, ERROR, "%s: File could not be read\n", __FUNCTION__);
+        debugss(ssFloppyDisk, ERROR, "File could not be read\n");
         return false;
     }
 
     if (dataSize_m < 20) /// \todo determine the minimum size.
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid file size: %lld\n", __FUNCTION__,
-                dataSize_m);
+        debugss(ssFloppyDisk, ERROR, "Invalid file size: %lld\n", dataSize_m);
         return false;
     }
 
     if ((data_m[0] != 'H') || (data_m[2] != '7') || (data_m[3] == 'D'))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid file signature %c%c%c%c\n",
-                __FUNCTION__, data_m[0], data_m[1], data_m[2], data_m[3]);
+        debugss(ssFloppyDisk, ERROR, "Invalid file signature %c%c%c%c\n", data_m[0],
+                data_m[1], data_m[2], data_m[3]);
         return false;
     }
 
@@ -186,14 +185,14 @@ DiskData::readDiskFormat(unsigned int& pos)
 
     if ((flags & mandatoryFlag_c) == mandatoryFlag_c)
     {
-        debugss(ssFloppyDisk, WARNING, "%s Missing Mandatory Flag\n", __FUNCTION__);
+        debugss(ssFloppyDisk, WARNING, "Missing Mandatory Flag\n");
     }
 
     unsigned int blockLength = readLength(pos);
 
     if (blockLength != diskFormatSize_c)
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid size block: %d expected: %d\n", __FUNCTION__,
+        debugss(ssFloppyDisk, ERROR, "Invalid size block: %d expected: %d\n",
                 blockLength, diskFormatSize_c);
         return false;
     }
@@ -210,14 +209,14 @@ DiskData::readFlags(unsigned int& pos)
 
     if ((flags & mandatoryFlag_c) == mandatoryFlag_c)
     {
-        debugss(ssFloppyDisk, WARNING, "%s Missing Mandatory Flag\n", __FUNCTION__);
+        debugss(ssFloppyDisk, WARNING, "Missing Mandatory Flag\n");
     }
 
     unsigned int blockLength = readLength(pos);
 
     if (blockLength < flagsSize_c)
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Block too short: %d\n", __FUNCTION__, blockLength);
+        debugss(ssFloppyDisk, ERROR, "Block too short: %d\n", blockLength);
         return false;
     }
 
@@ -253,14 +252,14 @@ DiskData::readDataBlock(unsigned int& pos)
 
     if ((flags & mandatoryFlag_c) == mandatoryFlag_c)
     {
-        debugss(ssFloppyDisk, WARNING, "%s Missing Mandatory Flag\n", __FUNCTION__);
+        debugss(ssFloppyDisk, WARNING, "Missing Mandatory Flag\n");
     }
 
     unsigned int blockLength = readLength(pos);
 
     if (blockLength < diskFormatSize_c)
     {
-        debugss(ssFloppyDisk, ERROR, "%s Block too short: %d\n", __FUNCTION__, blockLength);
+        debugss(ssFloppyDisk, ERROR, "Block too short: %d\n", blockLength);
         return false;
     }
 
@@ -274,7 +273,7 @@ DiskData::readHoleBlock(unsigned int& pos)
 
     if ((flags & mandatoryFlag_c) == mandatoryFlag_c)
     {
-        debugss(ssFloppyDisk, WARNING, "%s Missing Mandatory Flag\n", __FUNCTION__);
+        debugss(ssFloppyDisk, WARNING, "Missing Mandatory Flag\n");
     }
 
     unsigned int blockLength = readLength(pos);

@@ -23,7 +23,7 @@ NMIPort::~NMIPort()
 BYTE
 NMIPort::in(BYTE addr)
 {
-    debugss(ssIO, INFO, "%s: In: %d\n", __FUNCTION__, addr);
+    debugss(ssIO, INFO, "In: %d\n", addr);
 
     h89.raiseNMI();
     /// \todo Determine the right value to return.
@@ -35,6 +35,6 @@ void
 NMIPort::out(BYTE addr,
              BYTE val)
 {
-    debugss(ssIO, INFO, "%s: Out: %d\n", __FUNCTION__, addr);
+    debugss(ssIO, INFO, "Out: %d\n", addr);
     h89.raiseNMI();
 }

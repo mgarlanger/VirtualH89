@@ -28,7 +28,7 @@ H_17_1::getControlInfo(unsigned long pos,
 {
     // Track info comes from the drive, the hole and write-protect is determined
     // by the actual disk
-    debugss(ssH17_1, INFO, "%s - pos: %ld\n", __FUNCTION__, pos);
+    debugss(ssH17_1, INFO, "pos: %ld\n", pos);
 
     trackZero = (track_m == 0);
 
@@ -38,7 +38,7 @@ H_17_1::getControlInfo(unsigned long pos,
     }
     else
     {
-        debugss(ssH17_1, INFO, "%s no disk_m\n", __FUNCTION__);
+        debugss(ssH17_1, INFO, "no disk_m\n");
         hole         = true;
         writeProtect = false;
     }
@@ -54,7 +54,7 @@ H_17_1::step(bool direction)
             ++track_m;
         }
 
-        debugss(ssH17_1, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssH17_1, INFO, "in(up) (%d)\n", track_m);
     }
     else
     {
@@ -63,7 +63,7 @@ H_17_1::step(bool direction)
             --track_m;
         }
 
-        debugss(ssH17_1, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
+        debugss(ssH17_1, INFO, "out(down) (%d)\n", track_m);
     }
 }
 
@@ -80,11 +80,11 @@ H_17_1::readData(unsigned long pos)
 
     if ((disk_m) && (disk_m->readData(head_c, track_m, pos, data)))
     {
-        debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
+        debugss(ssH17_1, INFO, "read passed - pos(%lu) data(%d)\n", pos, data);
     }
     else
     {
-        debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "read failed - pos(%lu)\n", pos);
     }
 
     return data;
@@ -96,7 +96,7 @@ H_17_1::writeData(unsigned long pos,
 {
     if ((disk_m) && (!disk_m->writeData(head_c, track_m, pos, data)))
     {
-        debugss(ssH17_1, WARNING, "%s: pos(%lu)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "pos(%lu)\n", pos);
     }
 }
 
@@ -108,11 +108,11 @@ H_17_1::readSectorData(BYTE          sector,
 
     if ((disk_m) && (disk_m->readSectorData(0, track_m, sector, pos, data)))
     {
-        debugss(ssH17_1, INFO, "%s: read passed - pos(%lu) data(%d)\n", __FUNCTION__, pos, data);
+        debugss(ssH17_1, INFO, "read passed - pos(%lu) data(%d)\n", pos, data);
     }
     else
     {
-        debugss(ssH17_1, WARNING, "%s: read failed - pos(%lu)\n", __FUNCTION__, pos);
+        debugss(ssH17_1, WARNING, "read failed - pos(%lu)\n", pos);
     }
 
     return data;

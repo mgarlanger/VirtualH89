@@ -300,7 +300,7 @@ MMS77316::connectDrive(BYTE                unitNum,
 {
     bool retVal = false;
 
-    debugss(ssMMS77316, INFO, "%s: unit (%d), drive (%p)\n", __FUNCTION__, unitNum, drive);
+    debugss(ssMMS77316, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
 
     if (unitNum < numDisks_c)
     {
@@ -311,12 +311,12 @@ MMS77316::connectDrive(BYTE                unitNum,
         }
         else
         {
-            debugss(ssMMS77316, ERROR, "%s: drive already connect\n", __FUNCTION__);
+            debugss(ssMMS77316, ERROR, "drive already connect\n");
         }
     }
     else
     {
-        debugss(ssMMS77316, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
+        debugss(ssMMS77316, ERROR, "Invalid unit number (%d)\n", unitNum);
     }
 
     return (retVal);
@@ -331,7 +331,7 @@ MMS77316::removeDrive(BYTE unitNum)
 void
 MMS77316::raiseIntrq()
 {
-    debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77316, INFO, "\n");
 
     WD1797::raiseIntrq();
     drqCount_m = 0;
@@ -347,7 +347,7 @@ MMS77316::raiseIntrq()
 void
 MMS77316::raiseDrq()
 {
-    debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77316, INFO, "\n");
 
     WD1797::raiseDrq();
 
@@ -362,7 +362,7 @@ MMS77316::raiseDrq()
 void
 MMS77316::lowerIntrq()
 {
-    debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77316, INFO, "\n");
     WD1797::lowerIntrq();
     // TODO: only lower if !drqRaised_m, but Z80 is not handling that correctly anyway.
     h89.lowerINT(MMS77316_Intr_c);
@@ -371,7 +371,7 @@ MMS77316::lowerIntrq()
 void
 MMS77316::lowerDrq()
 {
-    debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77316, INFO, "\n");
     WD1797::lowerDrq();
 
     // TODO: only lower if !intrqRaised_m, but Z80 is not handling that correctly anyway.
@@ -384,7 +384,7 @@ MMS77316::lowerDrq()
 void
 MMS77316::loadHead(bool load)
 {
-    debugss(ssMMS77316, INFO, "%s\n", __FUNCTION__);
+    debugss(ssMMS77316, INFO, "\n");
     WD1797::loadHead(load);
 
     if (!load)

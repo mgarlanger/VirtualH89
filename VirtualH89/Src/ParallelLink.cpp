@@ -35,14 +35,14 @@ ParallelLink::~ParallelLink()
 void
 ParallelLink::sendHostData(BYTE data)
 {
-    debugss(ssParallel, INFO, "%s: Entering: %d\n", __FUNCTION__, data);
+    debugss(ssParallel, INFO, "Entering: %d\n", data);
 
     if (host_m)
     {
         if ((dataFromDrive_m) || (dataFromHost_m))
         {
-            debugss(ssParallel, ERROR, "%s: Data already on bus: fromDrive: %d fromHost: %d.\n",
-                    __FUNCTION__, dataFromDrive_m, dataFromHost_m);
+            debugss(ssParallel, ERROR, "Data already on bus: fromDrive: %d fromHost: %d.\n",
+                    dataFromDrive_m, dataFromHost_m);
         }
 
         data_m          = data;
@@ -52,21 +52,21 @@ ParallelLink::sendHostData(BYTE data)
     }
     else
     {
-        debugss(ssParallel, ERROR, "%s: Host not connected.\n", __FUNCTION__);
+        debugss(ssParallel, ERROR, "Host not connected.\n");
     }
 }
 
 void
 ParallelLink::sendDriveData(BYTE data)
 {
-    debugss(ssParallel, INFO, "%s: Entering: %d\n", __FUNCTION__, data);
+    debugss(ssParallel, INFO, "Entering: %d\n", data);
 
     if (device_m)
     {
         if ((dataFromDrive_m) || (dataFromHost_m))
         {
-            debugss(ssParallel, ERROR, "%s: Data already on bus: fromDrive: %d fromHost: %d.\n",
-                    __FUNCTION__, dataFromDrive_m, dataFromHost_m);
+            debugss(ssParallel, ERROR, "Data already on bus: fromDrive: %d fromHost: %d.\n",
+                    dataFromDrive_m, dataFromHost_m);
         }
 
         data_m         = data;
@@ -75,14 +75,14 @@ ParallelLink::sendDriveData(BYTE data)
     }
     else
     {
-        debugss(ssParallel, FATAL, "%s: Drive not connected.\n", __FUNCTION__);
+        debugss(ssParallel, FATAL, "Drive not connected.\n");
     }
 }
 
 void
 ParallelLink::readDataBusByHost(BYTE& data)
 {
-    debugss(ssParallel, INFO, "%s: Entering, returning: 0x%02x\n", __FUNCTION__, data_m);
+    debugss(ssParallel, INFO, "Entering, returning: 0x%02x\n", data_m);
 
     if (dataFromDrive_m)
     {
@@ -91,8 +91,7 @@ ParallelLink::readDataBusByHost(BYTE& data)
     }
     else
     {
-        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
-                dataFromHost_m);
+        debugss(ssParallel, FATAL, "Drive did not provide data: %d\n", dataFromHost_m);
     }
 }
 
@@ -100,7 +99,7 @@ ParallelLink::readDataBusByHost(BYTE& data)
 void
 ParallelLink::readDataBusByDrive(BYTE& data)
 {
-    debugss(ssParallel, INFO, "%s: Entering, returning: 0x%02x\n", __FUNCTION__, data_m);
+    debugss(ssParallel, INFO, "Entering, returning: 0x%02x\n", data_m);
 
     if (dataFromHost_m)
     {
@@ -109,8 +108,7 @@ ParallelLink::readDataBusByDrive(BYTE& data)
     }
     else
     {
-        debugss(ssParallel, FATAL, "%s: Drive did not provide data: %d\n", __FUNCTION__,
-                dataFromDrive_m);
+        debugss(ssParallel, FATAL, "Drive did not provide data: %d\n", dataFromDrive_m);
     }
 }
 
@@ -119,7 +117,7 @@ ParallelLink::readDataBusByDrive(BYTE& data)
 void
 ParallelLink::setBusy(bool val)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (host_m)
     {
@@ -139,14 +137,14 @@ ParallelLink::setBusy(bool val)
 bool
 ParallelLink::readBusy()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
     return busy_m;
 }
 
 void
 ParallelLink::setDTR(bool val)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (host_m)
     {
@@ -161,7 +159,7 @@ ParallelLink::setDTR(bool val)
     }
     else
     {
-        debugss(ssParallel, ERROR, "%s: host_m is NULL\n", __FUNCTION__);
+        debugss(ssParallel, ERROR, "host_m is NULL\n");
 
     }
 
@@ -171,14 +169,14 @@ ParallelLink::setDTR(bool val)
 bool
 ParallelLink::readDTR()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
     return DTR_m;
 }
 
 void
 ParallelLink::masterReset()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (device_m)
     {
@@ -189,7 +187,7 @@ ParallelLink::masterReset()
 void
 ParallelLink::setDDOut(bool val)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (host_m)
     {
@@ -211,7 +209,7 @@ ParallelLink::setDDOut(bool val)
 bool
 ParallelLink::readDDOut()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
     return DDOut_m;
 }
 
@@ -219,7 +217,7 @@ ParallelLink::readDDOut()
 void
 ParallelLink::setDTAK(bool val)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (device_m)
     {
@@ -239,14 +237,14 @@ ParallelLink::setDTAK(bool val)
 bool
 ParallelLink::readDTAK()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
     return DTAK_m;
 }
 
 void
 ParallelLink::setError(bool val)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (host_m)
     {
@@ -266,18 +264,18 @@ ParallelLink::setError(bool val)
 bool
 ParallelLink::readError()
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
     return error_m;
 }
 
 void
 ParallelLink::registerDevice(ParallelPortConnection* device)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (device_m)
     {
-        debugss(ssParallel, ERROR, "%s: device already defined\n", __FUNCTION__);
+        debugss(ssParallel, ERROR, "device already defined\n");
     }
 
     device_m = device;
@@ -286,11 +284,11 @@ ParallelLink::registerDevice(ParallelPortConnection* device)
 void
 ParallelLink::registerHost(ParallelPortConnection* host)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (host_m)
     {
-        debugss(ssParallel, ERROR, "%s: device already defined\n", __FUNCTION__);
+        debugss(ssParallel, ERROR, "device already defined\n");
     }
 
     host_m = host;

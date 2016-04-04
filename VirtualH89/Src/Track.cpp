@@ -66,19 +66,19 @@ Track::readSectorData(BYTE  sector,
                       WORD  pos,
                       BYTE& data)
 {
-    debugss(ssFloppyDisk, INFO, "%s: sector: %d pos: %d\n", __FUNCTION__, sector, pos);
+    debugss(ssFloppyDisk, INFO, "sector: %d pos: %d\n", sector, pos);
 
     for (int i = 0; i < sectors_m.size(); i++)
     {
         if (sectors_m[i]->getSectorNum() == sector)
         {
-            debugss(ssFloppyDisk, INFO, "%s: found\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "found\n");
 
             return sectors_m[i]->readData(pos, data);
         }
     }
 
-    debugss(ssFloppyDisk, INFO, "%s: Not found\n", __FUNCTION__);
+    debugss(ssFloppyDisk, INFO, "Not found\n");
 
     return false;
 

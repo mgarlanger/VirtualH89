@@ -34,7 +34,7 @@ DiskDrive::getInstance(std::string type)
 
     if ((type.compare("FDD_5_25_SS_ST") == 0) || (type.compare("H17_1") == 0))
     {
-        debugss(ssDiskDrive, ERROR, "%s - allocating h17-1 drive\n", __FUNCTION__);
+        debugss(ssDiskDrive, INFO, "allocating h17-1 drive\n");
         drive = new H_17_1();
     }
     // \todo support ss_dt & ds_st
@@ -48,12 +48,12 @@ DiskDrive::getInstance(std::string type)
 //    }
     else if ((type.compare("FDD_5_25_DS_DT") == 0) || (type.compare("H17_4") == 0))
     {
-        debugss(ssDiskDrive, ERROR, "%s - allocating h17-4 drive\n", __FUNCTION__);
+        debugss(ssDiskDrive, INFO, "allocating h17-4 drive\n");
         drive = new H_17_4();
     }
     else
     {
-        debugss(ssDiskDrive, ERROR, "%s - unable to allocate drive\n", __FUNCTION__);
+        debugss(ssDiskDrive, ERROR, "unable to allocate drive\n");
     }
     return drive;
 }
@@ -98,29 +98,3 @@ DiskDrive::getHeadLoadStatus()
 {
     return headLoaded_m;
 }
-
-#if 0
-void
-DiskDrive::step(bool direction)
-{
-    if (direction)
-    {
-        if (track_m < 39)
-        {
-            ++track_m;
-        }
-
-        debugss(ssDiskDrive, INFO, "%s - in(up) (%d)\n", __FUNCTION__, track_m);
-    }
-    else
-    {
-        if (track_m)
-        {
-            --track_m;
-        }
-
-        debugss(ssDiskDrive, INFO, "%s - out(down) (%d)\n", __FUNCTION__, track_m);
-    }
-}
-
-#endif

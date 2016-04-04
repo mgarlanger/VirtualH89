@@ -33,60 +33,6 @@ class logger
 
 #define DEBUG 1
 #define DEBUG_TO_FILE 1
-#if DEBUG
-
-#if DEBUG_TO_FILE
-// #define debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
-
-#define debug(...)         {if (log_out){fprintf(log_out, __VA_ARGS__); }}
-
-#define debugss(subsys, level, args ...)               \
-    {                                                  \
-        int __val = 0;                                 \
-        if (level <= debugLevel[subsys])               \
-        {                                              \
-            if (level < ERROR)                         \
-            {__val = 31; } /* Red */                   \
-            else if (level < WARNING)                  \
-            {__val = 33; } /* Yellow */                \
-            else if (level < INFO)                     \
-            {__val = 35; } /* Magenta */               \
-            else if (level < VERBOSE)                  \
-            {__val = 34; } /* Blue */                  \
-            else                                       \
-            {__val = 32; } /* Green */                 \
-            fprintf(log_out, "\x1b[37m");              \
-            WallClock::instance()->printTime(log_out); \
-            fprintf(log_out, "\x1b[36m%s: \x1b[%dm",   \
-                    __PRETTY_FUNCTION__, __val);       \
-            fprintf(log_out, args);                    \
-            fprintf(log_out, "\x1b[0m");               \
-            fflush(log_out);                           \
-        }                                              \
-    }
-
-
-// nts - No TimeStamp
-#define debugss_nts(subsys, level, args ...) \
-    {                                        \
-        if (level <= debugLevel[subsys])     \
-        {                                    \
-            fprintf(log_out, args);          \
-        }                                    \
-    }
-
-#define chkdebuglevel(subsys, level)  ((level <= debugLevel[subsys]))
-
-#else
-#define cond_debug(cond, ...)   if (cond){printf(__VA_ARGS__); }
-#define debug(args ...)              {printf(args); }
-#endif
-#else
-#define debug(args ...)
-#define debugss(subsys, level, args ...)
-#define debugss_nts(subsys, level, args ...)
-#define chkdebuglevel(subsys, level) (false)
-#endif
 
 ///
 enum subSystems
@@ -152,6 +98,45 @@ enum logLevel
     VERBOSE = 40,
     ALL     = 100
 };
+
+#if DEBUG
+
+#if DEBUG_TO_FILE
+// #define debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
+
+#define debug(...)         {if (log_out){fprintf(log_out, __VA_ARGS__); }}
+
+extern void __debugss(enum subSystems, enum logLevel, const char* functionName, const char* fmt,
+                      ...);
+
+#define debugss(subsys, level, args ...)                     \
+    if (level <= debugLevel[subsys])                         \
+    {                                                        \
+        __debugss(subsys, level, __PRETTY_FUNCTION__, args); \
+    }
+
+
+// nts - No TimeStamp
+#define debugss_nts(subsys, level, args ...) \
+    {                                        \
+        if (level <= debugLevel[subsys])     \
+        {                                    \
+            fprintf(log_out, args);          \
+        }                                    \
+    }
+
+#define chkdebuglevel(subsys, level)  ((level <= debugLevel[subsys]))
+
+#else // if !DEBUG_TO_FILE
+#define cond_debug(cond, ...)   if (cond){printf(__VA_ARGS__); }
+#define debug(args ...)              {printf(args); }
+#endif // DEBUG_TO_FILE
+#else   // if !DEBUG
+#define debug(args ...)
+#define debugss(subsys, level, args ...)
+#define debugss_nts(subsys, level, args ...)
+#define chkdebuglevel(subsys, level) (false)
+#endif // DEBUG
 
 extern unsigned debugLevel[ssMax];
 

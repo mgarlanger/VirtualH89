@@ -47,32 +47,31 @@ HardSectoredDisk::HardSectoredDisk(const char* name)
             {
                 // check to see if we have to adjust side and track.
                 head = 0;
-                trk = 80;
+                trk  = 80;
             }
         }
         while (readCount == 1);
 
         tracks_m = trk;
         sides_m  = head + 1;
-        debugss(ssFloppyDisk, ALL, "%s: Sides: %d  Tracks: %d\n", __FUNCTION__,
-                sides_m, tracks_m);
+        debugss(ssFloppyDisk, ALL, "Sides: %d  Tracks: %d\n", sides_m, tracks_m);
         fclose(file);
     }
     else
     {
-        debugss(ssFloppyDisk, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, ERROR, "unable to open file - %s\n", name);
         initialized_m = false;
     }
 
     if (initialized_m)
     {
-        debugss(ssFloppyDisk, INFO, "%s: Success %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, INFO, "Success %s\n", name);
     }
 }
 
 HardSectoredDisk::HardSectoredDisk()
 {
-    debugss(ssFloppyDisk, ALL, "%s: blank disk\n", __FUNCTION__);
+    debugss(ssFloppyDisk, ALL, "blank disk\n");
 
     // clear disk
     bzero(rawImage_m, maxHeads_c * bytesPerTrack_c * maxTracksPerSide_c);
@@ -95,13 +94,13 @@ HardSectoredDisk::readData(BYTE          side,
                            unsigned long pos,
                            BYTE&         data)
 {
-    debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
+    debugss(ssFloppyDisk, ALL, "maxTrack (%d) tracks_m(%d)\n", maxTrack_m,
             tracks_m);
 
     // Currently only 40 and 80 are supported.
     if ((maxTrack_m != 40) && (maxTrack_m != 80))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid maxTrack: %d\n", __FUNCTION__, maxTrack_m);
+        debugss(ssFloppyDisk, ERROR, "Invalid maxTrack: %d\n", maxTrack_m);
         return false;
     }
 
@@ -109,13 +108,13 @@ HardSectoredDisk::readData(BYTE          side,
     {
         if ((maxTrack_m == 80) && (tracks_m = 40))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 80 trk_m - 40 | track - %d  newTrack - %d\n",
-                    __FUNCTION__, track, track / 2);
+            debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40 | track - %d  newTrack - %d\n",
+                    track, track / 2);
             track /= 2;
         }
         else if ((maxTrack_m == 40) && (tracks_m == 80))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 40 trk_m - 80\n");
             track *= 2;
         }
     }
@@ -124,21 +123,20 @@ HardSectoredDisk::readData(BYTE          side,
     {
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, INFO, "%s: side(%d) track(%d) pos(%lu) = %d\n", __FUNCTION__,
+            debugss(ssFloppyDisk, INFO, "side(%d) track(%d) pos(%lu) = %d\n",
                     side, track, pos, rawImage_m[side][track][pos]);
             data = rawImage_m[side][track][pos];
             return true;
         }
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%lu)\n",
-                    __FUNCTION__, track, pos);
+            debugss(ssFloppyDisk, ERROR, "range error: track(%d) pos(%lu)\n", track, pos);
             return false;
         }
     }
     else
     {
-        debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
+        debugss(ssFloppyDisk, ERROR, "disk not initialized\n");
         return false;
     }
 }
@@ -149,13 +147,12 @@ HardSectoredDisk::writeData(BYTE          side,
                             unsigned long pos,
                             BYTE          data)
 {
-    debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
-            maxTrack_m, tracks_m);
+    debugss(ssFloppyDisk, ALL, "maxTrack (%d) tracks_m(%d)\n", maxTrack_m, tracks_m);
 
     // Currently only 40 and 80 are supported.
     if ((maxTrack_m != 40) && (maxTrack_m != 80))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid maxTrack: %d\n", __FUNCTION__, maxTrack_m);
+        debugss(ssFloppyDisk, ERROR, "Invalid maxTrack: %d\n", maxTrack_m);
         return false;
     }
 
@@ -163,12 +160,12 @@ HardSectoredDisk::writeData(BYTE          side,
     {
         if ((maxTrack_m == 80) && (tracks_m = 40))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 80 trk_m - 40\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40\n");
             track /= 2;
         }
         else if ((maxTrack_m == 40) && (tracks_m == 80))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 40 trk_m - 80\n");
             track *= 2;
         }
     }
@@ -178,7 +175,7 @@ HardSectoredDisk::writeData(BYTE          side,
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
             rawImage_m[side][track][pos] = data;
-            debugss(ssFloppyDisk, ALL, "%s: side (%d) track(%d) pos(%lu) = %d\n", __FUNCTION__,
+            debugss(ssFloppyDisk, ALL, "side (%d) track(%d) pos(%lu) = %d\n",
                     side,
                     track,
                     pos, rawImage_m[side][track][pos]);
@@ -186,14 +183,13 @@ HardSectoredDisk::writeData(BYTE          side,
         }
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%lu)\n",
-                    __FUNCTION__, track, pos);
+            debugss(ssFloppyDisk, ERROR, "Out of Range - track(%d) pos(%lu)\n", track, pos);
             return false;
         }
     }
     else
     {
-        debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
+        debugss(ssFloppyDisk, ERROR, "disk not initialized\n");
         return false;
     }
 
@@ -222,7 +218,7 @@ HardSectoredDisk::getControlInfo(unsigned long pos,
 bool
 HardSectoredDisk::defaultHoleStatus(unsigned long pos)
 {
-    debugss(ssFloppyDisk, ALL, "%s: pos = %lu ", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, ALL, "pos = %lu ", pos);
 
     // check for a sector hole
     if ((pos % 320) < 64)
@@ -246,14 +242,14 @@ HardSectoredDisk::defaultHoleStatus(unsigned long pos)
 void
 HardSectoredDisk::dump()
 {
-    debugss(ssFloppyDisk, ALL, "%s: Not Implemented\n", __FUNCTION__);
+    debugss(ssFloppyDisk, ALL, "Not Implemented\n");
 }
 
 void
 HardSectoredDisk::eject(const char* name)
 {
     FILE* file;
-    debugss(ssFloppyDisk, ALL, "%s: Save: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, ALL, "Save: %s\n", name);
 
     if ((file = fopen(name, "wb")) != NULL)
     {
@@ -266,8 +262,8 @@ HardSectoredDisk::eject(const char* name)
                 if ((readCount =
                          fwrite(&rawImage_m[head][track][0], bytesPerTrack_c, 1, file)) != 1)
                 {
-                    debugss(ssFloppyDisk, ERROR, "%s: Unable to save file: %s head: %d track: %d\n",
-                            __FUNCTION__, name, head, track);
+                    debugss(ssFloppyDisk, ERROR, "Unable to save file: %s head: %d track: %d\n",
+                            name, head, track);
                 }
             }
         }
@@ -276,7 +272,7 @@ HardSectoredDisk::eject(const char* name)
     }
     else
     {
-        debugss(ssFloppyDisk, WARNING, "%s: unable to save file - %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, WARNING, "unable to save file - %s\n", name);
     }
 }
 
@@ -287,6 +283,6 @@ HardSectoredDisk::readSectorData(BYTE  side,
                                  WORD  pos,
                                  BYTE& data)
 {
-    debugss(ssFloppyDisk, ALL, "%s: Not Implemented\n", __FUNCTION__);
+    debugss(ssFloppyDisk, ALL, "Not Implemented\n");
     return false;
 }
