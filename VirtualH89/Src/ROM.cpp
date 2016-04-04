@@ -18,14 +18,14 @@ ROM::ROM(int size):
     base_m(0),
     size_m(size)
 {
-    debugss(ssROM, INFO, "%s: Creating ROM: %d\n", __FUNCTION__, size_m);
+    debugss(ssROM, INFO, "Creating ROM: %d\n", size_m);
 
     data_m = new BYTE[size_m];
 }
 
 ROM::~ROM()
 {
-    debugss(ssROM, INFO, "%s: Destroying ROM\n", __FUNCTION__);
+    debugss(ssROM, INFO, "Destroying ROM\n");
 
     delete[] data_m;
     data_m = 0;
@@ -45,7 +45,7 @@ ROM::getROM(const char* filename,
 
     if (!file.is_open())
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" cannot be opened\n", __FUNCTION__, filename);
+        debugss(ssROM, ERROR, "ROM image \"%s\" cannot be opened\n", filename);
         return NULL;
     }
 
@@ -55,8 +55,7 @@ ROM::getROM(const char* filename,
 
     if (fileSize != 2048 && fileSize != 4096)
     {
-        debugss(ssROM, ERROR, "%s: ROM image \"%s\" has invalid size %d\n", __FUNCTION__, filename,
-                fileSize);
+        debugss(ssROM, ERROR, "ROM image \"%s\" has invalid size %d\n", filename, fileSize);
         return NULL;
     }
 
@@ -79,19 +78,18 @@ void
 ROM::initialize(BYTE* block,
                 WORD  size)
 {
-    debugss(ssROM, INFO, "%s: size(%d)\n", __FUNCTION__, size);
+    debugss(ssROM, INFO, "size(%d)\n", size);
 
     if (size > size_m)
     {
         // error attempting to store too much
-        debugss(ssROM, ERROR, "%s: size to big size(%d) size_m(%d)\n",
-                __FUNCTION__, size, size_m);
+        debugss(ssROM, ERROR, "size to big size(%d) size_m(%d)\n", size, size_m);
         size = size_m;
     }
 
     for (int i = 0; i < size; i++)
     {
-        debugss(ssROM, VERBOSE, "%s: block[%d] = %d\n", __FUNCTION__, i, block[i]);
+        debugss(ssROM, VERBOSE, "block[%d] = %d\n", i, block[i]);
         data_m[i] = block[i];
     }
 }
@@ -103,8 +101,7 @@ ROM::writeByte(WORD addr,
 {
     // can't write to ROM.
     /// \todo update to set the RAM.
-    debugss(ssROM, INFO, "%s: Attempting to write to ROM [%d] = %d\n",
-            __FUNCTION__, addr, val);
+    debugss(ssROM, INFO, "Attempting to write to ROM [%d] = %d\n", addr, val);
     return;
 }
 
@@ -116,8 +113,7 @@ ROM::readByte(WORD addr)
 
     if ((addr < base_m) || (offset >= size_m))
     {
-        debugss(ssROM, ERROR, "%s: Invalid address: %d (base: %d/size: %d)\n", __FUNCTION__,
-                addr, base_m, size_m);
+        debugss(ssROM, ERROR, "Invalid address: %d (base: %d/size: %d)\n", addr, base_m, size_m);
         assert((addr >= base_m) && (offset < size_m));
 
     }
@@ -127,7 +123,7 @@ ROM::readByte(WORD addr)
         val = data_m[offset];
     }
 
-    debugss(ssROM, ALL, "%s: addr[%d] = %d\n", __FUNCTION__, addr, val);
+    debugss(ssROM, ALL, "addr[%d] = %d\n", addr, val);
     return (val);
 }
 

@@ -18,7 +18,7 @@
 SoftSectoredDisk::SoftSectoredDisk(const char*     name,
                                    DiskImageFormat format): initialized_m(false)
 {
-    debugss(ssFloppyDisk, INFO, "%s: Insert Disk: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, INFO, "Insert Disk: %s\n", name);
 
     if (format == dif_Unknown)
     {
@@ -45,7 +45,7 @@ SoftSectoredDisk::SoftSectoredDisk(const char*     name,
 
         default:
             // Unknown format
-            debugss(ssFloppyDisk, ERROR, "%s: Unknown disk format: %d\n", __FUNCTION__, format);
+            debugss(ssFloppyDisk, ERROR, "Unknown disk format: %d\n", format);
 
             break;
     }
@@ -53,7 +53,7 @@ SoftSectoredDisk::SoftSectoredDisk(const char*     name,
 
 SoftSectoredDisk::SoftSectoredDisk()
 {
-    debugss(ssFloppyDisk, INFO, "%s: Insert Empty Disk\n", __FUNCTION__);
+    debugss(ssFloppyDisk, INFO, "Insert Empty Disk\n");
 
     // clear disk
     bzero(rawImage_m, maxHeads_c * bytesPerTrack_c * tracksPerSide_c);
@@ -77,13 +77,13 @@ SoftSectoredDisk::readData(BYTE          side,
                            unsigned long pos,
                            BYTE&         data)
 {
-    debugss(ssFloppyDisk, ALL, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__, maxTrack_m,
+    debugss(ssFloppyDisk, ALL, "maxTrack (%d) tracks_m(%d)\n", maxTrack_m,
             numTracks_m);
 
     // Currently only 40 and 80 are supported.
     if ((maxTrack_m != 40) && (maxTrack_m != 80))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid maxTrack: %d\n", __FUNCTION__, maxTrack_m);
+        debugss(ssFloppyDisk, ERROR, "Invalid maxTrack: %d\n", maxTrack_m);
         return false;
     }
 
@@ -91,12 +91,12 @@ SoftSectoredDisk::readData(BYTE          side,
     {
         if ((maxTrack_m == 80) && (numTracks_m = 40))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 80 trk_m - 40\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40\n");
             track /= 2;
         }
         else if ((maxTrack_m == 40) && (numTracks_m == 80))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 40 trk_m - 80\n");
             track *= 2;
         }
     }
@@ -105,21 +105,20 @@ SoftSectoredDisk::readData(BYTE          side,
     {
         if ((track < tracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%lu) = %d\n", __FUNCTION__,
-                    track, pos, rawImage_m[side][track][pos]);
+            debugss(ssFloppyDisk, ALL, "track(%d) pos(%lu) = %d\n", track, pos,
+                    rawImage_m[side][track][pos]);
             data = rawImage_m[side][track][pos];
             return true;
         }
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: range error: track(%d) pos(%lu)\n", __FUNCTION__,
-                    track, pos);
+            debugss(ssFloppyDisk, ERROR, "range error: track(%d) pos(%lu)\n", track, pos);
             return false;
         }
     }
     else
     {
-        debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
+        debugss(ssFloppyDisk, ERROR, "disk not initialized\n");
         return false;
     }
 }
@@ -130,13 +129,12 @@ SoftSectoredDisk::writeData(BYTE          side,
                             unsigned long pos,
                             BYTE          data)
 {
-    debugss(ssFloppyDisk, INFO, "%s: maxTrack (%d) tracks_m(%d)\n", __FUNCTION__,
-            maxTrack_m, numTracks_m);
+    debugss(ssFloppyDisk, INFO, "maxTrack (%d) tracks_m(%d)\n", maxTrack_m, numTracks_m);
 
     // Currently only 40 and 80 are supported.
     if ((maxTrack_m != 40) && (maxTrack_m != 80))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid maxTrack: %d\n", __FUNCTION__, maxTrack_m);
+        debugss(ssFloppyDisk, ERROR, "Invalid maxTrack: %d\n", maxTrack_m);
         return false;
     }
 
@@ -144,12 +142,12 @@ SoftSectoredDisk::writeData(BYTE          side,
     {
         if ((maxTrack_m == 80) && (numTracks_m = 40))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 80 trk_m - 40\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40\n");
             track /= 2;
         }
         else if ((maxTrack_m == 40) && (numTracks_m == 80))
         {
-            debugss(ssFloppyDisk, INFO, "%s: max - 40 trk_m - 80\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "max - 40 trk_m - 80\n");
             track *= 2;
         }
     }
@@ -158,21 +156,21 @@ SoftSectoredDisk::writeData(BYTE          side,
     {
         if ((track < tracksPerSide_c) && (pos < bytesPerTrack_c))
         {
-            debugss(ssFloppyDisk, ALL, "%s: track(%d) pos(%lu) = %d\n", __FUNCTION__, track,
+            debugss(ssFloppyDisk, ALL, "track(%d) pos(%lu) = %d\n", track,
                     pos, rawImage_m[side][track][pos]);
             rawImage_m[side][track][pos] = data;
             return true;
         }
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: Out of Range - track(%d) pos(%lu)\n",
-                    __FUNCTION__, track, pos);
+            debugss(ssFloppyDisk, ERROR, "Out of Range - track(%d) pos(%lu)\n",
+                    track, pos);
             return false;
         }
     }
     else
     {
-        debugss(ssFloppyDisk, ERROR, "%s: disk not initialized\n", __FUNCTION__);
+        debugss(ssFloppyDisk, ERROR, "disk not initialized\n");
         return false;
     }
 }
@@ -193,15 +191,14 @@ SoftSectoredDisk::getControlInfo(unsigned long pos,
         writeProtect = false;
     }
 
-    debugss(ssFloppyDisk, INFO, "%s: init: %d hole: %d wp: %d\n", __FUNCTION__,
-            initialized_m, hole, writeProtect);
+    debugss(ssFloppyDisk, INFO, "init: %d hole: %d wp: %d\n", initialized_m, hole, writeProtect);
 }
 
 
 bool
 SoftSectoredDisk::defaultHoleStatus(unsigned long pos)
 {
-    debugss(ssFloppyDisk, ALL, "%s: pos = %ld ", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, ALL, "pos = %ld ", pos);
 
     // check for index hole
     if (pos < 128) /// \todo ??? does this need to change based on the density
@@ -218,7 +215,7 @@ SoftSectoredDisk::defaultHoleStatus(unsigned long pos)
 bool
 SoftSectoredDisk::readTD0(const char* name)
 {
-    debugss(ssFloppyDisk, ERROR, "%s: Not supported\n", __FUNCTION__);
+    debugss(ssFloppyDisk, ERROR, "Not supported\n");
     return false;
 }
 
@@ -231,7 +228,7 @@ SoftSectoredDisk::readIMD(const char* name)
 
     BYTE*             buf;
 
-    debugss(ssFloppyDisk, INFO, "%s: file: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, INFO, "file: %s\n", name);
 
     file.open(name, std::ios::binary);
     file.seekg(0, std::ios::end);
@@ -274,50 +271,49 @@ SoftSectoredDisk::readIMD(const char* name)
             case 0:
                 density  = Track::singleDensity;
                 dataRate = Track::dr_500kbps;
-                debugss(ssFloppyDisk, INFO, "%s: FM/500 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "FM/500 kbps\n");
                 break;
 
             case 1:
                 density  = Track::singleDensity;
                 dataRate = Track::dr_300kbps;
-                debugss(ssFloppyDisk, INFO, "%s: FM/300 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "FM/300 kbps\n");
                 break;
 
             case 2:
                 density  = Track::singleDensity;
                 dataRate = Track::dr_250kbps;
-                debugss(ssFloppyDisk, INFO, "%s: FM/250 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "FM/250 kbps\n");
                 break;
 
             case 3:
                 density  = Track::doubleDensity;
                 dataRate = Track::dr_500kbps;
-                debugss(ssFloppyDisk, INFO, "%s: MFM/500 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "MFM/500 kbps\n");
                 break;
 
             case 4:
                 density  = Track::doubleDensity;
                 dataRate = Track::dr_300kbps;
-                debugss(ssFloppyDisk, INFO, "%s: MFM/300 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "MFM/300 kbps\n");
                 break;
 
             case 5:
                 density  = Track::doubleDensity;
                 dataRate = Track::dr_250kbps;
-                debugss(ssFloppyDisk, INFO, "%s: MFM/250 kbps\n", __FUNCTION__);
+                debugss(ssFloppyDisk, INFO, "MFM/250 kbps\n");
                 break;
 
             default:
                 density  = Track::density_Unknown;
                 dataRate = Track::dr_Unknown;
-                debugss(ssFloppyDisk, WARNING, "%s: Unknown density/data rate: %d\n", __FUNCTION__,
-                        mode);
+                debugss(ssFloppyDisk, WARNING, "Unknown density/data rate: %d\n", mode);
                 break;
 
         }
 
         cyl           = buf[pos++];
-        debugss(ssFloppyDisk, ALL, "%s: Cylinder:    %d\n", __FUNCTION__, cyl);
+        debugss(ssFloppyDisk, ALL, "Cylinder:    %d\n", cyl);
 
         head          = buf[pos++];
 
@@ -327,12 +323,12 @@ SoftSectoredDisk::readIMD(const char* name)
 
         // mask off any flags
         head         &= 1;
-        debugss(ssFloppyDisk, ALL, "%s: Head:    %d\n", __FUNCTION__, head);
+        debugss(ssFloppyDisk, ALL, "Head:    %d\n", head);
 
         Track* trk = new Track(head, cyl);
 
         numSec        = buf[pos++];
-        debugss(ssFloppyDisk, ALL, "%s: Num Sectors:    %d\n", __FUNCTION__, numSec);
+        debugss(ssFloppyDisk, ALL, "Num Sectors:    %d\n", numSec);
 
         sectorSizeKey = buf[pos++];
 
@@ -342,7 +338,7 @@ SoftSectoredDisk::readIMD(const char* name)
         }
         else
         {
-            debugss(ssFloppyDisk, ERROR, "%s: Sector Size unknown: %d\n", __FUNCTION__,
+            debugss(ssFloppyDisk, ERROR, "Sector Size unknown: %d\n",
                     sectorSizeKey);
             delete [] buf;
             delete trk;
@@ -350,7 +346,7 @@ SoftSectoredDisk::readIMD(const char* name)
             return (false);
         }
 
-        debugss(ssFloppyDisk, ALL, "%s: Sector Size: %d (%d)\n", __FUNCTION__, sectorSize,
+        debugss(ssFloppyDisk, ALL, "Sector Size: %d (%d)\n", sectorSize,
                 sectorSizeKey);
 
         for (int i = 0; i < numSec; i++)
@@ -360,7 +356,7 @@ SoftSectoredDisk::readIMD(const char* name)
 
         if (sectorCylMap)
         {
-            debugss(ssFloppyDisk, INFO, "%s: Sector Cylinder Map Present\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "Sector Cylinder Map Present\n");
 
             for (int i = 0; i < numSec; i++)
             {
@@ -370,7 +366,7 @@ SoftSectoredDisk::readIMD(const char* name)
 
         if (sectorHeadMap)
         {
-            debugss(ssFloppyDisk, INFO, "%s: Sector Head Map Present\n", __FUNCTION__);
+            debugss(ssFloppyDisk, INFO, "Sector Head Map Present\n");
 
             for (int i = 0; i < numSec; i++)
             {
@@ -382,20 +378,17 @@ SoftSectoredDisk::readIMD(const char* name)
         {
             unsigned char sectorType = buf[pos++];
 
-            debugss(ssFloppyDisk, INFO, "%s: Sector: %d(%d) Type: %d\n", __FUNCTION__,
-                    sectorOrder[i], i, sectorType);
+            debugss(ssFloppyDisk, INFO, "Sector: %d(%d) Type: %d\n", sectorOrder[i], i, sectorType);
 
             if (sectorType == 0x00)
             {
                 // Sector Data Unavailable
-                debugss(ssFloppyDisk, INFO, "%s: Sector Size unknown: %d\n", __FUNCTION__,
-                        sectorSizeKey);
+                debugss(ssFloppyDisk, INFO, "Sector Size unknown: %d\n", sectorSizeKey);
             }
             else if (sectorType > 0x08)
             {
                 // Out of Range.
-                debugss(ssFloppyDisk, ERROR, "%s: Out of Range: %d\n", __FUNCTION__,
-                        sectorType);
+                debugss(ssFloppyDisk, ERROR, "Out of Range: %d\n", sectorType);
                 delete [] buf;
 
                 return false;
@@ -445,7 +438,7 @@ SoftSectoredDisk::readIMD(const char* name)
 
     delete [] buf;
 
-    debugss(ssFloppyDisk, INFO, "%s: Read successful.\n", __FUNCTION__);
+    debugss(ssFloppyDisk, INFO, "Read successful.\n");
 
     return true;
 }
@@ -464,7 +457,7 @@ SoftSectoredDisk::readRaw(const char* name)
 
     if (!file.is_open())
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Unable to open file: %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, ERROR, "Unable to open file: %s\n", name);
         return false;
     }
 
@@ -477,11 +470,11 @@ SoftSectoredDisk::readRaw(const char* name)
 
     file.close();
 
-    debugss(ssFloppyDisk, INFO, "%s: RAW File: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, INFO, "RAW File: %s\n", name);
 
     if (fileSize != (256 * 10 * 40))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid File Size: %s - %ld\n", __FUNCTION__, name,
+        debugss(ssFloppyDisk, ERROR, "Invalid File Size: %s - %ld\n", name,
                 fileSize);
         delete [] buf;
 
@@ -527,7 +520,7 @@ SoftSectoredDisk::readRaw8(const char* name)
 
     if (!file.is_open())
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Unable to open file: %s\n", __FUNCTION__, name);
+        debugss(ssFloppyDisk, ERROR, "Unable to open file: %s\n", name);
         return false;
     }
 
@@ -540,7 +533,7 @@ SoftSectoredDisk::readRaw8(const char* name)
 
     file.close();
 
-    debugss(ssFloppyDisk, INFO, "%s: RAW File: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, INFO, "RAW File: %s\n", name);
 
     switch (fileSize)
     {
@@ -556,7 +549,7 @@ SoftSectoredDisk::readRaw8(const char* name)
 
     if (fileSize != (bytesPerSector_c * numSectors_c * numTrks_c))
     {
-        debugss(ssFloppyDisk, ERROR, "%s: Invalid File Size: %s - %ld\n", __FUNCTION__, name,
+        debugss(ssFloppyDisk, ERROR, "Invalid File Size: %s - %ld\n", name,
                 fileSize);
         delete [] buf;
 
@@ -590,7 +583,7 @@ void
 SoftSectoredDisk::determineDiskFormat(const char*      name,
                                       DiskImageFormat& format)
 {
-    debugss(ssFloppyDisk, INFO, "%s: Name: %s\n", __FUNCTION__, name);
+    debugss(ssFloppyDisk, INFO, "Name: %s\n", name);
     /// \todo implement
     format = dif_Unknown;
 }
@@ -618,8 +611,7 @@ SoftSectoredDisk::readSectorData(BYTE  side,
                                  WORD  pos,
                                  BYTE& data)
 {
-    debugss(ssFloppyDisk, INFO, "%s: side: %d track: %d sector: %d pos: %d\n",
-            __FUNCTION__, side, track, sector, pos);
+    debugss(ssFloppyDisk, ALL, "side: %d track: %d sector: %d pos: %d\n", side, track, sector, pos);
 
     return tracks_m[side][track]->readSectorData(sector, pos, data);
 }

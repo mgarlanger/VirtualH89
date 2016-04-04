@@ -118,24 +118,24 @@ WD1797::in(BYTE addr)
     BYTE offset = addr - basePort_m;
     BYTE val    = 0;
 
-    debugss(ssWD1797, ALL, "WD1797::in(%d)\n", addr);
+    debugss(ssWD1797, ALL, "(%d)\n", addr);
 
     switch (offset)
     {
         case StatusPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::in(StatusPort) (%02x) trk=%02x sec=%02x dat=%02x\n",
+            debugss(ssWD1797, INFO, "(StatusPort) (%02x) trk=%02x sec=%02x dat=%02x\n",
                     statusReg_m, trackReg_m, sectorReg_m, dataReg_m);
             val = statusReg_m;
             lowerIntrq();
             break;
 
         case TrackPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::in(TrackPort)\n");
+            debugss(ssWD1797, INFO, "(TrackPort)\n");
             val = trackReg_m;
             break;
 
         case SectorPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::in(SectorPort)\n");
+            debugss(ssWD1797, INFO, "(SectorPort)\n");
             val = sectorReg_m;
             break;
 
@@ -147,7 +147,7 @@ WD1797::in(BYTE addr)
             break;
 
         default:
-            debugss(ssWD1797, ERROR, "WD1797::in(Unknown - 0x%02x)\n", addr);
+            debugss(ssWD1797, ERROR, "(Unknown - 0x%02x)\n", addr);
             break;
 
     }
@@ -162,12 +162,12 @@ WD1797::out(BYTE addr,
 {
     BYTE offset = addr - basePort_m;
 
-    debugss(ssWD1797, ALL, "WD1797::out(%d, %d (0x%x))\n", addr, val, val);
+    debugss(ssWD1797, ALL, "(%d, %d (0x%x))\n", addr, val, val);
 
     switch (offset)
     {
         case CommandPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::out(CommandPort): %02x trk=%02x sec=%02x dat=%02x\n",
+            debugss(ssWD1797, INFO, "(CommandPort): %02x trk=%02x sec=%02x dat=%02x\n",
                     val, trackReg_m, sectorReg_m, dataReg_m);
             // MUST tolerate changing of selected disk *after* setting command...
             // timing is tricky...
@@ -177,17 +177,17 @@ WD1797::out(BYTE addr,
             break;
 
         case TrackPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::out(TrackPort): %d\n", val);
+            debugss(ssWD1797, INFO, "(TrackPort): %d\n", val);
             trackReg_m = val;
             break;
 
         case SectorPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::out(SectorPort): %d\n", val);
+            debugss(ssWD1797, INFO, "(SectorPort): %d\n", val);
             sectorReg_m = val;
             break;
 
         case DataPort_Offset_c:
-            debugss(ssWD1797, INFO, "WD1797::out(DataPort): %02x\n", val);
+            debugss(ssWD1797, INFO, "(DataPort): %02x\n", val);
 
             // unpredictable results if !dataReady_m... (data changed while being written).
             // other mechanisms detect lostData, which is different.
@@ -197,7 +197,7 @@ WD1797::out(BYTE addr,
             break;
 
         default:
-            debugss(ssWD1797, ERROR, "WD1797::out(Unknown - 0x%02x): %d\n", addr, val);
+            debugss(ssWD1797, ERROR, "(Unknown - 0x%02x): %d\n", addr, val);
             break;
     }
 }
@@ -211,7 +211,7 @@ WD1797::waitForData()
 void
 WD1797::processCmd(BYTE cmd)
 {
-    debugss(ssWD1797, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
+    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
 
     // Make sure controller is not already busy. Documentation
     // did not specify what would happen, for now just ignore
@@ -270,7 +270,7 @@ WD1797::processCmdTypeI(BYTE cmd)
     loadHead((cmd & cmdop_HeadLoad_c) != 0);
     stepUpdate_m = false;
 
-    debugss(ssWD1797, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
+    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
     // reset CRC Error, Seek Error, DRQ, INTRQ
     statusReg_m &= ~(stat_CRCError_c | stat_SeekError_c);
     lowerDrq();
@@ -278,18 +278,18 @@ WD1797::processCmdTypeI(BYTE cmd)
 
     if ((cmd & 0xf0) == 0x00)
     {
-        debugss(ssWD1797, INFO, "%s - Restore\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Restore\n");
         curCommand_m = restoreCmd;
     }
     else if ((cmd & 0xf0) == 0x10)
     {
-        debugss(ssWD1797, INFO, "%s - Seek\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Seek\n");
         curCommand_m = dataReg_m == 0 ? restoreCmd : seekCmd;
     }
     else
     {
         // One of the Step commands
-        debugss(ssWD1797, INFO, "%s - Step\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Step\n");
         curCommand_m = stepCmd;
 
         stepUpdate_m = (cmd & cmdop_TrackUpdate_c) != 0;
@@ -300,13 +300,13 @@ WD1797::processCmdTypeI(BYTE cmd)
             if ((cmd & 0x20) == 0x20)
             {
                 // Step Out
-                debugss(ssWD1797, INFO, "%s - Step Out\n", __FUNCTION__);
+                debugss(ssWD1797, INFO, "Step Out\n");
                 stepDirection_m = dir_out;
             }
             else
             {
                 // Step In
-                debugss(ssWD1797, INFO, "%s - Step In\n", __FUNCTION__);
+                debugss(ssWD1797, INFO, "Step In\n");
                 stepDirection_m = dir_in;
             }
         }
@@ -329,7 +329,7 @@ WD1797::processCmdTypeII(BYTE cmd)
     side_m         = ((cmd & cmdop_UpdateSSO_c) >> cmdop_UpdateSSO_Shift_c);
     loadHead(true);
 
-    debugss(ssWD1797, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
+    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
     lowerDrq();
     dataReady_m = false;
     sectorPos_m = -11;
@@ -341,18 +341,17 @@ WD1797::processCmdTypeII(BYTE cmd)
 
         if (deleteDAM_m)
         {
-            debugss(ssWD1797, WARNING, "%s - Deleted Data Addr Mark not supported - ignored\n",
-                    __FUNCTION__);
+            debugss(ssWD1797, WARNING, "Deleted Data Addr Mark not supported - ignored\n");
         }
 
-        debugss(ssWD1797, INFO, "%s - Write Sector - \n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Write Sector - \n");
         curCommand_m = writeSectorCmd;
     }
     else
     {
         // Read Sector
-        debugss(ssWD1797, INFO, "%s - Read Sector: %d - multi: %d delay: %d sector: %d side: %d\n",
-                __FUNCTION__, sectorReg_m, multiple_m, delay_m, sectorLength_m, side_m);
+        debugss(ssWD1797, INFO, "Read Sector: %d - multi: %d delay: %d sector: %d side: %d\n",
+                sectorReg_m, multiple_m, delay_m, sectorLength_m, side_m);
         curCommand_m = readSectorCmd;
     }
 
@@ -369,19 +368,19 @@ WD1797::processCmdTypeIII(BYTE cmd)
     dataReady_m = false;
     sectorPos_m = -11;
 
-    debugss(ssWD1797, INFO, "%s - cmd: %d\n", __FUNCTION__, cmd);
+    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
 
     if ((cmd & 0xf0) == 0xc0)
     {
         // Read Address
-        debugss(ssWD1797, INFO, "%s - Read Address\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Read Address\n");
         curCommand_m = readAddressCmd;
 
     }
     else if ((cmd & 0xf0) == 0xf0)
     {
         // write Track
-        debugss(ssWD1797, INFO, "%s - Write Track: %d\n", __FUNCTION__, trackReg_m);
+        debugss(ssWD1797, INFO, "Write Track: %d\n", trackReg_m);
         curCommand_m = writeTrackCmd;
         raiseDrq();
 
@@ -389,13 +388,13 @@ WD1797::processCmdTypeIII(BYTE cmd)
     else if ((cmd & 0xf0) == 0xe0)
     {
         // read Track
-        debugss(ssWD1797, INFO, "%s - Read Track: %d\n", __FUNCTION__, trackReg_m);
+        debugss(ssWD1797, INFO, "Read Track: %d\n", trackReg_m);
         curCommand_m = readTrackCmd;
 
     }
     else
     {
-        debugss(ssWD1797, ERROR, "%s - Invalid type-III cmd: %x\n", __FUNCTION__, cmd);
+        debugss(ssWD1797, ERROR, "Invalid type-III cmd: %x\n", cmd);
         statusReg_m &= ~stat_Busy_c;
         return;
     }
@@ -407,7 +406,7 @@ WD1797::processCmdTypeIII(BYTE cmd)
 void
 WD1797::processCmdTypeIV(BYTE cmd)
 {
-    debugss(ssWD1797, INFO, "%s - cmd: 0x%02x\n", __FUNCTION__, cmd);
+    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
     loadHead(false);
     // we assume drive won't change for Type IV commands...
     GenericFloppyDrive* drive = getCurDrive();
@@ -417,7 +416,7 @@ WD1797::processCmdTypeIV(BYTE cmd)
     // check to see if previous command is still running
     if (statusReg_m & stat_Busy_c)
     {
-        debugss(ssWD1797, INFO, "%s - Aborting Command\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "Aborting Command\n");
         // still running, abort command and reset busy
         abortCmd();
         statusReg_m &= ~stat_Busy_c;
@@ -430,7 +429,7 @@ WD1797::processCmdTypeIV(BYTE cmd)
         statusReg_m &= ~stat_CRCError_c;
         // if previous command was Tyype II or III, need to clear
         // stat_LostData_c and stat_DataRequest_c ? But not if Type I.
-        debugss(ssWD1797, INFO, "%s - updating statusReg: %d\n", __FUNCTION__, statusReg_m);
+        debugss(ssWD1797, INFO, "updating statusReg: %d\n", statusReg_m);
     }
     else
     {
@@ -445,32 +444,32 @@ WD1797::processCmdTypeIV(BYTE cmd)
         // at least one bit is set.
         if ((cmd & cmdop_NotReadyToReady_c) == cmdop_NotReadyToReady_c)
         {
-            debugss(ssWD1797, INFO, "%s - Not Ready to Ready\n", __FUNCTION__);
+            debugss(ssWD1797, INFO, "Not Ready to Ready\n");
 
         }
 
         if ((cmd & cmdop_ReadyToNotReady_c) == cmdop_ReadyToNotReady_c)
         {
-            debugss(ssWD1797, INFO, "%s - Ready to Not Ready\n", __FUNCTION__);
+            debugss(ssWD1797, INFO, "Ready to Not Ready\n");
 
         }
 
         if ((cmd & cmdop_IndexPulse_c) == cmdop_IndexPulse_c)
         {
-            debugss(ssWD1797, INFO, "%s - Index Pulse\n", __FUNCTION__);
+            debugss(ssWD1797, INFO, "Index Pulse\n");
 
         }
 
         if ((cmd & cmdop_ImmediateInterrupt_c) == cmdop_ImmediateInterrupt_c)
         {
-            debugss(ssWD1797, INFO, "%s - Immediate Interrupt\n", __FUNCTION__);
+            debugss(ssWD1797, INFO, "Immediate Interrupt\n");
             statusReg_m &= ~stat_Busy_c;
             raiseIntrq();
         }
     }
     else
     {
-        debugss(ssWD1797, INFO, "%s - No Interrupt/ Clear Busy\n", __FUNCTION__);
+        debugss(ssWD1797, INFO, "No Interrupt/ Clear Busy\n");
         statusReg_m &= ~stat_Busy_c;
         curCommand_m = noneCmd;
     }
@@ -479,7 +478,7 @@ WD1797::processCmdTypeIV(BYTE cmd)
 void
 WD1797::abortCmd()
 {
-    debugss(ssWD1797, INFO, "%s\n", __FUNCTION__);
+    debugss(ssWD1797, INFO, "\n");
 
     curCommand_m = noneCmd;
 }
@@ -487,35 +486,35 @@ WD1797::abortCmd()
 void
 WD1797::raiseIntrq()
 {
-    debugss(ssWD1797, INFO, "%s\n", __FUNCTION__);
+    debugss(ssWD1797, INFO, "\n");
     intrqRaised_m = true;
 }
 
 void
 WD1797::raiseDrq()
 {
-    debugss(ssWD1797, INFO, "%s\n", __FUNCTION__);
+    debugss(ssWD1797, INFO, "\n");
     drqRaised_m = true;
 }
 
 void
 WD1797::lowerIntrq()
 {
-    debugss(ssWD1797, INFO, "%s\n", __FUNCTION__);
+    debugss(ssWD1797, INFO, "\n");
     intrqRaised_m = false;
 }
 
 void
 WD1797::lowerDrq()
 {
-    debugss(ssWD1797, INFO, "%s\n", __FUNCTION__);
+    debugss(ssWD1797, INFO, "\n");
     drqRaised_m = false;
 }
 
 void
 WD1797::loadHead(bool load)
 {
-    debugss(ssWD1797, INFO, "%s: %sload\n", __FUNCTION__, load ? "" : "un");
+    debugss(ssWD1797, INFO, "%sload\n", load ? "" : "un");
     headLoaded_m = load;
 }
 
@@ -681,7 +680,7 @@ WD1797::notification(unsigned int cycleCount)
         case stepCmd:
             if (stepDirection_m == dir_out)
             {
-                debugss(ssWD1797, INFO, "%s - step out\n", __FUNCTION__);
+                debugss(ssWD1797, INFO, "step out\n");
 
                 if (!drive->getTrackZero())
                 {
@@ -710,7 +709,7 @@ WD1797::notification(unsigned int cycleCount)
             }
             else if (stepDirection_m == dir_in)
             {
-                debugss(ssWD1797, INFO, "%s - step in\n", __FUNCTION__);
+                debugss(ssWD1797, INFO, "step in\n");
 
                 drive->step(true);
                 statusReg_m &= ~stat_TrackZero_c;
@@ -741,8 +740,7 @@ WD1797::notification(unsigned int cycleCount)
             break;
 
         default:
-            debugss(ssWD1797, WARNING, "%s: default1: %d\n", __FUNCTION__,
-                    curCommand_m);
+            debugss(ssWD1797, WARNING, "default1: %d\n", curCommand_m);
             break;
     }
 

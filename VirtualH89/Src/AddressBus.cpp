@@ -12,13 +12,12 @@
 
 AddressBus::AddressBus(InterruptController* ic): ic_m(ic), mem(NULL)
 {
-    debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
-
+    debugss(ssAddressBus, INFO, "\n");
 }
 
 AddressBus::~AddressBus()
 {
-    debugss(ssAddressBus, INFO, "%s\n", __FUNCTION__);
+    debugss(ssAddressBus, INFO, "\n");
 }
 
 BYTE
@@ -28,7 +27,7 @@ AddressBus::readByte(WORD addr,
 
     if (interruptAck)
     {
-        debugss(ssAddressBus, ALL, "%s interrupt\n", __FUNCTION__);
+        debugss(ssAddressBus, ALL, "interrupt\n");
 
         return ic_m->readDataBus();
     }
@@ -37,7 +36,7 @@ AddressBus::readByte(WORD addr,
     // more options for direct access to all memory.
     int bnk = mem->getCurrentBank();
 
-    debugss(ssAddressBus, ALL, "%s: addr(%d), bank(%d)\n", __FUNCTION__, addr, bnk);
+    debugss(ssAddressBus, ALL, "addr(%d), bank(%d)\n", addr, bnk);
 
     return mem->readByte(bnk, addr);
 }
@@ -51,8 +50,7 @@ AddressBus::writeByte(WORD addr,
     // more options for direct access to all memory.
     int bnk = mem->getCurrentBank();
 
-    debugss(ssAddressBus, ALL, "%s: addr(%d) = %d, bank(%d)\n", __FUNCTION__,
-            addr, val, bnk);
+    debugss(ssAddressBus, ALL, "addr(%d) = %d, bank(%d)\n", addr, val, bnk);
 
     mem->writeByte(bnk, addr, val);
 }
@@ -68,7 +66,7 @@ AddressBus::installMemory(MemoryDecoder* memory)
 void
 AddressBus::clearMemory(BYTE data)
 {
-    debugss(ssAddressBus, INFO, "%s: data(%d)", __FUNCTION__, data);
+    debugss(ssAddressBus, INFO, "data(%d)\n", data);
 
     // TODO: implement this if needed - it is never used right now.
 }

@@ -14,7 +14,7 @@
 
 H89_IO::H89_IO()
 {
-    debugss(ssIO, INFO, "%s\n", __FUNCTION__);
+    debugss(ssIO, INFO, "%\n");
 
     for (int port = 0; port < 256; ++port)
     {
@@ -24,7 +24,7 @@ H89_IO::H89_IO()
 
 H89_IO::~H89_IO()
 {
-    debugss(ssIO, INFO, "%s\n", __FUNCTION__);
+    debugss(ssIO, INFO, "\n");
 }
 
 std::vector<DiskController*>&
@@ -42,12 +42,12 @@ H89_IO::addDiskDevice(DiskController* device)
 bool
 H89_IO::addDevice(IODevice* device)
 {
-    debugss(ssIO, INFO, "%s\n", __FUNCTION__);
+    debugss(ssIO, INFO, "\n");
 
     if (device == NULL)
     {
         // NULL device passed in
-        debugss(ssIO, ERROR, "%s: Null Device\n", __FUNCTION__);
+        debugss(ssIO, ERROR, "Null Device\n");
         return (false);
     }
 
@@ -55,12 +55,12 @@ H89_IO::addDevice(IODevice* device)
     BYTE num  = device->getNumPorts();
     BYTE last = base + num;
 
-    debugss(ssIO, INFO, "%s: ports (%03o - %03o)\n", __FUNCTION__, base, last);
+    debugss(ssIO, INFO, "ports (%03o - %03o)\n", base, last);
 
     if (!num)
     {
         // no ports.
-        debugss(ssIO, ERROR, "%s: no ports\n", __FUNCTION__);
+        debugss(ssIO, ERROR, "no ports\n");
 
         return (false);
     }
@@ -71,8 +71,7 @@ H89_IO::addDevice(IODevice* device)
         if (iodevices[port])
         {
             // Address already in use
-            debugss(ssIO, ERROR, "%s: duplicate devices on port (%03o)\n",
-                    __FUNCTION__, port);
+            debugss(ssIO, ERROR, "duplicate devices on port (%03o)\n", port);
             return (false);
         }
     }
@@ -97,7 +96,7 @@ H89_IO::removeDevice(IODevice* device)
         BYTE num  = device->getNumPorts();
         BYTE last = base + num;
 
-        debugss(ssIO, INFO, "%s: ports (%03o - %03o)\n", __FUNCTION__, base, last);
+        debugss(ssIO, INFO, "ports (%03o - %03o)\n", base, last);
 
         if (num)
         {
@@ -111,8 +110,7 @@ H89_IO::removeDevice(IODevice* device)
                 else
                 {
                     // Doesn't match what is attempting to be removed.
-                    debugss(ssIO, ERROR, "%s: non-matching device on port (%03o)\n",
-                            __FUNCTION__, port);
+                    debugss(ssIO, ERROR, "non-matching device on port (%03o)\n", port);
                     retVal = false;
                 }
             }
@@ -120,7 +118,7 @@ H89_IO::removeDevice(IODevice* device)
         else
         {
             // no ports.
-            debugss(ssIO, ERROR, "%s: no ports\n", __FUNCTION__);
+            debugss(ssIO, ERROR, "no ports\n");
 
             retVal = false;
         }
@@ -128,7 +126,7 @@ H89_IO::removeDevice(IODevice* device)
     else
     {
         // NULL device passed in
-        debugss(ssIO, ERROR, "%s: Null Device\n", __FUNCTION__);
+        debugss(ssIO, ERROR, "Null Device\n");
 
         retVal = false;
     }
@@ -153,7 +151,7 @@ H89_IO::in(BYTE addr)
 {
     BYTE val = 0xff;
 
-    debugss(ssIO, ALL, "%s: (%03o)\n", __FUNCTION__, addr);
+    debugss(ssIO, ALL, "(%03o)\n", addr);
 
     if (iodevices[addr])
     {
@@ -162,10 +160,10 @@ H89_IO::in(BYTE addr)
     else
     {
         // undefined in
-        debugss(ssIO, WARNING, "%s: undefined port (%03o)\n", __FUNCTION__, addr);
+        debugss(ssIO, WARNING, "undefined port (%03o)\n", addr);
     }
 
-    debugss(ssIO, ALL, "%s: (%03o): %d\n", __FUNCTION__, addr, val);
+    debugss(ssIO, ALL, "(%03o): %d\n", addr, val);
     return (val);
 }
 
@@ -173,7 +171,7 @@ void
 H89_IO::out(BYTE addr,
             BYTE val)
 {
-    debugss(ssIO, ALL, "%s: (%03o) = 0x%02x\n", __FUNCTION__, addr, val);
+    debugss(ssIO, ALL, "(%03o) = 0x%02x\n", addr, val);
 
     if (iodevices[addr])
     {
@@ -181,7 +179,6 @@ H89_IO::out(BYTE addr,
     }
     else
     {
-        debugss(ssIO, WARNING, "%s: undefined port (%03o) = 0x%02x\n", __FUNCTION__,
-                addr, val);
+        debugss(ssIO, WARNING, "undefined port (%03o) = 0x%02x\n", addr, val);
     }
 }

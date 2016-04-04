@@ -24,11 +24,11 @@ ParallelPortConnection::~ParallelPortConnection()
 void
 ParallelPortConnection::connectLink(ParallelLink* link)
 {
-    debugss(ssParallel, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssParallel, INFO, "Entering\n");
 
     if (link_m)
     {
-        debugss(ssParallel, ERROR, "%s: Link already in use\n", __FUNCTION__);
+        debugss(ssParallel, ERROR, "Link already in use\n");
     }
 
     link_m = link;

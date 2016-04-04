@@ -15,7 +15,7 @@
 InterruptController::InterruptController(CPU* cpu): intLevel_m(0),
                                                     cpu_m(cpu)
 {
-    debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
+    debugss(ssInterruptController, VERBOSE, "Entering\n");
 
 }
 
@@ -23,25 +23,25 @@ InterruptController::InterruptController(InterruptController* ic):
     intLevel_m(ic->intLevel_m),
     cpu_m(ic->cpu_m)
 {
-    debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
+    debugss(ssInterruptController, VERBOSE, "Entering\n");
 
 }
 
 InterruptController::~InterruptController()
 {
-    debugss(ssInterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
+    debugss(ssInterruptController, VERBOSE, "Entering\n");
 
 }
 
 void
 InterruptController::raiseInterrupt(BYTE level)
 {
-    debugss(ssInterruptController, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
+    debugss(ssInterruptController, VERBOSE, "level(%d)\n", level);
 
     // verify level - only 0-7 are valid
     if ((level < 0) || (level > 7))
     {
-        debugss(ssInterruptController, ERROR, "%s: invalid level(%d)\n", __FUNCTION__, level);
+        debugss(ssInterruptController, ERROR, "invalid level(%d)\n", level);
         return;
     }
 
@@ -54,13 +54,13 @@ InterruptController::raiseInterrupt(BYTE level)
 void
 InterruptController::lowerInterrupt(BYTE level)
 {
-    debugss(ssInterruptController, VERBOSE, "%s: level(%d)\n", __FUNCTION__, level);
+    debugss(ssInterruptController, VERBOSE, "level(%d)\n", level);
 
     // verify level - only 0-7 are valid
     if ((level < 0) || (level > 7))
     {
         // INT level out-of-range.
-        debugss(ssInterruptController, ERROR, "%s: invalid level(%d)\n", __FUNCTION__, level);
+        debugss(ssInterruptController, ERROR, "invalid level(%d)\n", level);
         return;
     }
 
@@ -117,14 +117,12 @@ InterruptController::readDataBus()
     else
     {
         // invalid interrupt level.
-        debugss(ssInterruptController, ERROR, "%s: Invalid interrupt level: %d\n",
-                __FUNCTION__, intLevel_m);
+        debugss(ssInterruptController, ERROR, "Invalid interrupt level: %d\n", intLevel_m);
 
         // printf("Interrupt Instruction, bad interrupt level: %d\n", intLevel_m);
     }
 
-    debugss(ssInterruptController, VERBOSE, "%s: Interrupt Instruction %d\n",
-            __FUNCTION__, opCode);
+    debugss(ssInterruptController, VERBOSE, "Interrupt Instruction %d\n", opCode);
 
     // printf("Interrupt Instruction: %d\n", opCode);
     return opCode;

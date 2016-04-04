@@ -58,7 +58,7 @@ H17::install_H17(BYTE                        baseAddr,
 {
     std::string                   s;
     H17*                          h17 = new H17(baseAddr);
-    debugss(ssH17, INFO, "%s: entering\n", __FUNCTION__);
+    debugss(ssH17, INFO, "entering\n");
 
     for (BYTE i = 0; i < maxDiskDrive_c; ++i)
     {
@@ -368,7 +368,7 @@ H17::connectDrive(BYTE       unitNum,
 {
     bool retVal = false;
 
-    debugss(ssH17, INFO, "%s: unit (%d), drive (%p)\n", __FUNCTION__, unitNum, drive);
+    debugss(ssH17, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
 
     if (unitNum < maxDiskDrive_c)
     {
@@ -379,12 +379,12 @@ H17::connectDrive(BYTE       unitNum,
         }
         else
         {
-            debugss(ssH17, ERROR, "%s: drive already connect\n", __FUNCTION__);
+            debugss(ssH17, ERROR, "drive already connect\n");
         }
     }
     else
     {
-        debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
+        debugss(ssH17, ERROR, "Invalid unit number (%d)\n", unitNum);
     }
 
     return (retVal);
@@ -395,7 +395,7 @@ H17::removeDrive(BYTE unitNum)
 {
     bool retVal = false;
 
-    debugss(ssH17, INFO, "%s: unit (%d)\n", __FUNCTION__, unitNum);
+    debugss(ssH17, INFO, "unit (%d)\n", unitNum);
 
     if (curDrive_m < maxDiskDrive_c)
     {
@@ -406,12 +406,12 @@ H17::removeDrive(BYTE unitNum)
         }
         else
         {
-            debugss(ssH17, WARNING, "%s: no unit to remove (%d)\n", __FUNCTION__, unitNum);
+            debugss(ssH17, WARNING, "no unit to remove (%d)\n", unitNum);
         }
     }
     else
     {
-        debugss(ssH17, ERROR, "%s: Invalid unit number (%d)\n", __FUNCTION__, unitNum);
+        debugss(ssH17, ERROR, "Invalid unit number (%d)\n", unitNum);
     }
 
     return (retVal);
@@ -474,14 +474,14 @@ H17::notification(unsigned int cycleCount)
     {
         /// Idle case, this will happen when no drive activity is expected.
         /// \todo don't call this and make this an warning again
-        debugss(ssH17, ALL, "%s: Invalid Drive: %d\n", __FUNCTION__, curDrive_m);
+        debugss(ssH17, ALL, "Invalid Drive: %d\n", curDrive_m);
         return;
     }
 
     switch (state_m)
     {
         case idleState:
-            debugss(ssH17, INFO, "%s: Idle State\n", __FUNCTION__);
+            debugss(ssH17, INFO, "Idle State\n");
             /// do nothing
             break;
 
@@ -492,19 +492,17 @@ H17::notification(unsigned int cycleCount)
             if (drives_m[curDrive_m])
             {
                 data = drives_m[curDrive_m]->readData(curCharPos_m);
-                debugss(ssH17, ALL, "%s: Seeking Sync(disk: %d): %d\n", __FUNCTION__,
-                        curDrive_m, data);
+                debugss(ssH17, ALL, "Seeking Sync(disk: %d): %d\n", curDrive_m, data);
             }
             else
             {
-                debugss(ssH17, ERROR, "%s: Seeking Sync - No Drive(%d)\n",
-                        __FUNCTION__, curDrive_m);
+                debugss(ssH17, ERROR, "Seeking Sync - No Drive(%d)\n", curDrive_m);
                 // should we return here...
             }
 
             if (data == syncChar_m)
             {
-                debugss(ssH17, INFO, "%s: found sync\n", __FUNCTION__);
+                debugss(ssH17, INFO, "found sync\n");
                 receiverOutputRegister_m = data;
                 syncCharacterReceived_m  = true;
                 receiveDataAvail_m       = true; /// \todo determine if this should be set.
@@ -523,7 +521,7 @@ H17::notification(unsigned int cycleCount)
             if (receiveDataAvail_m)
             {
                 /// \todo determine why this is coming out when idle - set back to info
-                debugss(ssH17, ALL, "%s: Receiver Overrun\n", __FUNCTION__);
+                debugss(ssH17, ALL, "Receiver Overrun\n");
                 // last data byte was not read, set overrun
                 receiverOverrun_m = true;
             }
@@ -533,8 +531,7 @@ H17::notification(unsigned int cycleCount)
                 data = drives_m[curDrive_m]->readData(curCharPos_m);
             }
 
-            debugss(ssH17, ALL, "%s: Reading - Pos: %ld Data: %d\n",
-                    __FUNCTION__, curCharPos_m, data);
+            debugss(ssH17, ALL, "Reading - Pos: %ld Data: %d\n", curCharPos_m, data);
             receiverOutputRegister_m = data;
             receiveDataAvail_m       = true;
             break;
@@ -551,15 +548,13 @@ H17::notification(unsigned int cycleCount)
             {
                 data                  = fillChar_m;
                 fillCharTransmitted_m = true;
-                debugss(ssH17, ERROR, "%s: fill char sent Pos: %ld\n",
-                        __FUNCTION__, curCharPos_m);
+                debugss(ssH17, ERROR, "fill char sent Pos: %ld\n", curCharPos_m);
             }
             else
             {
                 data                     = transmitterHoldingRegister_m;
                 transmitterBufferEmpty_m = true;
-                debugss(ssH17, ALL, "%s: Writing - Pos: %ld Data: %d\n", __FUNCTION__,
-                        curCharPos_m, data);
+                debugss(ssH17, ALL, "Writing - Pos: %ld Data: %d\n", curCharPos_m, data);
             }
 
             if (drives_m[curDrive_m])
@@ -568,8 +563,7 @@ H17::notification(unsigned int cycleCount)
             }
             else
             {
-                debugss(ssH17, INFO, "%s: No Valid Drive - Pos: %ld\n", __FUNCTION__,
-                        curCharPos_m);
+                debugss(ssH17, INFO, "No Valid Drive - Pos: %ld\n", curCharPos_m);
             }
 
             break;

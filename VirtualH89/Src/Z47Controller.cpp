@@ -55,7 +55,7 @@ Z47Controller::~Z47Controller()
 void
 Z47Controller::loadDisk()
 {
-    debugss(ssH47, VERBOSE, "%s: Entering\n", __FUNCTION__);
+    debugss(ssH47, VERBOSE, "Entering\n");
 
     FILE* file;
 
@@ -68,11 +68,11 @@ Z47Controller::loadDisk()
         {
             if ((fread(&diskData[i * 128], 128, 1, file)) != 1)
             {
-                debugss(ssH47, INFO, "%s: File ended early: %d\n", __FUNCTION__, i);
+                debugss(ssH47, INFO, "File ended early: %d\n", i);
             }
             else
             {
-                debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
+                debugss(ssH47, ALL, "File was read\n");
                 break;
             }
 
@@ -85,23 +85,10 @@ Z47Controller::loadDisk()
 
         fclose(file);
 
-#if 0
-
-        if ((fread(&diskData[0], 128 * 26 * 77, 1, file)) != 1)
-        {
-            debugss(ssH47, ERROR, "%s: Unable to read file\n", __FUNCTION__);
-        }
-        else
-        {
-            debugss(ssH47, ALL, "%s: File was read\n", __FUNCTION__);
-        }
-
-        fclose(file);
-#endif
     }
     else
     {
-        debugss(ssH47, ERROR, "%s: unable to open file\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "unable to open file\n");
     }
 
 }
@@ -223,7 +210,7 @@ Z47Controller::transitionLinkToTransmit()
 void
 Z47Controller::processReadControlStatus(void)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 2)
@@ -234,7 +221,7 @@ Z47Controller::processReadControlStatus(void)
 
     if (statePosition_m != 1)
     {
-        debugss(ssH47, ERROR, "%s - Unexpected position\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "Unexpected position\n");
 
     }
 
@@ -244,68 +231,68 @@ Z47Controller::processReadControlStatus(void)
 
         if (driveNotReady_m)
         {
-            debugss(ssH47, INFO, "%s - set Drive not Ready\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Drive not Ready\n");
             dataToTransmit_m |= stat_Cntrl_Drive_Not_Ready_c;
             driveNotReady_m   = false;
         }
 
         if (diskWriteProtected_m)
         {
-            debugss(ssH47, INFO, "%s - set Disk Write Protected\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Disk Write Protected\n");
             dataToTransmit_m    |= stat_Cntrl_Write_Protected_c;
             diskWriteProtected_m = false;
         }
 
         if (deletedData_m)
         {
-            debugss(ssH47, INFO, "%s - set Deleted Data\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Deleted Data\n");
             dataToTransmit_m |= stat_Cntrl_Deleted_Data_c;
             deletedData_m     = false;
         }
 
         if (noRecordFound_m)
         {
-            debugss(ssH47, INFO, "%s - set No Record Found\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set No Record Found\n");
             dataToTransmit_m |= stat_Cntrl_No_Record_Found_c;
             noRecordFound_m   = false;
         }
 
         if (crcError_m)
         {
-            debugss(ssH47, INFO, "%s - set CRC Error\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set CRC Error\n");
             dataToTransmit_m |= stat_Cntrl_CRC_Error_c;
             crcError_m        = false;
         }
 
         if (lateData_m)
         {
-            debugss(ssH47, INFO, "%s - set Late Data\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Late Data\n");
             dataToTransmit_m |= stat_Cntrl_Late_Data_c;
             lateData_m        = false;
         }
 
         if (invalidCommandReceived_m)
         {
-            debugss(ssH47, INFO, "%s - set Invalid Command Received\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Invalid Command Received\n");
             dataToTransmit_m        |= stat_Cntrl_Illegal_Command_c;
             invalidCommandReceived_m = false;
         }
 
         if (badTrackOverflow_m)
         {
-            debugss(ssH47, INFO, "%s - set Bad Track Overflow\n", __FUNCTION__);
+            debugss(ssH47, INFO, "set Bad Track Overflow\n");
             dataToTransmit_m  |= stat_Cntrl_Bad_Track_Overflow_c;
             badTrackOverflow_m = false;
         }
 
-        debugss(ssH47, INFO, "%s - cmd_ReadCntrlStat_c - 0x%02x\n", __FUNCTION__, dataToTransmit_m);
+        debugss(ssH47, INFO, "cmd_ReadCntrlStat_c - 0x%02x\n", dataToTransmit_m);
 
         curLinkState = st_Link_AwaitingToTransmit_c;
     }
     else
     {
         /// \todo assert or make the top check an assert
-        debugss(ssH47, FATAL, "%s - Link not connected\n", __FUNCTION__);
+        debugss(ssH47, FATAL, "Link not connected\n");
     }
 
 }
@@ -313,7 +300,7 @@ Z47Controller::processReadControlStatus(void)
 void
 Z47Controller::processReadAuxStatus(BYTE val)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 3)
@@ -351,13 +338,13 @@ Z47Controller::processReadAuxStatus(BYTE val)
 void
 Z47Controller::processLoadSectorCount(BYTE val)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 3)
     {
         sectorCount |= val;
-        debugss(ssH47, ALL, "%s sector Count = %d\n", __FUNCTION__, sectorCount);
+        debugss(ssH47, ALL, "sector Count = %d\n", sectorCount);
 
         commandComplete();
         return;
@@ -387,13 +374,12 @@ Z47Controller::processLoadSectorCount(BYTE val)
 void
 Z47Controller::processReadSectorsBufffered(BYTE val)
 {
-    // debugss(ssH47, ALL, "%s\n", __FUNCTION__);
     statePosition_m++;
-    debugss(ssH47, ALL, "%s   statePosition: %d\n", __FUNCTION__, statePosition_m);
+    debugss(ssH47, ALL, "statePosition: %d\n", statePosition_m);
 
     if (bytesToTransfer == 0)
     {
-        debugss(ssH47, ALL, "%s All Sectors Read\n", __FUNCTION__);
+        debugss(ssH47, ALL, "All Sectors Read\n");
 
         commandComplete();
         return;
@@ -450,15 +436,14 @@ Z47Controller::processReadSectorsBufffered(BYTE val)
 void
 Z47Controller::processWriteSectorsBufffered(BYTE val)
 {
-    // debugss(ssH47, ALL, "%s\n", __FUNCTION__);
     statePosition_m++;
-    debugss(ssH47, ALL, "%s   statePosition: %d\n", __FUNCTION__, statePosition_m);
+    debugss(ssH47, ALL, "statePosition: %d\n", statePosition_m);
 
     if (bytesToTransfer == 0)
     {
         diskData[diskOffset++] = val;
 
-        debugss(ssH47, ALL, "%s All Sectors written\n", __FUNCTION__);
+        debugss(ssH47, ALL, "All Sectors written\n");
 
         commandComplete();
         return;
@@ -515,7 +500,7 @@ Z47Controller::processWriteSectorsBufffered(BYTE val)
 void
 Z47Controller::processFormatSingleDensity(BYTE val)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 3)
@@ -551,7 +536,7 @@ Z47Controller::processFormatSingleDensity(BYTE val)
 void
 Z47Controller::processFormatIBMDoubleDensity(BYTE val)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 3)
@@ -587,7 +572,7 @@ Z47Controller::processFormatIBMDoubleDensity(BYTE val)
 void
 Z47Controller::processFormatDoubleDensity(BYTE val)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 3)
@@ -624,7 +609,7 @@ Z47Controller::processFormatDoubleDensity(BYTE val)
 void
 Z47Controller::processReadReadyStatus(void)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     statePosition_m++;
 
     if (statePosition_m == 2)
@@ -635,7 +620,7 @@ Z47Controller::processReadReadyStatus(void)
 
     if (statePosition_m != 1)
     {
-        debugss(ssH47, ERROR, "%s - Unexpected position\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "Unexpected position\n");
     }
 
     dataToTransmit_m = readyState;
@@ -661,88 +646,87 @@ Z47Controller::processTransmitted()
     switch (curState)
     {
         case st_Boot_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Boot_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Boot_c\n");
 
             break;
 
         case st_ReadCntrlStat_c:
-            debugss(ssH47, INFO, "%s - st_ReadCntrlStat_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadCntrlStat_c\n");
             processReadControlStatus();
             break;
 
         case st_ReadAuxStat_c:
-            debugss(ssH47, INFO, "%s - st_ReadAuxStat_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadAuxStat_c\n");
             processReadAuxStatus();
             break;
 
         case st_LoadSectorCount_c:
-            debugss(ssH47, ERROR, "%s - st_LoadSectorCount_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_LoadSectorCount_c\n");
             processLoadSectorCount();
             break;
 
         case st_ReadLastAddr_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_ReadLastAddr_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_ReadLastAddr_c\n");
             break;
 
         case st_ReadSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_ReadSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_ReadSectors_c\n");
             break;
 
         case st_WriteSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectors_c\n");
             break;
 
         case st_ReadSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - st_ReadSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadSectorsBuffered_c\n");
             // bytesToTransfer = sectorSize;
             processReadSectorsBufffered();
             break;
 
         case st_WriteSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - st_WriteSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_WriteSectorsBuffered_c\n");
             processReadSectorsBufffered();
             break;
 
         case st_WriteSectorsAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsAndDelete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectorsAndDelete_c\n");
             break;
 
         case st_WriteSectorsBufferedAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsBufferedAndDelete_c\n",
-                    __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectorsBufferedAndDelete_c\n");
             break;
 
         case st_Copy_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Copy_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Copy_c\n");
             break;
 
         case st_FormatIBM_SD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_FormatIBM_SD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_FormatIBM_SD_c\n");
             break;
 
         case st_Format_SD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Format_SD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Format_SD_c\n");
             break;
 
         case st_FormatIBM_DD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_FormatIBM_DD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_FormatIBM_DD_c\n");
             break;
 
         case st_Format_DD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Format_DD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Format_DD_c\n");
             break;
 
         case st_ReadReadyStatus_c:
-            debugss(ssH47, INFO, "%s - st_ReadReadyStatus_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadReadyStatus_c\n");
             processReadReadyStatus();
             break;
 
         case st_WaitingToComplete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WaitingToComplete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WaitingToComplete_c\n");
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - default: - %d\n", __FUNCTION__, curState);
+            debugss(ssH47, ERROR, "default: - %d\n", curState);
             break;
     }
 }
@@ -752,8 +736,7 @@ Z47Controller::processCmd(BYTE cmd)
 {
     debugss(ssH47, ALL, "=============START of CMD=============\n");
 
-    debugss(ssH47, ALL, "%s - state - %s: cmd - 0x%02x\n", __FUNCTION__,
-            getStateStr(curState), cmd);
+    debugss(ssH47, ALL, "state - %s: cmd - 0x%02x\n", getStateStr(curState), cmd);
 
     countDown_m     = coundDown_Default_c;
     statePosition_m = 0;
@@ -770,20 +753,20 @@ Z47Controller::processCmd(BYTE cmd)
     switch (cmd)
     {
         case cmd_Boot_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_Boot_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_Boot_c %d\n", cmd);
             // not sure if this is used by heathkit boot. Likes like they just read
             // the first 10 sectors.
             curState = st_Boot_c;
             break;
 
         case cmd_ReadCntrlStat_c:
-            debugss(ssH47, INFO, "%s - cmd_ReadCntrlStat_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "cmd_ReadCntrlStat_c\n");
             curState = st_ReadCntrlStat_c;
             processReadControlStatus();
             break;
 
         case cmd_ReadAuxStat_c:
-            debugss(ssH47, INFO, "%s - Read Aux Status\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Read Aux Status\n");
             curState    = st_ReadAuxStat_c;
             processReadAuxStatus();
             countDown_m = 20;
@@ -791,7 +774,7 @@ Z47Controller::processCmd(BYTE cmd)
             break;
 
         case cmd_LoadSectorCount_c:
-            debugss(ssH47, INFO, "%s - cmd_LoadSectorCount_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "cmd_LoadSectorCount_c\n");
             curState    = st_LoadSectorCount_c;
             processLoadSectorCount();
             countDown_m = 20;
@@ -799,69 +782,67 @@ Z47Controller::processCmd(BYTE cmd)
             break;
 
         case cmd_ReadLastAddr_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_ReadLastAddr_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_ReadLastAddr_c %d\n", cmd);
             break;
 
         case cmd_ReadSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_ReadSectors_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_ReadSectors_c %d\n", cmd);
             break;
 
         case cmd_WriteSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteSectors_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteSectors_c %d\n", cmd);
             break;
 
         case cmd_ReadSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - cmd_ReadSectorsBuffered_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, INFO, "cmd_ReadSectorsBuffered_c %d\n", cmd);
             curState        = st_ReadSectorsBuffered_c;
             bytesToTransfer = sectorSize;
             processReadSectorsBufffered();
             break;
 
         case cmd_WriteSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - cmd_WriteSectorsBuffered_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, INFO, "cmd_WriteSectorsBuffered_c %d\n", cmd);
             curState        = st_WriteSectorsBuffered_c;
             bytesToTransfer = sectorSize;
             processReadSectorsBufffered();
             break;
 
         case cmd_WriteSectorsAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteSectorsAndDelete_c %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteSectorsAndDelete_c %d\n", cmd);
             break;
 
         case cmd_WriteSectorsBufferedAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteSectorsBufferedAndDelete_c %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteSectorsBufferedAndDelete_c %d\n", cmd);
             break;
 
         case cmd_Copy_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_Copy_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_Copy_c %d\n", cmd);
             break;
 
         case cmd_FormatIBM_SD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_FormatIBM_SD_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_FormatIBM_SD_c %d\n", cmd);
             break;
 
         case cmd_Format_SD_c:
-            debugss(ssH47, INFO, "%s - cmd_Format_SD_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, INFO, "cmd_Format_SD_c %d\n", cmd);
             curState = st_Format_SD_c;
             processFormatSingleDensity();
             break;
 
         case cmd_FormatIBM_DD_c:
-            debugss(ssH47, INFO, "%s - cmd_FormatIBM_DD_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, INFO, "cmd_FormatIBM_DD_c %d\n", cmd);
             curState = st_FormatIBM_DD_c;
             processFormatIBMDoubleDensity();
             break;
 
         case cmd_Format_DD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_Format_DD_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_Format_DD_c %d\n", cmd);
             curState = st_Format_DD_c;
             processFormatDoubleDensity();
             break;
 
         case cmd_ReadReadyStatus_c:
-            debugss(ssH47, INFO, "%s - Read Ready Status\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Read Ready Status\n");
             curState = st_ReadReadyStatus_c;
             processReadReadyStatus();
             break;
@@ -871,54 +852,49 @@ Z47Controller::processCmd(BYTE cmd)
         case cmd_SpecialFunction3_c:
         case cmd_SpecialFunction4_c:
         case cmd_SpecialFunction5_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_SpecialFunctionx_c %d\n", __FUNCTION__,
-                    cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_SpecialFunctionx_c %d\n", cmd);
 
             break;
 
         case cmd_SetDriveCharacteristics_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_SetDriveCharacteristics_c %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_SetDriveCharacteristics_c %d\n", cmd);
             break;
 
         case cmd_SeekToTrack_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_SeekToTrack_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_SeekToTrack_c %d\n", cmd);
             break;
 
         case cmd_DiskStatus_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_DiskStatus_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_DiskStatus_c %d\n", cmd);
             break;
 
         case cmd_ReadLogical_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_ReadLogical_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_ReadLogical_c %d\n", cmd);
             break;
 
         case cmd_WriteLogical_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteLogical_c %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteLogical_c %d\n", cmd);
             break;
 
         case cmd_ReadBufferedLogical_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_ReadBufferedLogical_c %d\n", __FUNCTION__,
+            debugss(ssH47, ERROR, "Unsupported - cmd_ReadBufferedLogical_c %d\n",
                     cmd);
             break;
 
         case cmd_WriteBufferedLogical_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteBufferedLogical_c %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteBufferedLogical_c %d\n", cmd);
             break;
 
         case cmd_WriteDeletedDataLogical:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteDeletedDataLogical %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteDeletedDataLogical %d\n", cmd);
             break;
 
         case cmd_WriteBufferedDeletedDataLogical_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - cmd_WriteBufferedDeletedDataLogical_c %d\n",
-                    __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unsupported - cmd_WriteBufferedDeletedDataLogical_c %d\n", cmd);
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__, cmd);
+            debugss(ssH47, ERROR, "Unknown command - default %d\n", cmd);
             invalidCommandReceived_m = true;
 
             if (linkToHost_m)
@@ -933,23 +909,23 @@ Z47Controller::processCmd(BYTE cmd)
     switch (curLinkState)
     {
         case st_Link_Undefined_c:
-            debugss(ssH47, ERROR, "%s - Unexpected Undefined link state\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unexpected Undefined link state\n");
             break;
 
         case st_Link_Ready_c:
-            debugss(ssH47, INFO, "%s - link ready state - do nothing\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link ready state - do nothing\n");
             break;
 
         case st_Link_AwaitingToReqReceive_c:
-            debugss(ssH47, INFO, "%s - link awaiting receive state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link awaiting receive state\n");
             break;
 
         case st_Link_AwaitingToTransmit_c:
-            debugss(ssH47, INFO, "%s - link transmit state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link transmit state\n");
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__,
+            debugss(ssH47, ERROR, "Unknown command - default %d\n",
                     curLinkState);
 
     }
@@ -962,7 +938,7 @@ bool
 Z47Controller::connectDrive(BYTE       unitNum,
                             DiskDrive* drive)
 {
-    debugss(ssH47, ALL, "%s - %d - %p\n", __FUNCTION__, unitNum, drive);
+    debugss(ssH47, ALL, "%d - %p\n", unitNum, drive);
 
     if (unitNum < numDrives_c)
     {
@@ -972,17 +948,15 @@ Z47Controller::connectDrive(BYTE       unitNum,
         }
         else
         {
-            debugss(ssH47, ERROR, "%s - drive conflict - %d.\n", __FUNCTION__, unitNum);
+            debugss(ssH47, ERROR, "drive conflict - %d.\n", unitNum);
             return false;
         }
     }
     else
     {
-        debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
+        debugss(ssH47, ERROR, "invalid drive - %d\n", unitNum);
         return false;
     }
-
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
 
     return true;
 }
@@ -990,21 +964,21 @@ Z47Controller::connectDrive(BYTE       unitNum,
 bool
 Z47Controller::removeDrive(BYTE unitNum)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     if (unitNum < numDrives_c)
     {
         if (drives_m[unitNum] == 0)
         {
-            debugss(ssH47, WARNING, "%s - no drive to remove - %d.\n", __FUNCTION__, unitNum);
+            debugss(ssH47, WARNING, "no drive to remove - %d.\n", unitNum);
         }
 
         drives_m[unitNum] = 0;
-        debugss(ssH47, ERROR, "%s - disk already in use - %d.\n", __FUNCTION__, unitNum);
+        debugss(ssH47, ERROR, " disk already in use - %d.\n", unitNum);
     }
     else
     {
-        debugss(ssH47, ERROR, "%s - invalid drive - %d\n", __FUNCTION__, unitNum);
+        debugss(ssH47, ERROR, "invalid drive - %d\n", unitNum);
     }
 
     return true;
@@ -1016,24 +990,24 @@ Z47Controller::notification(unsigned int cycleCount)
     switch (curLinkState)
     {
         case st_Link_Undefined_c:
-            // debugss(ssH47, ERROR, "%s - Unexpected Undefined link state\n", __FUNCTION__);
+            // debugss(ssH47, ERROR, "Unexpected Undefined link state\n");
             return;
 
         case st_Link_Ready_c:
-            // debugss(ssH47, INFO, "%s - link ready state - do nothing\n", __FUNCTION__);
+            // debugss(ssH47, INFO, "link ready state - do nothing\n");
             return;
 
         case st_Link_AwaitingToReqReceive_c:
-            debugss(ssH47, INFO, "%s - link awaiting to request receive state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link awaiting to request receive state\n");
             break;
 
         case st_Link_AwaitingToReceive_c:
-            // debugss(ssH47, INFO, "%s - link to receive - do nothing\n", __FUNCTION__);
+            // debugss(ssH47, INFO, "link to receive - do nothing\n");
             // get data when dtak is asserted.
             return;
 
         case st_Link_AwaitingToTransmit_c:
-            debugss(ssH47, INFO, "%s - link transmit state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link transmit state\n");
             break;
 
         case st_Link_AwaitingTransmitComplete_c:
@@ -1061,7 +1035,7 @@ Z47Controller::notification(unsigned int cycleCount)
     switch (curLinkState)
     {
         case st_Link_AwaitingToReqReceive_c:
-            debugss(ssH47, INFO, "%s - link awaiting receive state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link awaiting receive state\n");
 
             // just set the flags and wait for the host to send;
             if (linkToHost_m)
@@ -1073,7 +1047,7 @@ Z47Controller::notification(unsigned int cycleCount)
             return;
 
         case st_Link_AwaitingToTransmit_c:
-            debugss(ssH47, INFO, "%s - link transmit state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link transmit state\n");
 
             if (linkToHost_m)
             {
@@ -1084,7 +1058,7 @@ Z47Controller::notification(unsigned int cycleCount)
             return;
 
         case st_Link_AwaitingReadyState_c:
-            debugss(ssH47, INFO, "%s - link awaiting ready state\n", __FUNCTION__);
+            debugss(ssH47, INFO, "link awaiting ready state\n");
 
             // just set the flags and wait for the host to send;
             if (linkToHost_m)
@@ -1096,14 +1070,13 @@ Z47Controller::notification(unsigned int cycleCount)
             return;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__,
-                    curLinkState);
+            debugss(ssH47, ERROR, "Unknown command - default %d\n", curLinkState);
 
     }
 
     if (curState == st_None_c)
     {
-        debugss(ssH47, ERROR, "%s - Unexpected st_None_c\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "Unexpected st_None_c\n");
 
         return;
     }
@@ -1111,84 +1084,83 @@ Z47Controller::notification(unsigned int cycleCount)
     switch (curState)
     {
         case st_Boot_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Boot_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Boot_c\n");
 
             break;
 
         case st_ReadCntrlStat_c:
-            debugss(ssH47, INFO, "%s - st_ReadCntrlStat_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadCntrlStat_c\n");
             processReadControlStatus();
             break;
 
         case st_ReadAuxStat_c:
-            debugss(ssH47, INFO, "%s - st_ReadAuxStat_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadAuxStat_c\n");
             processReadReadyStatus();
             break;
 
         case st_LoadSectorCount_c:
-            debugss(ssH47, ERROR, "%s - st_LoadSectorCount_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_LoadSectorCount_c\n");
             processLoadSectorCount();
             break;
 
         case st_ReadLastAddr_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_ReadLastAddr_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_ReadLastAddr_c\n");
             break;
 
         case st_ReadSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_ReadSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_ReadSectors_c\n");
             break;
 
         case st_WriteSectors_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectors_c\n");
             break;
 
         case st_ReadSectorsBuffered_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_ReadSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_ReadSectorsBuffered_c\n");
             break;
 
         case st_WriteSectorsBuffered_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectorsBuffered_c\n");
             break;
 
         case st_WriteSectorsAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsAndDelete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectorsAndDelete_c\n");
             break;
 
         case st_WriteSectorsBufferedAndDelete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WriteSectorsBufferedAndDelete_c\n",
-                    __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WriteSectorsBufferedAndDelete_c\n");
             break;
 
         case st_Copy_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Copy_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Copy_c\n");
             break;
 
         case st_FormatIBM_SD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_FormatIBM_SD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_FormatIBM_SD_c\n");
             break;
 
         case st_Format_SD_c:
-            debugss(ssH47, INFO, "%s - st_Format_SD_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_Format_SD_c\n");
             processFormatSingleDensity();
             break;
 
         case st_FormatIBM_DD_c:
-            debugss(ssH47, INFO, "%s - st_FormatIBM_DD_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_FormatIBM_DD_c\n");
             processFormatIBMDoubleDensity();
 
             break;
 
         case st_Format_DD_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_Format_DD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_Format_DD_c\n");
             processFormatDoubleDensity();
             break;
 
         case st_WaitingToComplete_c:
-            debugss(ssH47, ERROR, "%s - Unsupported - st_WaitingToComplete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unsupported - st_WaitingToComplete_c\n");
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown command - default %d\n", __FUNCTION__, curState);
+            debugss(ssH47, ERROR, "Unknown command - default %d\n", curState);
 
     }
 
@@ -1198,7 +1170,7 @@ Z47Controller::notification(unsigned int cycleCount)
 void
 Z47Controller::connectHostLink(ParallelLink* link)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
     linkToHost_m = link;
 
     if (linkToHost_m)
@@ -1207,7 +1179,7 @@ Z47Controller::connectHostLink(ParallelLink* link)
     }
     else
     {
-        debugss(ssH47, ERROR, "%s - link invalid\n", __FUNCTION__);
+        debugss(ssH47, ERROR, "link invalid\n");
     }
 }
 
@@ -1215,90 +1187,90 @@ Z47Controller::connectHostLink(ParallelLink* link)
 void
 Z47Controller::processData(BYTE val)
 {
-    debugss(ssH47, ALL, "%s - 0x%02x\n", __FUNCTION__, val);
+    debugss(ssH47, ALL, "0x%02x\n", val);
 
     switch (curState)
     {
         case st_None_c:
-            debugss(ssH47, ALL, "%s - st_None_c\n", __FUNCTION__);
+            debugss(ssH47, ALL, "st_None_c\n");
             processCmd(val);
             break;
 
         case st_Boot_c:
-            debugss(ssH47, ERROR, "%s - st_Boot_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_Boot_c\n");
             break;
 
         case st_ReadCntrlStat_c:
-            debugss(ssH47, ERROR, "%s - Invalid state st_ReadCntrlStat_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid state st_ReadCntrlStat_c\n");
             // processReadControlStatus();
             break;
 
         case st_ReadAuxStat_c:
-            debugss(ssH47, INFO, "%s - st_ReadAuxStat_c - 0x%02x\n", __FUNCTION__, val);
+            debugss(ssH47, INFO, "st_ReadAuxStat_c - 0x%02x\n", val);
             processReadAuxStatus(val);
             break;
 
         case st_LoadSectorCount_c:
-            debugss(ssH47, INFO, "%s - st_LoadSectorCount_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_LoadSectorCount_c\n");
             processLoadSectorCount(val);
             break;
 
         case st_ReadLastAddr_c:
-            debugss(ssH47, ERROR, "%s - st_ReadLastAddr_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_ReadLastAddr_c\n");
             break;
 
         case st_ReadSectors_c:
-            debugss(ssH47, ERROR, "%s - st_ReadSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_ReadSectors_c\n");
             break;
 
         case st_WriteSectors_c:
-            debugss(ssH47, ERROR, "%s - st_WriteSectors_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_WriteSectors_c\n");
             break;
 
         case st_ReadSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - st_ReadSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_ReadSectorsBuffered_c\n");
             processReadSectorsBufffered(val);
             break;
 
         case st_WriteSectorsBuffered_c:
-            debugss(ssH47, INFO, "%s - st_WriteSectorsBuffered_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_WriteSectorsBuffered_c\n");
             processWriteSectorsBufffered(val);
             break;
 
         case st_WriteSectorsAndDelete_c:
-            debugss(ssH47, ERROR, "%s - st_WriteSectorsAndDelete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_WriteSectorsAndDelete_c\n");
             break;
 
         case st_WriteSectorsBufferedAndDelete_c:
-            debugss(ssH47, ERROR, "%s - st_WriteSectorsBufferedAndDelete_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_WriteSectorsBufferedAndDelete_c\n");
             break;
 
         case st_Copy_c:
-            debugss(ssH47, ERROR, "%s - st_Copy_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_Copy_c\n");
             break;
 
         case st_FormatIBM_SD_c:
-            debugss(ssH47, ERROR, "%s - st_FormatIBM_SD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_FormatIBM_SD_c\n");
             break;
 
         case st_Format_SD_c:
-            debugss(ssH47, INFO, "%s - st_Format_SD_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_Format_SD_c\n");
             processFormatSingleDensity(val);
             break;
 
         case st_FormatIBM_DD_c:
-            debugss(ssH47, INFO, "%s - st_FormatIBM_DD_c\n", __FUNCTION__);
+            debugss(ssH47, INFO, "st_FormatIBM_DD_c\n");
             processFormatIBMDoubleDensity(val);
 
             break;
 
         case st_Format_DD_c:
-            debugss(ssH47, ERROR, "%s - st_Format_DD_c\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "st_Format_DD_c\n");
             processFormatDoubleDensity(val);
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s - Unknown state\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Unknown state\n");
 
             break;
     }
@@ -1307,14 +1279,14 @@ Z47Controller::processData(BYTE val)
 void
 Z47Controller::raiseSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     switch (sigType)
     {
         // Master Reset (Host to Disk System)
         case st_MasterReset:
             // Handle a reset
-            debugss(ssH47, INFO, "%s: Master Reset received.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Master Reset received.\n");
             // Set reset flag.
             readyState   = stat_Ready_Drive0ReadyChanged_c |
                            stat_Ready_Drive1ReadyChanged_c;
@@ -1343,7 +1315,7 @@ Z47Controller::raiseSignal(SignalType sigType)
         // Data Acknowledge (Host to Disk System)
         case st_DTAK:
             // Handle data acknowledge.
-            debugss(ssH47, INFO, "%s: DTAK received.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DTAK received.\n");
 
             if (curLinkState == st_Link_AwaitingTransmitComplete_c)
             {
@@ -1366,27 +1338,27 @@ Z47Controller::raiseSignal(SignalType sigType)
 
         // Data Ready (Disk System to Host)
         case st_DTR:
-            debugss(ssH47, ERROR, "%s: Invalid DTR received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DTR received.\n");
             break;
 
         // Disk Drive Out (Disk System to Host)
         case st_DDOUT:
-            debugss(ssH47, ERROR, "%s: Invalid DDOUT received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DDOUT received.\n");
             break;
 
         // Busy (Disk System to Host)
         case st_Busy:
             // Not valid
-            debugss(ssH47, ERROR, "%s: Invalid Busy received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid Busy received.\n");
             break;
 
         // Error (Disk System to Host)
         case st_Error:
-            debugss(ssH47, ERROR, "%s: Invalid error received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid error received.\n");
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid sigType received.\n");
             break;
     }
 }
@@ -1394,14 +1366,14 @@ Z47Controller::raiseSignal(SignalType sigType)
 void
 Z47Controller::lowerSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     switch (sigType)
     {
         // Master Reset (Host to Disk System)
         case st_MasterReset:
             // Handle a reset
-            debugss(ssH47, INFO, "%s: Master Reset received.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "Master Reset received.\n");
 
             break;
 
@@ -1410,36 +1382,36 @@ Z47Controller::lowerSignal(SignalType sigType)
             // Handle data acknowledge.
             // Computer acknowledged the transfer to it, or has valid data
             // available for the disk system to receive.
-            debugss(ssH47, INFO, "%s: DTAK received.\n", __FUNCTION__);
+            debugss(ssH47, INFO, "DTAK received.\n");
 
             break;
 
         // Data Ready (Disk System to Host)
         case st_DTR:
             // This signal only goes to the host
-            debugss(ssH47, ERROR, "%s: Invalid DTR received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DTR received.\n");
             break;
 
         // Disk Drive Out (Disk System to Host)
         case st_DDOUT:
             // This signal only goes to the host
-            debugss(ssH47, ERROR, "%s: Invalid DDOUT received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid DDOUT received.\n");
             break;
 
         // Busy (Disk System to Host)
         case st_Busy:
             // This signal only goes to the host
-            debugss(ssH47, ERROR, "%s: Invalid Busy received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid Busy received.\n");
             break;
 
         // Error (Disk System to Host)
         case st_Error:
             // This signal only goes to the host
-            debugss(ssH47, ERROR, "%s: Invalid error received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid error received.\n");
             break;
 
         default:
-            debugss(ssH47, ERROR, "%s: Invalid sigType received.\n", __FUNCTION__);
+            debugss(ssH47, ERROR, "Invalid sigType received.\n");
             break;
     }
 }
@@ -1447,7 +1419,7 @@ Z47Controller::lowerSignal(SignalType sigType)
 void
 Z47Controller::pulseSignal(SignalType sigType)
 {
-    debugss(ssH47, ALL, "%s\n", __FUNCTION__);
+    debugss(ssH47, ALL, "\n");
 
     raiseSignal(sigType);
     lowerSignal(sigType);
@@ -1456,7 +1428,7 @@ Z47Controller::pulseSignal(SignalType sigType)
 void
 Z47Controller::commandComplete(void)
 {
-    debugss(ssH47, ALL, "%s - state: %s\n", __FUNCTION__, getStateStr(curState));
+    debugss(ssH47, ALL, "state: %s\n", getStateStr(curState));
 
     curState     = st_None_c;
     curLinkState = st_Link_AwaitingReadyState_c;
@@ -1481,13 +1453,12 @@ Z47Controller::decodeSideDriveSector(BYTE val)
 
     sector_m = (val & sectorMask_c) >> sectorShift_c;
 
-    debugss(ssH47, ALL, "%s side: %d  drive: %d  sector: %d\n", __FUNCTION__,
-            side_m, drive_m, sector_m);
+    debugss(ssH47, ALL, "side: %d  drive: %d  sector: %d\n", side_m, drive_m, sector_m);
 }
 
 void
 Z47Controller::decodeTrack(BYTE val)
 {
     track_m = (val & trackMask_c) >> trackShift_c;
-    debugss(ssH47, ALL, "%s track: %d\n", __FUNCTION__, track_m);
+    debugss(ssH47, ALL, "track: %d\n", track_m);
 }

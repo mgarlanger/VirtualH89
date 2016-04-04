@@ -14,14 +14,14 @@
 H37InterruptController::H37InterruptController(CPU* cpu): InterruptController(cpu),
                                                           drqRaised_m(false)
 {
-    debugss(ssH37InterruptController, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssH37InterruptController, INFO, "Entering\n");
 
 }
 
 
 H37InterruptController::~H37InterruptController()
 {
-    debugss(ssH37InterruptController, INFO, "%s: Entering\n", __FUNCTION__);
+    debugss(ssH37InterruptController, INFO, "Entering\n");
 
 }
 
@@ -31,8 +31,8 @@ H37InterruptController::setINTLine()
 {
     if (intLevel_m != 2 && intLevel_m != 0)
     {
-        debugss(ssH37InterruptController, VERBOSE, "%s: intLevel: %d  drqRaised: %d\n",
-                __FUNCTION__, intLevel_m, drqRaised_m);
+        debugss(ssH37InterruptController, VERBOSE, "intLevel: %d  drqRaised: %d\n", intLevel_m,
+                drqRaised_m);
     }
     if (intLevel_m != 0 || drqRaised_m)
     {
@@ -49,7 +49,7 @@ BYTE
 H37InterruptController::readDataBus()
 {
     BYTE op = 0;
-    // debugss(ssH37InterruptController, VERBOSE, "%s: Entering\n", __FUNCTION__);
+    // debugss(ssH37InterruptController, VERBOSE, "Entering\n");
 
     if (drqRaised_m)
     {
@@ -62,7 +62,7 @@ H37InterruptController::readDataBus()
 
     if (op != 207)
     {
-        debugss(ssH37InterruptController, VERBOSE, "%s: op: %d\n", __FUNCTION__, op);
+        debugss(ssH37InterruptController, VERBOSE, "op: %d\n", op);
     }
     return op;
 }
@@ -71,7 +71,7 @@ H37InterruptController::readDataBus()
 void
 H37InterruptController::drq(bool raise)
 {
-    debugss(ssH37InterruptController, VERBOSE, "%s: Entering: %d\n", __FUNCTION__, raise);
+    debugss(ssH37InterruptController, VERBOSE, "Entering: %d\n", raise);
     drqRaised_m = raise;
     setINTLine();
 }

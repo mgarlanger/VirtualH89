@@ -95,8 +95,8 @@ Sector::initialize(BYTE  headNum,
     {
         // Error condition, shouldn't initialize an already valid object
 
-        debugss(ssFloppyDisk, ERROR, "%s: Sector already initialized - h: %d t: %d s: %d\n",
-                __FUNCTION__, headNum, trackNum, sectorNum);
+        debugss(ssFloppyDisk, ERROR, "Sector already initialized - h: %d t: %d s: %d\n",
+                headNum, trackNum, sectorNum);
 
     }
 
@@ -181,13 +181,13 @@ bool
 Sector::readData(WORD  pos,
                  BYTE& data)
 {
-    debugss(ssFloppyDisk, INFO, "%s: pos: %d\n", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, INFO, "pos: %d\n", pos);
 
     if (pos < sectorLength_m)
     {
         data = data_m[pos];
 
-        debugss(ssFloppyDisk, INFO, "%s: Valid pos: %d 0x%02x\n", __FUNCTION__, data, data);
+        debugss(ssFloppyDisk, INFO, "Valid pos: %d 0x%02x\n", data, data);
 
         return true;
     }
@@ -199,13 +199,13 @@ bool
 Sector::writeData(WORD pos,
                   BYTE data)
 {
-    debugss(ssFloppyDisk, INFO, "%s: pos: %d\n", __FUNCTION__, pos);
+    debugss(ssFloppyDisk, INFO, "pos: %d\n", pos);
 
     if (pos < sectorLength_m)
     {
         data = data_m[pos];
 
-        debugss(ssFloppyDisk, INFO, "%s: Valid pos: %d 0x%02x\n", __FUNCTION__, data, data);
+        debugss(ssFloppyDisk, INFO, "Valid pos: %d 0x%02x\n", data, data);
 
         return true;
     }

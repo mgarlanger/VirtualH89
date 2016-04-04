@@ -380,7 +380,7 @@ HostFileBdos::deleteFile(uint8_t* msgbuf, int len)
         return 2;
     }
     if ((fcb->name[4] & 0x80) != 0) // check F5'
-    {   // no XFCBs in this implementation,
+    {                               // no XFCBs in this implementation,
         // do not remove timestamps.
         return 1;
     }
@@ -1118,7 +1118,7 @@ HostFileBdos::copyOutSearch(uint8_t* buf, const char* name)
         return curSearch.iter++ & 0x03; // should be "0" (iter == 0)
     }
     else if (*name == '!')              // SFCB (already populated)
-    {   // this should never happen...
+    {                                   // this should never happen...
         debugss(ssHostFileBdos, ERROR, "Copy Out SFCB in wrong place\n");
         memcpy(buf, &sFcb, 32);
         return curSearch.iter++ & 0x03; // should be "3"
@@ -1197,7 +1197,7 @@ HostFileBdos::commonSearch(struct search* search)
         return NULL;
     }
     if (search->ext == '?') // this includes search->full
-    {   // return size of file... by some definition...
+    {                       // return size of file... by some definition...
         struct stat stb;
         stat(cpmPathFound(&search->find), &stb);
         search->size = stb.st_size;

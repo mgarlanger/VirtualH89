@@ -181,11 +181,11 @@ INS8250::in(BYTE addr)
 
         }
 
-        debugss(ss8250, INFO, "%s: %d(%d) <- %d", __FUNCTION__, addr, offset, val);
+        debugss(ss8250, INFO, "%d(%d) <- %d", addr, offset, val);
     }
     else
     {
-        debugss(ss8250, ERROR, "%s: Verify Port failed: %d", __FUNCTION__, addr);
+        debugss(ss8250, ERROR, "Verify Port failed: %d", addr);
         return (0);
     }
 
@@ -214,7 +214,7 @@ INS8250::out(BYTE addr,
                     }
                     else
                     {
-                        debugss(ss8250, ERROR, "%s: THR - No device_m.", __FUNCTION__);
+                        debugss(ss8250, ERROR, "THR - No device_m.");
                     }
                 }
                 else
@@ -323,7 +323,7 @@ INS8250::receiveReady()
 void
 INS8250::receiveData(BYTE data)
 {
-    debugss(ss8250, ALL, "%s - %d\n", __FUNCTION__, data);
+    debugss(ss8250, ALL, "%d\n", data);
 
     unsigned int baud = device_m->getBaudRate();
 
@@ -334,14 +334,14 @@ INS8250::receiveData(BYTE data)
 
     if (baud == baud_m)
     {
-        debugss(ss8250, ALL, "%s: Baud matches\n", __FUNCTION__);
+        debugss(ss8250, ALL, "Baud matches\n");
         PE_m = false;
         FE_m = false;
     }
     else if (baud > baud_m)
     {
         // computer is at lower baud than the remote device.
-        debugss(ss8250, ALL, "%s: device baud exceeds our baud.\n", __FUNCTION__);
+        debugss(ss8250, ALL, "device baud exceeds our baud.\n");
         PE_m = true;
         FE_m = false;
         // a full character will not be received, so we must exit and not set rxByteAvail
@@ -350,7 +350,7 @@ INS8250::receiveData(BYTE data)
     else
     {
         // computer is at a faster baud than the remote device.
-        debugss(ss8250, ALL, "%s: device baud lower\n", __FUNCTION__);
+        debugss(ss8250, ALL, "device baud lower\n");
         PE_m = false;
         FE_m = true;
     }

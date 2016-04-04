@@ -70,3 +70,39 @@ setDebug(subSystems ss,
 {
     debugLevel[ss] = level;
 }
+
+void
+__debugss(enum subSystems subsys, enum logLevel level, const char* functionName, const char* fmt,
+          ...)
+{
+    va_list vl;
+    int     __val = 0;
+    if (level < ERROR)
+    {
+        __val = 31; /* FATAL = Red */
+    }
+    else if (level < WARNING)
+    {
+        __val = 33; /* ERROR = Yellow */
+    }
+    else if (level < INFO)
+    {
+        __val = 35; /* WARNING = Magenta */
+    }
+    else if (level < VERBOSE)
+    {
+        __val = 34; /* INFO = Blue */
+    }
+    else
+    {
+        __val = 32; /* default = Green */
+    }
+    fprintf(log_out, "\x1b[37m");
+    WallClock::instance()->printTime(log_out);
+    fprintf(log_out, "\x1b[36m%s: \x1b[%dm", functionName, __val);
+    va_start(vl, fmt);
+    vfprintf(log_out, fmt, vl);
+    va_end(vl);
+    fprintf(log_out, "\x1b[0m");
+    fflush(log_out);
+}

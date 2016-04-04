@@ -150,7 +150,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
 {
     if (argv.size() < 1)
     {
-        debugss(ssSectorFloppyImage, WARNING, "%s: no file specified\n", __FUNCTION__);
+        debugss(ssSectorFloppyImage, WARNING, "no file specified\n");
         return;
     }
 
@@ -174,7 +174,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::s
 
     if (fd < 0)
     {
-        debugss(ssSectorFloppyImage, ERROR, "%s: unable to open file - %s\n", __FUNCTION__, name);
+        debugss(ssSectorFloppyImage, ERROR, "unable to open file - %s\n", name);
         return;
     }
 
