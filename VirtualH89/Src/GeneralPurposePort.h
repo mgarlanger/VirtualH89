@@ -80,8 +80,8 @@ class GeneralPurposePort: public virtual IODevice
     static const BYTE Mtr89_Port170_Undef1_c  = 0x08; // Undefined
     static const BYTE Mtr89_Port170_Undef2_c  = 0x0c; // Undefined
     static const BYTE Mtr89_PrimaryPort_c     = 0x10; // Determine primary controller
-    static const BYTE Mtr89_PrimaryPort_174_c = 0x10; // Primary boot device is at port 174
-    static const BYTE Mtr89_PrimaryPort_170_c = 0x00; // Primary boot device is at port 170
+    static const BYTE Mtr89_PrimaryPort_174_c = 0x00; // Primary boot device is at port 174
+    static const BYTE Mtr89_PrimaryPort_170_c = 0x10; // Primary boot device is at port 170
     static const BYTE Mtr89_MemoryTest_Mask_c = Mtr88_MemoryTest_Mask_c;
     static const BYTE Mtr89_MemoryTest_On_c   = Mtr88_MemoryTest_On_c;
     static const BYTE Mtr89_MemoryTest_Off_c  = Mtr88_MemoryTest_Off_c;

@@ -97,7 +97,7 @@ class H17: public DiskController, public ClockUser, public GppListener
     bool               syncCharacterReceived_m;
     bool               receiveDataAvail_m;
     bool               receiverOverrun_m;
-//  bool receiverParityErr_m; // Not needed based the the H17 circuit, no parity is used.
+    bool               receiverParityErr_m; // Parity is not used in the H17 circuit
     bool               fillCharTransmitted_m;
     bool               transmitterBufferEmpty_m;
 
@@ -159,7 +159,7 @@ class H17: public DiskController, public ClockUser, public GppListener
     ///
     /// Number of CPU cycles for each read byte from the Floppy disk.
     /// This is fixed on due to the single density, and rotation speed of the disk
-    /// \todo move this to a disk or disk drive class.
+    ///
     static const unsigned int CPUCyclesPerByte_c = 128;
     static const unsigned int BytesPerTrack_c    = 3200;
 
