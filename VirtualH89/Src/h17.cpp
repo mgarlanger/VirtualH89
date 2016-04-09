@@ -271,23 +271,20 @@ H17::out(BYTE addr,
             if (val & DriveSelect0_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS0");
-                curDrive_m               = ds0;
-                transmitterBufferEmpty_m = false;
-                fillCharTransmitted_m    = false;
+                
+                curDrive_m = ds0;
             }
             else if (val & DriveSelect1_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS1");
-                curDrive_m               = ds1;
-                transmitterBufferEmpty_m = false;
-                fillCharTransmitted_m    = false;
+                
+                curDrive_m = ds1;
             }
             else if (val & DriveSelect2_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS2");
-                curDrive_m               = ds2;
-                transmitterBufferEmpty_m = false;
-                fillCharTransmitted_m    = false;
+                
+                curDrive_m = ds2;
             }
             else
             {
@@ -313,14 +310,12 @@ H17::out(BYTE addr,
                 debugss_nts(ssH17, INFO, " MtrOn");
 
                 motorOn_m = true;
-                /// \todo Register with the cpu clock for notification.
             }
             else
             {
                 debugss_nts(ssH17, INFO, " MtrOff");
 
                 motorOn_m = false;
-                /// \todo Unregister with the CPU clock to disable notification.
             }
 
             /// Need to terminate the debug status print, since the following bits call
@@ -435,53 +430,49 @@ H17::notification(unsigned int cycleCount)
     unsigned long charPos = 0;
     BYTE          data    = 0;
 
-    if (motorOn_m)
+    if ((curDrive_m >= maxDiskDrive_c) || (!drives_m[curDrive_m]))
     {
-        spinCycles_m += cycleCount;
-        spinCycles_m %= (BytesPerTrack_c * CPUCyclesPerByte_c);
-        charPos       = spinCycles_m / CPUCyclesPerByte_c;
-
-        if (charPos == curCharPos_m)
-        {
-            // Position hasn't changed just return
-            return;
-        }
-
-        debugss(ssH17, ALL, "New character Pos - old: %ld, new: %ld\n", curCharPos_m,
-                charPos);
-        curCharPos_m = charPos;
-    }
-    else
-    {
-        // Drive motor is not turned on. Nothing to do.
-        /// \todo determine if we need to use clock to determine when these occur.
-        // These are needed for drive detection.
-        if ((curDrive_m < maxDiskDrive_c) && (drives_m[curDrive_m]))
-        {
-            transmitterBufferEmpty_m = true;
-            fillCharTransmitted_m    = true;
-        }
-        else
-        {
-            transmitterBufferEmpty_m = false;
-            fillCharTransmitted_m    = false;
-        }
-
         return;
     }
 
-    if (!(curDrive_m < maxDiskDrive_c))
+    spinCycles_m = (spinCycles_m + cycleCount) % (BytesPerTrack_c * CPUCyclesPerByte_c);
+
+    charPos      = spinCycles_m / CPUCyclesPerByte_c;
+
+    if (charPos == curCharPos_m)
     {
-        /// Idle case, this will happen when no drive activity is expected.
-        /// \todo don't call this and make this an warning again
-        debugss(ssH17, ALL, "Invalid Drive: %d\n", curDrive_m);
+        // Position hasn't changed just return
+        return;
+    }
+
+    debugss(ssH17, ALL, "New character Pos - old: %ld, new: %ld\n", curCharPos_m,
+            charPos);
+    curCharPos_m = charPos;
+
+    // handle the transmit buffer whether or not writing is going on, this is
+    // needed to handle drive detection.
+    // data variable will be used later if currently writing.
+    if (transmitterBufferEmpty_m)
+    {
+        data                  = fillChar_m;
+        fillCharTransmitted_m = true;
+    }
+    else
+    {
+        data                     = transmitterHoldingRegister_m;
+        transmitterBufferEmpty_m = true;
+    }
+
+    // if motor is not on, just bail.
+    if (!motorOn_m)
+    {
         return;
     }
 
     switch (state_m)
     {
         case idleState:
-            debugss(ssH17, INFO, "Idle State\n");
+            debugss(ssH17, VERBOSE, "Idle State\n");
             /// do nothing
             break;
 
@@ -489,16 +480,8 @@ H17::notification(unsigned int cycleCount)
 
             // check to see if character matches sync, -> set set sync found
             // also load data buffer.
-            if (drives_m[curDrive_m])
-            {
-                data = drives_m[curDrive_m]->readData(curCharPos_m);
-                debugss(ssH17, ALL, "Seeking Sync(disk: %d): %d\n", curDrive_m, data);
-            }
-            else
-            {
-                debugss(ssH17, ERROR, "Seeking Sync - No Drive(%d)\n", curDrive_m);
-                // should we return here...
-            }
+            data = drives_m[curDrive_m]->readData(curCharPos_m);
+            debugss(ssH17, ALL, "Seeking Sync(disk: %d): %d\n", curDrive_m, data);
 
             if (data == syncChar_m)
             {
@@ -526,46 +509,20 @@ H17::notification(unsigned int cycleCount)
                 receiverOverrun_m = true;
             }
 
-            if (drives_m[curDrive_m])
-            {
-                data = drives_m[curDrive_m]->readData(curCharPos_m);
-            }
+            data                     = drives_m[curDrive_m]->readData(curCharPos_m);
 
             debugss(ssH17, ALL, "Reading - Pos: %ld Data: %d\n", curCharPos_m, data);
+            
             receiverOutputRegister_m = data;
             receiveDataAvail_m       = true;
+            
             break;
 
         case writingState:
 
-            // Determine if transmitter Holding is empty,
-            //    if so,
-            //         write fill character.
-            //         set fill character transmitted flag.
-            //    else
-            //         transmit from buffer, empty buffer.
-            if (transmitterBufferEmpty_m)
-            {
-                data                  = fillChar_m;
-                fillCharTransmitted_m = true;
-                debugss(ssH17, ERROR, "fill char sent Pos: %ld\n", curCharPos_m);
-            }
-            else
-            {
-                data                     = transmitterHoldingRegister_m;
-                transmitterBufferEmpty_m = true;
-                debugss(ssH17, ALL, "Writing - Pos: %ld Data: %d\n", curCharPos_m, data);
-            }
-
-            if (drives_m[curDrive_m])
-            {
-                drives_m[curDrive_m]->writeData(curCharPos_m, data);
-            }
-            else
-            {
-                debugss(ssH17, INFO, "No Valid Drive - Pos: %ld\n", curCharPos_m);
-            }
+            drives_m[curDrive_m]->writeData(curCharPos_m, data);
 
             break;
     }
+
 }
