@@ -1584,22 +1584,23 @@ Z80::raiseNMI(void)
 }
 
 ///
-/// Raise an interrupt.
-///
-/// @param level The interrupt level to raise.
+/// Raise interrupt line
 ///
 void
 Z80::raiseINT()
 {
     debugss(ssZ80, VERBOSE, "\n");
+    if (!IFF1)
+    {
+        debugss(ssZ80, INFO, "interrupt raised, but currently disabled\n");
+
+    }
 
     int_type |= Intr_INT;
 }
 
 ///
-/// Lower an interrupt.
-///
-/// @param level The interrupt level to lower.
+/// Lower interrupt line
 ///
 void
 Z80::lowerINT()

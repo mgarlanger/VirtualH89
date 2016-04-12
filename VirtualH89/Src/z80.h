@@ -272,6 +272,22 @@ class Z80: public CPU, public GppListener
 
   private:
 
+    // Types of interrupts
+    const int Intr_NMI = 0x01;
+    const int Intr_INT = 0x02;
+
+    // operation of simulated CPU
+    
+    enum
+    {
+        STOPPED_C     = 0,
+        RUN_C         = 1,
+        HALT_C        = 2,
+        SINGLE_STEP_C = 3,
+        POWEROFF_C    = 255
+    };
+    
+
     /// \todo - move this outside of the z80 class.
     unsigned int speedUpFactor_m;
     bool         fast_m;
@@ -496,19 +512,5 @@ class Z80: public CPU, public GppListener
 
 };
 
-// operation of simulated CPU
-
-enum
-{
-    STOPPED_C     = 0,
-    RUN_C         = 1,
-    HALT_C        = 2,
-    SINGLE_STEP_C = 3,
-    POWEROFF_C    = 255
-};
-
-// Types of interrupts
-const int Intr_NMI = 0x01;
-const int Intr_INT = 0x02;
 
 #endif // Z80_H_
