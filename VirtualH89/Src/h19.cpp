@@ -1108,7 +1108,7 @@ H19::insertLine()
         }
     }
 
-    eraseLine(PosX);
+    eraseLine(PosY);
 
     PosX    = 0;
 
