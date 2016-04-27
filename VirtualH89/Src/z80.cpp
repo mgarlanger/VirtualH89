@@ -2611,7 +2611,12 @@ Z80::op_ld_ihl_x(void)
 void
 Z80::op_ld_ihl_n(void)
 {
-    writeMEM(getIndirectAddr(), READn());
+    // Order is imperative here for DD/FD instructions:
+    // displacement is 3rd byte and value is 4th.
+    // Functions with side-effects can be dangerous.
+    WORD adr = getIndirectAddr();
+    BYTE n = READn();
+    writeMEM(adr, n);
 }
 
 ///

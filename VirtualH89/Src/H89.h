@@ -125,9 +125,9 @@ class H89: public Computer
     /// Addresses for the serial ports (NOTE addresses are in OCTAL)
     static const BYTE          Serial_Console_c           = 0350; // (0xe8)
     static const BYTE          Serial_Console_Interrupt_c = 3;
-    static const BYTE          Serial_LpPort_c            = 0320; // (0xD0)
+    static const BYTE          Serial_AuxPort_c           = 0320; // (0xD0)
     static const BYTE          Serial_ModemPort_c         = 0330; // (0xD8)
-    static const BYTE          Serial_AuxPort_c           = 0340; // (0xE0)
+    static const BYTE          Serial_LpPort_c            = 0340; // (0xE0)
 
     /// Address for NMI Addresses, used to respond to H8 ports.
     /// Octal 360-361 and 372-373
