@@ -13,7 +13,7 @@
 
 #include "InterruptController.h"
 
-class MMS77316;
+class CPU;
 
 /// \class MMS316IntrCtrlr
 ///
@@ -23,19 +23,21 @@ class MMS77316;
 
 class MMS316IntrCtrlr: public InterruptController
 {
-  private:
-    MMS77316* m316_m;
+  protected:
+    bool drqRaised_m;
+    bool intrqRaised_m;
 
   public:
-    MMS316IntrCtrlr(InterruptController* ic,
-                    MMS77316*            m316);
+    MMS316IntrCtrlr(CPU* cpu);
     virtual ~MMS316IntrCtrlr();
 
-    virtual void raiseInterrupt(BYTE level);
-    virtual void lowerInterrupt(BYTE level);
+    void setINTLine();
 
     // reading instructions for interrupts
     virtual BYTE readDataBus();
+    virtual void setDrq(bool raise);
+    virtual void setIntrq(bool raise);
+
 };
 
 

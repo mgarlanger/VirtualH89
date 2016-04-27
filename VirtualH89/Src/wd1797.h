@@ -13,19 +13,20 @@
 #include "h89Types.h"
 
 class GenericFloppyDrive;
+class WD179xUserIf;
 
 ///
-/// \brief Virtual soft-sectored disk controller
+/// \brief Virtual Western Digital's soft-sectored floppy controller chip
 ///
-/// A virtual Magnolia Microsystems soft-sectored disk controller (MMS77316).
-/// Note: this is NOT complete or even marginally functional.
-///
-/// The MMS77316 uses the 1797-02 controller.
+/// Implements a virtual WD1797 floppy controller chip, requires additional
+/// logic to function as a complete floppy disk controller.
 ///
 class WD1797: public ClockUser
 {
   public:
     WD1797(int baseAddr = 0);
+    WD1797(WD179xUserIf* userIf);
+
     virtual ~WD1797();
 
     virtual BYTE in(BYTE addr);
@@ -38,18 +39,19 @@ class WD1797: public ClockUser
     void eject(char const* file);
     void dump();
 
-  protected:
-    virtual GenericFloppyDrive* getCurDrive() = 0;
-    virtual int getClockPeriod()              = 0;
-    BYTE              basePort_m;
-
-    static const BYTE WD1797_NumPorts_c    = 4;
-
     static const BYTE StatusPort_Offset_c  = 0;
     static const BYTE CommandPort_Offset_c = 0;
     static const BYTE TrackPort_Offset_c   = 1;
     static const BYTE SectorPort_Offset_c  = 2;
     static const BYTE DataPort_Offset_c    = 3;
+
+  protected:
+    virtual GenericFloppyDrive* getCurDrive();
+    virtual int getClockPeriod();
+    BYTE              basePort_m;
+
+    static const BYTE WD1797_NumPorts_c = 4;
+
 
     BYTE              trackReg_m;
     BYTE              sectorReg_m;
@@ -79,21 +81,6 @@ class WD1797: public ClockUser
     bool              deleteDAM_m;
     BYTE              addr_m[6];
 
-    enum Direction
-    {
-        dir_out = -1,
-        dir_in  = 1
-    };
-
-    enum State
-    {
-        idleState,
-        seekingSyncState,
-        readingState,
-        writingState
-    };
-    State state_m;
-
     enum Command
     {
         restoreCmd,
@@ -109,7 +96,13 @@ class WD1797: public ClockUser
         stepDoneCmd,
         noneCmd
     };
-    Command           curCommand_m;
+    Command curCommand_m;
+
+    enum Direction
+    {
+        dir_out = -1,
+        dir_in  = 1
+    };
 
     Direction         stepDirection_m;
 
@@ -128,12 +121,12 @@ class WD1797: public ClockUser
     unsigned long millisecToTicks(unsigned long ms);
 
     // Controller may need to override/trap these.
-    virtual void raiseIntrq()    = 0;
-    virtual void raiseDrq()      = 0;
-    virtual void lowerIntrq()    = 0;
-    virtual void lowerDrq()      = 0;
+    virtual void raiseIntrq();
+    virtual void raiseDrq();
+    virtual void lowerIntrq();
+    virtual void lowerDrq();
     virtual void loadHead(bool load);
-    virtual bool doubleDensity() = 0;
+    virtual bool doubleDensity();
 
     ///
     /// Commands sent to CommandPort_c
@@ -321,11 +314,20 @@ class WD1797: public ClockUser
     /// stat_Busy_c           - 0x01;
 
     static const int sectorLengths[2][4];
+    static const int HeadSettleTimeInTicks_c = 100;
+    static const int InitialSectorPos_c      = -11;
+    static const int ErrorSectorPos_c        = -1;
+
   private:
+    WD179xUserIf*    userIf_m;
+
+
+
     void transferData(int data);
-    bool             checkAddr(BYTE addr[6]);
-    int              sectorLen(BYTE addr[6]);
     void updateReady(GenericFloppyDrive* drive);
+    bool checkAddr(BYTE addr[6]);
+    int  sectorLen(BYTE addr[6]);
+
 };
 
 #endif // WD1797_H_

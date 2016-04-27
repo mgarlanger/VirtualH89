@@ -7,6 +7,8 @@
 #include "logger.h"
 
 
+#define ANSI 0
+
 unsigned debugLevel[ssMax];
 
 
@@ -32,12 +34,12 @@ setDebugLevel()
     debugLevel[ssRAM]                    = defaultLevel; // RAM accesses
     debugLevel[ssROM]                    = defaultLevel; // ROM accesses
     debugLevel[ssZ80]                    = defaultLevel; // Z80 CPU
-    debugLevel[ssH37InterruptController] = defaultLevel; // Interrupt Controller
+    debugLevel[ssH37InterruptController] = INFO;         // Interrupt Controller
     debugLevel[ssInterruptController]    = defaultLevel; // Interrupt Controller
     debugLevel[ssAddressBus]             = defaultLevel; // Address Bus
     debugLevel[ssIO]                     = defaultLevel; // I/O ports
     debugLevel[ssH17]                    = defaultLevel; // H17 controller
-    debugLevel[ssH37]                    = defaultLevel; // H37 controller
+    debugLevel[ssH37]                    = VERBOSE;      // H37 controller
     debugLevel[ssH47]                    = defaultLevel; // H47 controller
     debugLevel[ssH67]                    = defaultLevel; // H67 controller
     debugLevel[ssDiskDrive]              = defaultLevel; // Floppy disks
@@ -49,19 +51,19 @@ setDebugLevel()
     debugLevel[ss8250]                   = defaultLevel; // 8250 Serial Port
     debugLevel[ssTimer]                  = defaultLevel; // 2 mSec Timer
     debugLevel[ssWallClock]              = defaultLevel; // Wall Clock.
-    debugLevel[ssFloppyDisk]             = defaultLevel; // Floppy Disk
+    debugLevel[ssFloppyDisk]             = INFO;         // Floppy Disk
     debugLevel[ssGpp]                    = defaultLevel; // General Purpose Port
     debugLevel[ssParallel]               = defaultLevel; // Parallel Port Interface (Z47)
     debugLevel[ssStdioConsole]           = defaultLevel;
     debugLevel[ssMMS77316]               = defaultLevel;
-    debugLevel[ssWD1797]                 = defaultLevel;
+    debugLevel[ssWD1797]                 = VERBOSE;
     debugLevel[ssGenericFloppyDrive]     = defaultLevel;
     debugLevel[ssRawFloppyImage]         = defaultLevel;
     debugLevel[ssMMS77320]               = defaultLevel;
     debugLevel[ssGenericSASIDrive]       = defaultLevel;
     debugLevel[ssHostFileBdos]           = defaultLevel;
     debugLevel[ssCPNetDevice]            = defaultLevel;
-    debugLevel[ssSectorFloppyImage]      = defaultLevel;
+    debugLevel[ssSectorFloppyImage]      = INFO;
 }
 
 void
@@ -72,10 +74,11 @@ setDebug(subSystems ss,
 }
 
 void
-__debugss(enum subSystems subsys, enum logLevel level, const char* functionName, const char* fmt,
-          ...)
+__debugss(enum subSystems subsys, enum logLevel level, const char* functionName,
+          const char* fmt, ...)
 {
     va_list vl;
+#if ANSI
     int     __val = 0;
     if (level < ERROR)
     {
@@ -98,11 +101,18 @@ __debugss(enum subSystems subsys, enum logLevel level, const char* functionName,
         __val = 32; /* default = Green */
     }
     fprintf(log_out, "\x1b[37m");
+#endif
     WallClock::instance()->printTime(log_out);
+#if ANSI
     fprintf(log_out, "\x1b[36m%s: \x1b[%dm", functionName, __val);
+#else
+    fprintf(log_out, "%s: ", functionName);
+#endif
     va_start(vl, fmt);
     vfprintf(log_out, fmt, vl);
     va_end(vl);
+#if ANSI
     fprintf(log_out, "\x1b[0m");
+#endif
     fflush(log_out);
 }

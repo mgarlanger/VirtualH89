@@ -9,13 +9,14 @@
 #ifndef H89_IO_H_
 #define H89_IO_H_
 
+#include "IOBus.h"
+
 #include <vector>
 
-#include "config.h"
 #include "h89Types.h"
 
-#include "IODevice.h"
 
+class IODevice;
 class DiskController;
 
 ///
@@ -23,25 +24,19 @@ class DiskController;
 ///
 /// Interfaces between the CPU and all the I/O devices
 ///
-class H89_IO
+///
+class H89_IO: public IOBus
 {
   public:
     H89_IO();
-    ~H89_IO();
+    virtual ~H89_IO();
 
     std::vector<DiskController*>& getDiskDevices();
-    bool addDiskDevice(DiskController* device);
-    bool addDevice(IODevice* device);
-    bool removeDevice(IODevice* device);
-    void reset();
-
-    BYTE in(BYTE addr);
-    void out(BYTE addr,
-             BYTE val);
+    virtual bool addDiskDevice(DiskController* device);
 
   private:
-    IODevice*                    iodevices[256];
     std::vector<DiskController*> dsk_devs;
+
 };
 
 #endif // H89_IO_H_

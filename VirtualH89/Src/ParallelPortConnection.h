@@ -10,7 +10,6 @@
 #define PARALLELPORTCONNECTION_H_
 
 #include "h89Types.h"
-#include "config.h"
 
 class ParallelLink;
 

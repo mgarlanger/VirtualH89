@@ -57,9 +57,13 @@ class Track
 
     void dump();
 
+    Sector* findSector(BYTE sector);
+
     bool readSectorData(BYTE  sector,
                         WORD  pos,
                         BYTE& data);
+    BYTE getMaxSectors();
+
 };
 
 #endif // TRACK_H_

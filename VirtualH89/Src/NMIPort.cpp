@@ -7,11 +7,13 @@
 
 #include "NMIPort.h"
 
-#include "H89.h"
 #include "logger.h"
+#include "cpu.h"
 
-NMIPort::NMIPort(BYTE base,
-                 BYTE size): IODevice(base, size)
+NMIPort::NMIPort(CPU* cpu,
+                 BYTE base,
+                 BYTE size): IODevice(base, size),
+                             cpu_m(cpu)
 {
 
 }
@@ -25,7 +27,7 @@ NMIPort::in(BYTE addr)
 {
     debugss(ssIO, INFO, "In: %d\n", addr);
 
-    h89.raiseNMI();
+    cpu_m->raiseNMI();
     /// \todo Determine the right value to return.
 
     return (0xff);
@@ -36,5 +38,5 @@ NMIPort::out(BYTE addr,
              BYTE val)
 {
     debugss(ssIO, INFO, "Out: %d\n", addr);
-    h89.raiseNMI();
+    cpu_m->raiseNMI();
 }

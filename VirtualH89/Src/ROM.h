@@ -7,7 +7,6 @@
 #ifndef ROM_H_
 #define ROM_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 /// \brief  Virtual %ROM

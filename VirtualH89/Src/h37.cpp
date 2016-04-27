@@ -6,34 +6,50 @@
 
 #include "h37.h"
 
-#include "H89.h"
 #include "logger.h"
 #include "DiskDrive.h"
 #include "wd1797.h"
+#include "SoftSectoredDisk.h"
+#include "InterruptController.h"
+#include "GenericFloppyDrive.h"
+#include "SectorFloppyImage.h"
+#include "computer.h"
+
+#include "IMDFloppyDisk.h"
 
 
-Z_89_37::Z_89_37(int baseAddr): DiskController(baseAddr, H37_NumPorts_c),
-                                interfaceReg_m(0),
-                                controlReg_m(0),
-                                motorOn_m(false),
-                                dataReady_m(false),
-                                lostDataStatus_m(false),
-                                sectorTrackAccess_m(false),
-                                dataEncoding_m(FM),
-                                curDiskDrive_m(numDisks_c),
-                                intLevel_m(z_89_37_Intr_c),
-                                curPos_m(0),
-                                sectorPos_m(-10),
-                                intrqAllowed_m(false),
-                                drqAllowed_m(false),
-                                cycleCount_m(0)
+
+Z_89_37::Z_89_37(Computer*            computer,
+                 int                  baseAddr,
+                 InterruptController* ic): DiskController(baseAddr, H37_NumPorts_c),
+                                           computer_m(computer),
+                                           ic_m(ic),
+                                           interfaceReg_m(0),
+                                           controlReg_m(0),
+                                           motorOn_m(false),
+                                           dataReady_m(false),
+                                           lostDataStatus_m(false),
+                                           sectorTrackAccess_m(false),
+                                           dataEncoding_m(FM),
+                                           curDiskDrive_m(numDisks_c),
+                                           intLevel_m(z_89_37_Intr_c),
+                                           curPos_m(0),
+                                           sectorPos_m(-10),
+                                           intrqAllowed_m(false),
+                                           drqAllowed_m(false),
+                                           cycleCount_m(0)
 {
-    // wd1797 = new WD1797;
+    wd1797               = new WD1797(this);
 
-    drives_m[ds0] = nullptr;
-    drives_m[ds1] = nullptr;
-    drives_m[ds2] = nullptr;
-    drives_m[ds3] = nullptr;
+    drives_m[ds0]        = nullptr;
+    drives_m[ds1]        = nullptr;
+    drives_m[ds2]        = nullptr;
+    drives_m[ds3]        = nullptr;
+    genericDrives_m[ds0] = nullptr;
+    genericDrives_m[ds1] = nullptr;
+    genericDrives_m[ds2] = nullptr;
+    genericDrives_m[ds3] = nullptr;
+
 }
 
 Z_89_37::~Z_89_37()
@@ -44,7 +60,7 @@ Z_89_37::~Z_89_37()
 void
 Z_89_37::reset(void)
 {
-    interfaceReg_m      = 0;
+/*    interfaceReg_m      = 0;
     controlReg_m        = 0;
     sectorTrackAccess_m = false;
     dataEncoding_m      = FM;
@@ -62,6 +78,87 @@ Z_89_37::reset(void)
     drives_m[ds1]       = nullptr;
     drives_m[ds2]       = nullptr;
     drives_m[ds3]       = nullptr;
+ */
+    interfaceReg_m      = 0;
+    controlReg_m        = 0;
+    sectorTrackAccess_m = false;
+    intrqAllowed_m      = false;
+    drqAllowed_m        = false;
+    motorOn_m           = false;
+    dataReady_m         = false;
+    lostDataStatus_m    = false;
+    wd1797->reset();
+
+}
+
+
+Z_89_37*
+Z_89_37::install_H37(Computer*                   computer,
+                     BYTE                        baseAddr,
+                     InterruptController*        ic,
+                     PropertyUtil::PropertyMapT& props,
+                     std::string                 slot)
+{
+    std::string                   s;
+    Z_89_37*                      z37 = new Z_89_37(computer, baseAddr, ic);
+
+    debugss(ssH37, INFO, "entering\n");
+
+    for (BYTE i = 0; i < numDisks_c; ++i)
+    {
+
+        std::string prop = "h37_drive";
+        prop += ('0' + i + 1);
+        s     = props[prop];
+
+        if (!s.empty())
+        {
+#if 1
+            GenericFloppyDrive* drive = GenericFloppyDrive::getInstance(s);
+            if (drive)
+            {
+
+                z37->connectDrive(i, drive);
+
+                prop  = "h37_disk";
+                prop += ('0' + i + 1);
+                s     = props[prop];
+
+                if (!s.empty())
+                {
+                    /*SoftSectoredDisk* disk = new SoftSectoredDisk(
+                                                                  s.c_str(), SoftSectoredDisk::dif_RAW);
+                       drive->insertDisk(disk);*/
+                    drive->insertDisk(IMDFloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
+                }
+
+            }
+
+#else
+            DiskDrive* drive = DiskDrive::getInstance(s);
+            if (drive)
+            {
+
+                z37->connectDrive(i, drive);
+                prop  = "z37_disk";
+                prop += ('0' + i + 1);
+                s     = props[prop];
+
+                s     = props["z37_disk1"];
+
+                if (!s.empty())
+                {
+                    SoftSectoredDisk* disk = new SoftSectoredDisk(
+                        s.c_str(), SoftSectoredDisk::dif_RAW);
+                    drive->insertDisk(disk);
+                }
+
+            }
+#endif
+        }
+    }
+
+    return z37;
 }
 
 BYTE
@@ -70,17 +167,17 @@ Z_89_37::in(BYTE addr)
     BYTE offset = getPortOffset(addr);
     BYTE val    = 0;
 
-    debugss(ssH37, ALL, "H37::in(%d)\n", addr);
+    debugss(ssH37, ALL, "(%d)\n", addr);
 
     switch (offset)
     {
         case ControlPort_Offset_c:
-            debugss(ssH37, INFO, "H37::in(ControlPort)");
+            debugss(ssH37, INFO, "(ControlPort) - %d\n", controlReg_m);
             val = controlReg_m;
             break;
 
         case InterfaceControl_Offset_c:
-            debugss(ssH37, INFO, "H37::in(InterfaceControl)");
+            debugss(ssH37, INFO, "(InterfaceControl) - %d\n", sectorTrackAccess_m);
 
             if (sectorTrackAccess_m)
             {
@@ -92,14 +189,13 @@ Z_89_37::in(BYTE addr)
         case StatusPort_Offset_c:
             if (sectorTrackAccess_m)
             {
-                debugss(ssH37, INFO, "H37::in(SectorPort)");
-                val = wd1797->in(SectorPort_Offset_c);
+                debugss(ssH37, INFO, "(SectorPort)\n");
+                val = wd1797->in(WD1797::SectorPort_Offset_c);
             }
             else
             {
-                debugss(ssH37, INFO, "H37::in(StatusPort)");
-                val = wd1797->in(StatusPort_Offset_c);
-                // lowerIntrq();
+                debugss(ssH37, INFO, "(StatusPort)\n");
+                val = wd1797->in(WD1797::StatusPort_Offset_c);
             }
 
             break;
@@ -107,25 +203,24 @@ Z_89_37::in(BYTE addr)
         case DataPort_Offset_c:
             if (sectorTrackAccess_m)
             {
-                debugss(ssH37, INFO, "H37::in(TrackPort)");
-                val = wd1797->in(TrackPort_Offset_c);
+                debugss(ssH37, INFO, "(TrackPort)\n");
+                val = wd1797->in(WD1797::TrackPort_Offset_c);
             }
             else
             {
-                debugss(ssH37, INFO, "H37::in(DataPort)");
-                val = wd1797->in(DataPort_Offset_c);
+                debugss(ssH37, INFO, "(DataPort)\n");
+                val = wd1797->in(WD1797::DataPort_Offset_c);
 
             }
 
             break;
 
         default:
-            debugss(ssH37, ERROR, "H37::in(Unknown - 0x%02x)", addr);
+            debugss(ssH37, ERROR, "(Unknown - 0x%02x)", addr);
             break;
 
     }
 
-    debugss_nts(ssH37, INFO, " - %d(0x%x)\n", val, val);
     return (val);
 }
 
@@ -133,14 +228,14 @@ void
 Z_89_37::out(BYTE addr,
              BYTE val)
 {
-    BYTE offset = getPortOffset(addr);
+    debugss(ssH37, ALL, "(%d, %d (0x%x))\n", addr, val, val);
 
-    debugss(ssH37, ALL, "H37::out(%d, %d (0x%x))\n", addr, val, val);
+    BYTE offset = getPortOffset(addr);
 
     switch (offset)
     {
         case ControlPort_Offset_c:
-            debugss(ssH37, INFO, "H37::out(ControlPort)");
+            debugss(ssH37, INFO, "(ControlPort)");
             controlReg_m = val;
 
             if (val & ctrl_EnableIntReq_c)
@@ -158,6 +253,7 @@ Z_89_37::out(BYTE addr,
             {
                 debugss_nts(ssH37, INFO, " EnableDrqInt");
                 drqAllowed_m = true;
+
             }
             else
             {
@@ -175,6 +271,7 @@ Z_89_37::out(BYTE addr,
                 dataEncoding_m = FM;
             }
 
+            motorOn(val & ctrl_MotorsOn_c);
             if (val & ctrl_MotorsOn_c)
             {
                 debugss_nts(ssH37, INFO, " MotorsOn");
@@ -210,10 +307,13 @@ Z_89_37::out(BYTE addr,
             }
 
             debugss_nts(ssH37, INFO, "\n");
+
+            ic_m->blockInterrupts(drqAllowed_m);
+
             break;
 
         case InterfaceControl_Offset_c:
-            debugss(ssH37, INFO, "H37::out(InterfaceControl) - ");
+            debugss(ssH37, INFO, "(InterfaceControl) - ");
 
             interfaceReg_m = val;
 
@@ -233,14 +333,14 @@ Z_89_37::out(BYTE addr,
         case CommandPort_Offset_c:
             if (sectorTrackAccess_m)
             {
-                debugss(ssH37, INFO, "H37::out(SectorPort): %d\n", val);
+                debugss(ssH37, INFO, "(SectorPort): %d\n", val);
 
-                wd1797->out(SectorPort_Offset_c, val);
+                wd1797->out(WD1797::SectorPort_Offset_c, val);
             }
             else
             {
-                debugss(ssH37, INFO, "H37::out(CommandPort): %d\n", val);
-                wd1797->out(CommandPort_Offset_c, val);
+                debugss(ssH37, INFO, "(CommandPort): %d\n", val);
+                wd1797->out(WD1797::CommandPort_Offset_c, val);
 
             }
 
@@ -249,21 +349,48 @@ Z_89_37::out(BYTE addr,
         case DataPort_Offset_c:
             if (sectorTrackAccess_m)
             {
-                debugss(ssH37, INFO, "H37::out(TrackPort): %d\n", val);
-                wd1797->out(TrackPort_Offset_c, val);
+                debugss(ssH37, INFO, "(TrackPort): %d\n", val);
+                wd1797->out(WD1797::TrackPort_Offset_c, val);
             }
             else
             {
-                debugss(ssH37, INFO, "H37::out(DataPort): %d\n", val);
-                wd1797->out(DataPort_Offset_c, val);
+                debugss(ssH37, INFO, "(DataPort): %d\n", val);
+                wd1797->out(WD1797::DataPort_Offset_c, val);
             }
 
             break;
 
         default:
-            debugss(ssH37, ERROR, "H37::out(Unknown - 0x%02x): %d\n", addr, val);
+            debugss(ssH37, ERROR, "(Unknown - 0x%02x): %d\n", addr, val);
             break;
     }
+}
+
+void
+Z_89_37::motorOn(bool motor)
+{
+    if (motor != motorOn_m)
+    {
+        motorOn_m = motor;
+        for (int drive = ds0; drive < numDisks_c; drive++)
+        {
+            if (genericDrives_m[drive])
+            {
+                genericDrives_m[drive]->motor(motorOn_m);
+            }
+        }
+    }
+}
+
+
+GenericFloppyDrive*
+Z_89_37::getCurrentDrive()
+{
+    if (curDiskDrive_m < numDisks_c)
+    {
+        return genericDrives_m[curDiskDrive_m];
+    }
+    return nullptr;
 }
 
 
@@ -296,6 +423,34 @@ Z_89_37::connectDrive(BYTE       unitNum,
 }
 
 bool
+Z_89_37::connectDrive(BYTE                unitNum,
+                      GenericFloppyDrive* drive)
+{
+    bool retVal = false;
+
+    debugss(ssH37, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
+
+    if (unitNum < numDisks_c)
+    {
+        if (genericDrives_m[unitNum] == 0)
+        {
+            genericDrives_m[unitNum] = drive;
+            retVal                   = true;
+        }
+        else
+        {
+            debugss(ssH37, ERROR, "drive already connect\n");
+        }
+    }
+    else
+    {
+        debugss(ssH37, ERROR, "Invalid unit number (%d)\n", unitNum);
+    }
+
+    return (retVal);
+}
+
+bool
 Z_89_37::removeDrive(BYTE unitNum)
 {
 
@@ -310,7 +465,8 @@ Z_89_37::raiseIntrq()
 
     if (intrqAllowed_m)
     {
-        h89.raiseINT(z_89_37_Intr_c);
+        ic_m->setIntrq(true);
+        computer_m->continueCPU();
         return;
     }
 }
@@ -323,8 +479,8 @@ Z_89_37::raiseDrq()
     // check if DRQ is allowed.
     if (drqAllowed_m)
     {
-//      h89.raiseINT(z_89_37_Intr_c);
-        h89.continueCPU();
+        ic_m->setDrq(true);
+        computer_m->continueCPU();
         return;
     }
 
@@ -337,10 +493,9 @@ Z_89_37::lowerIntrq()
 {
     debugss(ssH37, INFO, "\n");
 
-    if (!intrqAllowed_m)
+    if (1) // (!intrqAllowed_m)
     {
-        h89.lowerINT(z_89_37_Intr_c);
-        return;
+        ic_m->setIntrq(false);
     }
 }
 
@@ -349,10 +504,28 @@ Z_89_37::lowerDrq()
 {
     debugss(ssH37, INFO, "\n");
 
-    if (!drqAllowed_m)
+    if (1) // (!drqAllowed_m)
     {
-//        h89.lowerINT(z_89_37_Intr_c);
-        return;
+        ic_m->setDrq(false);
     }
 
+}
+
+bool
+Z_89_37::doubleDensity()
+{
+    debugss(ssH37, ALL, "\n");
+
+    return dataEncoding_m == MFM;
+}
+
+bool
+Z_89_37::readReady()
+{
+    return true;
+}
+
+int
+Z_89_37::getClockPeriod() {
+    return 1000;
 }

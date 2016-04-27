@@ -8,7 +8,6 @@
 
 #include "WallClock.h"
 
-#include "config.h"
 #include "ClockUser.h"
 #include "logger.h"
 #include <cstddef>
@@ -41,7 +40,6 @@ WallClock::instance(void)
 void
 WallClock::addTimerEvent()
 {
-#if TWOMSEC
 
     /// \todo Properly handle other CPU Speeds.
     if (ticks_m > 4096)
@@ -56,10 +54,7 @@ WallClock::addTimerEvent()
         clock_m += 4096;
     }
 
-#else
-    clock_m += 4096 * 5;
-#endif
-    ticks_m  = 0;
+    ticks_m = 0;
 }
 
 void

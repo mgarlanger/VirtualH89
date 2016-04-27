@@ -9,13 +9,14 @@
 
 #include "ClockUser.h"
 
+#include "WallClock.h"
 
 ClockUser::ClockUser()
 {
-
+    WallClock::instance()->registerUser(this);
 }
 
 ClockUser::~ClockUser()
 {
-
+    WallClock::instance()->unregisterUser(this);
 }

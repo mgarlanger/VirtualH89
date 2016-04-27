@@ -26,6 +26,10 @@
 
 #include "ascii.h"
 
+
+// \TODO make this run-time config.
+#define CONSOLE_LOG 1
+
 static pthread_mutex_t h19_mutex;
 
 H19*                   H19::h19;
@@ -94,7 +98,6 @@ H19::initGl()
     glEndList();
 }
 
-#define CURSOR 1
 
 // GLUT routine used to redisplay the screen when needed.
 
@@ -123,17 +126,11 @@ H19::display()
     glPopAttrib();
     glEnable(GL_COLOR_LOGIC_OP);
 
-#if CURSOR
-
     if ((!cursorOff) && (curCursor))
     {
-#if 0
-        glRasterPos2i(PosX * 8, (24 - PosY) * 20);
-#else
 
         glRasterPos2i(min(PosX, 79) * 8, (24 - PosY) * 20);
 
-#endif
         glPushAttrib(GL_LIST_BIT);
         //  glEnable(GL_COLOR_LOGIC_OP);
         glLogicOp(GL_COPY);
@@ -142,8 +139,6 @@ H19::display()
         glCallLists(1, GL_UNSIGNED_INT, &cursor);
         glPopAttrib();
     }
-
-#endif
 
     glLogicOp(GL_COPY);
     glutSwapBuffers();

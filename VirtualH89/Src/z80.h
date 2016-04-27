@@ -20,7 +20,9 @@
 #include "cpu.h"
 #include "GppListener.h"
 
+class Computer;
 class AddressBus;
+class IOBus;
 
 ///
 /// \brief  Zilog %Z80 %CPU simulator.
@@ -37,6 +39,7 @@ class Z80: public CPU, public GppListener
 
     void systemMutexCycle();
     // data
+    Computer* computer_m;
 
     // Registers
 
@@ -118,6 +121,7 @@ class Z80: public CPU, public GppListener
     int                   lastInstTicks;
 
     AddressBus*           ab_m;
+    IOBus*                io_m;
 
     static const int      maxNumInst = 4;
     BYTE                  curInst[maxNumInst];
@@ -151,7 +155,9 @@ class Z80: public CPU, public GppListener
     static const BYTE         z80_gppSpeedSelBit_c = 0b00010000;
 
   public:
-    Z80(int clockRate, int ticksPerSecond);
+    Z80(Computer* computer,
+        int       clockRate,
+        int       ticksPerSecond);
     virtual ~Z80();
 
     std::string dumpDebug();
@@ -167,6 +173,7 @@ class Z80: public CPU, public GppListener
     virtual void raiseNMI(void);
     virtual void addClockTicks(void);
     virtual void setAddressBus(AddressBus* ab);
+    virtual void setIOBus(IOBus* io);
     virtual void setSpeedup(int factor);
     virtual void enableFast();
 
@@ -251,7 +258,8 @@ class Z80: public CPU, public GppListener
     void SET_FLAGS(BYTE flags);
     void CLEAR_FLAGS(BYTE flags);
     bool CHECK_FLAGS(BYTE flags);
-    void UPDATE_FLAGS(BYTE setFlags, BYTE clearFlags);
+    void UPDATE_FLAGS(BYTE setFlags,
+                      BYTE clearFlags);
     void COND_FLAGS(bool cond,
                     BYTE flags);
     void SET_ZSP_FLAGS(BYTE val);
@@ -277,7 +285,7 @@ class Z80: public CPU, public GppListener
     const int Intr_INT = 0x02;
 
     // operation of simulated CPU
-    
+
     enum
     {
         STOPPED_C     = 0,
@@ -286,7 +294,7 @@ class Z80: public CPU, public GppListener
         SINGLE_STEP_C = 3,
         POWEROFF_C    = 255
     };
-    
+
 
     /// \todo - move this outside of the z80 class.
     unsigned int speedUpFactor_m;
@@ -299,7 +307,8 @@ class Z80: public CPU, public GppListener
     //  This routines share common code and are inlined to help avoid performance
     // impact.
     //
-    inline void op_add_reg16(WORD &, WORD);
+    inline void op_add_reg16(WORD &,
+                             WORD);
     inline void op_and(const BYTE);
     inline void op_or(const BYTE);
     inline void op_xor(const BYTE);

@@ -16,6 +16,8 @@
 #include "z80.h"
 #include "AddressBus.h"
 #include "InterruptController.h"
+#include "H37InterruptController.h"
+#include "MMS316IntrCtrlr.h"
 #include "h89-timer.h"
 #include "h89-io.h"
 #include "NMIPort.h"
@@ -27,7 +29,6 @@
 #include "Z47Controller.h"
 #include "mms77316.h"
 #include "mms77320.h"
-#include "RawFloppyImage.h"
 #include "ParallelLink.h"
 #include "h-17-1.h"
 #include "h-17-4.h"
@@ -93,25 +94,26 @@ H89::buildSystem(Console* console)
     // TODO: use properties to configure rest of hardware.
     // Possibly set defaults and write/create file.
 
-    cpu                 = new Z80(cpuClockRate_c, clockInterruptPerSecond_c);
-    interruptController = new InterruptController(cpu);
-    ab                  = new AddressBus(interruptController);
-    cpu->setAddressBus(ab);
-    timer               = new H89Timer(cpu);
-    h89io               = new H89_IO;
+    interruptController = nullptr;
+    ab                  = nullptr;
 
-    nmi1                = new NMIPort(NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
-    nmi2                = new NMIPort(NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
-    s                   = props["sw501"];
+
+    cpu                 = new Z80(this, cpuClockRate_c, clockInterruptPerSecond_c);
+    h89io               = new H89_IO;
+    cpu->setIOBus(h89io);
+
+
+    s = props["sw501"];
 
     if (!s.empty())
     {
-        gpp = new GeneralPurposePort(s);
+        gpp = new GeneralPurposePort(this, s);
     }
     else
     {
-        gpp = new GeneralPurposePort();
+        gpp = new GeneralPurposePort(this);
     }
+    h89io->addDevice(gpp);
 
     monitorROM = NULL;
     s          = props["monitor_rom"];
@@ -123,15 +125,9 @@ H89::buildSystem(Console* console)
 
     if (monitorROM == NULL)
     {
-#if MTR90
         monitorROM = new ROM(4096);
         monitorROM->setBaseAddress(0);
         monitorROM->initialize(&MTR90_2_ROM[0], 4096);
-#else
-        monitorROM = new ROM(2048);
-        monitorROM->setBaseAddress(0);
-        monitorROM->initialize(&MTR89_ROM[0], 2048);
-#endif
     }
 
     h17ROM = new ROM(2048);
@@ -142,6 +138,7 @@ H89::buildSystem(Console* console)
     bool                     have16K      = false;
     bool                     haveMMS77318 = false;
     // in reality, only P503 can contain the 16K/128K add-on board.
+    // \todo make sure only one is specified and it's on P503.
     for (int x = 0; x < memslots.size(); ++x)
     {
         s = props[memslots[x]];
@@ -156,28 +153,27 @@ H89::buildSystem(Console* console)
             haveMMS77318 = true;
         }
     }
-    int speedup = 0;
+
+    // default to no speedup.
+    unsigned long speedup = 0;
     s = props["z80_speedup_option"];
     if (!s.empty())
     {
         speedup = strtoul(s.c_str(), NULL, 10);
-        if (speedup < 0 || speedup > 40)
+        if (speedup > 40)
         {
             debugss(ssH89, ERROR, "Illegal CPU speedup factor %d, disabling\n", speedup);
             speedup = 0;
         }
         else if (haveMMS77318)
         {
-            debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n", speedup);
+            debugss(ssH89, ERROR, "CPU speedup incompatible with MMS77318, disabling\n");
             speedup = 0;
         }
     }
-    if (speedup > 0)
+    if ((speedup > 1) && (!haveMMS77318))
     {
-        cpu->setSpeedup(speedup);
-    }
-    if (!haveMMS77318)
-    {
+        cpu->setSpeedup((unsigned) speedup);
         cpu->enableFast();
     }
 
@@ -191,23 +187,9 @@ H89::buildSystem(Console* console)
     // \TODO Allow for 16K/32K  - also support ORG-0 with less than 64k
     MemoryLayout*  h89_0 = new H88MemoryLayout(HDOS); // creates 48K RAM at 0x2000...
 
-    if (have16K)
-    {
-        memDecoder = new H89MemoryDecoder(h89_0);
-    }
-    else if (haveMMS77318)
-    {
-        memDecoder = new MMS77318MemoryDecoder(h89_0);
-    }
-    else
-    {
-        memDecoder = new H88MemoryDecoder(h89_0);
-    }
-
-    ab->installMemory(memDecoder);
 
     // H17
-    H17* h17 = nullptr;
+    H17*           h17 = nullptr;
     driveUnitH0 = nullptr;
     driveUnitH1 = nullptr;
     driveUnitH2 = nullptr;
@@ -232,9 +214,15 @@ H89::buildSystem(Console* console)
     eight0      = nullptr;
     eight1      = nullptr;
 
-    MMS77316*                m316      = NULL;
-    MMS77320*                m320      = NULL;
-    CPNetDevice*             cpn       = CPNetDevice::install_CPNetDevice(props);
+    MMS77316*                m316 = NULL;
+    MMS77320*                m320 = NULL;
+    CPNetDevice*             cpn  = CPNetDevice::install_CPNetDevice(props);
+
+    if (cpn != NULL)
+    {
+        h89io->addDevice(cpn);
+    }
+
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
     std::vector<std::string> devslots  = {"slot_p504", "slot_p505", "slot_p506"};
@@ -247,65 +235,49 @@ H89::buildSystem(Console* console)
 
         if (s.compare("MMS77316") == 0)
         {
-            m316      = MMS77316::install_MMS77316(props, devslots[x]);
+            interruptController = new MMS316IntrCtrlr(cpu);
+            m316                = MMS77316::install_MMS77316(interruptController,
+                                                             props,
+                                                             devslots[x]);
+            h89io->addDiskDevice(m316);
             dev_slots = true;
         }
-
         else if (s.compare("MMS77320") == 0)
         {
             // Also includes (auxiliary) serial ports... TODO
             m320 = MMS77320::install_MMS77320(props, devslots[x]);
+            h89io->addDiskDevice(m320);
         }
-
         else if (s.compare("H17") == 0)
         {
+            // TODO - should only support slot p506
             h17       = H17::install_H17(H17_BaseAddress_c, props, devslots[x]);
             h89io->addDiskDevice(h17);
+
             dev_slots = true;
 
         }
         else if (s.compare("H37") == 0)
         {
-            h37         = new Z_89_37(H37_BasePort_c);
-            // create the floppy drives for the soft-sectored controller.
-            driveUnitS0 = new H_17_1;
-            driveUnitS1 = new H_17_1;
-            driveUnitS2 = new H_17_1;
-            driveUnitS3 = new H_17_1;
+            // TODO make sure only one of H37 or MMS77316 is configured.
+            interruptController = new H37InterruptController(cpu);
 
-            s           = props["z37_disk1"];
+            // TODO - should only be supported on p504 (and maybe p505 - check schematics)
+            h37                 = Z_89_37::install_H37(this,
+                                                       H37_BaseAddress_c,
+                                                       interruptController,
+                                                       props,
+                                                       devslots[x]);
+            h89io->addDiskDevice(h37);
 
-            if (s.empty())
-            {
-                s = "diskA.softdisk";
-            }
-
-            soft0 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-            s     = props["z37_disk2"];
-
-            if (s.empty())
-            {
-                s = "diskB.softdisk";
-            }
-
-            soft1 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-            s     = props["z37_disk3"];
-
-            if (s.empty())
-            {
-                s = "diskC.softdisk";
-            }
-
-            soft2 = new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
-            soft3 = 0;
-            //    s = props["z37_disk4"];
-            //    if (s.empty()) s = "diskD.softdisk";
-            //    soft3 = 0; new SoftSectoredDisk(s.c_str(), SoftSectoredDisk::dif_RAW);
+            dev_slots = true;
         }
         else if (s.compare("H47") == 0)
         {
-            // TODO select port based on slot
-            z47If    = new Z47Interface(Z47_BasePort1_c);
+            // select port based on slot - p504 -> 0170 p506 -> 0174
+            z47If    = new Z47Interface(devslots[x].compare("slot_p506") == 0 ?
+                                        Z47_BaseAddress_2_c : Z47_BaseAddress_1_c);
+
             z47Cntrl = new Z47Controller();
             z47Link  = new ParallelLink();
 
@@ -332,7 +304,51 @@ H89::buildSystem(Console* console)
             eight1 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
 
         }
+        else if (s.compare("H_88_3") == 0)
+        {
+            // 3-port serial board
+            // \todo make sure it's on P504 or P505.
+            lpPort    = new INS8250(this, Serial_LpPort_c);
+            modemPort = new INS8250(this, Serial_ModemPort_c);
+            auxPort   = new INS8250(this, Serial_AuxPort_c);
+
+            h89io->addDevice(lpPort);
+            h89io->addDevice(auxPort);
+            h89io->addDevice(modemPort);
+
+            ser_slots = true;
+        }
     }
+
+    // if no interrupt created with the soft-sectored controllers, create the default one
+    if (interruptController == nullptr)
+    {
+        interruptController = new InterruptController(cpu);
+    }
+
+    ab    = new AddressBus(interruptController);
+    cpu->setAddressBus(ab);
+    timer = new H89Timer(this, cpu);
+
+    nmi1  = new NMIPort(cpu, NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
+    nmi2  = new NMIPort(cpu, NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
+    h89io->addDevice(nmi1);
+    h89io->addDevice(nmi2);
+
+    if (have16K)
+    {
+        memDecoder = new H89MemoryDecoder(h89_0);
+    }
+    else if (haveMMS77318)
+    {
+        memDecoder = new MMS77318MemoryDecoder(h89_0);
+    }
+    else
+    {
+        memDecoder = new H88MemoryDecoder(h89_0);
+    }
+
+    ab->installMemory(memDecoder);
 
     if (!dev_slots)
     {
@@ -381,40 +397,22 @@ H89::buildSystem(Console* console)
 
     }
 
-    h89io->addDevice(gpp);
-    h89io->addDevice(nmi1);
-    h89io->addDevice(nmi2);
 
     // Serial Ports.
-    consolePort = new INS8250(Serial_Console_c, Serial_Console_Interrupt_c);
+    consolePort = new INS8250(this, Serial_Console_c, Serial_Console_Interrupt_c);
     consolePort->attachDevice(console);
 
     h89io->addDevice(consolePort);
 
     if (!ser_slots)
     {
-        lpPort    = new INS8250(Serial_LpPort_c);
-        modemPort = new INS8250(Serial_ModemPort_c);
-        auxPort   = new INS8250(Serial_AuxPort_c);
+        lpPort    = new INS8250(this, Serial_LpPort_c);
+        modemPort = new INS8250(this, Serial_ModemPort_c);
+        auxPort   = new INS8250(this, Serial_AuxPort_c);
 
         h89io->addDevice(lpPort);
         h89io->addDevice(auxPort);
         h89io->addDevice(modemPort);
-    }
-
-    if (cpn != NULL)
-    {
-        h89io->addDevice(cpn);
-    }
-
-    if (m316 != NULL)
-    {
-        h89io->addDiskDevice(m316);
-    }
-
-    if (m320 != NULL)
-    {
-        h89io->addDiskDevice(m320);
     }
 
 }
@@ -447,7 +445,7 @@ void
 H89::reset()
 {
     cpu->reset();
-    getAddressBus().reset();
+    ab->reset();
     console->reset(); // TODO: does H89 reset really also reset H19?
     h89io->reset();
     timer->reset();
@@ -498,14 +496,14 @@ void
 H89::raiseINT(int level)
 {
     debugss(ssH89, VERBOSE, "level - %d\n", level);
-    getAddressBus().getIntrCtrlr()->raiseInterrupt(level);
+    interruptController->raiseInterrupt(level);
 }
 
 void
 H89::lowerINT(int level)
 {
     debugss(ssH89, VERBOSE, "level - %d\n", level);
-    getAddressBus().getIntrCtrlr()->lowerInterrupt(level);
+    interruptController->lowerInterrupt(level);
 }
 
 void
@@ -535,12 +533,6 @@ H89::run()
     return (cpu->execute());
 }
 
-void
-H89::clearMemory(BYTE data)
-{
-    ab->clearMemory(data);
-}
-
 AddressBus&
 H89::getAddressBus()
 {
@@ -551,12 +543,6 @@ CPU&
 H89::getCPU()
 {
     return (*cpu);
-}
-
-GeneralPurposePort&
-H89::getGPP()
-{
-    return (*gpp);
 }
 
 std::string

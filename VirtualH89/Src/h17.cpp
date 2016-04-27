@@ -41,13 +41,23 @@ H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
         drives_m[i] = nullptr;
     }
 
-    WallClock::instance()->registerUser(this);
     GppListener::addListener(this);
 }
 
 H17::~H17()
 {
-    WallClock::instance()->unregisterUser(this);
+    for (BYTE i = 0; i < maxDiskDrive_c; ++i)
+    {
+
+        if (drives_m[i])
+        {
+            std::string diskName = "h17_saveDisk";
+            diskName += ('0' + i + 1);
+            diskName += ".rawdisk";
+
+            drives_m[i]->ejectDisk(diskName.c_str());
+        }
+    }
 }
 
 
@@ -95,7 +105,8 @@ H17::install_H17(BYTE                        baseAddr,
 
 
 void
-H17::gppNewValue(BYTE gpo) {
+H17::gppNewValue(BYTE gpo)
+{
     selectSide((gpo & h17_gppSideSelectBit_c) ? 1 : 0);
 }
 
@@ -271,19 +282,19 @@ H17::out(BYTE addr,
             if (val & DriveSelect0_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS0");
-                
+
                 curDrive_m = ds0;
             }
             else if (val & DriveSelect1_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS1");
-                
+
                 curDrive_m = ds1;
             }
             else if (val & DriveSelect2_Ctrl)
             {
                 debugss_nts(ssH17, INFO, " DS2");
-                
+
                 curDrive_m = ds2;
             }
             else
@@ -509,13 +520,13 @@ H17::notification(unsigned int cycleCount)
                 receiverOverrun_m = true;
             }
 
-            data                     = drives_m[curDrive_m]->readData(curCharPos_m);
+            data = drives_m[curDrive_m]->readData(curCharPos_m);
 
             debugss(ssH17, ALL, "Reading - Pos: %ld Data: %d\n", curCharPos_m, data);
-            
+
             receiverOutputRegister_m = data;
             receiveDataAvail_m       = true;
-            
+
             break;
 
         case writingState:

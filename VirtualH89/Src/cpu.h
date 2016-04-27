@@ -10,10 +10,10 @@
 
 #include <string>
 
-#include "config.h"
 #include "h89Types.h"
 
 class AddressBus;
+class IOBus;
 
 ///
 /// \brief  Abstract processor.
@@ -40,6 +40,7 @@ class CPU
     virtual void raiseINT(void)                = 0;
     virtual void lowerINT(void)                = 0;
     virtual void raiseNMI(void)                = 0;
+    virtual void setIOBus(IOBus* io)           = 0;
     virtual void setAddressBus(AddressBus* ab) = 0;
     virtual void continueRunning(void)         = 0;
     virtual void waitState(void)               = 0;

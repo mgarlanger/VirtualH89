@@ -8,9 +8,15 @@
 #define Z_89_37_H_
 
 #include "DiskController.h"
+#include "WD179xUserIf.h"
 
+#include "propertyutil.h"
+
+class GenericFloppyDrive;
 class DiskDrive;
 class WD1797;
+class InterruptController;
+class Computer;
 
 ///
 /// \brief Virtual soft-sectored disk controller
@@ -20,18 +26,28 @@ class WD1797;
 ///
 /// The Z-89-37 uses the 1797-02 controller.
 ///
-class Z_89_37: public DiskController
+class Z_89_37: public DiskController, WD179xUserIf
 {
   public:
-    Z_89_37(int baseAddr);
+    Z_89_37(Computer* computer, int baseAddr, InterruptController* ic);
     virtual ~Z_89_37();
 
+    static Z_89_37* install_H37(Computer*                   computer,
+                                BYTE                        baseAddr,
+                                InterruptController*        ic,
+                                PropertyUtil::PropertyMapT& props,
+                                std::string                 slot);
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr,
                      BYTE val);
 
     virtual bool connectDrive(BYTE       unitNum,
                               DiskDrive* drive);
+    virtual bool connectDrive(BYTE                unitNum,
+                              GenericFloppyDrive* drive);
+
+    virtual GenericFloppyDrive* getCurrentDrive();
+
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void reset(void);
@@ -59,11 +75,23 @@ class Z_89_37: public DiskController
     {
         return "";
     }
+    virtual void raiseIntrq();
+    virtual void raiseDrq();
+    virtual void lowerIntrq();
+    virtual void lowerDrq();
+    virtual bool doubleDensity();
+    virtual bool readReady();
+    // virtual void loadHead(bool load);
+    virtual int getClockPeriod();
 
   private:
-    WD1797*           wd1797;
+    void motorOn(bool motor);
 
-    static const BYTE H37_NumPorts_c = 4;
+    Computer*            computer_m;
+    WD1797*              wd1797;
+    InterruptController* ic_m;
+
+    static const BYTE    H37_NumPorts_c = 4;
 
     ///
     /// DK.PORT  - 0170 (0x78) base port.
@@ -114,29 +142,25 @@ class Z_89_37: public DiskController
         numDisks_c = 4
     };
 
-    bool               sectorTrackAccess_m;
+    bool                sectorTrackAccess_m;
 
-    Encoding           dataEncoding_m;
-    DiskDrive*         drives_m[numDisks_c];
-    Disks              curDiskDrive_m;
+    Encoding            dataEncoding_m;
+    DiskDrive*          drives_m[numDisks_c];
+    GenericFloppyDrive* genericDrives_m[numDisks_c];
+    Disks               curDiskDrive_m;
 
-    unsigned char      intLevel_m;
-    unsigned long int  curPos_m;
+    unsigned char       intLevel_m;
+    unsigned long int   curPos_m;
 
-    int                sectorPos_m;
+    int                 sectorPos_m;
 
-    bool               intrqAllowed_m;
-    bool               drqAllowed_m;
+    bool                intrqAllowed_m;
+    bool                drqAllowed_m;
 
-    unsigned long long cycleCount_m;
+    unsigned long long  cycleCount_m;
 
     void seekTo();
     void step(void);
-
-    void raiseIntrq();
-    void raiseDrq();
-    void lowerIntrq();
-    void lowerDrq();
 
 
     ///

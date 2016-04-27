@@ -15,11 +15,10 @@
 #include <string>
 #include <vector>
 
-#include "config.h"
 #include "h89Types.h"
 #include "GenericFloppyDisk.h"
-#include "GenericFloppyDrive.h"
-#include "GenericFloppyFormat.h"
+
+class GenericDiskDrive;
 
 /// \class SectorFloppyImage
 ///
@@ -35,6 +34,8 @@ class SectorFloppyImage: public GenericFloppyDisk
     bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data);
     bool writeData(BYTE track, BYTE side, BYTE sector, int inSector,
                    BYTE data, bool dataReady, int& result);
+    virtual BYTE getMaxSectors(BYTE sides,
+                               BYTE track);
     bool isReady();
     void eject(const char* name);
     void dump(void);

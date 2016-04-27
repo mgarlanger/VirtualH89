@@ -12,6 +12,8 @@
 
 #include "IODevice.h"
 
+class CPU;
+
 ///
 /// \brief Non-Maskable-Interrupt  (NMI) Port
 ///
@@ -22,7 +24,8 @@
 class NMIPort: public virtual IODevice
 {
   public:
-    NMIPort(BYTE base,
+    NMIPort(CPU* cpu,
+            BYTE base,
             BYTE size);
     virtual ~NMIPort();
 
@@ -32,6 +35,7 @@ class NMIPort: public virtual IODevice
     void reset() {
     }
   private:
+    CPU* cpu_m;
 
 };
 

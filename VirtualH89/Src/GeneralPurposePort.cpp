@@ -9,21 +9,25 @@
 
 #include <stdlib.h>
 
-#include "H89.h"
 #include "logger.h"
 #include "propertyutil.h"
 #include "GppListener.h"
+#include "computer.h"
 
-GeneralPurposePort::GeneralPurposePort(): IODevice(GPP_BaseAddress_c, GPP_NumPorts_c),
-                                          portBits_m(0)
+GeneralPurposePort::GeneralPurposePort(Computer* computer): IODevice(GPP_BaseAddress_c,
+                                                                     GPP_NumPorts_c),
+                                                            portBits_m(0),
+                                                            computer_m(computer)
 {
     dipsw_m = (Mtr89_MemoryTest_Off_c | Mtr89_Port170_Z_89_47_c);
 
 }
 
-GeneralPurposePort::GeneralPurposePort(std::string settings): IODevice(GPP_BaseAddress_c,
+GeneralPurposePort::GeneralPurposePort(Computer*   computer,
+                                       std::string settings): IODevice(GPP_BaseAddress_c,
                                                                        GPP_NumPorts_c),
-                                                              portBits_m(0)
+                                                              portBits_m(0),
+                                                              computer_m(computer)
 {
     // TODO: verify a binary string and/or handle other formats/nmenonics.
     dipsw_m = strtol(settings.c_str(), NULL, 2);
@@ -138,7 +142,7 @@ GeneralPurposePort::out(BYTE addr,
     if (verifyPort(addr))
     {
         // from the manual, writing to this port clears the interrupt.
-        h89.lowerINT(1);
+        computer_m->lowerINT(1);
         BYTE diffs = portBits_m ^ val;
         portBits_m = val;
 

@@ -16,6 +16,7 @@
 
 class GenericFloppyDrive;
 class GenericDiskDrive;
+class InterruptController;
 
 ///
 /// \brief Virtual soft-sectored disk controller
@@ -29,10 +30,11 @@ class MMS77316: public DiskController, WD1797
   public:
     static const int numDisks_c = 8;
 
-    MMS77316(int baseAddr);
+    MMS77316(int baseAddr, InterruptController* ic);
     virtual ~MMS77316();
 
-    static MMS77316* install_MMS77316(PropertyUtil::PropertyMapT& props,
+    static MMS77316* install_MMS77316(InterruptController*        ic,
+                                      PropertyUtil::PropertyMapT& props,
                                       std::string                 slot);
 
     virtual BYTE in(BYTE addr);
@@ -46,7 +48,7 @@ class MMS77316: public DiskController, WD1797
 
     virtual void reset(void);
 
-    static const BYTE MMS77316_Intr_c = 5; // INT5N
+    static const BYTE MMS77316_Intr_c = 5; // INT 5
 
     // TODO: implement this
     std::vector<GenericDiskDrive*> getDiskDrives();
@@ -58,8 +60,6 @@ class MMS77316: public DiskController, WD1797
     GenericDiskDrive* findDrive(std::string ident);
     std::string dumpDebug();
 
-    bool interResponder(BYTE& opCode);
-
   protected:
     static const char* MMS77316_Name_c;
 
@@ -69,26 +69,28 @@ class MMS77316: public DiskController, WD1797
     void lowerIntrq();
     void lowerDrq();
 
-    static const BYTE   MMS77316_NumPorts_c  = 8;
+    static const BYTE MMS77316_NumPorts_c  = 8;
 
-    static const BYTE   BasePort_c           = 0x38;
-    static const BYTE   ControlPort_Offset_c = 0;
-    static const BYTE   Wd1797_Offset_c      = 4;
-    BYTE                controlReg_m;
+    static const BYTE BasePort_c           = 0x38;
+    static const BYTE ControlPort_Offset_c = 0;
+    static const BYTE Wd1797_Offset_c      = 4;
+    BYTE              controlReg_m;
 
     GenericFloppyDrive* getCurDrive();
     int getClockPeriod();
-    GenericFloppyDrive* drives_m[numDisks_c];
 
-    unsigned char       intLevel_m;
-    int                 drqCount_m;
+    InterruptController* ic_m;
+    GenericFloppyDrive*  drives_m[numDisks_c];
+
+    unsigned char        intLevel_m;
+    int                  drqCount_m;
 
     /// Bits set in cmd_ControlPort_c
-    static const BYTE   ctrl_EnableIntReq_c     = 0x08;
-    static const BYTE   ctrl_EnableBurstN_c     = 0x20;
-    static const BYTE   ctrl_SetMFMRecordingN_c = 0x40;
-    static const BYTE   ctrl_DriveSel_c         = 0x07;
-    static const BYTE   ctrl_525DriveSel_c      = 0x04;
+    static const BYTE    ctrl_EnableIntReq_c     = 0x08;
+    static const BYTE    ctrl_EnableBurstN_c     = 0x20;
+    static const BYTE    ctrl_SetMFMRecordingN_c = 0x40;
+    static const BYTE    ctrl_DriveSel_c         = 0x07;
+    static const BYTE    ctrl_525DriveSel_c      = 0x04;
 
     bool burstMode()
     {

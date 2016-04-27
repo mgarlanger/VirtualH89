@@ -10,33 +10,39 @@
 
 #include "MMS316IntrCtrlr.h"
 
-#include "mms77316.h"
 #include "logger.h"
-#include "z80.h"
+#include "cpu.h"
 
-MMS316IntrCtrlr::MMS316IntrCtrlr(InterruptController* ic,
-                                 MMS77316*            m316): InterruptController(ic),
-                                                             m316_m(m316)
+MMS316IntrCtrlr::MMS316IntrCtrlr(CPU* cpu): InterruptController(cpu),
+                                            intrqRaised_m(false),
+                                            drqRaised_m(false)
 {
-    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr(InterruptController *, MMS77316 *)\n");
+    debugss(ssMMS77316, INFO, "\n");
 }
 
 MMS316IntrCtrlr::~MMS316IntrCtrlr()
 {
+
 }
 
 void
-MMS316IntrCtrlr::raiseInterrupt(BYTE level)
+MMS316IntrCtrlr::setINTLine()
 {
-    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr::raiseInterrupt(%d)\n", level);
-    InterruptController::raiseInterrupt(level);
-}
+    if (intLevel_m != 2 && intLevel_m != 0)
+    {
+        debugss(ssInterruptController, VERBOSE, "intLevel: %d  intrqRaised_m: %d drqRaised: %d\n",
+                intLevel_m, intrqRaised_m, drqRaised_m);
+    }
 
-void
-MMS316IntrCtrlr::lowerInterrupt(BYTE level)
-{
-    debugss(ssMMS77316, VERBOSE, "MMS316IntrCtrlr::lowerInterrupt(%d)\n", level);
-    InterruptController::lowerInterrupt(level);
+    if (intLevel_m != 0 || intrqRaised_m || drqRaised_m)
+    {
+        cpu_m->raiseINT();
+        cpu_m->continueRunning();
+    }
+    else
+    {
+        cpu_m->lowerINT();
+    }
 }
 
 // reading instructions for interrupts
@@ -45,11 +51,40 @@ MMS316IntrCtrlr::readDataBus()
 {
     BYTE opCode = 0;
 
-    if (!m316_m->interResponder(opCode))
+    if (intrqRaised_m)
+    {
+        // RST 30H
+        opCode = 0xf7;
+    }
+    else if (drqRaised_m)
+    {
+        // EI
+        opCode = 0xfb;
+    }
+    else
     {
         opCode = InterruptController::readDataBus();
     }
 
     debugss(ssMMS77316, VERBOSE, "readDataBus in interrupt... returning %02x\n", opCode);
     return opCode;
+}
+
+
+
+void
+MMS316IntrCtrlr::setDrq(bool raise)
+{
+    debugss(ssMMS77316, VERBOSE, "%d\n", raise);
+    drqRaised_m = raise;
+    setINTLine();
+}
+
+void
+MMS316IntrCtrlr::setIntrq(bool raise)
+{
+    debugss(ssMMS77316, VERBOSE, "%d\n", raise);
+    intrqRaised_m = raise;
+    setINTLine();
+
 }

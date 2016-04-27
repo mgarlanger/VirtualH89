@@ -28,6 +28,7 @@
 		A13C989A1C7A3839000CF03B /* StdioProxyConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C98981C7A3839000CF03B /* StdioProxyConsole.cpp */; };
 		A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989B1C7A3850000CF03B /* RawFloppyImage.cpp */; };
 		A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989E1C7A385C000CF03B /* wd1797.cpp */; };
+		A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */; };
 		A1A434371C7060430015F838 /* AddressBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D01C7060430015F838 /* AddressBus.cpp */; };
 		A1A434381C7060430015F838 /* ClockUser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D41C7060430015F838 /* ClockUser.cpp */; };
 		A1A434391C7060430015F838 /* computer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D61C7060430015F838 /* computer.cpp */; };
@@ -74,6 +75,8 @@
 		A1A434641C7060430015F838 /* z80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434341C7060430015F838 /* z80.cpp */; };
 		A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434651C7063C40015F838 /* OpenGL.framework */; };
 		A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434671C7063CF0015F838 /* GLUT.framework */; };
+		A1CA80A21CC20F7D004A11B7 /* IOBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1CA80A01CC20F7D004A11B7 /* IOBus.cpp */; };
+		A1CA80A51CC46F5E004A11B7 /* IMDFloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -141,6 +144,8 @@
 		A13C989C1C7A3850000CF03B /* RawFloppyImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RawFloppyImage.h; sourceTree = "<group>"; };
 		A13C989E1C7A385C000CF03B /* wd1797.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wd1797.cpp; sourceTree = "<group>"; };
 		A13C989F1C7A385C000CF03B /* wd1797.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wd1797.h; sourceTree = "<group>"; };
+		A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WD179xUserIf.cpp; sourceTree = "<group>"; };
+		A15861A81CB8DCE500D3382D /* WD179xUserIf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WD179xUserIf.h; sourceTree = "<group>"; };
 		A1A433C01C705D310015F838 /* VirtualH89 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VirtualH89; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A433CB1C7060430015F838 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = doxygen.conf; sourceTree = "<group>"; };
 		A1A433CC1C7060430015F838 /* generateDoxy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = generateDoxy; sourceTree = "<group>"; };
@@ -242,6 +247,10 @@
 		A1A434651C7063C40015F838 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		A1A434671C7063CF0015F838 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		A1A4346C1C719B560015F838 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		A1CA80A01CC20F7D004A11B7 /* IOBus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOBus.cpp; sourceTree = "<group>"; };
+		A1CA80A11CC20F7D004A11B7 /* IOBus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOBus.h; sourceTree = "<group>"; };
+		A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IMDFloppyDisk.cpp; sourceTree = "<group>"; };
+		A1CA80A41CC46F5E004A11B7 /* IMDFloppyDisk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMDFloppyDisk.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -388,6 +397,8 @@
 				A1A434081C7060430015F838 /* INS8250.h */,
 				A1A434091C7060430015F838 /* InterruptController.cpp */,
 				A1A4340A1C7060430015F838 /* InterruptController.h */,
+				A1CA80A01CC20F7D004A11B7 /* IOBus.cpp */,
+				A1CA80A11CC20F7D004A11B7 /* IOBus.h */,
 				A1A4340B1C7060430015F838 /* IODevice.cpp */,
 				A1A4340C1C7060430015F838 /* IODevice.h */,
 				A1A4340D1C7060430015F838 /* LICENSE */,
@@ -443,6 +454,8 @@
 				A1A4342D1C7060430015F838 /* Track.h */,
 				A1A4342E1C7060430015F838 /* WallClock.cpp */,
 				A1A4342F1C7060430015F838 /* WallClock.h */,
+				A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */,
+				A15861A81CB8DCE500D3382D /* WD179xUserIf.h */,
 				A13C989E1C7A385C000CF03B /* wd1797.cpp */,
 				A13C989F1C7A385C000CF03B /* wd1797.h */,
 				A1A434301C7060430015F838 /* Z47Controller.cpp */,
@@ -452,6 +465,8 @@
 				A13BEE691C96957500C7E65A /* Z64KMemoryLayout.h */,
 				A1A434341C7060430015F838 /* z80.cpp */,
 				A1A434351C7060430015F838 /* z80.h */,
+				A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */,
+				A1CA80A41CC46F5E004A11B7 /* IMDFloppyDisk.h */,
 			);
 			path = Src;
 			sourceTree = "<group>";
@@ -523,6 +538,7 @@
 				A1A434481C7060430015F838 /* h37.cpp in Sources */,
 				A1A4343E1C7060430015F838 /* DiskData.cpp in Sources */,
 				A13BEE681C96956800C7E65A /* GppListener.cpp in Sources */,
+				A1CA80A21CC20F7D004A11B7 /* IOBus.cpp in Sources */,
 				A1A4345B1C7060430015F838 /* SerialPortDevice.cpp in Sources */,
 				A13BEE741C96959F00C7E65A /* HostFileBdos.cpp in Sources */,
 				A1A434541C7060430015F838 /* NMIPort.cpp in Sources */,
@@ -544,6 +560,7 @@
 				A1A434441C7060430015F838 /* h-17-1.cpp in Sources */,
 				A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */,
 				A13BEE801C9695C200C7E65A /* NetworkServer.cpp in Sources */,
+				A1CA80A51CC46F5E004A11B7 /* IMDFloppyDisk.cpp in Sources */,
 				A1A4344C1C7060430015F838 /* H89.cpp in Sources */,
 				A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */,
 				A1A434511C7060430015F838 /* logger.cpp in Sources */,
@@ -575,6 +592,7 @@
 				A1A434641C7060430015F838 /* z80.cpp in Sources */,
 				A1A434491C7060430015F838 /* H47Drive.cpp in Sources */,
 				A1A4343F1C7060430015F838 /* DiskDrive.cpp in Sources */,
+				A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */,
 				A1A4345D1C7060430015F838 /* SoftSectoredDisk.cpp in Sources */,
 				A1A4345C1C7060430015F838 /* SignalHandler.cpp in Sources */,
 			);

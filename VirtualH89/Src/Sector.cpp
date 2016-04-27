@@ -177,6 +177,24 @@ Sector::getSectorNum()
     return sectorNum_m;
 }
 
+WORD
+Sector::getSectorLength()
+{
+    return sectorLength_m;
+}
+
+BYTE
+Sector::getHeadNum()
+{
+    return headNum_m;
+}
+BYTE
+Sector::getTrackNum()
+{
+    return trackNum_m;
+}
+
+
 bool
 Sector::readData(WORD  pos,
                  BYTE& data)
@@ -203,12 +221,13 @@ Sector::writeData(WORD pos,
 
     if (pos < sectorLength_m)
     {
-        data = data_m[pos];
+        data_m[pos] = data;
 
-        debugss(ssFloppyDisk, INFO, "Valid pos: %d 0x%02x\n", data, data);
+        debugss(ssFloppyDisk, INFO, "Valid pos: %d 0x%02x\n", pos, data);
 
         return true;
     }
+    debugss(ssFloppyDisk, ERROR, "pos: %d sectorLength_m: %d\n", pos, sectorLength_m);
 
     return false;
 }

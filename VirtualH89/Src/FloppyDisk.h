@@ -10,7 +10,6 @@
 #ifndef FLOPPYDISK_H_
 #define FLOPPYDISK_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 

@@ -10,9 +10,9 @@
 #ifndef MEMORYDECODER_H_
 #define MEMORYDECODER_H_
 
-#include "Memory8K.h"
 #include "MemoryLayout.h"
 #include "GppListener.h"
+
 
 class MemoryDecoder: public GppListener
 {

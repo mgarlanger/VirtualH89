@@ -9,7 +9,6 @@
 #ifndef DISKDATA_H_
 #define DISKDATA_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 

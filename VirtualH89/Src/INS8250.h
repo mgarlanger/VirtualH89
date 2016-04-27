@@ -12,6 +12,7 @@
 #include "IODevice.h"
 
 class SerialPortDevice;
+class Computer;
 
 ///
 /// \brief Serial Port
@@ -21,8 +22,9 @@ class SerialPortDevice;
 class INS8250: public IODevice
 {
   public:
-    INS8250(BYTE baseAddr,
-            int  IntLevel = -1);
+    INS8250(Computer* computer,
+            BYTE      baseAddr,
+            int       IntLevel = -1);
     virtual ~INS8250();
 
     virtual BYTE in(BYTE addr);
@@ -40,7 +42,8 @@ class INS8250: public IODevice
     //        and for the port to set the status.
 
   private:
-    int intLevel_m;
+    Computer* computer_m;
+    int       intLevel_m;
 
     void raiseInterrupt();
     void lowerInterrupt();

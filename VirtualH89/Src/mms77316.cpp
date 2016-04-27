@@ -10,14 +10,11 @@
 
 #include "mms77316.h"
 
-#include "H89.h"
 #include "logger.h"
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
 #include "SectorFloppyImage.h"
-#include "InterruptController.h"
 #include "MMS316IntrCtrlr.h"
-#include "AddressBus.h"
 
 const char* MMS77316::MMS77316_Name_c = "MMS77316";
 
@@ -34,22 +31,23 @@ MMS77316::getClockPeriod()
     return ((controlReg_m & ctrl_525DriveSel_c) != 0 ? 1000 : 500);
 }
 
-MMS77316::MMS77316(int baseAddr): DiskController(baseAddr, MMS77316_NumPorts_c),
-                                  WD1797(baseAddr + Wd1797_Offset_c),
-                                  controlReg_m(0),
-                                  intLevel_m(MMS77316_Intr_c),
-                                  drqCount_m(0)
+MMS77316::MMS77316(int                  baseAddr,
+                   InterruptController* ic): DiskController(baseAddr,
+                                                            MMS77316_NumPorts_c),
+                                             WD1797(baseAddr + Wd1797_Offset_c),
+                                             ic_m(ic),
+                                             controlReg_m(0),
+                                             intLevel_m(MMS77316_Intr_c),
+                                             drqCount_m(0)
 {
     for (int x = 0; x < numDisks_c; ++x)
     {
         drives_m[x] = nullptr;
     }
-
-    InterruptController* ic = h89.getAddressBus().getIntrCtrlr();
-    h89.getAddressBus().setIntrCtrlr(new MMS316IntrCtrlr(ic, this));
 }
 
-std::vector<GenericDiskDrive*> MMS77316::getDiskDrives()
+std::vector<GenericDiskDrive*>
+MMS77316::getDiskDrives()
 {
     std::vector<GenericDiskDrive*> drives;
 
@@ -96,12 +94,13 @@ MMS77316::findDrive(std::string ident)
 }
 
 MMS77316*
-MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props,
+MMS77316::install_MMS77316(InterruptController*        ic,
+                           PropertyUtil::PropertyMapT& props,
                            std::string                 slot)
 {
     std::map<int, GenericFloppyDrive*> mmsdrives;
     std::string                        s;
-    MMS77316*                          m316 = new MMS77316(BasePort_c);
+    MMS77316*                          m316 = new MMS77316(BasePort_c, ic);
 
     // First identify what drives are installed.
     for (int x = 0; x < numDisks_c; ++x)
@@ -151,23 +150,6 @@ MMS77316::install_MMS77316(PropertyUtil::PropertyMapT& props,
     return m316;
 }
 
-bool
-MMS77316::interResponder(BYTE& opCode)
-{
-    // The MMS77316 controller assumes it is the highest priority interrupt,
-    // so if we have an interrupt asserted then we take control.
-    if (intrqAllowed() && (intrqRaised_m || drqRaised_m))
-    {
-        // TODO: generate op-codes without knowing Z80CPU?
-        opCode        = (intrqRaised_m ? 0xf7 : 0xfb);
-        // TODO: should anything be reset here?
-        intrqRaised_m = false;
-        return true;
-    }
-
-    return false;
-}
-
 MMS77316::~MMS77316()
 {
     for (int x = 0; x < numDisks_c; ++x)
@@ -182,8 +164,12 @@ MMS77316::~MMS77316()
 void
 MMS77316::reset(void)
 {
-    controlReg_m = 0;
-    h89.lowerINT(MMS77316_Intr_c);
+    controlReg_m  = 0;
+    intrqRaised_m = false;
+    drqRaised_m   = false;
+    ic_m->setIntrq(intrqRaised_m);
+    ic_m->setDrq(drqRaised_m);
+
     WD1797::reset();
 }
 
@@ -192,8 +178,6 @@ MMS77316::in(BYTE addr)
 {
     BYTE offset = getPortOffset(addr);
     BYTE val    = 0;
-
-    debugss(ssMMS77316, ALL, "MMS77316::in(%d)\n", addr);
 
     // case ControlPort_Offset_c: NOT READABLE
     if (offset >= Wd1797_Offset_c)
@@ -222,10 +206,10 @@ MMS77316::in(BYTE addr)
     }
     else
     {
-        debugss(ssMMS77316, ERROR, "MMS77316::in(Unknown - 0x%02x)\n", addr);
+        debugss(ssMMS77316, ERROR, "(Unknown addr - 0x%02x)\n", addr);
     }
 
-    debugss_nts(ssMMS77316, INFO, " - %d(0x%x)\n", val, val);
+    debugss(ssMMS77316, VERBOSE, "(addr: %d) - %d\n", addr, val);
     return (val);
 }
 
@@ -235,7 +219,7 @@ MMS77316::out(BYTE addr,
 {
     BYTE offset = getPortOffset(addr);
 
-    debugss(ssMMS77316, ALL, "MMS77316::out(%d, %d (0x%x))\n", addr, val, val);
+    debugss(ssMMS77316, VERBOSE, "(addr: %d, %d (0x%x))\n", addr, val, val);
 
     if (offset >= Wd1797_Offset_c)
     {
@@ -254,7 +238,7 @@ MMS77316::out(BYTE addr,
     }
     else if (offset == ControlPort_Offset_c)
     {
-        debugss(ssMMS77316, INFO, "MMS77316::out(ControlPort) %02x\n", val);
+        debugss(ssMMS77316, VERBOSE, "(ControlPort) %02x\n", val);
         controlReg_m = val;
         drqCount_m   = 0;
 
@@ -271,15 +255,14 @@ MMS77316::out(BYTE addr,
         if ((controlReg_m & ctrl_EnableIntReq_c) != 0 && (intrqRaised_m || drqRaised_m))
         {
             // Interrupt still pending, but now un-masked. Raise it.
-            h89.raiseINT(MMS77316_Intr_c);
-            h89.continueCPU();
+            ic_m->setIntrq(intrqRaised_m);
+            ic_m->setDrq(drqRaised_m);
         }
 
-        debugss_nts(ssMMS77316, INFO, "\n");
     }
     else
     {
-        debugss(ssMMS77316, ERROR, "MMS77316::out(Unknown - 0x%02x): %d\n", addr, val);
+        debugss(ssMMS77316, ERROR, "(Unknown addr- 0x%02x): %d\n", addr, val);
     }
 }
 
@@ -331,16 +314,14 @@ MMS77316::removeDrive(BYTE unitNum)
 void
 MMS77316::raiseIntrq()
 {
-    debugss(ssMMS77316, INFO, "\n");
+    debugss(ssMMS77316, VERBOSE, "\n");
 
-    WD1797::raiseIntrq();
-    drqCount_m = 0;
+    drqCount_m    = 0;
+    intrqRaised_m = true;
 
     if (intrqAllowed())
     {
-        h89.raiseINT(MMS77316_Intr_c);
-        h89.continueCPU();
-        return;
+        ic_m->setIntrq(intrqRaised_m);
     }
 }
 
@@ -349,13 +330,12 @@ MMS77316::raiseDrq()
 {
     debugss(ssMMS77316, INFO, "\n");
 
-    WD1797::raiseDrq();
+    drqRaised_m = true;
 
     if (drqAllowed())
     {
         ++drqCount_m;
-        h89.raiseINT(MMS77316_Intr_c);
-        h89.continueCPU();
+        ic_m->setDrq(drqRaised_m);
     }
 }
 
@@ -363,22 +343,18 @@ void
 MMS77316::lowerIntrq()
 {
     debugss(ssMMS77316, INFO, "\n");
-    WD1797::lowerIntrq();
-    // TODO: only lower if !drqRaised_m, but Z80 is not handling that correctly anyway.
-    h89.lowerINT(MMS77316_Intr_c);
+
+    intrqRaised_m = false;
+    ic_m->setIntrq(intrqRaised_m);
 }
 
 void
 MMS77316::lowerDrq()
 {
     debugss(ssMMS77316, INFO, "\n");
-    WD1797::lowerDrq();
 
-    // TODO: only lower if !intrqRaised_m, but Z80 is not handling that correctly anyway.
-    if (!intrqRaised_m)
-    {
-        h89.lowerINT(MMS77316_Intr_c);
-    }
+    drqRaised_m = false;
+    ic_m->setDrq(drqRaised_m);
 }
 
 void

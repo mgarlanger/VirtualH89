@@ -9,7 +9,6 @@
 #ifndef INTERRUPTCONTROLLER_H_
 #define INTERRUPTCONTROLLER_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 /// \class InterruptController
@@ -29,17 +28,18 @@ class InterruptController
     BYTE intLevel_m;
     CPU* cpu_m;
 
+    virtual void setINTLine();
+
   public:
     InterruptController(CPU* cpu);
-    InterruptController(InterruptController* ic);
     virtual ~InterruptController();
-    CPU* getCpu()
-    {
-        return cpu_m;
-    }
 
     virtual void raiseInterrupt(BYTE level);
     virtual void lowerInterrupt(BYTE level);
+
+    virtual void setDrq(bool raise);
+    virtual void setIntrq(bool raise);
+    virtual void blockInterrupts(bool block);
 
     // reading instructions for interrupts
     virtual BYTE readDataBus();
