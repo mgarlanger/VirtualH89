@@ -14,7 +14,7 @@
 #include "GenericFloppyDrive.h"
 #include "RawFloppyImage.h"
 #include "SectorFloppyImage.h"
-#include "MMS316IntrCtrlr.h"
+#include "InterruptController.h"
 
 const char* MMS77316::MMS77316_Name_c = "MMS77316";
 

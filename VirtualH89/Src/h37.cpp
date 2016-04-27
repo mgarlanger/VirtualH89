@@ -12,7 +12,6 @@
 #include "SoftSectoredDisk.h"
 #include "InterruptController.h"
 #include "GenericFloppyDrive.h"
-#include "SectorFloppyImage.h"
 #include "computer.h"
 
 #include "IMDFloppyDisk.h"

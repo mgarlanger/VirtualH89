@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 
 GenericFloppyDisk*
@@ -49,7 +50,7 @@ IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         return;
     }
 
-    const char* name = strdup(argv[0].c_str());
+    char* name = strdup(argv[0].c_str());
     debugss(ssFloppyDisk, INFO, "reading: %s\n", name);
 
     for (int x = 1; x < argv.size(); ++x)
@@ -66,7 +67,8 @@ IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         ready_m = false;
         debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name);
     }
-
+    
+    free(name);
 }
 
 IMDFloppyDisk::~IMDFloppyDisk()

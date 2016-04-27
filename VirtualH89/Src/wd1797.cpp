@@ -13,6 +13,7 @@
 #include "GenericFloppyDrive.h"
 #include "GenericFloppyFormat.h"
 #include "WD179xUserIf.h"
+#include "WallClock.h"
 
 // 8" (2MHz) step rates, 5.25" (1MHz) are 2x.
 const BYTE WD1797::speeds[maxStepSpeeds_c] = {3, 6, 10, 15};
