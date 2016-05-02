@@ -30,6 +30,7 @@ class AddressBus;
 class Console;
 class InterruptController;
 class H89Timer;
+class IOBus;
 class H89_IO;
 class NMIPort;
 class GeneralPurposePort;
@@ -109,27 +110,30 @@ class H89: public Computer
 
     /// Base address for the H17 controller
     /// Octal 174
-    static const BYTE          H17_BaseAddress_c = 0x7c; // Octal 174
+    static const BYTE          H17_BaseAddress_c = 0x7c;
 
-    /// Possible base addresses for the H37 controller
-    /// Octal 174
-    static const BYTE          H37_BasePort_c  = 0x78;
+    /// Base address for the H37 controller
+    /// Octal 170
+    static const BYTE          H37_BaseAddress_c = 0x78;
 
-    static const BYTE          Z47_BasePort1_c = 0x78;
-    static const BYTE          Z47_BasePort2_c = 0x7c;
+    /// Possible base addresses for the H47 controller
+    /// 0x78 - when in slot P504
+    static const BYTE          Z47_BaseAddress_1_c        = 0x78;
+    /// 0x7c - when in slot P506
+    static const BYTE          Z47_BaseAddress_2_c        = 0x7c;
 
-
-    /// Addresses for the serial ports
+    /// Addresses for the serial ports (NOTE addresses are in OCTAL)
     static const BYTE          Serial_Console_c           = 0350; // (0xe8)
     static const BYTE          Serial_Console_Interrupt_c = 3;
-    static const BYTE          Serial_AuxPort_c           = 0320;
-    static const BYTE          Serial_ModemPort_c         = 0330;
-    static const BYTE          Serial_LpPort_c            = 0340;
+    static const BYTE          Serial_AuxPort_c           = 0320; // (0xD0)
+    static const BYTE          Serial_ModemPort_c         = 0330; // (0xD8)
+    static const BYTE          Serial_LpPort_c            = 0340; // (0xE0)
 
-    /// Address for NMI
+    /// Address for NMI Addresses, used to respond to H8 ports.
     /// Octal 360-361 and 372-373
     static const BYTE          NMI_BaseAddress_1_c = 0xf0;
     static const BYTE          NMI_NumPorts_1_c    = 2;
+
     static const BYTE          NMI_BaseAddress_2_c = 0xfa;
     static const BYTE          NMI_NumPorts_2_c    = 2;
 
@@ -139,6 +143,7 @@ class H89: public Computer
 
     /// Frequency 2.048 MHz
     static const unsigned long cpuClockRate_c            = 2048000;
+
     /// 2 mSec Interrupt
     static const unsigned int  clockInterruptPerSecond_c = 500;
 
@@ -169,13 +174,11 @@ class H89: public Computer
     virtual void writeProtectH17RAM();
     virtual void writeEnableH17RAM();
 
-    virtual H89_IO&             getIO();
+    virtual H89_IO&     getIO();
 
-    virtual void clearMemory(BYTE data = 0);
 
-    virtual AddressBus&         getAddressBus();
-    virtual CPU&                getCPU();
-    virtual GeneralPurposePort& getGPP();
+    virtual AddressBus& getAddressBus();
+    virtual CPU&        getCPU();
 };
 
 extern H89 h89;

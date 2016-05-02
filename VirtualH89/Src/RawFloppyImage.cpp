@@ -795,6 +795,13 @@ RawFloppyImage::writeData(BYTE track,
     return true;
 }
 
+BYTE
+RawFloppyImage::getMaxSectors(BYTE side,
+                              BYTE track)
+{
+    return numSectors_m & 0xff;
+}
+
 bool
 RawFloppyImage::isReady()
 {

@@ -9,7 +9,6 @@
 
 #include <assert.h>
 
-#include "config.h"
 #include "Console.h"
 
 /// \brief StdioConsole

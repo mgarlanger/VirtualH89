@@ -13,6 +13,7 @@
 #include "GppListener.h"
 
 class CPU;
+class Computer;
 class InterruptController;
 
 ///
@@ -24,9 +25,9 @@ class InterruptController;
 class H89Timer: public EventHandler, public GppListener
 {
   public:
-    H89Timer(CPU*          cpu,
+    H89Timer(Computer*     computer,
+             CPU*          cpu,
              unsigned char intlvl = 1);
-    H89Timer(unsigned char intlvl = 1);
     virtual ~H89Timer();
     virtual void setCPU(CPU* cpu);
     virtual int handleSignal(int signum);
@@ -37,6 +38,7 @@ class H89Timer: public EventHandler, public GppListener
   private:
     virtual void gppNewValue(BYTE gpo);
     static const BYTE h89timer_gpp2msIntEnBit_c = 0b00000010;
+    Computer*         computer_m;
     CPU*              cpu_m;
     bool              intEnabled_m;
 

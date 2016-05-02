@@ -41,14 +41,12 @@ Z47Controller::Z47Controller(): curDisk(invalidDisk_c),
                                 sectorSize(128)
 
 {
-    // TODO Auto-generated constructor stub
-    WallClock::instance()->registerUser(this);
 
 }
 
 Z47Controller::~Z47Controller()
 {
-    WallClock::instance()->unregisterUser(this);
+
 }
 
 

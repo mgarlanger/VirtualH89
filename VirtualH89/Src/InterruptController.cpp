@@ -9,34 +9,45 @@
 #include "InterruptController.h"
 
 #include "logger.h"
-#include "z80.h"
+#include "cpu.h"
+
 
 
 InterruptController::InterruptController(CPU* cpu): intLevel_m(0),
                                                     cpu_m(cpu)
 {
-    debugss(ssInterruptController, VERBOSE, "Entering\n");
+    debugss(ssInterruptController, INFO, "Entering\n");
 
 }
 
-InterruptController::InterruptController(InterruptController* ic):
-    intLevel_m(ic->intLevel_m),
-    cpu_m(ic->cpu_m)
-{
-    debugss(ssInterruptController, VERBOSE, "Entering\n");
-
-}
 
 InterruptController::~InterruptController()
 {
-    debugss(ssInterruptController, VERBOSE, "Entering\n");
+    debugss(ssInterruptController, INFO, "Entering\n");
 
 }
+
+
+void
+InterruptController::setINTLine()
+{
+    debugss(ssInterruptController, ALL, "\n");
+
+    if (intLevel_m != 0)
+    {
+        cpu_m->raiseINT();
+    }
+    else
+    {
+        cpu_m->lowerINT();
+    }
+}
+
 
 void
 InterruptController::raiseInterrupt(BYTE level)
 {
-    debugss(ssInterruptController, VERBOSE, "level(%d)\n", level);
+    debugss(ssInterruptController, ALL, "level(%d)\n", level);
 
     // verify level - only 0-7 are valid
     if ((level < 0) || (level > 7))
@@ -47,14 +58,15 @@ InterruptController::raiseInterrupt(BYTE level)
 
     intLevel_m |= (1 << level);
 
-    // raise interrupt line to Z80
-    cpu_m->raiseINT();
+    // raise interrupt line to cpu
+    setINTLine();
 }
+
 
 void
 InterruptController::lowerInterrupt(BYTE level)
 {
-    debugss(ssInterruptController, VERBOSE, "level(%d)\n", level);
+    debugss(ssInterruptController, ALL, "level(%d)\n", level);
 
     // verify level - only 0-7 are valid
     if ((level < 0) || (level > 7))
@@ -66,12 +78,7 @@ InterruptController::lowerInterrupt(BYTE level)
 
     intLevel_m &= ~(1 << level);
 
-    // ONLY clear int_type if no other interrupts are pending.
-    if (!intLevel_m)
-    {
-        // lower interrupt line to Z80
-        cpu_m->lowerINT();
-    }
+    setINTLine();
 }
 
 
@@ -118,12 +125,28 @@ InterruptController::readDataBus()
     {
         // invalid interrupt level.
         debugss(ssInterruptController, ERROR, "Invalid interrupt level: %d\n", intLevel_m);
-
-        // printf("Interrupt Instruction, bad interrupt level: %d\n", intLevel_m);
     }
 
-    debugss(ssInterruptController, VERBOSE, "Interrupt Instruction %d\n", opCode);
+    debugss(ssInterruptController, ALL, "Interrupt Instruction %d\n", opCode);
 
-    // printf("Interrupt Instruction: %d\n", opCode);
     return opCode;
+}
+
+void
+InterruptController::setDrq(bool raise)
+{
+    debugss(ssInterruptController, ERROR, "base called(%d)\n", raise);
+}
+
+void
+InterruptController::setIntrq(bool raise)
+{
+    debugss(ssInterruptController, ERROR, "base called(%d)\n", raise);
+}
+
+void
+InterruptController::blockInterrupts(bool block)
+{
+    debugss(ssInterruptController, ERROR, "base called(%d)\n", block);
+
 }

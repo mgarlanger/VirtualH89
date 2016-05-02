@@ -12,31 +12,30 @@
 
 
 H37InterruptController::H37InterruptController(CPU* cpu): InterruptController(cpu),
-                                                          drqRaised_m(false)
+                                                          intrqRaised_m(false),
+                                                          drqRaised_m(false),
+                                                          interruptsBlocked_m(false)
 {
     debugss(ssH37InterruptController, INFO, "Entering\n");
-
 }
 
 
 H37InterruptController::~H37InterruptController()
 {
     debugss(ssH37InterruptController, INFO, "Entering\n");
-
 }
 
 
 void
 H37InterruptController::setINTLine()
 {
-    if (intLevel_m != 2 && intLevel_m != 0)
-    {
-        debugss(ssH37InterruptController, VERBOSE, "intLevel: %d  drqRaised: %d\n", intLevel_m,
-                drqRaised_m);
-    }
-    if (intLevel_m != 0 || drqRaised_m)
+//    debugss(ssH37InterruptController, INFO, "intLevel: %d intrqRaised_m: %d drqRaised: %d\n",
+//            intLevel_m, intrqRaised_m, drqRaised_m);
+
+    if ((!interruptsBlocked_m && intLevel_m != 0) || intrqRaised_m || drqRaised_m)
     {
         cpu_m->raiseINT();
+        cpu_m->continueRunning();
     }
     else
     {
@@ -45,33 +44,67 @@ H37InterruptController::setINTLine()
 }
 
 // reading instructions for interrupts
+// this models the real hardware, in which the circuit generated the right
+// bits to be the desired instruction
 BYTE
 H37InterruptController::readDataBus()
 {
-    BYTE op = 0;
-    // debugss(ssH37InterruptController, VERBOSE, "Entering\n");
+    BYTE opCode = 0;
 
-    if (drqRaised_m)
+    // debugss(ssH37InterruptController, INFO, "intLevel: %d intrqRaised_m: %d drqRaised: %d\n",
+    //         intLevel_m, intrqRaised_m, drqRaised_m);
+
+    if (intrqRaised_m)
     {
-        op = 0xfb; // EI
+        debugss(ssH37InterruptController, INFO, "intrq set\n");
+
+        // RST 20H
+        opCode = 0xe7;
+    }
+    else if (drqRaised_m)
+    {
+        // EI
+        opCode = 0xfb;
+    }
+    else if (!interruptsBlocked_m)
+    {
+        opCode = InterruptController::readDataBus();
     }
     else
     {
-        op = InterruptController::readDataBus();
+        debugss(ssH37InterruptController, ERROR, "readData bus, but nothing to provide\n");
+
     }
 
-    if (op != 207)
-    {
-        debugss(ssH37InterruptController, VERBOSE, "op: %d\n", op);
-    }
-    return op;
+    debugss(ssH37InterruptController, ALL, "opCode: %d\n", opCode);
+    return opCode;
 }
 
+void
+H37InterruptController::setIntrq(bool raise)
+{
+    debugss(ssH37InterruptController, VERBOSE, "Entering: %d\n", raise);
+    intrqRaised_m = raise;
+/*    if (raise)
+    {
+        interruptsBlocked_m = false;
+    }*/
+    setINTLine();
+}
 
 void
-H37InterruptController::drq(bool raise)
+H37InterruptController::setDrq(bool raise)
 {
     debugss(ssH37InterruptController, VERBOSE, "Entering: %d\n", raise);
     drqRaised_m = raise;
     setINTLine();
+}
+
+void
+H37InterruptController::blockInterrupts(bool block)
+{
+    debugss(ssH37InterruptController, INFO, "Entering: %d\n", block);
+    setINTLine();
+
+    interruptsBlocked_m = block;
 }

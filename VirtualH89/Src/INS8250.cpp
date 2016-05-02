@@ -7,34 +7,36 @@
 
 #include "INS8250.h"
 
-#include "H89.h"
+#include "computer.h"
 #include "WallClock.h"
 #include "logger.h"
 
 #include "SerialPortDevice.h"
 
 
-INS8250::INS8250(BYTE base,
-                 int  intLevel): IODevice(base, 8),
-                                 DLAB_m(false),
-                                 ERBFI_m(false),
-                                 receiveInterruptPending(false),
-                                 OE_m(false),
-                                 PE_m(false),
-                                 FE_m(false),
-                                 device_m(0),
-                                 rxByteAvail(false),
-                                 txByteAvail(false),
-                                 lsBaudDiv(0),
-                                 msBaudDiv(0),
-                                 baud_m(0),
-                                 lastTransmit(0),
-                                 saveIER(0),
-                                 saveIIR(0),
-                                 saveLCR(0),
-                                 saveMCR(0),
-                                 saveLSR(0),
-                                 saveMSR(MSB_ClearToSend | MSB_DataSetReady)
+INS8250::INS8250(Computer* computer,
+                 BYTE      base,
+                 int       intLevel): IODevice(base, 8),
+                                      computer_m(computer),
+                                      DLAB_m(false),
+                                      ERBFI_m(false),
+                                      receiveInterruptPending(false),
+                                      OE_m(false),
+                                      PE_m(false),
+                                      FE_m(false),
+                                      device_m(0),
+                                      rxByteAvail(false),
+                                      txByteAvail(false),
+                                      lsBaudDiv(0),
+                                      msBaudDiv(0),
+                                      baud_m(0),
+                                      lastTransmit(0),
+                                      saveIER(0),
+                                      saveIIR(0),
+                                      saveLCR(0),
+                                      saveMCR(0),
+                                      saveLSR(0),
+                                      saveMSR(MSB_ClearToSend | MSB_DataSetReady)
 
 {
     intLevel_m = intLevel;
@@ -181,15 +183,14 @@ INS8250::in(BYTE addr)
 
         }
 
-        debugss(ss8250, INFO, "%d(%d) <- %d", addr, offset, val);
+        debugss(ss8250, INFO, "%d(%d) <- %d\n", addr, offset, val);
     }
     else
     {
-        debugss(ss8250, ERROR, "Verify Port failed: %d", addr);
+        debugss(ss8250, ERROR, "Verify Port failed: %d\n", addr);
         return (0);
     }
 
-    // debug("%d\n", val);
     return (val);
 }
 
@@ -372,7 +373,7 @@ INS8250::raiseInterrupt()
 {
     if (intLevel_m >= 0)
     {
-        h89.raiseINT(intLevel_m);
+        computer_m->raiseINT(intLevel_m);
     }
 
 }
@@ -383,7 +384,7 @@ INS8250::lowerInterrupt()
 {
     if (intLevel_m >= 0)
     {
-        h89.lowerINT(intLevel_m);
+        computer_m->lowerINT(intLevel_m);
     }
 
 }

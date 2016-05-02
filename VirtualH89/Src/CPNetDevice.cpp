@@ -7,6 +7,9 @@
 ///
 
 #include "CPNetDevice.h"
+
+#include "HostFileBdos.h"
+
 #include "logger.h"
 
 #include <sys/types.h>

@@ -17,7 +17,9 @@ class H37InterruptController: public InterruptController
 {
 
   protected:
+    bool intrqRaised_m;
     bool drqRaised_m;
+    bool interruptsBlocked_m;
 
     virtual void setINTLine();
 
@@ -28,7 +30,9 @@ class H37InterruptController: public InterruptController
     // reading instructions for interrupts
     virtual BYTE readDataBus();
 
-    virtual void drq(bool raise);
+    virtual void setDrq(bool raise);
+    virtual void setIntrq(bool raise);
+    virtual void blockInterrupts(bool block);
 
 };
 

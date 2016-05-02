@@ -4,13 +4,8 @@
 /// \author Mark Garlanger
 ///
 ///
-/// \todo
 ///
 ///
-/// 3. Get interrupt mode 0 working.
-///    - for any type of instruction.
-///
-/// 6. Fix intermittent issue with 'pure virtual class' when exiting program.
 ///
 
 #include "main.h"
@@ -73,10 +68,8 @@ cpuThreadFunc(void* v)
         }
     }
 
-#else
-    // h89->clearMemory(0);
-    // h89->reset();
 #endif
+
 #if 0
     powerUp();
 #else

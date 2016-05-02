@@ -9,32 +9,21 @@
 #include <sys/time.h>
 #include <signal.h>
 
-#include "H89.h"
+#include "computer.h"
 #include "cpu.h"
-#include "InterruptController.h"
 #include "SignalHandler.h"
 #include "WallClock.h"
 #include "logger.h"
+#include "config.h"
 
 
-#define USE_ONE_MSEC 0
-
-#if TWOMSEC
-#if USE_ONE_MSEC
-static const int TimerInterval_c = 1000;
-#else
 static const int TimerInterval_c = 2000;
-#endif
-#else
-// in order for this to work, the CPU will need to create the intermediary interrupts.
-// - add a second counter to the CPU object, one counter for the total cycles to use, the
-//  second counter to determine when to initiate the interrupt. May still have some issue
-//  for interrupt driven code???
-static const int TimerInterval_c = 10000;
-#endif
 
-H89Timer::H89Timer(CPU*          cpu,
+
+H89Timer::H89Timer(Computer*     computer,
+                   CPU*          cpu,
                    unsigned char intlvl): GppListener(h89timer_gpp2msIntEnBit_c),
+                                          computer_m(computer),
                                           cpu_m(cpu),
                                           intEnabled_m(false),
                                           count_m(0),
@@ -51,17 +40,6 @@ H89Timer::H89Timer(CPU*          cpu,
     GppListener::addListener(this);
 }
 
-
-H89Timer::H89Timer(unsigned char intlvl): cpu_m(0),
-                                          intEnabled_m(false),
-                                          count_m(0),
-                                          intLevel(intlvl),
-                                          thread(0)
-{
-    debugss(ssTimer, INFO, "cpu_m(NULL)\n");
-
-    SignalHandler::instance()->registerHandler(SIGALRM, this);
-}
 
 void
 H89Timer::setCPU(CPU* cpu)
@@ -147,16 +125,11 @@ H89Timer::handleSignal(int signum)
         cpu_m->addClockTicks();
 
         // Only if interrrupt is enabled.
-#if USE_ONE_MSEC
-
-        if ((intEnabled_m) && ((count_m & 0x01) == 0x00))
-#else
         if (intEnabled_m)
-#endif
         {
             debugss(ssTimer, VERBOSE, "raising Interrupt\n");
 
-            h89.raiseINT(intLevel);
+            computer_m->raiseINT(intLevel);
         }
     }
     else
@@ -172,6 +145,6 @@ H89Timer::gppNewValue(BYTE gpo) {
     intEnabled_m = ((gpo & h89timer_gpp2msIntEnBit_c) != 0);
     if (!intEnabled_m)
     {
-        h89.lowerINT(intLevel);
+        computer_m->lowerINT(intLevel);
     }
 }

@@ -12,7 +12,6 @@
 
 #include <string>
 
-#include "config.h"
 #include "h89Types.h"
 
 class DiskData;
@@ -47,11 +46,14 @@ class GenericFloppyDisk
                            int  inSector,
                            BYTE data,
                            bool dataReady,
-                           int& result)  = 0;
-    virtual bool isReady()               = 0;
-    virtual void eject(const char* name) = 0;
-    virtual void dump(void)              = 0;
-    virtual std::string getMediaName()   = 0;
+                           int& result)    = 0;
+    virtual BYTE getMaxSectors(BYTE side,
+                               BYTE track) = 0;
+
+    virtual bool isReady()                 = 0;
+    virtual void eject(const char* name)   = 0;
+    virtual void dump(void)                = 0;
+    virtual std::string getMediaName()     = 0;
 
   private:
 

@@ -72,7 +72,7 @@ Track::readSectorData(BYTE  sector,
     {
         if (sectors_m[i]->getSectorNum() == sector)
         {
-            debugss(ssFloppyDisk, INFO, "found\n");
+            debugss(ssFloppyDisk, ALL, "found\n");
 
             return sectors_m[i]->readData(pos, data);
         }
@@ -82,4 +82,27 @@ Track::readSectorData(BYTE  sector,
 
     return false;
 
+}
+
+Sector*
+Track::findSector(BYTE sector)
+{
+    for (int i = 0; i < sectors_m.size(); i++)
+    {
+        if (sectors_m[i]->getSectorNum() == sector)
+        {
+            debugss(ssFloppyDisk, INFO, "found\n");
+
+            return sectors_m[i];
+        }
+    }
+
+    return nullptr;
+}
+
+BYTE
+Track::getMaxSectors()
+{
+    // todo see if this should look through and find the highest sector number from all sectors.
+    return sectors_m.size() & 0xff;
 }

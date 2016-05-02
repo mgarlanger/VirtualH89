@@ -9,7 +9,7 @@
 
 #include <cstdio>
 
-#include "WallClock.h"
+//#include "WallClock.h"
 
 extern FILE* log_out;
 
@@ -84,10 +84,12 @@ enum subSystems
 ///  ERROR   - maskable errors
 ///  WARNING - warning that something is probably wrong
 ///  INFO    - General info about object creation or other infrequent events.
-///  VERBOSE -
+///  VERBOSE - A large amount of logging, which may require slowing down the emulation speed
+///            to not fall behind
 ///  ALL     - Detailed logs that will generally generate MASSIVE amounts of logs, for example
 ///            in the ssZ80, this will enable per instruction dumping of all registers - on
-///            the order of 500,000 logs per second.
+///            the order of 500,000 logs per second. This will probably require running
+///            at a greatly reduced speed, or on a very powerful system.
 ///
 enum logLevel
 {
@@ -98,13 +100,6 @@ enum logLevel
     VERBOSE = 40,
     ALL     = 100
 };
-
-#if DEBUG
-
-#if DEBUG_TO_FILE
-// #define debug(cond, ...)   if (cond) { printf(__VA_ARGS__); }
-
-#define debug(...)         {if (log_out){fprintf(log_out, __VA_ARGS__); }}
 
 extern void __debugss(enum subSystems, enum logLevel, const char* functionName, const char* fmt,
                       ...);
@@ -127,16 +122,6 @@ extern void __debugss(enum subSystems, enum logLevel, const char* functionName, 
 
 #define chkdebuglevel(subsys, level)  ((level <= debugLevel[subsys]))
 
-#else // if !DEBUG_TO_FILE
-#define cond_debug(cond, ...)   if (cond){printf(__VA_ARGS__); }
-#define debug(args ...)              {printf(args); }
-#endif // DEBUG_TO_FILE
-#else   // if !DEBUG
-#define debug(args ...)
-#define debugss(subsys, level, args ...)
-#define debugss_nts(subsys, level, args ...)
-#define chkdebuglevel(subsys, level) (false)
-#endif // DEBUG
 
 extern unsigned debugLevel[ssMax];
 

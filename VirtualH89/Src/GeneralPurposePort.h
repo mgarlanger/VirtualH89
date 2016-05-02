@@ -14,6 +14,8 @@
 
 #include "IODevice.h"
 
+class Computer;
+
 ///
 /// \brief General Purpose Port
 ///
@@ -24,8 +26,8 @@
 class GeneralPurposePort: public virtual IODevice
 {
   public:
-    GeneralPurposePort();
-    GeneralPurposePort(std::string settings);
+    GeneralPurposePort(Computer* computer);
+    GeneralPurposePort(Computer* computer, std::string settings);
     virtual ~GeneralPurposePort();
 
     virtual BYTE in(BYTE addr);
@@ -36,6 +38,7 @@ class GeneralPurposePort: public virtual IODevice
     void reset();
 
   private:
+    Computer*         computer_m;
     BYTE              dipsw_m;
     BYTE              portBits_m;
 

@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <string>
 
-#include "config.h"
 
 class GenericDiskDrive;
 class DiskController;

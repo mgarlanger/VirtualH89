@@ -15,13 +15,14 @@
 #include <unistd.h>
 
 #include "logger.h"
-#include "H89.h"
+#include "computer.h"
 #include "AddressBus.h"
 #include "WallClock.h"
 #include "disasm.h"
-#include "h89-io.h"
+#include "IOBus.h"
 #include "propertyutil.h"
 
+#include "config.h"
 
 /// Precalculated flag values for Z, S, & P
 ///
@@ -1409,43 +1410,45 @@ Z80::SET_ZSP_FLAGS(BYTE val)
 /// @param clockRate Speed of the Z80 in cycles per second.
 /// @param ticksPerSecond Number of interrupts per second for the clock
 ///
-Z80::Z80(int clockRate,
-         int ticksPerSecond): CPU(),
-                              GppListener(z80_gppSpeedSelBit_c),
-                              A(af.hi),
-                              sA(af.shi),
-                              F(af.lo),
-                              AF(af.val),
-                              B(bc.hi),
-                              C(bc.lo),
-                              BC(bc.val),
-                              D(de.hi),
-                              E(de.lo),
-                              DE(de.val),
-                              H(hl.hi),
-                              L(hl.lo),
-                              HL(hl.val),
-                              sHL(hl.sval),
-                              W(wz.hi),
-                              sW(wz.shi),
-                              Z(wz.lo),
-                              WZ(wz.val),
-                              IXl(ix.lo),
-                              IXh(ix.hi),
-                              IX(ix.val),
-                              IYl(iy.lo),
-                              IYh(iy.hi),
-                              IY(iy.val),
-                              SP(sp.val),
-                              processingIntr(false),
-                              ticks(0),
-                              lastInstTicks(0),
-                              curInstByte(0),
-                              mode(cm_reset),
-                              prefix(ip_none),
-                              speedUpFactor_m(40),
-                              fast_m(false),
-                              IM(0)
+Z80::Z80(Computer* computer,
+         int       clockRate,
+         int       ticksPerSecond): CPU(),
+                                    GppListener(z80_gppSpeedSelBit_c),
+                                    computer_m(computer),
+                                    A(af.hi),
+                                    sA(af.shi),
+                                    F(af.lo),
+                                    AF(af.val),
+                                    B(bc.hi),
+                                    C(bc.lo),
+                                    BC(bc.val),
+                                    D(de.hi),
+                                    E(de.lo),
+                                    DE(de.val),
+                                    H(hl.hi),
+                                    L(hl.lo),
+                                    HL(hl.val),
+                                    sHL(hl.sval),
+                                    W(wz.hi),
+                                    sW(wz.shi),
+                                    Z(wz.lo),
+                                    WZ(wz.val),
+                                    IXl(ix.lo),
+                                    IXh(ix.hi),
+                                    IX(ix.val),
+                                    IYl(iy.lo),
+                                    IYh(iy.hi),
+                                    IY(iy.val),
+                                    SP(sp.val),
+                                    processingIntr(false),
+                                    ticks(0),
+                                    lastInstTicks(0),
+                                    curInstByte(0),
+                                    mode(cm_reset),
+                                    prefix(ip_none),
+                                    speedUpFactor_m(40),
+                                    fast_m(false),
+                                    IM(0)
 
 {
     debugss(ssZ80, INFO, "Creating Z80 proc, clock (%d), ticks(%d)\n", clockRate, ticksPerSecond);
@@ -1637,13 +1640,21 @@ Z80::setAddressBus(AddressBus* ab)
     ab_m = ab;
 }
 
+void
+Z80::setIOBus(IOBus* io)
+{
+    debugss(ssZ80, INFO, "Entering\n");
+
+    io_m = io;
+
+}
 
 void
 Z80::traceInstructions(void)
 {
-    if (chkdebuglevel(ssZ80, ALL))
+    if (chkdebuglevel(ssZ80, ERROR))
     {
-        debugss(ssZ80, ALL, "z80: %04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
+        debugss(ssZ80, ERROR, "0x%04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
                 PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
         disass(PC);
 
@@ -1666,9 +1677,9 @@ Z80::step(void)
 void
 Z80::systemMutexCycle()
 {
-    h89.systemMutexRelease();
+    computer_m->systemMutexRelease();
     // If someone else is waiting, they should get the mutex now.
-    h89.systemMutexAcquire();
+    computer_m->systemMutexAcquire();
 }
 
 std::string
@@ -1729,7 +1740,7 @@ Z80::execute(WORD numInst)
     bool limited = (numInst != 0);
 
     cpu_state = RUN_C;
-    h89.systemMutexAcquire();
+    computer_m->systemMutexAcquire();
 
     do
     {
@@ -1794,10 +1805,6 @@ Z80::execute(WORD numInst)
             switch (IM)
             {
                 case 0:
-                    // mode zero currently just supports the RST instructions based on the level
-                    // passed in - this is all that is needed on an Heathkit H89.
-                    /// \todo But it should be enhance to support any instruction placed on the
-                    /// data bus. -
                     debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
                     processingIntr = true;
                     break;
@@ -1830,7 +1837,6 @@ Z80::execute(WORD numInst)
         traceInstructions();
 #endif
 
-
         // check to see if the clock has any ticks left
         if (ticks <= 0)
         {
@@ -1842,9 +1848,9 @@ Z80::execute(WORD numInst)
             // CPU at the correct time.
             sp.tv_sec  = 1;
             sp.tv_nsec = 0;
-            h89.systemMutexRelease();
+            computer_m->systemMutexRelease();
             nanosleep(&sp, &act);
-            h89.systemMutexAcquire();
+            computer_m->systemMutexAcquire();
             continue;
         }
 
@@ -1881,7 +1887,7 @@ Z80::execute(WORD numInst)
     }
     while (cpu_state == RUN_C);
 
-    h89.systemMutexRelease();
+    computer_m->systemMutexRelease();
 
     return (0);
 }
@@ -2247,7 +2253,7 @@ Z80::op_di(void)
 void
 Z80::op_in(void)
 {
-    A      = (h89.getIO()).in(READn());
+    A      = io_m->in(READn());
 
     ticks -= 4;
 }
@@ -2285,7 +2291,7 @@ Z80::op_in(void)
 void
 Z80::op_out(void)
 {
-    (h89.getIO()).out(READn(), A);
+    io_m->out(READn(), A);
 
     ticks -= 4;
 }
@@ -5716,7 +5722,7 @@ Z80::op_neg(void)
 inline void
 Z80::op_in_ic(BYTE& reg)
 {
-    reg = (h89.getIO()).in(C);
+    reg = io_m->in(C);
 
     CLEAR_FLAGS(N_FLAG | H_FLAG);
     SET_ZSP_FLAGS(reg);
@@ -5758,7 +5764,7 @@ Z80::op_in_f_ic(void)
 void
 Z80::op_out_c_x(void)
 {
-    (h89.getIO()).out(C, getReg8Val(lastInstByte >> 3));
+    io_m->out(C, getReg8Val(lastInstByte >> 3));
 
     ticks -= 4;
 }
@@ -5771,7 +5777,7 @@ Z80::op_out_c_x(void)
 void
 Z80::op_out_c_0(void)
 {
-    (h89.getIO()).out(C, 0);
+    io_m->out(C, 0);
 
     ticks -= 4;
 }
@@ -5784,7 +5790,7 @@ Z80::op_out_c_0(void)
 void
 Z80::op_ini(void)
 {
-    writeMEM(HL, (h89.getIO()).in(C));
+    writeMEM(HL, io_m->in(C));
 
     HL++;
     B--;
@@ -5821,7 +5827,7 @@ Z80::op_inir(void)
 void
 Z80::op_ind(void)
 {
-    writeMEM(HL, (h89.getIO()).in(C));
+    writeMEM(HL, io_m->in(C));
 
     HL--;
     B--;
@@ -5858,7 +5864,7 @@ Z80::op_indr(void)
 void
 Z80::op_outi(void)
 {
-    (h89.getIO()).out(C, readMEM(HL));
+    io_m->out(C, readMEM(HL));
 
     HL++;
     B--;
@@ -5895,7 +5901,7 @@ Z80::op_otir(void)
 void
 Z80::op_outd(void)
 {
-    (h89.getIO()).out(C, readMEM(HL));
+    io_m->out(C, readMEM(HL));
 
     HL--;
     B--;

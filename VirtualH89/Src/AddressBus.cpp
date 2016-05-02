@@ -55,32 +55,10 @@ AddressBus::writeByte(WORD addr,
     mem->writeByte(bnk, addr, val);
 }
 
-
-
 void
 AddressBus::installMemory(MemoryDecoder* memory)
 {
     mem = memory;
-}
-
-void
-AddressBus::clearMemory(BYTE data)
-{
-    debugss(ssAddressBus, INFO, "data(%d)\n", data);
-
-    // TODO: implement this if needed - it is never used right now.
-}
-
-InterruptController*
-AddressBus::getIntrCtrlr()
-{
-    return ic_m;
-}
-
-void
-AddressBus::setIntrCtrlr(InterruptController* ic)
-{
-    ic_m = ic;
 }
 
 void

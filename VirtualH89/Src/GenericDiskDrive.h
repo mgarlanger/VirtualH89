@@ -12,7 +12,6 @@
 
 #include <string>
 
-#include "config.h"
 #include "h89Types.h"
 
 class GenericFloppyDisk;

@@ -7,7 +7,6 @@
 #ifndef SERIALPORTDEVICE_H_
 #define SERIALPORTDEVICE_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 class INS8250;

@@ -43,7 +43,8 @@ MMS77320::MMS77320(int baseAddr,
     }
 }
 
-std::vector<GenericDiskDrive*> MMS77320::getDiskDrives()
+std::vector<GenericDiskDrive*>
+MMS77320::getDiskDrives()
 {
     // No removable drives (?) so nothing returned here...
     std::vector<GenericDiskDrive*> drives;

@@ -42,7 +42,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "config.h"
 
 #include "H89.h"
 #include "logger.h"

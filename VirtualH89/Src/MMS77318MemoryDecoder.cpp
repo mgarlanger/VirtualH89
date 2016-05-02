@@ -12,7 +12,6 @@
 #include "MemoryLayout.h"
 #include "Memory64K.h"
 #include "Memory8K.h"
-#include "H89.h"
 #include "logger.h"
 
 BYTE MMS77318MemoryDecoder::lockSeq[] = {
@@ -25,8 +24,11 @@ BYTE MMS77318MemoryDecoder::lockSeq[] = {
 };
 
 /// 128K add-on board
-MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0):
-    MemoryDecoder(8, h89_gppBnkSelBits_c | h89_gppUnlockBits_c) {
+MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0): MemoryDecoder(8,
+                                                                                 h89_gppBnkSelBits_c |
+                                                                                 h89_gppUnlockBits_c)
+
+{
     lockState = 1;
     curBank   = 0;
     int        x;
@@ -104,18 +106,22 @@ MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0):
     addLayout(7, cpm64k_8k_2);
 }
 
-MMS77318MemoryDecoder::~MMS77318MemoryDecoder() {
+MMS77318MemoryDecoder::~MMS77318MemoryDecoder()
+{
+
 }
 
 void
-MMS77318MemoryDecoder::reset() {
+MMS77318MemoryDecoder::reset()
+{
     interestedBits = h89_gppBnkSelBits_c | h89_gppUnlockBits_c;
     lockState      = 1;
     curBank        = 0;
 }
 
 void
-MMS77318MemoryDecoder::gppNewValue(BYTE gpo) {
+MMS77318MemoryDecoder::gppNewValue(BYTE gpo)
+{
     debugss(ssAddressBus, INFO, "MMS77318 gpio %02x lock state %d\n", gpo, lockState);
     int bnk = (gpo & h89_gppBnkSelBit0_c) ? 0x01 : 0; // LSB - a.k.a. GPIO5
     if (lockState == 0)
@@ -146,7 +152,8 @@ MMS77318MemoryDecoder::gppNewValue(BYTE gpo) {
 }
 
 void
-MMS77318MemoryDecoder::addLayout(int ix, MemoryLayout* lo) {
+MMS77318MemoryDecoder::addLayout(int ix, MemoryLayout* lo)
+{
     if (ix >= 0 && ix < numBnks)
     {
         banks[ix] = lo;

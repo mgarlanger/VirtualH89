@@ -9,15 +9,14 @@
 #ifndef CPNETDEVICE_H_
 #define CPNETDEVICE_H_
 
-#include "config.h"
-#include "h89Types.h"
 #include "IODevice.h"
 #include "NetworkServer.h"
-#include "HostFileBdos.h"
 #include "propertyutil.h"
 
 #include <dirent.h>
 #include <string>
+
+
 
 class CPNetDevice: public IODevice
 {

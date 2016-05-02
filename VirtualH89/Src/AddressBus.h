@@ -10,7 +10,6 @@
 #ifndef ADDRESSBUS_H_
 #define ADDRESSBUS_H_
 
-#include "config.h"
 #include "h89Types.h"
 
 const int addressLine_c  = 16;
@@ -40,10 +39,7 @@ class AddressBus
 
     // setup memory
     void installMemory(MemoryDecoder* mem);
-    virtual void clearMemory(BYTE data = 0);
 
-    InterruptController* getIntrCtrlr();
-    void setIntrCtrlr(InterruptController* ic);
     // Wanted to use the [] operator, but unfortunately it can't be used since the
     // emulated CPU may need to handle writing and reading differently.
     BYTE readByte(WORD addr,

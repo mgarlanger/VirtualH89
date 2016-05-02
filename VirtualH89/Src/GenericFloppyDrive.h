@@ -33,8 +33,6 @@ class GenericFloppyDrive: public GenericDiskDrive
         FDD_8_DS,
     };
 
-    GenericFloppyDrive(DriveType type);
-
     virtual ~GenericFloppyDrive();
 
     static GenericFloppyDrive* getInstance(std::string type);
@@ -58,6 +56,9 @@ class GenericFloppyDrive: public GenericDiskDrive
                   int  inSector,
                   BYTE data,
                   bool dataReady);
+
+    BYTE getMaxSectors(BYTE side,
+                       BYTE track);
 
     void insertDisk(GenericFloppyDisk* disk);
 
@@ -99,6 +100,10 @@ class GenericFloppyDrive: public GenericDiskDrive
     int                track_m;
     bool               motor_m;
     bool               head_m;
+
+    GenericFloppyDrive(unsigned int heads,
+                       unsigned int tracks,
+                       unsigned int mediaSize);
 };
 
 #endif // GENERICFLOPPYDRIVE_H_
