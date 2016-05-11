@@ -591,13 +591,13 @@ SoftSectoredDisk::determineDiskFormat(const char*      name,
 void
 SoftSectoredDisk::dump()
 {
-    printf("SoftSectored - dump\n");
+    debugss(ssFloppyDisk, INFO, "SoftSectored - dump\n");
 
     for (int head = 0; head < numHeads_m; head++)
     {
         for (int track = 0; track < numTracks_m; track++)
         {
-            printf("  Head: %d  Track: %d\n", head, track);
+            debugss(ssFloppyDisk, INFO, "  Head: %d  Track: %d\n", head, track);
 
             tracks_m[head][track]->dump();
         }

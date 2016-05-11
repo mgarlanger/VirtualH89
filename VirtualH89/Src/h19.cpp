@@ -6,9 +6,6 @@
 
 #include "h19.h"
 
-#include <iostream>
-#include <signal.h>
-#include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <assert.h>
@@ -35,19 +32,79 @@ static pthread_mutex_t h19_mutex;
 H19*                   H19::h19;
 unsigned int           H19::screenRefresh = screenRefresh_c;
 
-H19::H19(): Console(0, NULL),
-            updated(true),
-            offline(false),
-            curCursor(false)
+H19::H19(std::string sw401, std::string sw402): Console(0, nullptr),
+                                                updated(true),
+                                                offline(false),
+                                                curCursor(false)
 {
     h19 = this;
-    pthread_mutex_init(&h19_mutex, NULL);
+    pthread_mutex_init(&h19_mutex, nullptr);
+    setSW401((BYTE) strtol(sw401.c_str(), nullptr, 2));
+    setSW402((BYTE) strtol(sw402.c_str(), nullptr, 2));
     reset();
 }
 
 H19::~H19()
 {
     pthread_mutex_destroy(&h19_mutex);
+}
+
+void
+H19::setSW401(BYTE sw401)
+{
+    // Manual suggested setting for Zenith/Heath Computer
+    // 10001100 (0x8c)
+    //
+    // ------------------------
+    // | Bit  | Meaning       |
+    // +======+===============+
+    // |   7  | Duplex        |
+    // |   6  | Sitck Parity  |
+    // |   5  | Even Parity   |
+    // |   4  | Parity        |
+    // |   3  | Baud Rate     |
+    // |   2  | Baud Rate     |
+    // |   1  | Baud Rate     |
+    // |   0  | Baud Rate     |
+    // +======+===============+
+    //
+    sw401_m = sw401;
+
+    // \todo implement serial settings.
+
+}
+
+void
+H19::setSW402(BYTE sw402)
+{
+    //
+    // ------------------------
+    // | Bit  | Meaning       |
+    // +======+===============+
+    // |   7  | Refresh Freq  |
+    // |   6  | Keypad mode   |
+    // |   5  | Zenith/ANSI   |
+    // |   4  | Auto CR       |
+    // |   3  | Auto LF       |
+    // |   2  | Wrap at EOL   |
+    // |   1  | Key Click     |
+    // |   0  | Cursor type   |
+    // +======+===============+
+    //
+
+    sw402_m = sw402;
+
+    // should anything be done with refresh frequency
+
+    keypadShifted = ((sw402 & KeypadMode_c) == KeypadMode_c);
+
+    // don't support ANSI yet, so can't do anything here.. - 5  - Zenith/ANSI
+
+    autoCR      = ((sw402 & AutoCR_c) == AutoCR_c);
+    autoLF      = ((sw402 & AutoLF_c) == AutoLF_c);
+    wrapEOL     = ((sw402 & WrapEOL_c) == WrapEOL_c);
+    keyClick    = ((sw402 & KeyClick_c) == KeyClick_c);
+    cursorBlock = ((sw402 & BlockCursor) == BlockCursor);
 }
 
 
@@ -196,19 +253,15 @@ H19::reset()
     graphicMode     = false;
     insertMode      = false;
     line25          = false;
-    keyClick        = false;
     holdScreen      = false;
     cursorOff       = false;
-    cursorBlock     = false;
-    keypadShifted   = false;
     altKeypadMode   = false;
-    autoLF          = false;
-    autoCR          = false;
     keyboardEnabled = false;
-    wrapEOL         = true;
+    setSW401(sw401_m);
+    setSW402(sw402_m);
 
-    PosX            = PosY = 0;
-    SaveX           = SaveY = 0;
+    PosX  = PosY = 0;
+    SaveX = SaveY = 0;
 
     for (unsigned int y = 0; y < rows; ++y)
     {

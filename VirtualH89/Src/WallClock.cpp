@@ -62,9 +62,9 @@ WallClock::addTicks(unsigned ticks)
 {
     ticks_m += ticks;
 
-    for (std::list<ClockUser*>::iterator it = users_m.begin(); it != users_m.end(); ++it)
+    for (ClockUser* clockUser : users_m)
     {
-        (*it)->notification(ticks);;
+        clockUser->notification(ticks);;
     }
 }
 

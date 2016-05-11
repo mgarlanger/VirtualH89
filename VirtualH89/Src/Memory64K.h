@@ -9,27 +9,27 @@
 #ifndef MEMORY64K_H_
 #define MEMORY64K_H_
 
-#include "Memory8K.h"
-#include "RAMemory8K.h"
+#include "h89Types.h"
+
+#include <memory>
+
+class Memory8K;
+
+using namespace std;
 
 class Memory64K
 {
   public:
-    Memory64K() {
-        int x;
+    Memory64K();
 
-        // for 64K all base addresses are defined
-        for (x = 0; x < 8; ++x)
-        {
-            mem64k[x] = new RAMemory8K(x << 13);
-        }
+    shared_ptr<Memory8K> getPage(BYTE page)
+    {
+        // \todo - error if out of range
+        return mem64k[page & 0x7];
     }
-    Memory8K* getPage(WORD adr) {
-        int a = ((adr >> 13) & 0x07);
-        return mem64k[a];
-    }
+
   private:
-    Memory8K* mem64k[8];
+    shared_ptr<Memory8K> mem64k[8];
 };
 
 #endif // MEMORY64K_H_

@@ -200,6 +200,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive*        drive,
         debugss(ssSectorFloppyImage, ERROR, "file is not SectorFloppyImage (%d,%d) - %s\n", x,
                 errno,
                 name);
+        free((void*) name);
         return;
     }
 

@@ -10,7 +10,8 @@
 #include "MemoryDecoder.h"
 #include "InterruptController.h"
 
-AddressBus::AddressBus(InterruptController* ic): ic_m(ic), mem(NULL)
+AddressBus::AddressBus(InterruptController* ic): ic_m(ic),
+                                                 mem_m(nullptr)
 {
     debugss(ssAddressBus, INFO, "\n");
 }
@@ -32,40 +33,31 @@ AddressBus::readByte(WORD addr,
         return ic_m->readDataBus();
     }
 
-    // Could do this entirely inside MemoryLayout, but this way we have
-    // more options for direct access to all memory.
-    int bnk = mem->getCurrentBank();
+    debugss(ssAddressBus, ALL, "addr(%d)\n", addr);
 
-    debugss(ssAddressBus, ALL, "addr(%d), bank(%d)\n", addr, bnk);
-
-    return mem->readByte(bnk, addr);
+    return mem_m->readByte(addr);
 }
 
 void
 AddressBus::writeByte(WORD addr,
                       BYTE val)
 {
+    debugss(ssAddressBus, ALL, "addr(%d) = %d\n", addr, val);
 
-    // Could do this entirel inside MemoryLayout, but this way we have
-    // more options for direct access to all memory.
-    int bnk = mem->getCurrentBank();
-
-    debugss(ssAddressBus, ALL, "addr(%d) = %d, bank(%d)\n", addr, val, bnk);
-
-    mem->writeByte(bnk, addr, val);
+    mem_m->writeByte(addr, val);
 }
 
 void
 AddressBus::installMemory(MemoryDecoder* memory)
 {
-    mem = memory;
+    mem_m = memory;
 }
 
 void
 AddressBus::reset()
 {
-    if (mem != NULL)
+    if (mem_m != nullptr)
     {
-        mem->reset();
+        mem_m->reset();
     }
 }

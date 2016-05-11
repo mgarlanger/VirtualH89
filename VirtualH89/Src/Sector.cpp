@@ -11,8 +11,8 @@
 #include "logger.h"
 
 #include <iostream>
-
-Sector::Sector(): headNum_m(0),
+/*
+   Sector::Sector(): headNum_m(0),
                   trackNum_m(0),
                   sectorNum_m(0),
                   deletedDataAddressMark_m(false),
@@ -20,9 +20,9 @@ Sector::Sector(): headNum_m(0),
                   valid_m(false),
                   data_m(0),
                   sectorLength_m(0)
-{
+   {
 
-}
+   }*/
 
 Sector::Sector(BYTE  headNum,
                BYTE  trackNum,
@@ -83,14 +83,14 @@ Sector::~Sector()
 
     valid_m = false;
 }
-
-void
-Sector::initialize(BYTE  headNum,
+/*
+   void
+   Sector::initialize(BYTE  headNum,
                    BYTE  trackNum,
                    BYTE  sectorNum,
                    WORD  sectorLength,
                    BYTE* data)
-{
+   {
     if (valid_m)
     {
         // Error condition, shouldn't initialize an already valid object
@@ -99,6 +99,8 @@ Sector::initialize(BYTE  headNum,
                 headNum, trackNum, sectorNum);
 
     }
+    debugss(ssFloppyDisk, INFO, "Sector initializing - h: %d t: %d s: %d, len: %d\n",
+            headNum, trackNum, sectorNum, sectorLength);
 
     headNum_m      = headNum;
     trackNum_m     = trackNum;
@@ -119,8 +121,8 @@ Sector::initialize(BYTE  headNum,
     {
         valid_m = false;
     }
-}
-
+   }
+ */
 void
 Sector::setDeletedDataAddressMark(bool val)
 {
@@ -133,12 +135,22 @@ Sector::setReadError(bool val)
     readError_m = val;
 }
 
+bool
+Sector::getDeletedDataAddressMark()
+{
+    return deletedDataAddressMark_m;
+}
+bool
+Sector::getReadError()
+{
+    return readError_m;
+}
+
 void
 Sector::dump()
 {
-    printf("Sector dump - Side: %d Track: %d Sector: %d\n", headNum_m,
-           trackNum_m,
-           sectorNum_m);
+    debugss(ssFloppyDisk, INFO, "Sector dump - Side: %d Track: %d Sector: %d\n",
+            headNum_m, trackNum_m, sectorNum_m);
 
     char printable[17];
 
@@ -148,13 +160,13 @@ Sector::dump()
     {
         if ((i % 16) == 0)
         {
-            printf("     0x%04x: ", i);
+            debugss(ssFloppyDisk, INFO, "     0x%04x: ", i);
         }
         else
         {
             if ((i % 8) == 0)
             {
-                printf(" ");
+                debugss_nts(ssFloppyDisk, INFO, " ");
             }
         }
 
@@ -162,11 +174,11 @@ Sector::dump()
         printable[i % 16] = (isprint(data_m[i])) ? data_m[i] : '.';
 
         // print hex value
-        printf("%02x", data_m[i]);
+        debugss_nts(ssFloppyDisk, INFO, "%02x", data_m[i]);
 
         if (((i + 1) % 16) == 0)
         {
-            printf("  %s\n", printable);
+            debugss_nts(ssFloppyDisk, INFO, "  %s\n", printable);
         }
     }
 }

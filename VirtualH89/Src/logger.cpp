@@ -9,7 +9,8 @@
 
 #define ANSI 0
 
-unsigned debugLevel[ssMax];
+unsigned     debugLevel[ssMax];
+extern FILE* log_out;
 
 
 logger::logger():  printToFile(false),
@@ -35,7 +36,7 @@ setDebugLevel()
     debugLevel[ssROM]                    = defaultLevel; // ROM accesses
     debugLevel[ssZ80]                    = defaultLevel; // Z80 CPU
     debugLevel[ssH37InterruptController] = INFO;         // Interrupt Controller
-    debugLevel[ssInterruptController]    = defaultLevel; // Interrupt Controller
+    debugLevel[ssInterruptController]    = INFO;         // Interrupt Controller
     debugLevel[ssAddressBus]             = defaultLevel; // Address Bus
     debugLevel[ssIO]                     = defaultLevel; // I/O ports
     debugLevel[ssH17]                    = defaultLevel; // H17 controller
@@ -74,10 +75,10 @@ setDebug(subSystems ss,
 }
 
 void
-__debugss(enum subSystems subsys, enum logLevel level, const char* functionName,
-          const char* fmt, ...)
+__debugss(enum logLevel level, const char* functionName, const char* fmt, ...)
 {
     va_list vl;
+
 #if ANSI
     int     __val = 0;
     if (level < ERROR)
@@ -102,17 +103,35 @@ __debugss(enum subSystems subsys, enum logLevel level, const char* functionName,
     }
     fprintf(log_out, "\x1b[37m");
 #endif
+
     WallClock::instance()->printTime(log_out);
+
 #if ANSI
     fprintf(log_out, "\x1b[36m%s: \x1b[%dm", functionName, __val);
 #else
     fprintf(log_out, "%s: ", functionName);
 #endif
+
     va_start(vl, fmt);
     vfprintf(log_out, fmt, vl);
     va_end(vl);
+
 #if ANSI
     fprintf(log_out, "\x1b[0m");
 #endif
+
     fflush(log_out);
+}
+
+
+void
+__debugss_nts(const char* fmt, ...)
+{
+    va_list vl;
+
+    va_start(vl, fmt);
+    vfprintf(log_out, fmt, vl);
+    va_end(vl);
+    fflush(log_out);
+
 }

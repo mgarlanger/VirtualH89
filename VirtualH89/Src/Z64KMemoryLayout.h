@@ -10,23 +10,11 @@
 #define Z64KMEMORYLAYOUT_H_
 
 #include "MemoryLayout.h"
-#include "RAMemory8K.h"
 
 class Z64KMemoryLayout: public MemoryLayout
 {
   public:
-    Z64KMemoryLayout(MemoryLayout* rom): MemoryLayout() {
-        int       x;
-        Memory8K* rd6_0 = new RAMemory8K(0x0000);
-        Memory8K* rd6_1 = new RAMemory8K(0xe000);
-        rom->addPage(rd6_1);
-        addPage(rd6_0);
-        for (x = 1; x < 7; ++x)
-        {
-            addPage(rom->getPage(x << 13));
-        }
-        addPage(rd6_1);
-    }
+    Z64KMemoryLayout(MemoryLayout* rom);
 };
 
 #endif // Z64KMEMORYLAYOUT_H_

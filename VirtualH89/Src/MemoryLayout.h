@@ -9,44 +9,53 @@
 #ifndef MEMORYLAYOUT_H_
 #define MEMORYLAYOUT_H_
 
-#include "Memory8K.h"
-#include "Memory64K.h"
-#include "NilMemory8K.h"
+#include "h89Types.h"
+
+#include <memory>
+
+class Memory8K;
+class Memory64K;
+
+using namespace std;
 
 class MemoryLayout
 {
   public:
-    MemoryLayout() {
-        int x;
-        for (x = 0; x < 8; ++x)
-        {
-            memBnk[x] = new NilMemory8K(x << 13);
-        }
-    }
-    void addPage(Memory8K* mem) {
-        int a = (mem->getBase() >> 13) & 0x07;
-        // error if not NULL?
-        memBnk[a] = mem;
-    }
-    void addPageAt(Memory8K* mem, WORD adr) {
-        int a = (adr >> 13) & 0x07;
-        // error if not NULL?
-        memBnk[a] = mem;
-    }
-    void addPage(Memory64K* mem64) {
-        int x;
-        for (x = 0; x < 8; ++x)
-        {
-            addPage(mem64->getPage(x << 13));
-        }
-    }
-    inline Memory8K* getPage(WORD adr) {
-        int a = (adr >> 13) & 0x07;
+    MemoryLayout();
+    void addPage(shared_ptr<Memory8K> mem);
+    void addPageAt(shared_ptr<Memory8K> mem, WORD adr);
+    void addPage(Memory64K* mem64);
+
+    inline shared_ptr<Memory8K> getPageByAddress(WORD address)
+    {
         // error if NULL?
-        return memBnk[a];
+        return memPage_m[addressToPage(address)];
     }
+    inline shared_ptr<Memory8K> getPage(BYTE page)
+    {
+        // error if NULL?
+        if (page >= numPages_c)
+        {
+            // TODO - add something for out-of-range
+        }
+
+        return memPage_m[page & 0x7];
+    }
+
   protected:
-    Memory8K* memBnk[8]; // 8 8K regions in 64K addr space
+    static const BYTE pageShiftFactor_c = 13;
+    static const BYTE numPages_c        = 8;
+
+    BYTE addressToPage(WORD address)
+    {
+        return (address >> pageShiftFactor_c) & 0x07;
+    }
+    WORD pageToAddress(BYTE page)
+    {
+        return page << pageShiftFactor_c;
+    }
+
+    shared_ptr<Memory8K> memPage_m[numPages_c]; // 8 8K regions in 64K addr space
 };
 
 #endif // MEMORYLAYOUT_H_

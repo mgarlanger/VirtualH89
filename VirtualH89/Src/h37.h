@@ -159,46 +159,24 @@ class Z_89_37: public DiskController, WD179xUserIf
 
     unsigned long long  cycleCount_m;
 
-    void seekTo();
-    void step(void);
-
-
-    ///
-    /// C - Side Compare Flag
-    /// ===============================================
-    /// 0 - Disable side compare
-    /// 1 - Enable side compare
-    ///
-    static const BYTE cmdop_SideCheck_c = 0x02;
-
-
-    ///
-    /// S - Side Compare Flag
-    /// ===============================================
-    /// 0 - Compare for side 0
-    /// 1 - Compare for side 1
-    ///
-    static const BYTE cmdop_CompareSide_c       = 0x08;
-    static const BYTE cmdop_CompareSide_Shift_c = 3;
-
 
     /// Bits set in cmd_ControlPort_c - DK.CON
-    static const BYTE ctrl_EnableIntReq_c    = 0x01;
-    static const BYTE ctrl_EnableDrqInt_c    = 0x02;
-    static const BYTE ctrl_SetMFMRecording_c = 0x04;
-    static const BYTE ctrl_MotorsOn_c        = 0x08;
-    static const BYTE ctrl_Drive_0_c         = 0x10;
-    static const BYTE ctrl_Drive_1_c         = 0x20;
-    static const BYTE ctrl_Drive_2_c         = 0x40;
-    static const BYTE ctrl_Drive_3_c         = 0x80;
+    static const BYTE   ctrl_EnableIntReq_c    = 0x01;
+    static const BYTE   ctrl_EnableDrqInt_c    = 0x02;
+    static const BYTE   ctrl_SetMFMRecording_c = 0x04;
+    static const BYTE   ctrl_MotorsOn_c        = 0x08;
+    static const BYTE   ctrl_Drive_0_c         = 0x10;
+    static const BYTE   ctrl_Drive_1_c         = 0x20;
+    static const BYTE   ctrl_Drive_2_c         = 0x40;
+    static const BYTE   ctrl_Drive_3_c         = 0x80;
 
     /// Bits to set alternate registers on InterfaceControl_c - DK.INT
-    static const BYTE if_SelectCommandData_c = 0x00;
-    static const BYTE if_SelectSectorTrack_c = 0x01;
+    static const BYTE   if_SelectCommandData_c = 0x00;
+    static const BYTE   if_SelectSectorTrack_c = 0x01;
 
     /// Floppy disk related items
-    static const int  bytesPerTrack_c        = 6400;
-    static const int  clocksPerByte_c        = 64;
+    static const int    bytesPerTrack_c        = 6400;
+    static const int    clocksPerByte_c        = 64;
 };
 
 #endif // Z_89_37_H_

@@ -27,7 +27,7 @@
 class H19: public Console // , public BaseThread
 {
   public:
-    H19();
+    H19(std::string sw401, std::string sw402);
     virtual ~H19();
 
     virtual void init();
@@ -79,6 +79,8 @@ class H19: public Console // , public BaseThread
     };
     InputMode    mode;
     bool         updated;
+    BYTE         sw401_m;
+    BYTE         sw402_m;
 
     // display modes
     bool         reverseVideo;
@@ -170,6 +172,19 @@ class H19: public Console // , public BaseThread
         return (PosX == (rows - 1));
     };
     virtual void bell(void);
+
+    const BYTE RefreshRate_c  = 0x80;
+    const BYTE KeypadMode_c   = 0x40;
+    const BYTE TerminalMode_c = 0x20;
+    const BYTE AutoCR_c       = 0x10;
+    const BYTE AutoLF_c       = 0x08;
+    const BYTE WrapEOL_c      = 0x04;
+    const BYTE KeyClick_c     = 0x02;
+    const BYTE BlockCursor    = 0x01;
+
+    void setSW401(BYTE sw401);
+    void setSW402(BYTE sw402);
+
 };
 
 #endif // H19_H_

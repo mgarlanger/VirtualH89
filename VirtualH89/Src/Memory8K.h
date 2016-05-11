@@ -11,24 +11,22 @@
 
 #include "h89Types.h"
 
-#include <string.h>
 
 class Memory8K
 {
   public:
-    Memory8K(WORD ba) {
-        base = ba;
-        memset(mem, 0, sizeof(mem));
-    }
+    Memory8K(WORD base);
+
     inline WORD getBase() {
-        return base;
+        return base_m;
     }
     inline BYTE readByte(WORD adr) {
         return mem[adr & 0x1fff];
     }
     virtual void writeByte(WORD adr, BYTE val) = 0;
+
   protected:
-    WORD base;
+    WORD base_m;
     BYTE mem[8 * 1024];
 };
 

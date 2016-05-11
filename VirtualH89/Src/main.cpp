@@ -22,14 +22,18 @@
 #include "StdioConsole.h"
 #include "StdioProxyConsole.h"
 #include "logger.h"
+#include "propertyutil.h"
+
 
 using namespace std;
 
-#define Z80COPYRIGHT "Copyright (C) 1987-2008 by Udo Munk"
-#define RELEASE "1.17"
-#define H89COPYRIGHT "Copyright (C) 2009-2016 by Mark Garlanger"
+const char* Z80_COPYRIGHT_c   =
+    "Portions derived from Z80Pack Release 1.17 - Copyright (C) 1987-2008 by Udo Munk";
 
-const char* usage_str = " -b -s -l";
+const char* RELEASE_VERSION_c = "1.93";
+const char* H89_COPYRIGHT_c   = "Copyright (C) 2009-2016 by Mark Garlanger";
+
+const char* usage_str         = " -q -g";
 
 /// \todo - make H89 into a singleton.
 H89         h89;
@@ -39,12 +43,31 @@ FILE*       log_out     = 0;
 FILE*       console_out = 0;
 
 void
+displayLogo()
+{
+    cout << "Virtual H89" << endl << endl;
+
+    cout << "  #     # ### ####  ##### #   #   #   #       #   #  ###   ### " << endl;
+    cout << "  #     #  #  #   #   #   #   #  # #  #       #   # #   # #   #" << endl;
+    cout << "   #   #   #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
+    cout << "   #   #   #  ####    #   #   # ##### #       #####  ###   ####" << endl;
+    cout << "    # #    #  #  #    #   #   # #   # #       #   # #   #     #" << endl;
+    cout << "    # #    #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
+    cout << "     #    ### #   #   #    ###  #   # #####   #   #  ###   ### " << endl;
+    cout << endl << Z80_COPYRIGHT_c << endl;
+    cout << "Virtual H89 - " << H89_COPYRIGHT_c << endl << endl;
+    cout << "Release " << RELEASE_VERSION_c << endl;
+}
+
+
+void
 usage(char* pn)
 {
     cerr << "usage: " << pn << usage_str << endl;
-    cerr << "\ts = save core and cpu" << endl;
-    cerr << "\tl = load core and cpu" << endl;
-    cerr << "\tb = display opening banner" << endl;
+    // cerr << "\ts = save core and cpu" << endl;
+    // cerr << "\tl = load core and cpu" << endl;
+    cerr << "\tg = specify gui to use, default is built-in H19 emulation" << endl;
+    cerr << "\tq = quiet - don't display opening banner" << endl;
     exit(1);
 }
 
@@ -70,14 +93,10 @@ cpuThreadFunc(void* v)
 
 #endif
 
-#if 0
-    powerUp();
-#else
     BYTE cpu_error;
 
-    // load boot code into memory
     cpu_error = h89->run();
-#endif
+
 
 #if FIXME
 
@@ -101,7 +120,6 @@ cpuThreadFunc(void* v)
 //
 const char* getopts = "g:lq";
 
-/// \todo - use argv[0] to determine configuration... ie H88 vs. H89 vs. Z90.
 int
 main(int   argc,
      char* argv[])
@@ -142,32 +160,7 @@ main(int   argc,
 
     if (!quiet)
     {
-        cout << "Virtual H89" << endl << endl;
-
-        cout <<
-            " #       #  #####  #####   #######  #     #    ###    #           #     #   #####    ##### "
-             << endl;
-        cout <<
-            "  #     #     #    #    #     #     #     #   #   #   #           #     #  #     #  #     #"
-             << endl;
-        cout <<
-            "  #     #     #    #    #     #     #     #  #     #  #           #     #  #     #  #     #"
-             << endl;
-        cout <<
-            "   #   #      #    #####      #     #     #  #######  #           #######   #####    ######"
-             << endl;
-        cout <<
-            "   #   #      #    #   #      #     #     #  #     #  #           #     #  #     #        #"
-             << endl;
-        cout <<
-            "    # #       #    #    #     #     #     #  #     #  #           #     #  #     #  #     #"
-             << endl;
-        cout <<
-            "     #      #####  #    #     #      #####   #     #  ######      #     #   #####    ##### "
-             << endl;
-        cout << endl << "Portions derived from Z80Pack Release " << RELEASE << " - "
-             << Z80COPYRIGHT << endl;
-        cout << "Virtual H89 - " << H89COPYRIGHT << endl << endl;
+        displayLogo();
         cout << "CPU speed is 2.048 MHz" << endl << endl;
     }
 
@@ -177,6 +170,47 @@ main(int   argc,
     sigaddset(&set, SIGINT);
     sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &set, 0);
+
+    // TODO: allow specification of config file via cmdline args.
+    std::string                cfg;
+    char*                      env = getenv("V89_CONFIG");
+    PropertyUtil::PropertyMapT props;
+    std::string                sw401;
+    std::string                sw402;
+
+    // \todo - if file not found, default to something sane (h17 + 64k)
+    if (env)
+    {
+        // If file-not-found, we still might create it later...
+        cfg = env;
+
+        try
+        {
+            PropertyUtil::read(cfg.c_str(), props);
+        }
+
+        catch (std::exception& e)
+        {
+        }
+    }
+    else
+    {
+        cfg  = getenv("HOME");
+        cfg += "/.v89rc";
+
+        try
+        {
+            PropertyUtil::read(cfg.c_str(), props);
+        }
+
+        catch (std::exception& e)
+        {
+        }
+    }
+
+
+    sw401 = props["sw401"];
+    sw402 = props["sw402"];
 
     if (gui.compare("stdio") == 0)
     {
@@ -188,13 +222,15 @@ main(int   argc,
     }
     else
     {
-        console = new H19();
+        console = new H19(sw401.c_str(), sw402.c_str());
     }
 
-    h89.buildSystem(console);
 
-    pthread_t thread;
-    pthread_create(&thread, NULL, cpuThreadFunc, &h89);
+
+    h89.buildSystem(console, props);
+
+    pthread_t cpuThread;
+    pthread_create(&cpuThread, NULL, cpuThreadFunc, &h89);
     h89.init();
 
     console->run();

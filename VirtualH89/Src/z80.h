@@ -14,7 +14,6 @@
 #define Z80_H_
 
 #include <csignal>
-#include <vector>
 #include <pthread.h>
 
 #include "cpu.h"

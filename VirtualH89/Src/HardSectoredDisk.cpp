@@ -106,7 +106,7 @@ HardSectoredDisk::readData(BYTE          side,
 
     if (maxTrack_m != tracks_m)
     {
-        if ((maxTrack_m == 80) && (tracks_m = 40))
+        if ((maxTrack_m == 80) && (tracks_m == 40))
         {
             debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40 | track - %d  newTrack - %d\n",
                     track, track / 2);
@@ -158,7 +158,7 @@ HardSectoredDisk::writeData(BYTE          side,
 
     if (maxTrack_m != tracks_m)
     {
-        if ((maxTrack_m == 80) && (tracks_m = 40))
+        if ((maxTrack_m == 80) && (tracks_m == 40))
         {
             debugss(ssFloppyDisk, INFO, "max - 80 trk_m - 40\n");
             track /= 2;

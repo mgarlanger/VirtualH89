@@ -8,19 +8,19 @@
 /// \author Douglas Miller
 ///
 #include "MMS77318MemoryDecoder.h"
-#include "MemoryDecoder.h"
+
 #include "MemoryLayout.h"
 #include "Memory64K.h"
-#include "Memory8K.h"
+
 #include "logger.h"
 
-BYTE MMS77318MemoryDecoder::lockSeq[] = {
+const BYTE MMS77318MemoryDecoder::lockSeq[] = {
     0b00000100,
     0b00001100,
     0b00000100,
     0b00001000,
     0b00001100,
-    0b00001000,
+    0b00001000
 };
 
 /// 128K add-on board
@@ -30,15 +30,15 @@ MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0): MemoryDecoder
 
 {
     lockState = 1;
-    curBank   = 0;
-    int        x;
-    Memory64K* rd6    = new Memory64K();
-    Memory64K* rd7    = new Memory64K();
+    curBank_m = 0;
+    int                   x;
+    Memory64K*            rd6    = new Memory64K();
+    Memory64K*            rd7    = new Memory64K();
 
     // 0: RESET state, ROM at 0x0000
-    Memory8K*  ras2_1 = h89_0->getPage(0xc000);
-    h89_0->addPage(rd6->getPage(0xe000));
-    h89_0->addPage(rd6->getPage(0xc000));
+    shared_ptr<Memory8K>  ras2_1 = h89_0->getPage(6);
+    h89_0->addPage(rd6->getPage(7));
+    h89_0->addPage(rd6->getPage(6));
     addLayout(0, h89_0);
 
     // 1: CP/M state, 64K RAM
@@ -46,25 +46,25 @@ MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0): MemoryDecoder
     h89_1->addPageAt(ras2_1, 0x0000);
     for (x = 1; x < 8; ++x)
     {
-        h89_1->addPage(h89_0->getPage(x << 13));
+        h89_1->addPage(h89_0->getPage(x));
     }
     addLayout(1, h89_1);
 
     // MMS 77318 additional layouts:
     // 2,3: Hi 56K always main, low 8K bank switched (HDOS)
     MemoryLayout* hdos56k_1 = new MemoryLayout();
-    hdos56k_1->addPage(rd7->getPage(0x0000));
+    hdos56k_1->addPage(rd7->getPage(0));
     for (x = 1; x < 8; ++x)
     {
-        hdos56k_1->addPage(h89_1->getPage(x << 13));
+        hdos56k_1->addPage(h89_1->getPage(x));
     }
     addLayout(2, hdos56k_1);
 
     MemoryLayout* hdos56k_2 = new MemoryLayout();
-    hdos56k_2->addPage(rd6->getPage(0x0000));
+    hdos56k_2->addPage(rd6->getPage(0));
     for (x = 1; x < 8; ++x)
     {
-        hdos56k_2->addPage(h89_1->getPage(x << 13));
+        hdos56k_2->addPage(h89_1->getPage(x));
     }
     addLayout(3, hdos56k_2);
 
@@ -72,37 +72,37 @@ MMS77318MemoryDecoder::MMS77318MemoryDecoder(MemoryLayout* h89_0): MemoryDecoder
     MemoryLayout* cpm64k_16k_1 = new MemoryLayout();
     for (x = 0; x < 6; ++x)
     {
-        cpm64k_16k_1->addPage(rd7->getPage(x << 13));
+        cpm64k_16k_1->addPage(rd7->getPage(x));
     }
-    cpm64k_16k_1->addPage(h89_1->getPage(0xc000));
-    cpm64k_16k_1->addPage(h89_1->getPage(0xe000));
+    cpm64k_16k_1->addPage(h89_1->getPage(6));
+    cpm64k_16k_1->addPage(h89_1->getPage(7));
     addLayout(4, cpm64k_16k_1);
 
     MemoryLayout* cpm64k_16k_2 = new MemoryLayout();
     for (x = 0; x < 6; ++x)
     {
-        cpm64k_16k_2->addPage(rd6->getPage(x << 13));
+        cpm64k_16k_2->addPage(rd6->getPage(x));
     }
-    cpm64k_16k_2->addPage(h89_1->getPage(0xc000));
-    cpm64k_16k_2->addPage(h89_1->getPage(0xe000));
+    cpm64k_16k_2->addPage(h89_1->getPage(6));
+    cpm64k_16k_2->addPage(h89_1->getPage(7));
     addLayout(5, cpm64k_16k_2);
 
     // 6,7: Hi 8K always main, low 56K bank switched
     MemoryLayout* cpm64k_8k_1 = new MemoryLayout();
     for (x = 0; x < 7; ++x)
     {
-        cpm64k_8k_1->addPage(rd7->getPage(x << 13));
+        cpm64k_8k_1->addPage(rd7->getPage(x));
     }
-    cpm64k_8k_1->addPage(h89_1->getPage(0xe000));
+    cpm64k_8k_1->addPage(h89_1->getPage(7));
     addLayout(6, cpm64k_8k_1);
 
     MemoryLayout* cpm64k_8k_2 = new MemoryLayout();
     for (x = 0; x < 6; ++x)
     {
-        cpm64k_8k_2->addPage(rd6->getPage(x << 13));
+        cpm64k_8k_2->addPage(rd6->getPage(x));
     }
-    cpm64k_8k_2->addPageAt(rd7->getPage(0xe000), 0xc000);
-    cpm64k_8k_2->addPage(h89_1->getPage(0xe000));
+    cpm64k_8k_2->addPageAt(rd7->getPage(7), 0xc000);
+    cpm64k_8k_2->addPage(h89_1->getPage(7));
     addLayout(7, cpm64k_8k_2);
 }
 
@@ -116,7 +116,7 @@ MMS77318MemoryDecoder::reset()
 {
     interestedBits = h89_gppBnkSelBits_c | h89_gppUnlockBits_c;
     lockState      = 1;
-    curBank        = 0;
+    curBank_m      = 0;
 }
 
 void
@@ -148,14 +148,14 @@ MMS77318MemoryDecoder::gppNewValue(BYTE gpo)
             lockState = 1;
         }
     }
-    curBank = bnk;
+    curBank_m = bnk;
 }
 
 void
 MMS77318MemoryDecoder::addLayout(int ix, MemoryLayout* lo)
 {
-    if (ix >= 0 && ix < numBnks)
+    if (ix >= 0 && ix < numBanks_m)
     {
-        banks[ix] = lo;
+        banks_m[ix] = lo;
     }
 }

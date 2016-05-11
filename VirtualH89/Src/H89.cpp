@@ -41,7 +41,6 @@
 #include "logger.h"
 #include "propertyutil.h"
 
-#include <stdlib.h>
 #include <vector>
 
 H89::H89(): Computer()
@@ -50,44 +49,9 @@ H89::H89(): Computer()
 }
 
 void
-H89::buildSystem(Console* console)
+H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
 {
-    PropertyUtil::PropertyMapT props;
-
-    // TODO: allow specification of config file via cmdline args.
-    std::string                cfg;
-    char*                      env = getenv("V89_CONFIG");
-
     this->console = console;
-
-    if (env)
-    {
-        // If file-not-found, we still might create it later...
-        cfg = env;
-
-        try
-        {
-            PropertyUtil::read(cfg.c_str(), props);
-        }
-
-        catch (std::exception& e)
-        {
-        }
-    }
-    else
-    {
-        cfg  = getenv("HOME");
-        cfg += "/.v89rc";
-
-        try
-        {
-            PropertyUtil::read(cfg.c_str(), props);
-        }
-
-        catch (std::exception& e)
-        {
-        }
-    }
 
     std::string s; // for general property queries.
 
@@ -177,14 +141,14 @@ H89::buildSystem(Console* console)
         cpu->enableFast();
     }
 
-    HDOS = new HDOSMemory8K();
+    HDOS = make_shared<HDOSMemory8K>();
     HDOS->installROM(monitorROM);
     HDOS->installROM(h17ROM);
     HDOS->enableRAM(0x1400, 1024);
 
     MemoryDecoder* memDecoder;
     // All sytems have the core 48K + ROM.
-    // \TODO Allow for 16K/32K  - also support ORG-0 with less than 64k
+    // \TODO Allow for 16K/32K  - also make support ORG-0 configurable.
     MemoryLayout*  h89_0 = new H88MemoryLayout(HDOS); // creates 48K RAM at 0x2000...
 
 
@@ -195,15 +159,7 @@ H89::buildSystem(Console* console)
     driveUnitH2 = nullptr;
 
     // Z37
-    h37         = nullptr;
-    driveUnitS0 = nullptr;
-    driveUnitS1 = nullptr;
-    driveUnitS2 = nullptr;
-    driveUnitS3 = nullptr;
-    soft0       = nullptr;
-    soft1       = nullptr;
-    soft2       = nullptr;
-    soft3       = nullptr;
+    Z_89_37*   h37 = nullptr;
 
     // Z47
     z47If       = nullptr;
@@ -214,11 +170,11 @@ H89::buildSystem(Console* console)
     eight0      = nullptr;
     eight1      = nullptr;
 
-    MMS77316*                m316 = NULL;
-    MMS77320*                m320 = NULL;
+    MMS77316*                m316 = nullptr;
+    MMS77320*                m320 = nullptr;
     CPNetDevice*             cpn  = CPNetDevice::install_CPNetDevice(props);
 
-    if (cpn != NULL)
+    if (cpn != nullptr)
     {
         h89io->addDevice(cpn);
     }

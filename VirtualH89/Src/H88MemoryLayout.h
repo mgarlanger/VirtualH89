@@ -10,20 +10,14 @@
 #define H88MEMORYLAYOUT_H_
 
 #include "MemoryLayout.h"
-#include "Memory8K.h"
-#include "RAMemory8K.h"
+
+class Memory8K;
 
 class H88MemoryLayout: public MemoryLayout
 {
   public:
-    H88MemoryLayout(Memory8K* hdos): MemoryLayout() {
-        addPage(hdos);
-        int x;
-        for (x = 1; x < 7; ++x)
-        {
-            addPage(new RAMemory8K(x << 13));
-        }
-    }
+    H88MemoryLayout(shared_ptr<Memory8K> hdos);
+    H88MemoryLayout(MemoryLayout* nonOrg0Layout);
 };
 
 #endif // H88MEMORYLAYOUT_H_

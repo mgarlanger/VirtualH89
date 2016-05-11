@@ -13,10 +13,7 @@
 #include "GenericFloppyFormat.h"
 #include "logger.h"
 
-
-#include <iostream>
 #include <fstream>
-#include <cstdlib>
 
 
 GenericFloppyDisk*
@@ -67,7 +64,7 @@ IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         ready_m = false;
         debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name);
     }
-    
+
     free(name);
 }
 
@@ -234,6 +231,8 @@ IMDFloppyDisk::readIMD(const char* name)
         debugss(ssFloppyDisk, ALL, "Head:    %d\n", head);
 
         Track* trk = new Track(head, cyl);
+        trk->setDataRate(dataRate);
+        trk->setDensity(density);
 
         numSec        = buf[pos++];
         debugss(ssFloppyDisk, ALL, "Num Sectors:    %d\n", numSec);

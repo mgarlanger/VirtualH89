@@ -10,7 +10,7 @@
 #define H88MEMORYDECODER_H_
 
 #include "MemoryDecoder.h"
-#include "MemoryLayout.h"
+
 
 class H88MemoryDecoder: public MemoryDecoder
 {
@@ -22,6 +22,8 @@ class H88MemoryDecoder: public MemoryDecoder
     virtual void reset();
   private:
     virtual void gppNewValue(BYTE gpo);
+
+    static const BYTE h89_gppOrg0Bit_c = 0b00100000;
 };
 
 #endif // H88MEMORYDECODER_H_

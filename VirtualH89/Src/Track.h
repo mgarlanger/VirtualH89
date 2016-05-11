@@ -38,9 +38,8 @@ class Track
   private:
     BYTE                  sideNum_m;
     BYTE                  trackNum_m;
-    // BYTE   numSectors_m;
-    std::vector <Sector*> sectors_m;
 
+    std::vector <Sector*> sectors_m;
 
     Density               density_m;
     DataRate              dataRate_m;

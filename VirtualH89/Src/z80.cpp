@@ -948,8 +948,6 @@ Z80::READnn(void)
 };
 
 
-#define COMMON_GET 1
-
 inline BYTE&
 Z80::getReg8(BYTE val)
 {
@@ -1656,7 +1654,14 @@ Z80::traceInstructions(void)
     {
         debugss(ssZ80, ERROR, "0x%04x(%03o.%03o) %04x %04x %04x %04x %04x : ",
                 PC, (PC >> 8) & 0xff, (PC & 0xff), AF, BC, DE, HL, SP);
-        disass(PC);
+        if (mode == cm_halt)
+        {
+            debugss_nts(ssZ80, ERROR, "Halted\n");
+        }
+        else
+        {
+            disass(PC);
+        }
 
     }
 }
@@ -2187,6 +2192,8 @@ Z80::op_ei(void)
     IFF2 = true;
 
     // Keep IFF1 false, it will be set to true after the next instruction by IFF0
+    // this ensures that the next instruction executes before servicing another
+    // interrupt.
     IFF0 = true;
 
 }
@@ -2615,7 +2622,7 @@ Z80::op_ld_ihl_n(void)
     // displacement is 3rd byte and value is 4th.
     // Functions with side-effects can be dangerous.
     WORD adr = getIndirectAddr();
-    BYTE n = READn();
+    BYTE n   = READn();
     writeMEM(adr, n);
 }
 
