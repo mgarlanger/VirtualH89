@@ -22,9 +22,10 @@ class Sector
     bool  valid_m;
     BYTE* data_m;
     WORD  sectorLength_m;
+    Sector();
 
   public:
-    Sector();
+    //
     Sector(BYTE  headNum,
            BYTE  trackNum,
            BYTE  sectorNum,
@@ -36,17 +37,13 @@ class Sector
            BYTE sectorNum,
            WORD sectorLength,
            BYTE data = 0xe5);
-
-    void initialize(BYTE  headNum,
-                    BYTE  trackNum,
-                    BYTE  sectorNum,
-                    WORD  sectorLength,
-                    BYTE* data);
-
     virtual ~Sector();
 
     void setDeletedDataAddressMark(bool val);
     void setReadError(bool val);
+
+    bool getDeletedDataAddressMark();
+    bool getReadError();
 
     BYTE getSectorNum();
     WORD getSectorLength();

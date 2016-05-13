@@ -12,11 +12,9 @@
 
 #include "h89Types.h"
 
-const int addressLine_c  = 16;
-const int memorySize_c   = 1L << addressLine_c;
-const int pageSizeBits_c = 10;
-const int pageSize_c     = 1L << pageSizeBits_c;
-const int numOfPages_c   = memorySize_c / pageSize_c;
+
+/// \todo make AddressBus a base class and this functionality in an H89AddressBus
+/// class
 
 class MemoryDecoder;
 class InterruptController;
@@ -30,7 +28,7 @@ class InterruptController;
 class AddressBus
 {
   private:
-    MemoryDecoder*       mem;
+    MemoryDecoder*       mem_m;
     InterruptController* ic_m;
 
   public:

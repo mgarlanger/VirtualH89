@@ -13,43 +13,57 @@
 #include "MemoryLayout.h"
 #include "GppListener.h"
 
+#include "Memory8K.h"
 
 class MemoryDecoder: public GppListener
 {
   public:
-    MemoryDecoder(int numBanks, BYTE gppBits): GppListener(gppBits) {
-        numBnks = numBanks;
-        bnkMask = numBanks - 1; // assumes power of 2
-        banks   = new MemoryLayout*[numBanks];
-        curBank = 0;
-        GppListener::addListener(this);
-    }
-    virtual ~MemoryDecoder() {
-    }
+    MemoryDecoder(int numBanks, BYTE gppBits);
+    virtual ~MemoryDecoder();
+
     virtual void reset()                             = 0;
     virtual void addLayout(int ix, MemoryLayout* lo) = 0;
-    inline MemoryLayout* getLayout(int ix) {
-        return banks[ix & bnkMask];
-    }
-    inline int numLayouts() {
-        return numBnks;
-    }
-    inline int getCurrentBank() {
-        return curBank;
+
+    inline MemoryLayout* getLayout(int ix)
+    {
+        return banks_m[ix & bankMask_m];
     }
 
-    inline BYTE readByte(int ix, WORD adr) {
-        return getLayout(ix)->getPage(adr)->readByte(adr);
+    inline int numLayouts()
+    {
+        return numBanks_m;
     }
+
+    inline int getCurrentBank()
+    {
+        return curBank_m;
+    }
+
+    inline BYTE readByte(int ix, WORD adr)
+    {
+        return getLayout(ix)->getPageByAddress(adr)->readByte(adr);
+    }
+
     inline void writeByte(int ix, WORD adr, BYTE val)
     {
-        getLayout(ix)->getPage(adr)->writeByte(adr, val);
+        getLayout(ix)->getPageByAddress(adr)->writeByte(adr, val);
     }
+
+    inline BYTE readByte(WORD address)
+    {
+        return getLayout(curBank_m)->getPageByAddress(address)->readByte(address);
+    }
+    inline void writeByte(WORD address, BYTE val)
+    {
+        getLayout(curBank_m)->getPageByAddress(address)->writeByte(address, val);
+    }
+
+
   protected:
-    BYTE           curBank;
-    int            bnkMask;
-    int            numBnks;
-    MemoryLayout** banks;
+    BYTE           curBank_m;
+    int            bankMask_m;
+    int            numBanks_m;
+    MemoryLayout** banks_m;
 };
 
 #endif // MEMORYDECODER_H_

@@ -12,6 +12,8 @@
 
 #include "GenericDiskDrive.h"
 
+#include "h89Types.h"
+
 class GenericFloppyDisk;
 
 ///

@@ -15,7 +15,7 @@ class DiskData;
 
 /// \class HardSectoredDisk
 ///
-/// \brief Virtual hard-sectored disk, currently just supports SS/40-track disks.
+/// \brief Virtual hard-sectored disk
 ///
 /// This class implements a virtual hard-sectored disk. It models the entire track
 /// such as the headers and gaps, not only the data portion.

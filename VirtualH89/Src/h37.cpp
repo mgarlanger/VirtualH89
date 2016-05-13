@@ -15,6 +15,7 @@
 #include "computer.h"
 
 #include "IMDFloppyDisk.h"
+#include "TD0FloppyDisk.h"
 
 
 
@@ -128,7 +129,8 @@ Z_89_37::install_H37(Computer*                   computer,
                     /*SoftSectoredDisk* disk = new SoftSectoredDisk(
                                                                   s.c_str(), SoftSectoredDisk::dif_RAW);
                        drive->insertDisk(disk);*/
-                    drive->insertDisk(IMDFloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
+                    // drive->insertDisk(IMDFloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
+                    drive->insertDisk(TD0FloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
                 }
 
             }

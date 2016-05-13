@@ -11,7 +11,6 @@
 
 #include "WallClock.h"
 #include "logger.h"
-#include "FloppyDisk.h"
 #include "GenericFloppyFormat.h"
 #include "GenericFloppyDisk.h"
 
@@ -174,7 +173,7 @@ GenericFloppyDrive::readData(bool dd,
     {
         // TODO determine why CP/M didn't handle fallback properly.
         debugss(ssGenericFloppyDrive, WARNING, "DD mismatch(%d)\n", dd);
-        //    return GenericFloppyFormat::ERROR;
+        return GenericFloppyFormat::ERROR;
     }
 
     if (track_m != track || headSel_m != side)
@@ -292,9 +291,15 @@ BYTE
 GenericFloppyDrive::getMaxSectors(BYTE side,
                                   BYTE track)
 {
+    if (track_m != track || headSel_m != side)
+    {
+        debugss(ssGenericFloppyDrive, WARNING, "mismatch trk %d:%d sid %d:%d\n", track_m, track,
+                headSel_m, side);
+    }
+
     if (disk_m)
     {
-        return disk_m->getMaxSectors(side, track);
+        return disk_m->getMaxSectors(headSel_m, track_m);
     }
 
 

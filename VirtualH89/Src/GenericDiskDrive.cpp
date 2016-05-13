@@ -10,8 +10,6 @@
 #include "GenericDiskDrive.h"
 
 
-#include "WallClock.h"
-#include "logger.h"
 
 GenericDiskDrive::GenericDiskDrive()
 {

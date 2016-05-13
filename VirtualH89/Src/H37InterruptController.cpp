@@ -29,8 +29,8 @@ H37InterruptController::~H37InterruptController()
 void
 H37InterruptController::setINTLine()
 {
-//    debugss(ssH37InterruptController, INFO, "intLevel: %d intrqRaised_m: %d drqRaised: %d\n",
-//            intLevel_m, intrqRaised_m, drqRaised_m);
+    // debugss(ssH37InterruptController, INFO, "intLevel: %d intrqRaised_m: %d drqRaised: %d\n",
+    //        intLevel_m, intrqRaised_m, drqRaised_m);
 
     if ((!interruptsBlocked_m && intLevel_m != 0) || intrqRaised_m || drqRaised_m)
     {
@@ -64,6 +64,7 @@ H37InterruptController::readDataBus()
     else if (drqRaised_m)
     {
         // EI
+        debugss(ssH37InterruptController, ALL, "drq set\n");
         opCode = 0xfb;
     }
     else if (!interruptsBlocked_m)
@@ -73,7 +74,7 @@ H37InterruptController::readDataBus()
     else
     {
         debugss(ssH37InterruptController, ERROR, "readData bus, but nothing to provide\n");
-
+        opCode = InterruptController::readDataBus();
     }
 
     debugss(ssH37InterruptController, ALL, "opCode: %d\n", opCode);
@@ -85,10 +86,6 @@ H37InterruptController::setIntrq(bool raise)
 {
     debugss(ssH37InterruptController, VERBOSE, "Entering: %d\n", raise);
     intrqRaised_m = raise;
-/*    if (raise)
-    {
-        interruptsBlocked_m = false;
-    }*/
     setINTLine();
 }
 
@@ -104,7 +101,7 @@ void
 H37InterruptController::blockInterrupts(bool block)
 {
     debugss(ssH37InterruptController, INFO, "Entering: %d\n", block);
-    setINTLine();
 
     interruptsBlocked_m = block;
+    setINTLine();
 }

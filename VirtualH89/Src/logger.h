@@ -9,7 +9,6 @@
 
 #include <cstdio>
 
-//#include "WallClock.h"
 
 extern FILE* log_out;
 
@@ -30,9 +29,6 @@ class logger
     FILE* logFile;
 
 };
-
-#define DEBUG 1
-#define DEBUG_TO_FILE 1
 
 ///
 enum subSystems
@@ -101,22 +97,22 @@ enum logLevel
     ALL     = 100
 };
 
-extern void __debugss(enum subSystems, enum logLevel, const char* functionName, const char* fmt,
-                      ...);
+extern void __debugss(enum logLevel, const char* functionName, const char* fmt, ...);
+extern void __debugss_nts(const char* fmt, ...);
 
-#define debugss(subsys, level, args ...)                     \
-    if (level <= debugLevel[subsys])                         \
-    {                                                        \
-        __debugss(subsys, level, __PRETTY_FUNCTION__, args); \
+
+#define debugss(subsys, level, args ...)             \
+    if (level <= debugLevel[subsys])                 \
+    {                                                \
+        __debugss(level, __PRETTY_FUNCTION__, args); \
     }
 
 
-// nts - No TimeStamp
 #define debugss_nts(subsys, level, args ...) \
     {                                        \
         if (level <= debugLevel[subsys])     \
         {                                    \
-            fprintf(log_out, args);          \
+            __debugss_nts(args);             \
         }                                    \
     }
 

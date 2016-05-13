@@ -22,6 +22,9 @@
 #include <pthread.h>
 
 #include "computer.h"
+#include "propertyutil.h"
+
+#include <memory>
 
 // Forward declare classes to avoid a tangled mess of includes.
 
@@ -35,8 +38,6 @@ class H89_IO;
 class NMIPort;
 class GeneralPurposePort;
 class INS8250;
-class H17;
-class Z_89_37;
 class Z47Interface;
 class Z47Controller;
 class DiskDrive;
@@ -46,6 +47,8 @@ class FloppyDisk;
 class ParallelLink;
 class HDOSMemory8K;
 
+using namespace std;
+
 ///
 /// \brief Virtual Heathkit %H89 Computer
 ///
@@ -54,57 +57,46 @@ class HDOSMemory8K;
 class H89: public Computer
 {
   private:
-    AddressBus*          ab;
-    InterruptController* interruptController;
-    H89Timer*            timer;
+    AddressBus*              ab;
+    InterruptController*     interruptController;
+    H89Timer*                timer;
 
-    H89_IO*              h89io;
+    H89_IO*                  h89io;
 
-    GeneralPurposePort*  gpp;
+    GeneralPurposePort*      gpp;
 
-    NMIPort*             nmi1;
-    NMIPort*             nmi2;
+    NMIPort*                 nmi1;
+    NMIPort*                 nmi2;
 
-    INS8250*             consolePort;
-    INS8250*             lpPort;
-    INS8250*             modemPort;
-    INS8250*             auxPort;
+    INS8250*                 consolePort;
+    INS8250*                 lpPort;
+    INS8250*                 modemPort;
+    INS8250*                 auxPort;
 
-    Console*             console;
-    Z_89_37*             h37;
-    Z47Interface*        z47If;
-    Z47Controller*       z47Cntrl;
-    ParallelLink*        z47Link;
+    Console*                 console;
+    Z47Interface*            z47If;
+    Z47Controller*           z47Cntrl;
+    ParallelLink*            z47Link;
 
-    DiskDrive*           driveUnitH0;
-    DiskDrive*           driveUnitH1;
-    DiskDrive*           driveUnitH2;
+    DiskDrive*               driveUnitH0;
+    DiskDrive*               driveUnitH1;
+    DiskDrive*               driveUnitH2;
 
-    DiskDrive*           driveUnitS0;
-    DiskDrive*           driveUnitS1;
-    DiskDrive*           driveUnitS2;
-    DiskDrive*           driveUnitS3;
+    DiskDrive*               driveUnitE0;
+    DiskDrive*               driveUnitE1;
 
-    DiskDrive*           driveUnitE0;
-    DiskDrive*           driveUnitE1;
+    FloppyDisk*              hard0;
+    FloppyDisk*              hard1;
+    FloppyDisk*              hard2;
 
-    FloppyDisk*          hard0;
-    FloppyDisk*          hard1;
-    FloppyDisk*          hard2;
+    FloppyDisk*              eight0;
+    FloppyDisk*              eight1;
 
-    FloppyDisk*          soft0;
-    FloppyDisk*          soft1;
-    FloppyDisk*          soft2;
-    FloppyDisk*          soft3;
+    CPU*                     cpu;
 
-    FloppyDisk*          eight0;
-    FloppyDisk*          eight1;
-
-    CPU*                 cpu;
-
-    ROM*                 monitorROM;
-    ROM*                 h17ROM;
-    HDOSMemory8K*        HDOS;
+    ROM*                     monitorROM;
+    ROM*                     h17ROM;
+    shared_ptr<HDOSMemory8K> HDOS;
 
     /// Port Addresses
 
@@ -125,6 +117,7 @@ class H89: public Computer
     /// Addresses for the serial ports (NOTE addresses are in OCTAL)
     static const BYTE          Serial_Console_c           = 0350; // (0xe8)
     static const BYTE          Serial_Console_Interrupt_c = 3;
+
     static const BYTE          Serial_AuxPort_c           = 0320; // (0xD0)
     static const BYTE          Serial_ModemPort_c         = 0330; // (0xD8)
     static const BYTE          Serial_LpPort_c            = 0340; // (0xE0)
@@ -152,7 +145,7 @@ class H89: public Computer
   public:
     H89();
     virtual ~H89();
-    void buildSystem(Console* console);
+    void buildSystem(Console* console, PropertyUtil::PropertyMapT props);
 
     virtual void reset();
     virtual BYTE run();

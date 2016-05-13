@@ -88,7 +88,8 @@ WD1797::WD1797(int baseAddr): ClockUser(),
                               stepDirection_m(dir_out),
                               curPos_m(0),
                               sectorPos_m(InitialSectorPos_c),
-                              userIf_m(nullptr)
+                              userIf_m(nullptr),
+                              cycleCount_m(0)
 {
 
 }
@@ -635,6 +636,8 @@ void
 WD1797::notification(unsigned int cycleCount)
 {
 
+    cycleCount_m += cycleCount;
+
     unsigned long       charPos   = 0;
     GenericFloppyDrive* drive     = getCurDrive();
     bool                indexEdge = false;
@@ -644,6 +647,7 @@ WD1797::notification(unsigned int cycleCount)
 
         // TODO: set some status indicator.
         bool notReady = true;
+        // the H37 has the ready signal tied to +5.
         if (userIf_m && userIf_m->readReady())
         {
             notReady = false;
@@ -710,7 +714,7 @@ WD1797::notification(unsigned int cycleCount)
 
     if (charPos == curPos_m)
     {
-        // TODO density shouldn't affect timing for later
+        // TODO density shouldn't affect timing for later - and shouldn't depend on drive/disk
         // Position hasn't changed just return
         return;
     }
@@ -911,7 +915,6 @@ WD1797::notification(unsigned int cycleCount)
                 debugss(ssWD1797, WARNING, "DATA_AM\n");
                 sectorPos_m = 0;
             }
-
             else if (data == GenericFloppyFormat::CRC)
             {
                 BYTE sectors = drive->getMaxSectors(side_m, trackReg_m);
@@ -931,7 +934,6 @@ WD1797::notification(unsigned int cycleCount)
                     sectorPos_m = InitialSectorPos_c;
                 }
             }
-
             else if (data < 0)
             {
                 debugss(ssWD1797, WARNING, "less than zero\n");
@@ -942,7 +944,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else
             {
                 transferData(data);
@@ -980,7 +981,6 @@ WD1797::notification(unsigned int cycleCount)
             {
                 sectorPos_m = 0;
             }
-
             else if (data == GenericFloppyFormat::CRC)
             {
                 debugss(ssWD1797, INFO, "read address %d - done\n", sectorPos_m);
@@ -989,7 +989,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else if (data < 0)
             {
                 // probably ERROR
@@ -999,7 +998,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else
             {
                 if (sectorPos_m == 0)
@@ -1030,12 +1028,10 @@ WD1797::notification(unsigned int cycleCount)
 
                 // just wait for sector to come around..
             }
-
             else if (result == GenericFloppyFormat::DATA_AM)
             {
                 sectorPos_m = 0;
             }
-
             else if (result == GenericFloppyFormat::CRC)
             {
                 sectorPos_m  = ErrorSectorPos_c;
@@ -1043,7 +1039,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else if (result < 0)
             {
                 // other errors
@@ -1053,7 +1048,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else
             {
                 dataReady_m = false;
@@ -1090,7 +1084,6 @@ WD1797::notification(unsigned int cycleCount)
             {
                 sectorPos_m = 0;
             }
-
             else if (data == GenericFloppyFormat::CRC)
             {
                 sectorPos_m  = ErrorSectorPos_c;
@@ -1135,12 +1128,10 @@ WD1797::notification(unsigned int cycleCount)
 
                 // just wait for sector to come around..
             }
-
             else if (result == GenericFloppyFormat::INDEX_AM)
             {
                 sectorPos_m = 0;
             }
-
             else if (result == GenericFloppyFormat::CRC)
             {
                 sectorPos_m  = ErrorSectorPos_c;
@@ -1148,7 +1139,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else if (result < 0)
             {
                 // other errors
@@ -1159,7 +1149,6 @@ WD1797::notification(unsigned int cycleCount)
                 raiseIntrq();
                 curCommand_m = noneCmd;
             }
-
             else
             {
                 dataReady_m = false;

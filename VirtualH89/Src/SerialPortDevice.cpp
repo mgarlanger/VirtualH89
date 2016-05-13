@@ -7,7 +7,8 @@
 #include "SerialPortDevice.h"
 
 #include "INS8250.h"
-#include <cstdio>
+#include "logger.h"
+
 
 SerialPortDevice::SerialPortDevice(): port_m(0)
 {
@@ -40,6 +41,7 @@ SerialPortDevice::sendData(BYTE data)
         return true;
     }
 
-    printf("port_m is NULL\n");
+    debugss(ssSerial, WARNING, "port_m is NULL\n");
+
     return false;
 }

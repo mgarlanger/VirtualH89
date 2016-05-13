@@ -12,8 +12,6 @@
 
 #include <string>
 
-#include "h89Types.h"
-
 class GenericFloppyDisk;
 
 ///

@@ -7,7 +7,6 @@
 ///
 
 #include "Track.h"
-
 #include "Sector.h"
 
 #include "logger.h"
@@ -40,12 +39,14 @@ Track::addSector(Sector* sector)
 void
 Track::dump()
 {
-    printf("Dumping track - head: %d track: %d\n", sideNum_m, trackNum_m);
+    debugss(ssFloppyDisk, INFO, "Dumping track - head: %d track: %d\n", sideNum_m,
+            trackNum_m);
 
-    for (int sect = 0; sect < sectors_m.size(); sect++)
+
+    for (Sector* sector : sectors_m)
     {
-        printf("  Sector: %d\n", sect);
-        sectors_m[sect]->dump();
+        debugss(ssFloppyDisk, INFO, "  Sector: %d\n", sector->getSectorNum());
+        sector->dump();
     }
 }
 
@@ -62,19 +63,19 @@ Track::setDataRate(DataRate datarate)
 }
 
 bool
-Track::readSectorData(BYTE  sector,
+Track::readSectorData(BYTE  sectorNum,
                       WORD  pos,
                       BYTE& data)
 {
-    debugss(ssFloppyDisk, INFO, "sector: %d pos: %d\n", sector, pos);
+    debugss(ssFloppyDisk, INFO, "sector: %d pos: %d\n", sectorNum, pos);
 
-    for (int i = 0; i < sectors_m.size(); i++)
+    for (Sector* sector : sectors_m)
     {
-        if (sectors_m[i]->getSectorNum() == sector)
+        if (sector->getSectorNum() == sectorNum)
         {
             debugss(ssFloppyDisk, ALL, "found\n");
 
-            return sectors_m[i]->readData(pos, data);
+            return sector->readData(pos, data);
         }
     }
 
@@ -85,15 +86,15 @@ Track::readSectorData(BYTE  sector,
 }
 
 Sector*
-Track::findSector(BYTE sector)
+Track::findSector(BYTE sectorNum)
 {
-    for (int i = 0; i < sectors_m.size(); i++)
+    for (Sector* sector : sectors_m)
     {
-        if (sectors_m[i]->getSectorNum() == sector)
+        if (sector->getSectorNum() == sectorNum)
         {
             debugss(ssFloppyDisk, INFO, "found\n");
 
-            return sectors_m[i];
+            return sector;
         }
     }
 
@@ -104,5 +105,6 @@ BYTE
 Track::getMaxSectors()
 {
     // todo see if this should look through and find the highest sector number from all sectors.
+    // that is properly the right thing to do.
     return sectors_m.size() & 0xff;
 }

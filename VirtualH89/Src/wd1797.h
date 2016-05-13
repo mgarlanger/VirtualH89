@@ -313,20 +313,20 @@ class WD1797: public ClockUser
     /// stat_DataRequest_c    - 0x02;
     /// stat_Busy_c           - 0x01;
 
-    static const int sectorLengths[2][4];
-    static const int HeadSettleTimeInTicks_c = 100;
-    static const int InitialSectorPos_c      = -11;
-    static const int ErrorSectorPos_c        = -1;
+    static const int   sectorLengths[2][4];
+    static const int   HeadSettleTimeInTicks_c = 100;
+    static const int   InitialSectorPos_c      = -11;
+    static const int   ErrorSectorPos_c        = -1;
 
   private:
-    WD179xUserIf*    userIf_m;
+    WD179xUserIf*      userIf_m;
 
-
+    unsigned long long cycleCount_m;
 
     void transferData(int data);
     void updateReady(GenericFloppyDrive* drive);
-    bool checkAddr(BYTE addr[6]);
-    int  sectorLen(BYTE addr[6]);
+    bool               checkAddr(BYTE addr[6]);
+    int                sectorLen(BYTE addr[6]);
 
 };
 
