@@ -15,6 +15,7 @@
 
 #include <fstream>
 
+using namespace std;
 
 unsigned char TD0FloppyDisk::d_code[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -326,31 +327,27 @@ TD0FloppyDisk::getword()
 
 
 
-GenericFloppyDisk*
-TD0FloppyDisk::getDiskette(std::vector<std::string> argv)
+shared_ptr<GenericFloppyDisk>
+TD0FloppyDisk::getDiskette(vector<string> argv)
 {
-    GenericFloppyDisk* gd = new TD0FloppyDisk(argv);
+    shared_ptr<GenericFloppyDisk> gd = make_shared<TD0FloppyDisk>(argv);
 
-    if (!gd->isReady())
+    if (gd->isReady())
     {
-        delete gd;
-        gd = nullptr;
+        return gd;
     }
 
-    return gd;
+    return nullptr;
 }
 
 
-TD0FloppyDisk::TD0FloppyDisk(std::vector<std::string> argv): GenericFloppyDisk(),
-                                                             imageName_m(nullptr),
-                                                             curSector_m(nullptr),
-                                                             dataPos_m(0),
-                                                             sectorLength_m(0),
-                                                             secLenCode_m(0),
-                                                             hypoTrack_m(false),
-                                                             hyperTrack_m(false),
-                                                             advanceCompression_m(false),
-                                                             ready_m(true)
+TD0FloppyDisk::TD0FloppyDisk(vector<string> argv): GenericFloppyDisk(),
+                                                   imageName_m(nullptr),
+                                                   curSector_m(nullptr),
+                                                   dataPos_m(0),
+                                                   sectorLength_m(0),
+                                                   secLenCode_m(0),
+                                                   ready_m(true)
 {
     if (argv.size() < 1)
     {
@@ -358,8 +355,8 @@ TD0FloppyDisk::TD0FloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         return;
     }
 
-    char* name = strdup(argv[0].c_str());
-    debugss(ssFloppyDisk, INFO, "reading: %s\n", name);
+    string name(argv[0].c_str());
+    debugss(ssFloppyDisk, INFO, "reading: %s\n", name.c_str());
 
     for (int x = 1; x < argv.size(); ++x)
     {
@@ -370,13 +367,12 @@ TD0FloppyDisk::TD0FloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
     }
 
 
-    if (!readTD0(name))
+    if (!readTD0(name.c_str()))
     {
         ready_m = false;
-        debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name);
+        debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name.c_str());
     }
 
-    free(name);
 }
 
 TD0FloppyDisk::~TD0FloppyDisk()
@@ -390,15 +386,32 @@ TD0FloppyDisk::findSector(int side,
                           int sector)
 {
 
+    if (hypoTrack_m)
+    {
+        if ((track & 1) != 0)
+        {
+            // return false;
+        }
+
+        track /= 2;
+    }
+    else if (hyperTrack_m)
+    {
+        track *= 2;
+    }
+
     if (!tracks_m[side][track])
     {
         return false;
     }
+
     curSector_m = tracks_m[side][track]->findSector(sector);
+
     if (!curSector_m)
     {
         return false;
     }
+
     if (curSector_m->getHeadNum() != side || curSector_m->getTrackNum() != track)
     {
         curSector_m = nullptr;
@@ -438,17 +451,17 @@ TD0FloppyDisk::findSector(int side,
 bool
 TD0FloppyDisk::readTD0(const char* name)
 {
-    std::ifstream   file;
+    ifstream        file;
 
     Track::Density  density;
     Track::DataRate dataRate;
 
     debugss(ssFloppyDisk, INFO, "file: %s\n", name);
 
-    file.open(name, std::ios::binary);
-    file.seekg(0, std::ios::end);
+    file.open(name, ios::binary);
+    file.seekg(0, ios::end);
     size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    file.seekg(0, ios::beg);
 
     buf  = new BYTE[size];
     file.read((char*) buf, size);
@@ -481,8 +494,10 @@ TD0FloppyDisk::readTD0(const char* name)
 
     debugss(ssFloppyDisk, INFO, "Sequence: %d\n", buf[2]);
     debugss(ssFloppyDisk, INFO, "Check Sequence: %d\n", buf[3]);
-    debugss(ssFloppyDisk, INFO, "Teledisk Version %d.%d\n", buf[4] & 0xf0 >> 4, buf[4] & 0x0f);
+    debugss(ssFloppyDisk, INFO, "Teledisk Version %d.%d\n", buf[4] & 0xf0 >> 4,
+            buf[4] & 0x0f);
     debugss(ssFloppyDisk, INFO, "Data Rate: %d\n", buf[5]);
+
     switch (buf[5] & 0x3)
     {
         case 0:
@@ -566,6 +581,10 @@ TD0FloppyDisk::readTD0(const char* name)
         density = (side & 0x80) ? Track::singleDensity : Track::doubleDensity;
         side   &= 0x01;
 
+        if (cylinder >= numTracks_m)
+        {
+            numTracks_m = cylinder + 1;
+        }
         int crc = getbyte();
         debugss(ssFloppyDisk, INFO, "Track %d head: %d density: %d CRC: %d\n", cylinder,
                 side, density, crc);
@@ -577,7 +596,7 @@ TD0FloppyDisk::readTD0(const char* name)
         else
         {
 
-            Track* trk = new Track(side, cylinder);
+            shared_ptr<Track> trk = make_shared<Track>(side, cylinder);
             trk->setDensity(density);
             trk->setDataRate(dataRate);
 
@@ -606,8 +625,8 @@ TD0FloppyDisk::readTD0(const char* name)
                 debugss(ssFloppyDisk, INFO, "Head: %d\n", secHead);
                 debugss(ssFloppyDisk, INFO, "Num: %d\n", secNum);
                 debugss(ssFloppyDisk, INFO, "Size: %d\n", secSize);
-                debugss(ssFloppyDisk, INFO, "Flags: 0x%02x", secFlags);
-                debugss(ssFloppyDisk, INFO, "CRC: 0x%02x", secCRC);
+                debugss(ssFloppyDisk, INFO, "Flags: 0x%02x\n", secFlags);
+                debugss(ssFloppyDisk, INFO, "CRC: 0x%02x\n", secCRC);
 
                 // make sure there is data
                 if ((secFlags & 0x30) == 0)
@@ -712,7 +731,8 @@ TD0FloppyDisk::readTD0(const char* name)
 
                     }
                     // create sector
-                    Sector* sect = new Sector(secHead, secCyl, secNum, secSize, block);
+                    shared_ptr<Sector> sect = make_shared<Sector>(secHead, secCyl, secNum, secSize,
+                                                                  block);
 
                     // set flags
                     sect->setReadError((secFlags & 0x02) == 0x02);
@@ -775,7 +795,18 @@ TD0FloppyDisk::readData(BYTE track,
         switch (inSector)
         {
             case 0:
-                data = track;
+                if (hypoTrack_m)
+                {
+                    data = track / 2;
+                }
+                else if (hyperTrack_m)
+                {
+                    data = track * 2;
+                }
+                else
+                {
+                    data = track;
+                }
                 break;
 
             case 1:
@@ -941,7 +972,7 @@ TD0FloppyDisk::dump(void)
     // \todo implement
 }
 
-std::string
+string
 TD0FloppyDisk::getMediaName()
 {
     if (!imageName_m)

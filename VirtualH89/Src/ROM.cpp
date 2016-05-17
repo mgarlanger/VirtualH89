@@ -39,14 +39,14 @@ ROM::getROM(const char* filename,
     std::ifstream     file;
     unsigned long int fileSize;
     BYTE*             buf;
-    ROM*              rom = NULL;
+    ROM*              rom = nullptr;
 
     file.open(filename, std::ios::binary);
 
     if (!file.is_open())
     {
         debugss(ssROM, ERROR, "ROM image \"%s\" cannot be opened\n", filename);
-        return NULL;
+        return nullptr;
     }
 
     file.seekg(0, std::ios::end);
@@ -56,7 +56,7 @@ ROM::getROM(const char* filename,
     if (fileSize != 2048 && fileSize != 4096)
     {
         debugss(ssROM, ERROR, "ROM image \"%s\" has invalid size %d\n", filename, fileSize);
-        return NULL;
+        return nullptr;
     }
 
     buf = new BYTE[fileSize];

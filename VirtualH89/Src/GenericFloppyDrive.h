@@ -14,6 +14,7 @@
 
 #include "h89Types.h"
 
+#include <memory>
 class GenericFloppyDisk;
 
 ///
@@ -62,7 +63,7 @@ class GenericFloppyDrive: public GenericDiskDrive
     BYTE getMaxSectors(BYTE side,
                        BYTE track);
 
-    void insertDisk(GenericFloppyDisk* disk);
+    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk);
 
     void notification(unsigned int cycleCount);
     unsigned long getCharPos(bool doubleDensity);
@@ -87,21 +88,21 @@ class GenericFloppyDrive: public GenericDiskDrive
     std::string getMediaName();
 
   private:
-    unsigned int       numTracks_m;
-    unsigned int       numHeads_m;
-    unsigned int       driveRpm_m;
-    unsigned int       mediaSize_m;
-    unsigned int       rawSDBytesPerTrack_m;
-    unsigned long      ticksPerSec_m;
-    unsigned long      ticksPerRev_m;
-    unsigned long long cycleCount_m;
-    bool               indexPulse_m;
+    unsigned int                       numTracks_m;
+    unsigned int                       numHeads_m;
+    unsigned int                       driveRpm_m;
+    unsigned int                       mediaSize_m;
+    unsigned int                       rawSDBytesPerTrack_m;
+    unsigned long                      ticksPerSec_m;
+    unsigned long                      ticksPerRev_m;
+    unsigned long long                 cycleCount_m;
+    bool                               indexPulse_m;
 
-    GenericFloppyDisk* disk_m;
-    int                headSel_m;
-    int                track_m;
-    bool               motor_m;
-    bool               head_m;
+    std::shared_ptr<GenericFloppyDisk> disk_m;
+    int                                headSel_m;
+    int                                track_m;
+    bool                               motor_m;
+    bool                               head_m;
 
     GenericFloppyDrive(unsigned int heads,
                        unsigned int tracks,

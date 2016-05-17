@@ -29,7 +29,7 @@ SerialPortDevice::attachPort(INS8250* port)
 bool
 SerialPortDevice::sendReady()
 {
-    return port_m != NULL && port_m->receiveReady();
+    return port_m != nullptr && port_m->receiveReady();
 }
 
 bool

@@ -14,6 +14,8 @@
 
 #include "h89Types.h"
 
+#include <memory>
+
 class GenericFloppyDisk;
 
 ///
@@ -64,7 +66,8 @@ class GenericSASIDrive: public GenericDiskDrive
     {
         return true;
     }
-    void insertDisk(GenericFloppyDisk* disk) {
+    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk)
+    {
     }
 
     std::string getMediaName();

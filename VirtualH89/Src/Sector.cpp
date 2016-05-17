@@ -11,18 +11,7 @@
 #include "logger.h"
 
 #include <iostream>
-/*
-   Sector::Sector(): headNum_m(0),
-                  trackNum_m(0),
-                  sectorNum_m(0),
-                  deletedDataAddressMark_m(false),
-                  readError_m(false),
-                  valid_m(false),
-                  data_m(0),
-                  sectorLength_m(0)
-   {
 
-   }*/
 
 Sector::Sector(BYTE  headNum,
                BYTE  trackNum,
@@ -83,46 +72,8 @@ Sector::~Sector()
 
     valid_m = false;
 }
-/*
-   void
-   Sector::initialize(BYTE  headNum,
-                   BYTE  trackNum,
-                   BYTE  sectorNum,
-                   WORD  sectorLength,
-                   BYTE* data)
-   {
-    if (valid_m)
-    {
-        // Error condition, shouldn't initialize an already valid object
 
-        debugss(ssFloppyDisk, ERROR, "Sector already initialized - h: %d t: %d s: %d\n",
-                headNum, trackNum, sectorNum);
 
-    }
-    debugss(ssFloppyDisk, INFO, "Sector initializing - h: %d t: %d s: %d, len: %d\n",
-            headNum, trackNum, sectorNum, sectorLength);
-
-    headNum_m      = headNum;
-    trackNum_m     = trackNum;
-    sectorNum_m    = sectorNum;
-    sectorLength_m = sectorLength;
-    data_m         = new BYTE[sectorLength_m];
-
-    if (data_m)
-    {
-        valid_m = true;
-
-        for (int i = 0; i < sectorLength_m; i++)
-        {
-            data_m[i] = data[i];
-        }
-    }
-    else
-    {
-        valid_m = false;
-    }
-   }
- */
 void
 Sector::setDeletedDataAddressMark(bool val)
 {
@@ -205,7 +156,6 @@ Sector::getTrackNum()
 {
     return trackNum_m;
 }
-
 
 bool
 Sector::readData(WORD  pos,

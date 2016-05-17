@@ -10,22 +10,24 @@
 #ifndef GPPLISTENER_H_
 #define GPPLISTENER_H_
 
-#include <vector>
 
 #include "h89Types.h"
 
-class GppListener
+#include <vector>
+#include <memory>
+
+class GppListener: std::enable_shared_from_this<GppListener>
 {
   public:
-    GppListener(): interestedBits(0xff) {
-    }
-    GppListener(BYTE bits): interestedBits(bits) {
-    }
+    GppListener(BYTE bits = 0xff);
+
     static void addListener(GppListener* lstr);
     static void notifyListeners(BYTE gpo, BYTE diffs);
+
   protected:
     virtual void gppNewValue(BYTE gpo) = 0;
-    BYTE                             interestedBits;
+    BYTE                             interestedBits_m;
+
   private:
     static std::vector<GppListener*> notifications;
 };

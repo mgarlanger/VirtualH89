@@ -11,6 +11,7 @@
 #include "GenericFloppyDisk.h"
 
 #include <vector>
+#include <memory>
 
 class Track;
 class Sector;
@@ -39,22 +40,23 @@ class TD0FloppyDisk: public GenericFloppyDisk
     virtual void eject(const char* name);
     virtual void dump(void);
     virtual std::string getMediaName();
-    static GenericFloppyDisk* getDiskette(std::vector<std::string> argv);
+    static std::shared_ptr<GenericFloppyDisk> getDiskette(std::vector<std::string> argv);
 
   private:
-    const char*               imageName_m;
-    static const unsigned int maxHeads_c = 2;
 
-    std::vector <Track*>      tracks_m[maxHeads_c];
+    const char*                           imageName_m;
+    static const unsigned int             maxHeads_c = 2;
 
-    Sector*                   curSector_m;
-    int                       dataPos_m;
-    int                       sectorLength_m;
-    BYTE                      secLenCode_m;
-    bool                      ready_m;
+    std::vector<std::shared_ptr<Track> >  tracks_m[maxHeads_c];
 
-    bool                      hypoTrack_m;  // ST media in DT drive
-    bool                      hyperTrack_m; // DT media in ST drive
+    std::shared_ptr<Sector>               curSector_m;
+    int                                   dataPos_m;
+    int                                   sectorLength_m;
+    BYTE                                  secLenCode_m;
+    bool                                  ready_m;
+
+    // bool                                  hypoTrack_m;  // ST media in DT drive
+    // bool                                  hyperTrack_m; // DT media in ST drive
 
     // bool          interlaced_m;
     // int           mediaLat_m;

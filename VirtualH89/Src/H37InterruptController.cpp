@@ -6,9 +6,10 @@
 ///
 
 #include "H37InterruptController.h"
-#include "logger.h"
 
 #include "cpu.h"
+
+#include "logger.h"
 
 
 H37InterruptController::H37InterruptController(CPU* cpu): InterruptController(cpu),
@@ -43,9 +44,9 @@ H37InterruptController::setINTLine()
     }
 }
 
-// reading instructions for interrupts
-// this models the real hardware, in which the circuit generated the right
-// bits to be the desired instruction
+/// reading instructions for interrupts
+/// this models the real hardware, in which the circuit generated the right
+/// bits to be the desired instruction
 BYTE
 H37InterruptController::readDataBus()
 {
@@ -73,7 +74,7 @@ H37InterruptController::readDataBus()
     }
     else
     {
-        debugss(ssH37InterruptController, ERROR, "readData bus, but nothing to provide\n");
+        debugss(ssH37InterruptController, ERROR, "interruptsBlocked_m, requesting instruction\n");
         opCode = InterruptController::readDataBus();
     }
 

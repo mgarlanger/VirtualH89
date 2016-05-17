@@ -16,6 +16,9 @@
 #include "DiskDrive.h"
 #include "HardSectoredDisk.h"
 
+#include <memory>
+
+using namespace std;
 
 H17::H17(int baseAddr): DiskController(baseAddr, H17_NumPorts_c),
                         GppListener(h17_gppSideSelectBit_c),
@@ -80,7 +83,7 @@ H17::install_H17(BYTE                        baseAddr,
         if (!s.empty())
         {
 
-            DiskDrive* drive = DiskDrive::getInstance(s);
+            shared_ptr<DiskDrive> drive = DiskDrive::getInstance(s);
             if (drive)
             {
 
@@ -91,7 +94,7 @@ H17::install_H17(BYTE                        baseAddr,
 
                 if (!s.empty())
                 {
-                    HardSectoredDisk* disk = new HardSectoredDisk(s.c_str());
+                    shared_ptr<HardSectoredDisk> disk = make_shared<HardSectoredDisk>(s.c_str());
 
                     drive->insertDisk(disk);
                 }
@@ -369,12 +372,12 @@ H17::out(BYTE addr,
 
 
 bool
-H17::connectDrive(BYTE       unitNum,
-                  DiskDrive* drive)
+H17::connectDrive(BYTE                  unitNum,
+                  shared_ptr<DiskDrive> drive)
 {
     bool retVal = false;
 
-    debugss(ssH17, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
+    debugss(ssH17, INFO, "unit (%d)\n", unitNum);
 
     if (unitNum < maxDiskDrive_c)
     {

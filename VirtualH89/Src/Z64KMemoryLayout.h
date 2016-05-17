@@ -14,7 +14,7 @@
 class Z64KMemoryLayout: public MemoryLayout
 {
   public:
-    Z64KMemoryLayout(MemoryLayout* rom);
+    Z64KMemoryLayout(shared_ptr<MemoryLayout> rom);
 };
 
 #endif // Z64KMEMORYLAYOUT_H_

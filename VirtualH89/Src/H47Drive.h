@@ -11,6 +11,7 @@
 
 #include "DiskDrive.h"
 #include "h89Types.h"
+#include <memory>
 
 class H47Drive: public DiskDrive
 {
@@ -31,7 +32,7 @@ class H47Drive: public DiskDrive
                            BYTE          data);
     virtual BYTE readSectorData(BYTE          sector,
                                 unsigned long pos);
-    virtual void insertDisk(FloppyDisk* disk);
+    virtual void insertDisk(std::shared_ptr<FloppyDisk> disk);
 
   private:
     static const unsigned int maxTracks_c          = 77;

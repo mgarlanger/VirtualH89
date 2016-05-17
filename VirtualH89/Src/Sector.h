@@ -25,6 +25,7 @@ class Sector
     Sector();
 
   public:
+
     //
     Sector(BYTE  headNum,
            BYTE  trackNum,

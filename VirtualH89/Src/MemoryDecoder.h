@@ -14,6 +14,7 @@
 #include "GppListener.h"
 
 #include "Memory8K.h"
+#include <vector>
 
 class MemoryDecoder: public GppListener
 {
@@ -21,10 +22,12 @@ class MemoryDecoder: public GppListener
     MemoryDecoder(int numBanks, BYTE gppBits);
     virtual ~MemoryDecoder();
 
-    virtual void reset()                             = 0;
-    virtual void addLayout(int ix, MemoryLayout* lo) = 0;
+    virtual void reset();
 
-    inline MemoryLayout* getLayout(int ix)
+    virtual void addLayout(int                      ix,
+                           shared_ptr<MemoryLayout> lo);
+
+    inline shared_ptr<MemoryLayout> getLayout(int ix)
     {
         return banks_m[ix & bankMask_m];
     }
@@ -39,31 +42,38 @@ class MemoryDecoder: public GppListener
         return curBank_m;
     }
 
-    inline BYTE readByte(int ix, WORD adr)
+    inline BYTE readByte(int  ix,
+                         WORD adr)
     {
         return getLayout(ix)->getPageByAddress(adr)->readByte(adr);
     }
 
-    inline void writeByte(int ix, WORD adr, BYTE val)
+    inline void writeByte(int ix, WORD adr,
+                          BYTE val)
     {
         getLayout(ix)->getPageByAddress(adr)->writeByte(adr, val);
     }
 
     inline BYTE readByte(WORD address)
     {
-        return getLayout(curBank_m)->getPageByAddress(address)->readByte(address);
+        return curLayout_m->getPageByAddress(address)->readByte(address);
     }
-    inline void writeByte(WORD address, BYTE val)
+    inline void writeByte(WORD address,
+                          BYTE val)
     {
-        getLayout(curBank_m)->getPageByAddress(address)->writeByte(address, val);
+        curLayout_m->getPageByAddress(address)->writeByte(address, val);
     }
 
 
   protected:
-    BYTE           curBank_m;
-    int            bankMask_m;
-    int            numBanks_m;
-    MemoryLayout** banks_m;
+    virtual void updateCurBank(BYTE bank);
+    BYTE                                   curBank_m;
+    int                                    bankMask_m;
+    int                                    numBanks_m;
+
+    std::vector<shared_ptr<MemoryLayout> > banks_m;
+
+    shared_ptr<MemoryLayout>               curLayout_m;
 };
 
 #endif // MEMORYDECODER_H_

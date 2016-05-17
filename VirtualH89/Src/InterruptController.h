@@ -16,8 +16,9 @@
 /// \brief Interrupt Controller Logic
 ///
 /// Although the H89 did not have an interrupt chip, it had special logic to generate
-/// an RST xx instruction for each interrupt. At least one third-party add-on card (mms77316)
-/// modified the logic to either generate the RST xx or an EI instruction.
+/// an RST xx instruction for each interrupt. Heath's soft-sectored controller and
+/// MMS's 77316 both modified the logic to either generate an RST for interrupts
+/// and an EI instruction when DRQ has been raised.
 ///
 
 class CPU;

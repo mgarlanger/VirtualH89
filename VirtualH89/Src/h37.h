@@ -65,7 +65,7 @@ class Z_89_37: public DiskController, WD179xUserIf
     }
     GenericDiskDrive* findDrive(std::string ident)
     {
-        return NULL;
+        return nullptr;
     }
     std::string getDriveName(int index)
     {

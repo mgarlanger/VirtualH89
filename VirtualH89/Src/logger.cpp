@@ -15,7 +15,7 @@ extern FILE* log_out;
 
 logger::logger():  printToFile(false),
                    printToScreen(false),
-                   logFile(NULL)
+                   logFile(nullptr)
 {
 
 }
@@ -35,12 +35,12 @@ setDebugLevel()
     debugLevel[ssRAM]                    = defaultLevel; // RAM accesses
     debugLevel[ssROM]                    = defaultLevel; // ROM accesses
     debugLevel[ssZ80]                    = defaultLevel; // Z80 CPU
-    debugLevel[ssH37InterruptController] = INFO;         // Interrupt Controller
-    debugLevel[ssInterruptController]    = INFO;         // Interrupt Controller
+    debugLevel[ssH37InterruptController] = defaultLevel; // Interrupt Controller
+    debugLevel[ssInterruptController]    = defaultLevel; // Interrupt Controller
     debugLevel[ssAddressBus]             = defaultLevel; // Address Bus
     debugLevel[ssIO]                     = defaultLevel; // I/O ports
     debugLevel[ssH17]                    = defaultLevel; // H17 controller
-    debugLevel[ssH37]                    = VERBOSE;      // H37 controller
+    debugLevel[ssH37]                    = INFO;         // H37 controller
     debugLevel[ssH47]                    = defaultLevel; // H47 controller
     debugLevel[ssH67]                    = defaultLevel; // H67 controller
     debugLevel[ssDiskDrive]              = defaultLevel; // Floppy disks
@@ -57,14 +57,14 @@ setDebugLevel()
     debugLevel[ssParallel]               = defaultLevel; // Parallel Port Interface (Z47)
     debugLevel[ssStdioConsole]           = defaultLevel;
     debugLevel[ssMMS77316]               = defaultLevel;
-    debugLevel[ssWD1797]                 = VERBOSE;
+    debugLevel[ssWD1797]                 = defaultLevel;
     debugLevel[ssGenericFloppyDrive]     = defaultLevel;
     debugLevel[ssRawFloppyImage]         = defaultLevel;
     debugLevel[ssMMS77320]               = defaultLevel;
     debugLevel[ssGenericSASIDrive]       = defaultLevel;
     debugLevel[ssHostFileBdos]           = defaultLevel;
     debugLevel[ssCPNetDevice]            = defaultLevel;
-    debugLevel[ssSectorFloppyImage]      = INFO;
+    debugLevel[ssSectorFloppyImage]      = defaultLevel;
 }
 
 void

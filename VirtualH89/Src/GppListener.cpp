@@ -8,24 +8,35 @@
 ///
 #include "GppListener.h"
 
-#include <stdio.h>
+
+using namespace std;
 
 std::vector<GppListener*> GppListener::notifications;
 
-void
-GppListener::addListener(GppListener* lstr) {
-    // If we have more than one, need vector<>, array, or ...
-    notifications.push_back(lstr);
+
+GppListener::GppListener(BYTE bits): interestedBits_m(bits)
+{
+
 }
 
 void
-GppListener::notifyListeners(BYTE gpo, BYTE diffs) {
-    int x;
-    for (x = 0; x < notifications.size(); ++x)
+GppListener::addListener(GppListener* listener)
+{
+    // If we have more than one, need vector<>, array, or ...
+    notifications.push_back(listener);
+}
+
+void
+GppListener::notifyListeners(BYTE gpo,
+                             BYTE diffs)
+{
+
+    for (GppListener* listener : notifications)
     {
-        if ((notifications[x]->interestedBits & diffs) != 0)
+        if ((listener->interestedBits_m & diffs) != 0)
         {
-            notifications[x]->gppNewValue(gpo);
+            listener->gppNewValue(gpo);
         }
     }
+
 }

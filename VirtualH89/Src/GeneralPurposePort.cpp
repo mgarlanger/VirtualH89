@@ -14,6 +14,8 @@
 #include "GppListener.h"
 #include "computer.h"
 
+using namespace std;
+
 GeneralPurposePort::GeneralPurposePort(Computer* computer): IODevice(GPP_BaseAddress_c,
                                                                      GPP_NumPorts_c),
                                                             portBits_m(0),
@@ -24,13 +26,13 @@ GeneralPurposePort::GeneralPurposePort(Computer* computer): IODevice(GPP_BaseAdd
 }
 
 GeneralPurposePort::GeneralPurposePort(Computer*   computer,
-                                       std::string settings): IODevice(GPP_BaseAddress_c,
+                                       string      settings): IODevice(GPP_BaseAddress_c,
                                                                        GPP_NumPorts_c),
                                                               portBits_m(0),
                                                               computer_m(computer)
 {
     // TODO: verify a binary string and/or handle other formats/nmenonics.
-    dipsw_m = strtol(settings.c_str(), NULL, 2);
+    dipsw_m = strtol(settings.c_str(), nullptr, 2);
 }
 
 GeneralPurposePort::~GeneralPurposePort()
@@ -126,13 +128,14 @@ GeneralPurposePort::in(BYTE addr)
     ///  10 - Z-89-67
     ///  11 - Undefined
     ///
+    BYTE val = 0;
 
     if (verifyPort(addr))
     {
-        return dipsw_m;
+        val = dipsw_m;
     }
 
-    return (0);
+    return val;
 }
 
 void
@@ -143,7 +146,9 @@ GeneralPurposePort::out(BYTE addr,
     {
         // from the manual, writing to this port clears the interrupt.
         computer_m->lowerINT(1);
+
         BYTE diffs = portBits_m ^ val;
+
         portBits_m = val;
 
         if (val & gpp_SingleStepInterrupt_c)
@@ -159,10 +164,10 @@ GeneralPurposePort::out(BYTE addr,
     }
 }
 
-std::string
+string
 GeneralPurposePort::dumpDebug()
 {
-    std::string ret = PropertyUtil::sprintf("GP-OUT=%02x GP-IN=%02x\n",
-                                            portBits_m, dipsw_m);
+    string ret = PropertyUtil::sprintf("GP-OUT=%02x GP-IN=%02x\n", portBits_m, dipsw_m);
+
     return ret;
 }

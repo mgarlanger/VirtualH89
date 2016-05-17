@@ -15,6 +15,8 @@
 #include "GppListener.h"
 #include "propertyutil.h"
 
+#include <memory>
+
 class DiskDrive;
 
 ///
@@ -38,8 +40,8 @@ class H17: public DiskController, public ClockUser, public GppListener
     virtual void out(BYTE addr,
                      BYTE val);
 
-    virtual bool connectDrive(BYTE       unitNum,
-                              DiskDrive* drive);
+    virtual bool connectDrive(BYTE                       unitNum,
+                              std::shared_ptr<DiskDrive> drive);
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void selectSide(BYTE side);
@@ -58,7 +60,7 @@ class H17: public DiskController, public ClockUser, public GppListener
     }
     GenericDiskDrive* findDrive(std::string ident)
     {
-        return NULL;
+        return nullptr;
     }
     std::string getDriveName(int index)
     {
@@ -112,12 +114,12 @@ class H17: public DiskController, public ClockUser, public GppListener
         maxDiskDrive_c = 3
     };
 
-    DiskDriveID curDrive_m;
+    DiskDriveID                 curDrive_m;
 
-    DiskDrive*  drives_m[maxDiskDrive_c];
+    std::shared_ptr<DiskDrive>  drives_m[maxDiskDrive_c];
 
-    BYTE        fillChar_m;
-    BYTE        syncChar_m;
+    BYTE                        fillChar_m;
+    BYTE                        syncChar_m;
 
     ///
     /// Ports

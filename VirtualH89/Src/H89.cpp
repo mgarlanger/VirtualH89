@@ -45,7 +45,7 @@
 
 H89::H89(): Computer()
 {
-    pthread_mutex_init(&h89_mutex, NULL);
+    pthread_mutex_init(&h89_mutex, nullptr);
 }
 
 void
@@ -79,7 +79,7 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     }
     h89io->addDevice(gpp);
 
-    monitorROM = NULL;
+    monitorROM = nullptr;
     s          = props["monitor_rom"];
 
     if (!s.empty())
@@ -87,7 +87,7 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
         monitorROM = ROM::getROM(s.c_str(), 0);
     }
 
-    if (monitorROM == NULL)
+    if (monitorROM == nullptr)
     {
         monitorROM = new ROM(4096);
         monitorROM->setBaseAddress(0);
@@ -123,7 +123,7 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     s = props["z80_speedup_option"];
     if (!s.empty())
     {
-        speedup = strtoul(s.c_str(), NULL, 10);
+        speedup = strtoul(s.c_str(), nullptr, 10);
         if (speedup > 40)
         {
             debugss(ssH89, ERROR, "Illegal CPU speedup factor %d, disabling\n", speedup);
@@ -146,20 +146,17 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     HDOS->installROM(h17ROM);
     HDOS->enableRAM(0x1400, 1024);
 
-    MemoryDecoder* memDecoder;
+    MemoryDecoder*            memDecoder;
     // All sytems have the core 48K + ROM.
     // \TODO Allow for 16K/32K  - also make support ORG-0 configurable.
-    MemoryLayout*  h89_0 = new H88MemoryLayout(HDOS); // creates 48K RAM at 0x2000...
+    shared_ptr<MemoryLayout>  h89_0 = make_shared<H88MemoryLayout>(HDOS); // creates 48K RAM at 0x2000...
 
 
     // H17
-    H17*           h17 = nullptr;
-    driveUnitH0 = nullptr;
-    driveUnitH1 = nullptr;
-    driveUnitH2 = nullptr;
+    H17*                      h17 = nullptr;
 
     // Z37
-    Z_89_37*   h37 = nullptr;
+    Z_89_37*                  h37 = nullptr;
 
     // Z47
     z47If       = nullptr;
@@ -308,36 +305,36 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
 
     if (!dev_slots)
     {
-        h17         = new H17(H17_BaseAddress_c);
+        h17 = new H17(H17_BaseAddress_c);
         // create the floppy drives for the hard-sectored controller.
-        driveUnitH0 = new H_17_1;
-        driveUnitH1 = new H_17_1;
-        driveUnitH2 = new H_17_1;
+        shared_ptr<DiskDrive> driveUnitH0 = make_shared<H_17_1>();
+        shared_ptr<DiskDrive> driveUnitH1 = make_shared<H_17_1>();
+        shared_ptr<DiskDrive> driveUnitH2 = make_shared<H_17_1>();
 
-        s           = props["h17_disk1"];
+        s = props["h17_disk1"];
 
         if (s.empty())
         {
             s = "diskA.tmpdisk";
         }
 
-        hard0 = new HardSectoredDisk(s.c_str());
-        s     = props["h17_disk2"];
+        shared_ptr<HardSectoredDisk> hard0 = make_shared<HardSectoredDisk>(s.c_str());
+        s = props["h17_disk2"];
 
         if (s.empty())
         {
             s = "diskB.tmpdisk";
         }
 
-        hard1 = new HardSectoredDisk(s.c_str());
-        s     = props["h17_disk3"];
+        shared_ptr<HardSectoredDisk> hard1 = make_shared<HardSectoredDisk>(s.c_str());
+        s = props["h17_disk3"];
 
         if (s.empty())
         {
             s = "diskC.tmpdisk";
         }
 
-        hard2 = new HardSectoredDisk(s.c_str());
+        shared_ptr<HardSectoredDisk> hard2 = make_shared<HardSectoredDisk>(s.c_str());
 
         h89io->addDiskDevice(h17);
 
@@ -352,7 +349,6 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
         driveUnitH2->insertDisk(hard2);
 
     }
-
 
     // Serial Ports.
     consolePort = new INS8250(this, Serial_Console_c, Serial_Console_Interrupt_c);
@@ -389,7 +385,7 @@ H89::~H89()
     {
         DiskController* dev = dsks[x];
 
-        if (dev != NULL)
+        if (dev != nullptr)
         {
             dev->~DiskController();
         }
@@ -402,7 +398,7 @@ H89::reset()
 {
     cpu->reset();
     ab->reset();
-    console->reset(); // TODO: does H89 reset really also reset H19?
+    console->reset();
     h89io->reset();
     timer->reset();
 }
@@ -412,7 +408,7 @@ H89::init()
 {
     console->init();
 
-    if (z47Cntrl != NULL)
+    if (z47Cntrl != nullptr)
     {
         z47Cntrl->loadDisk();
     }

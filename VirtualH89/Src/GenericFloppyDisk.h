@@ -10,11 +10,15 @@
 #ifndef GENERICFLOPPYDISK_H_
 #define GENERICFLOPPYDISK_H_
 
-#include <string>
 
 #include "h89Types.h"
 
-class DiskData;
+#include <string>
+#include <memory>
+#include <vector>
+
+class Sector;
+class Track;
 
 /// \class GenericFloppyDisk
 ///
@@ -55,9 +59,27 @@ class GenericFloppyDisk
     virtual void dump(void)                = 0;
     virtual std::string getMediaName()     = 0;
 
+    enum FileType_t
+    {
+        IMD,
+        TD0,
+        Unknown
+    };
+    enum DiskSize_t
+    {
+        FiveAndQuarterInch,
+        EightInch
+    };
+    static std::shared_ptr<GenericFloppyDisk> loadDiskImage(std::vector<std::string> argv);
+
+    void setDriveType(BYTE numTracks);
+
   private:
 
   protected:
+
+    static FileType_t determineFileType(std::string filename);
+
     bool writeProtect_m;
     bool doubleDensity_m;
     long trackLen_m;
@@ -66,6 +88,22 @@ class GenericFloppyDisk
     int  numSides_m;
     int  secSize_m;
     int  mediaSize_m;
+
+    ///
+/*
+    const char*               imageName_m;
+    static const unsigned int maxHeads_c = 2;
+
+    std::vector <Track*>      tracks_m[maxHeads_c];
+
+    std::shared_ptr<Sector>   curSector_m;
+    int                       dataPos_m;
+    int                       sectorLength_m;
+    BYTE                      secLenCode_m;
+    bool                      ready_m;
+ */
+    bool hypoTrack_m;  // ST media in DT drive
+    bool hyperTrack_m; // DT media in ST drive
 
 };
 

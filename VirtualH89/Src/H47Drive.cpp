@@ -10,6 +10,10 @@
 
 #include "logger.h"
 
+#include <memory>
+
+using namespace std;
+
 H47Drive::H47Drive(): tracks_m(maxTracks_c),
                       sectors_m(maxSectorsPerTrack_c),
                       bytes_m(maxBytesPerSector_c),
@@ -28,7 +32,7 @@ H47Drive::~H47Drive()
 }
 
 void
-H47Drive::insertDisk(FloppyDisk* disk)
+H47Drive::insertDisk(shared_ptr<FloppyDisk> disk)
 {
     disk_m = disk;
 

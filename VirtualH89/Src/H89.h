@@ -78,16 +78,8 @@ class H89: public Computer
     Z47Controller*           z47Cntrl;
     ParallelLink*            z47Link;
 
-    DiskDrive*               driveUnitH0;
-    DiskDrive*               driveUnitH1;
-    DiskDrive*               driveUnitH2;
-
     DiskDrive*               driveUnitE0;
     DiskDrive*               driveUnitE1;
-
-    FloppyDisk*              hard0;
-    FloppyDisk*              hard1;
-    FloppyDisk*              hard2;
 
     FloppyDisk*              eight0;
     FloppyDisk*              eight1;

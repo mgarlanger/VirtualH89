@@ -10,7 +10,7 @@
 #include "RAMemory8K.h"
 
 
-Z64KMemoryLayout::Z64KMemoryLayout(MemoryLayout* rom): MemoryLayout()
+Z64KMemoryLayout::Z64KMemoryLayout(shared_ptr<MemoryLayout> rom): MemoryLayout()
 {
 
     shared_ptr<Memory8K> rd6_0 = make_shared<RAMemory8K>(0x0000);

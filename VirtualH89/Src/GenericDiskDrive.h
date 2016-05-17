@@ -11,6 +11,7 @@
 #define GENERICDISKDRIVE_H_
 
 #include <string>
+#include <memory>
 
 class GenericFloppyDisk;
 
@@ -28,13 +29,13 @@ class GenericDiskDrive
 
     virtual ~GenericDiskDrive();
 
-    virtual std::string getMediaName()               = 0;
-    virtual void insertDisk(GenericFloppyDisk* disk) = 0;
+    virtual std::string getMediaName()                               = 0;
+    virtual void insertDisk(std::shared_ptr<GenericFloppyDisk> disk) = 0;
 
     // Returns the number of raw bytes per track, lowest density.
-    virtual int getRawBytesPerTrack()                = 0;
-    virtual int getNumTracks()                       = 0;
-    virtual bool isReady()                           = 0;
+    virtual int getRawBytesPerTrack()                                = 0;
+    virtual int getNumTracks()                                       = 0;
+    virtual bool isReady()                                           = 0;
 
   private:
 };

@@ -22,6 +22,7 @@
 #include "GenericFloppyFormat.h"
 #include "logger.h"
 
+using namespace std;
 
 bool
 SectorFloppyImage::checkHeader(BYTE* buf, int n)
@@ -242,17 +243,17 @@ SectorFloppyImage::~SectorFloppyImage()
     imageFd_m = -1;
 }
 
-GenericFloppyDisk*
+shared_ptr<GenericFloppyDisk>
 SectorFloppyImage::getDiskette(GenericDiskDrive*        drive,
                                std::vector<std::string> argv)
 {
-    GenericFloppyDisk* gd = new SectorFloppyImage(drive, argv);
+    shared_ptr<GenericFloppyDisk> gd = make_shared<SectorFloppyImage>(drive, argv);
 
     if (!gd->isReady())
     {
         debugss(ssSectorFloppyImage, INFO, "%s: Falling back to RawFloppyImage\n", argv[0].c_str());
-        delete gd;
-        gd = new RawFloppyImage(drive, argv);
+
+        gd = make_shared<RawFloppyImage>(drive, argv);
     }
 
     return gd;

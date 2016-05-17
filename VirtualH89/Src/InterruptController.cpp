@@ -78,6 +78,7 @@ InterruptController::lowerInterrupt(BYTE level)
 
     intLevel_m &= ~(1 << level);
 
+    // update interrupt line to cpu
     setINTLine();
 }
 
@@ -135,6 +136,7 @@ InterruptController::readDataBus()
 void
 InterruptController::setDrq(bool raise)
 {
+    // shouldn't be called
     debugss(ssInterruptController, ERROR, "base called(%d)\n", raise);
 }
 

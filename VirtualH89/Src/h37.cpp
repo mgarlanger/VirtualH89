@@ -13,15 +13,13 @@
 #include "InterruptController.h"
 #include "GenericFloppyDrive.h"
 #include "computer.h"
-
-#include "IMDFloppyDisk.h"
-#include "TD0FloppyDisk.h"
-
+#include "GenericFloppyDisk.h"
 
 
 Z_89_37::Z_89_37(Computer*            computer,
                  int                  baseAddr,
-                 InterruptController* ic): DiskController(baseAddr, H37_NumPorts_c),
+                 InterruptController* ic): DiskController(baseAddr,
+                                                          H37_NumPorts_c),
                                            computer_m(computer),
                                            ic_m(ic),
                                            interfaceReg_m(0),
@@ -60,25 +58,6 @@ Z_89_37::~Z_89_37()
 void
 Z_89_37::reset(void)
 {
-/*    interfaceReg_m      = 0;
-    controlReg_m        = 0;
-    sectorTrackAccess_m = false;
-    dataEncoding_m      = FM;
-    curDiskDrive_m      = numDisks_c;
-    intLevel_m          = z_89_37_Intr_c;
-    intrqAllowed_m      = false;
-    drqAllowed_m        = false;
-    cycleCount_m        = 0;
-
-    motorOn_m           = false;
-    dataReady_m         = false;
-    lostDataStatus_m    = false;
-
-    drives_m[ds0]       = nullptr;
-    drives_m[ds1]       = nullptr;
-    drives_m[ds2]       = nullptr;
-    drives_m[ds3]       = nullptr;
- */
     interfaceReg_m      = 0;
     controlReg_m        = 0;
     sectorTrackAccess_m = false;
@@ -88,7 +67,6 @@ Z_89_37::reset(void)
     dataReady_m         = false;
     lostDataStatus_m    = false;
     wd1797->reset();
-
 }
 
 
@@ -129,8 +107,7 @@ Z_89_37::install_H37(Computer*                   computer,
                     /*SoftSectoredDisk* disk = new SoftSectoredDisk(
                                                                   s.c_str(), SoftSectoredDisk::dif_RAW);
                        drive->insertDisk(disk);*/
-                    // drive->insertDisk(IMDFloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
-                    drive->insertDisk(TD0FloppyDisk::getDiskette(PropertyUtil::splitArgs(s)));
+                    drive->insertDisk(GenericFloppyDisk::loadDiskImage(PropertyUtil::splitArgs(s)));
                 }
 
             }
@@ -254,7 +231,6 @@ Z_89_37::out(BYTE addr,
             {
                 debugss_nts(ssH37, INFO, " EnableDrqInt");
                 drqAllowed_m = true;
-
             }
             else
             {
@@ -309,6 +285,7 @@ Z_89_37::out(BYTE addr,
 
             debugss_nts(ssH37, INFO, "\n");
 
+            // this APPEARS to be how the controller handles this.
             ic_m->blockInterrupts(drqAllowed_m);
 
             break;
@@ -454,7 +431,7 @@ Z_89_37::connectDrive(BYTE                unitNum,
 bool
 Z_89_37::removeDrive(BYTE unitNum)
 {
-
+    // \todo implement
     return (false);
 }
 
@@ -494,6 +471,8 @@ Z_89_37::lowerIntrq()
 {
     debugss(ssH37, INFO, "\n");
 
+    // \todo - if intrqAllowed_m is disabled, should THAT trigger the
+    // setting intrq to false.
     if (1) // (!intrqAllowed_m)
     {
         ic_m->setIntrq(false);
@@ -505,6 +484,8 @@ Z_89_37::lowerDrq()
 {
     debugss(ssH37, INFO, "\n");
 
+    // \todo - if drqAllowed_m is disabled, should THAT trigger the
+    // setting drq to false.
     if (1) // (!drqAllowed_m)
     {
         ic_m->setDrq(false);
@@ -523,10 +504,12 @@ Z_89_37::doubleDensity()
 bool
 Z_89_37::readReady()
 {
+    // the H-37 has this line set to +5V.
     return true;
 }
 
 int
-Z_89_37::getClockPeriod() {
+Z_89_37::getClockPeriod()
+{
     return 1000;
 }
