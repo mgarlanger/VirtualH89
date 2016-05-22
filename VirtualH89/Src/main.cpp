@@ -37,7 +37,7 @@ const char* usage_str         = " -q -g";
 
 /// \todo - make H89 into a singleton.
 H89         h89;
-Console*    console     = NULL;
+Console*    console     = nullptr;
 
 FILE*       log_out     = 0;
 FILE*       console_out = 0;
@@ -47,13 +47,13 @@ displayLogo()
 {
     cout << "Virtual H89" << endl << endl;
 
-    cout << "  #     # ### ####  ##### #   #   #   #       #   #  ###   ### " << endl;
-    cout << "  #     #  #  #   #   #   #   #  # #  #       #   # #   # #   #" << endl;
-    cout << "   #   #   #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
-    cout << "   #   #   #  ####    #   #   # ##### #       #####  ###   ####" << endl;
-    cout << "    # #    #  #  #    #   #   # #   # #       #   # #   #     #" << endl;
-    cout << "    # #    #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
-    cout << "     #    ### #   #   #    ###  #   # #####   #   #  ###   ### " << endl;
+    cout << " #     # ### ####  ##### #   #   #   #       #   #  ###   ### " << endl;
+    cout << " #     #  #  #   #   #   #   #  # #  #       #   # #   # #   #" << endl;
+    cout << "  #   #   #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
+    cout << "  #   #   #  ####    #   #   # ##### #       #####  ###   ####" << endl;
+    cout << "   # #    #  #  #    #   #   # #   # #       #   # #   #     #" << endl;
+    cout << "   # #    #  #   #   #   #   # #   # #       #   # #   # #   #" << endl;
+    cout << "    #    ### #   #   #    ###  #   # #####   #   #  ###   ### " << endl;
     cout << endl << Z80_COPYRIGHT_c << endl;
     cout << "Virtual H89 - " << H89_COPYRIGHT_c << endl << endl;
     cout << "Release " << RELEASE_VERSION_c << endl;
@@ -230,7 +230,7 @@ main(int   argc,
     h89.buildSystem(console, props);
 
     pthread_t cpuThread;
-    pthread_create(&cpuThread, NULL, cpuThreadFunc, &h89);
+    pthread_create(&cpuThread, nullptr, cpuThreadFunc, &h89);
     h89.init();
 
     console->run();

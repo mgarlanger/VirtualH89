@@ -15,6 +15,7 @@
 #include "GenericFloppyDisk.h"
 
 
+using namespace std;
 
 GenericFloppyDrive::GenericFloppyDrive(unsigned int heads,
                                        unsigned int tracks,
@@ -103,16 +104,15 @@ GenericFloppyDrive::~GenericFloppyDrive()
 
 }
 
-
 void
-GenericFloppyDrive::insertDisk(GenericFloppyDisk* disk)
+GenericFloppyDrive::insertDisk(shared_ptr<GenericFloppyDisk> disk)
 {
-    if (disk_m != NULL)
-    {
-        delete disk_m;
-    }
 
     disk_m = disk;
+    if (disk_m)
+    {
+        disk_m->setDriveType(numTracks_m);
+    }
 }
 
 bool

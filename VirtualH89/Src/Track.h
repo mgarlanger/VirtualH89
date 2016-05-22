@@ -12,6 +12,7 @@
 #include "h89Types.h"
 
 #include <vector>
+#include <memory>
 
 class Sector;
 
@@ -36,27 +37,27 @@ class Track
     };
 
   private:
-    BYTE                  sideNum_m;
-    BYTE                  trackNum_m;
+    BYTE                                   sideNum_m;
+    BYTE                                   trackNum_m;
 
-    std::vector <Sector*> sectors_m;
+    std::vector <std::shared_ptr<Sector> > sectors_m;
 
-    Density               density_m;
-    DataRate              dataRate_m;
+    Density                                density_m;
+    DataRate                               dataRate_m;
 
   public:
     Track(BYTE sideNum,
           BYTE trackNum);
     virtual ~Track();
 
-    bool addSector(Sector* sector);
+    bool addSector(std::shared_ptr<Sector> sector);
 
     void setDensity(Density density);
     void setDataRate(DataRate datarate);
 
     void dump();
 
-    Sector* findSector(BYTE sector);
+    std::shared_ptr<Sector> findSector(BYTE sector);
 
     bool readSectorData(BYTE  sector,
                         WORD  pos,

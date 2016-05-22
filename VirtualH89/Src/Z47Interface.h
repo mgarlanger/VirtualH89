@@ -45,7 +45,7 @@ class Z47Interface: public virtual DiskController,
     }
     GenericDiskDrive* findDrive(std::string ident)
     {
-        return NULL;
+        return nullptr;
     }
     std::string getDriveName(int index)
     {

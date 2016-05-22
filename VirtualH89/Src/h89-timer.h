@@ -29,7 +29,7 @@ class H89Timer: public EventHandler, public GppListener
              CPU*          cpu,
              unsigned char intlvl = 1);
     virtual ~H89Timer();
-    virtual void setCPU(CPU* cpu);
+
     virtual int handleSignal(int signum);
 
     void reset();
@@ -42,7 +42,7 @@ class H89Timer: public EventHandler, public GppListener
     CPU*              cpu_m;
     bool              intEnabled_m;
 
-    int               count_m;
+    unsigned long     count_m;
     unsigned char     intLevel;
     pthread_t         thread;
 

@@ -58,7 +58,7 @@ Z47Controller::loadDisk()
     FILE* file;
 
 
-    if ((file = fopen("8in.dsk", "r")) != NULL)
+    if ((file = fopen("8in.dsk", "r")) != nullptr)
     {
         int i = 0;
 

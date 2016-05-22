@@ -41,14 +41,6 @@ H89Timer::H89Timer(Computer*     computer,
 }
 
 
-void
-H89Timer::setCPU(CPU* cpu)
-{
-    debugss(ssTimer, INFO, "\n");
-
-    cpu_m = cpu;
-}
-
 H89Timer::~H89Timer()
 {
     static struct itimerval tim;
@@ -59,7 +51,7 @@ H89Timer::~H89Timer()
 
     tim.it_value.tv_sec  = 0;
     tim.it_value.tv_usec = 0;
-    setitimer(ITIMER_REAL, &tim, NULL);
+    setitimer(ITIMER_REAL, &tim, nullptr);
 }
 
 void
@@ -87,7 +79,7 @@ H89Timer::start()
     tim.it_interval.tv_usec *= 20;
 #endif
 
-    setitimer(ITIMER_REAL, &tim, NULL);
+    setitimer(ITIMER_REAL, &tim, nullptr);
 
 }
 
@@ -100,15 +92,16 @@ H89Timer::handleSignal(int signum)
     {
         debugss(ssTimer, ERROR, "signum != SIGALRM: %d\n", signum);
 
-        return (0);
+        return 0;
     }
     if (thread == 0)
     {
-        // can't do much else for now.
+        // real thread is not set, can't do much else for now.
         return 0;
     }
     if (thread != pthread_self())
     {
+        // pass the signal to the correct thread.
         pthread_kill(thread, SIGALRM);
         return 0;
     }
@@ -137,14 +130,11 @@ H89Timer::handleSignal(int signum)
         debugss(ssTimer, ERROR, "cpu_m is NULL\n");
     }
 
-    return (0);
+    return 0;
 }
 
 void
-H89Timer::gppNewValue(BYTE gpo) {
+H89Timer::gppNewValue(BYTE gpo)
+{
     intEnabled_m = ((gpo & h89timer_gpp2msIntEnBit_c) != 0);
-    if (!intEnabled_m)
-    {
-        computer_m->lowerINT(intLevel);
-    }
 }

@@ -10,21 +10,23 @@
 #ifndef DISKDRIVE_H_
 #define DISKDRIVE_H_
 
-#include <string>
 
 #include "h89Types.h"
+
+#include <string>
+#include <memory>
 
 class FloppyDisk;
 
 class DiskDrive
 {
   public:
-    static DiskDrive* getInstance(std::string type);
+    static std::shared_ptr<DiskDrive> getInstance(std::string type);
 
     DiskDrive(BYTE tracks = 40);
     virtual ~DiskDrive();
 
-    virtual void insertDisk(FloppyDisk* disk);
+    virtual void insertDisk(std::shared_ptr<FloppyDisk> disk);
     virtual void ejectDisk(const char* name);
 
 
@@ -49,11 +51,11 @@ class DiskDrive
 
 
   protected:
-    FloppyDisk* disk_m;
+    std::shared_ptr<FloppyDisk> disk_m;
 
-    bool        headLoaded_m;
-    BYTE        numTracks_m;
-    BYTE        track_m = 0;
+    bool                        headLoaded_m;
+    BYTE                        numTracks_m;
+    BYTE                        track_m = 0;
 
 };
 

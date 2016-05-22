@@ -535,7 +535,7 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
     BYTE diskData[256256];
     int  diskOffset;
     int  bytesToTransfer;
-    int  sectorSize;
+    WORD sectorSize;
 };
 
 #endif // Z47CONTROLLER_H_

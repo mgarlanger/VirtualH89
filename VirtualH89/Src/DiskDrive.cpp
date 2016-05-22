@@ -13,6 +13,10 @@
 #include "h-17-1.h"
 #include "h-17-4.h"
 
+#include <memory>
+
+using namespace std;
+
 DiskDrive::DiskDrive(BYTE tracks): disk_m(0),
                                    headLoaded_m(false),
                                    numTracks_m(tracks)
@@ -27,15 +31,15 @@ DiskDrive::~DiskDrive()
 
 
 
-DiskDrive*
+shared_ptr<DiskDrive>
 DiskDrive::getInstance(std::string type)
 {
-    DiskDrive* drive = nullptr;
+    shared_ptr<DiskDrive> drive = nullptr;
 
     if ((type.compare("FDD_5_25_SS_ST") == 0) || (type.compare("H17_1") == 0))
     {
         debugss(ssDiskDrive, INFO, "allocating h17-1 drive\n");
-        drive = new H_17_1();
+        drive = make_shared<H_17_1>();
     }
     // \todo support ss_dt & ds_st
 //    else if (type.compare("FDD_5_25_SS_DT") == 0)
@@ -49,7 +53,7 @@ DiskDrive::getInstance(std::string type)
     else if ((type.compare("FDD_5_25_DS_DT") == 0) || (type.compare("H17_4") == 0))
     {
         debugss(ssDiskDrive, INFO, "allocating h17-4 drive\n");
-        drive = new H_17_4();
+        drive = make_shared<H_17_4>();
     }
     else
     {
@@ -59,7 +63,7 @@ DiskDrive::getInstance(std::string type)
 }
 
 void
-DiskDrive::insertDisk(FloppyDisk* disk)
+DiskDrive::insertDisk(shared_ptr<FloppyDisk> disk)
 {
     disk_m = disk;
 
@@ -78,7 +82,7 @@ DiskDrive::ejectDisk(const char* name)
         disk_m->eject(name);
     }
 
-    disk_m = 0;
+    disk_m = nullptr;
 }
 
 void

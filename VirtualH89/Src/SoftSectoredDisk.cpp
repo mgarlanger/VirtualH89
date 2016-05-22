@@ -14,6 +14,9 @@
 
 #include <fstream>
 #include <strings.h>
+#include <memory>
+
+using namespace std;
 
 SoftSectoredDisk::SoftSectoredDisk(const char*     name,
                                    DiskImageFormat format): initialized_m(false)
@@ -419,7 +422,11 @@ SoftSectoredDisk::readIMD(const char* name)
                 }
 
                 // create sector
-                Sector* sect = new Sector(head, cyl, sectorOrder[i], sectorSize, sectorData);
+                shared_ptr<Sector> sect = make_shared<Sector>(head,
+                                                              cyl,
+                                                              sectorOrder[i],
+                                                              sectorSize,
+                                                              &sectorData[0]);
 
                 // set flags
                 sect->setReadError(dataError);
@@ -487,7 +494,7 @@ SoftSectoredDisk::readRaw(const char* name)
 
         for (int sect = 0; sect < 10; sect++, pos += 256)
         {
-            Sector* sector = new Sector(0, trk, sect, 256, &buf[pos]);
+            shared_ptr<Sector> sector = make_shared<Sector>(0, trk, sect, 256, &buf[pos]);
 
             track->addSector(sector);
             track->setDensity(Track::singleDensity);
@@ -562,7 +569,11 @@ SoftSectoredDisk::readRaw8(const char* name)
 
         for (int sect = 0; sect < numSectors_c; sect++, pos += bytesPerSector_c)
         {
-            Sector* sector = new Sector(0, trk, sect, bytesPerSector_c, &buf[pos]);
+            shared_ptr<Sector> sector = make_shared<Sector>(0,
+                                                            trk,
+                                                            sect,
+                                                            bytesPerSector_c,
+                                                            &buf[pos]);
 
             track->addSector(sector);
             track->setDensity(Track::singleDensity);

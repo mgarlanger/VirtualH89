@@ -18,6 +18,8 @@
 #include "h89Types.h"
 #include "GenericFloppyDisk.h"
 
+#include <memory>
+
 class GenericDiskDrive;
 
 /// \class SectorFloppyImage
@@ -29,7 +31,8 @@ class SectorFloppyImage: public GenericFloppyDisk
   public:
     SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv);
     ~SectorFloppyImage();
-    static GenericFloppyDisk* getDiskette(GenericDiskDrive* drive, std::vector<std::string> argv);
+    static std::shared_ptr<GenericFloppyDisk> getDiskette(GenericDiskDrive*        drive,
+                                                          std::vector<std::string> argv);
 
     bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data);
     bool writeData(BYTE track, BYTE side, BYTE sector, int inSector,

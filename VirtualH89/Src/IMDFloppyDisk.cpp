@@ -15,31 +15,33 @@
 
 #include <fstream>
 
+#include <memory>
 
-GenericFloppyDisk*
-IMDFloppyDisk::getDiskette(std::vector<std::string> argv)
+using namespace std;
+
+shared_ptr<GenericFloppyDisk>
+IMDFloppyDisk::getDiskette(vector<string> argv)
 {
-    GenericFloppyDisk* gd = new IMDFloppyDisk(argv);
+    shared_ptr<GenericFloppyDisk> gd = make_shared<IMDFloppyDisk>(argv);
 
-    if (!gd->isReady())
+    if (gd->isReady())
     {
-        delete gd;
-        gd = nullptr;
+        return gd;
     }
 
-    return gd;
+    return nullptr;
 }
 
 
-IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk(),
-                                                             imageName_m(nullptr),
-                                                             curSector_m(nullptr),
-                                                             dataPos_m(0),
-                                                             sectorLength_m(0),
-                                                             secLenCode_m(0),
-                                                             hypoTrack_m(false),
-                                                             hyperTrack_m(false),
-                                                             ready_m(true)
+IMDFloppyDisk::IMDFloppyDisk(vector<string> argv): GenericFloppyDisk(),
+                                                   imageName_m(nullptr),
+                                                   curSector_m(nullptr),
+                                                   dataPos_m(0),
+                                                   sectorLength_m(0),
+                                                   secLenCode_m(0),
+                                                   hypoTrack_m(false),
+                                                   hyperTrack_m(false),
+                                                   ready_m(true)
 {
     if (argv.size() < 1)
     {
@@ -47,8 +49,8 @@ IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         return;
     }
 
-    char* name = strdup(argv[0].c_str());
-    debugss(ssFloppyDisk, INFO, "reading: %s\n", name);
+    string name(argv[0]);
+    debugss(ssFloppyDisk, INFO, "reading: %s\n", name.c_str());
 
     for (int x = 1; x < argv.size(); ++x)
     {
@@ -58,14 +60,11 @@ IMDFloppyDisk::IMDFloppyDisk(std::vector<std::string> argv): GenericFloppyDisk()
         }
     }
 
-
-    if (!readIMD(name))
+    if (!readIMD(name.c_str()))
     {
         ready_m = false;
-        debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name);
+        debugss(ssFloppyDisk, ERROR, "Read of file %s failed\n", name.c_str());
     }
-
-    free(name);
 }
 
 IMDFloppyDisk::~IMDFloppyDisk()
@@ -78,6 +77,22 @@ IMDFloppyDisk::findSector(int side,
                           int track,
                           int sector)
 {
+
+    if (hypoTrack_m)
+    {
+        if ((track & 1) != 0)
+        {
+            // return false;
+        }
+
+        track /= 2;
+    }
+
+    else if (hyperTrack_m)
+    {
+        track *= 2;
+    }
+
 
     if (!tracks_m[side][track])
     {
@@ -127,7 +142,7 @@ IMDFloppyDisk::findSector(int side,
 bool
 IMDFloppyDisk::readIMD(const char* name)
 {
-    std::ifstream     file;
+    ifstream          file;
     unsigned long int fileSize;
     unsigned long int pos = 0;
 
@@ -135,10 +150,10 @@ IMDFloppyDisk::readIMD(const char* name)
 
     debugss(ssFloppyDisk, INFO, "file: %s\n", name);
 
-    file.open(name, std::ios::binary);
-    file.seekg(0, std::ios::end);
+    file.open(name, ios::binary);
+    file.seekg(0, ios::end);
     fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
+    file.seekg(0, ios::beg);
 
     buf      = new BYTE[fileSize];
     file.read((char*) buf, fileSize);
@@ -158,8 +173,8 @@ IMDFloppyDisk::readIMD(const char* name)
     BYTE            sectorOrder[256];
     BYTE            sectorCylMapping[256];
     BYTE            sectorHeadMapping[256];
-    unsigned char   mode, cyl, head, numSec, sectorSizeKey;
-    int             sectorSize;
+    BYTE            mode, cyl, head, numSec, sectorSizeKey;
+    WORD            sectorSize;
     bool            sectorCylMap, sectorHeadMap;
     Track::Density  density;
     Track::DataRate dataRate;
@@ -230,7 +245,11 @@ IMDFloppyDisk::readIMD(const char* name)
         head           &= 1;
         debugss(ssFloppyDisk, ALL, "Head:    %d\n", head);
 
-        Track* trk = new Track(head, cyl);
+        if (numTracks_m <= cyl)
+        {
+            numTracks_m = cyl + 1;
+        }
+        shared_ptr<Track> trk = make_shared<Track>(head, cyl);
         trk->setDataRate(dataRate);
         trk->setDensity(density);
 
@@ -247,7 +266,6 @@ IMDFloppyDisk::readIMD(const char* name)
         {
             debugss(ssFloppyDisk, ERROR, "Sector Size unknown: %d\n", sectorSizeKey);
             delete [] buf;
-            delete trk;
 
             return (false);
         }
@@ -326,7 +344,11 @@ IMDFloppyDisk::readIMD(const char* name)
                 }
 
                 // create sector
-                Sector* sect = new Sector(head, cyl, sectorOrder[i], sectorSize, sectorData);
+                shared_ptr<Sector> sect = make_shared<Sector>(head,
+                                                              cyl,
+                                                              sectorOrder[i],
+                                                              sectorSize,
+                                                              &sectorData[0]);
 
                 // set flags
                 sect->setReadError(dataError);
@@ -417,7 +439,6 @@ IMDFloppyDisk::readData(BYTE track,
 
         return true;
     }
-
     else if (sector == 0xff)
     {
         if (inSector < sectorLength_m)
@@ -551,7 +572,7 @@ IMDFloppyDisk::dump(void)
 
 }
 
-std::string
+string
 IMDFloppyDisk::getMediaName()
 {
     if (!imageName_m)

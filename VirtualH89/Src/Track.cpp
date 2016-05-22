@@ -11,6 +11,8 @@
 
 #include "logger.h"
 
+using namespace std;
+
 Track::Track(BYTE sideNum,
              BYTE trackNum): sideNum_m(sideNum),
                              trackNum_m(trackNum),
@@ -22,14 +24,10 @@ Track::Track(BYTE sideNum,
 
 Track::~Track()
 {
-//    if (sectors_m)
-//    {
-//        delete[] sectors_m;
-//    }
 }
 
 bool
-Track::addSector(Sector* sector)
+Track::addSector(shared_ptr<Sector> sector)
 {
     sectors_m.push_back(sector);
 
@@ -43,7 +41,7 @@ Track::dump()
             trackNum_m);
 
 
-    for (Sector* sector : sectors_m)
+    for (shared_ptr<Sector> sector : sectors_m)
     {
         debugss(ssFloppyDisk, INFO, "  Sector: %d\n", sector->getSectorNum());
         sector->dump();
@@ -69,14 +67,10 @@ Track::readSectorData(BYTE  sectorNum,
 {
     debugss(ssFloppyDisk, INFO, "sector: %d pos: %d\n", sectorNum, pos);
 
-    for (Sector* sector : sectors_m)
+    shared_ptr<Sector> sector = findSector(sectorNum);
+    if (sector)
     {
-        if (sector->getSectorNum() == sectorNum)
-        {
-            debugss(ssFloppyDisk, ALL, "found\n");
-
-            return sector->readData(pos, data);
-        }
+        return sector->readData(pos, data);
     }
 
     debugss(ssFloppyDisk, INFO, "Not found\n");
@@ -85,10 +79,10 @@ Track::readSectorData(BYTE  sectorNum,
 
 }
 
-Sector*
+shared_ptr<Sector>
 Track::findSector(BYTE sectorNum)
 {
-    for (Sector* sector : sectors_m)
+    for (shared_ptr<Sector> sector : sectors_m)
     {
         if (sector->getSectorNum() == sectorNum)
         {
@@ -104,7 +98,18 @@ Track::findSector(BYTE sectorNum)
 BYTE
 Track::getMaxSectors()
 {
-    // todo see if this should look through and find the highest sector number from all sectors.
-    // that is properly the right thing to do.
-    return sectors_m.size() & 0xff;
+
+    BYTE max = 0;
+
+    for (shared_ptr<Sector> sector : sectors_m)
+    {
+        BYTE sectorNum = sector->getSectorNum();
+
+        if (sectorNum > max)
+        {
+            max = sectorNum;
+        }
+    }
+
+    return max;
 }

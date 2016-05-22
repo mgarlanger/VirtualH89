@@ -21,7 +21,7 @@ H88MemoryLayout::H88MemoryLayout(shared_ptr<Memory8K> hdos): MemoryLayout()
     }
 }
 
-H88MemoryLayout::H88MemoryLayout(MemoryLayout* nonOrg0Layout): MemoryLayout()
+H88MemoryLayout::H88MemoryLayout(shared_ptr<MemoryLayout> nonOrg0Layout): MemoryLayout()
 {
     // Org-0 has the memory from 48K to 56K mapped to address 0.
     for (int x = 1; x < 6; ++x)

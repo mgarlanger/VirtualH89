@@ -27,7 +27,7 @@ class H37InterruptController: public InterruptController
     H37InterruptController(CPU* cpu);
     virtual ~H37InterruptController();
 
-    // reading instructions for interrupts
+    // read data bus for instruction to execute due to interrupt.
     virtual BYTE readDataBus();
 
     virtual void setDrq(bool raise);
@@ -35,7 +35,6 @@ class H37InterruptController: public InterruptController
     virtual void blockInterrupts(bool block);
 
 };
-
 
 
 #endif // H37_INTERRUPT_CONTROLLER_H

@@ -15,11 +15,9 @@
 class H89MemoryDecoder: public MemoryDecoder
 {
   public:
-    H89MemoryDecoder(MemoryLayout* h89_0);
+    H89MemoryDecoder(shared_ptr<MemoryLayout> h89_0);
     virtual ~H89MemoryDecoder();
 
-    virtual void addLayout(int ix, MemoryLayout* lo);
-    virtual void reset();
   private:
     virtual void gppNewValue(BYTE gpo);
     static const BYTE h89_gppOrg0Bit_c = 0b00100000;

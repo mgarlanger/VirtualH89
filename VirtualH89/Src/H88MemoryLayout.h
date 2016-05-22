@@ -17,7 +17,7 @@ class H88MemoryLayout: public MemoryLayout
 {
   public:
     H88MemoryLayout(shared_ptr<Memory8K> hdos);
-    H88MemoryLayout(MemoryLayout* nonOrg0Layout);
+    H88MemoryLayout(shared_ptr<MemoryLayout> nonOrg0Layout);
 };
 
 #endif // H88MEMORYLAYOUT_H_

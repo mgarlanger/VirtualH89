@@ -18,7 +18,7 @@ HardSectoredDisk::HardSectoredDisk(const char* name)
     initialized_m = true;
     memset(rawImage_m, 0, maxHeads_c * bytesPerTrack_c * maxTracksPerSide_c);
 
-    if ((file = fopen(name, "r")) != NULL)
+    if ((file = fopen(name, "r")) != nullptr)
     {
         unsigned long readCount;
         int           trk  = 0;
@@ -251,7 +251,7 @@ HardSectoredDisk::eject(const char* name)
     FILE* file;
     debugss(ssFloppyDisk, ALL, "Save: %s\n", name);
 
-    if ((file = fopen(name, "wb")) != NULL)
+    if ((file = fopen(name, "wb")) != nullptr)
     {
         unsigned long readCount;
 

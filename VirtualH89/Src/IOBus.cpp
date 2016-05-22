@@ -33,7 +33,7 @@ IOBus::addDevice(IODevice* device)
 {
     debugss(ssIO, INFO, "\n");
 
-    if (device == NULL)
+    if (device == nullptr)
     {
         // NULL device passed in
         debugss(ssIO, ERROR, "Null Device\n");
@@ -128,7 +128,7 @@ IOBus::reset()
 {
     for (int port = 0; port < 256; ++port)
     {
-        if (iodevices[port] != NULL)
+        if (iodevices[port] != nullptr)
         {
             iodevices[port]->reset();
         }
