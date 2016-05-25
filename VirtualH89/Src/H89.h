@@ -18,13 +18,15 @@
 #ifndef H89_H_
 #define H89_H_
 
-#include <string>
-#include <pthread.h>
 
 #include "computer.h"
 #include "propertyutil.h"
 
+/// \cond
+#include <string>
+#include <pthread.h>
 #include <memory>
+/// \endcond
 
 // Forward declare classes to avoid a tangled mess of includes.
 

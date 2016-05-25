@@ -9,9 +9,9 @@
 #include "CPNetDevice.h"
 
 #include "HostFileBdos.h"
-
 #include "logger.h"
 
+/// \cond
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <fnmatch.h>
+/// \endcond
 
 ///
 /// User (CP/M) prootocol:

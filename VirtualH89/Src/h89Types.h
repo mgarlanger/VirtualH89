@@ -8,7 +8,9 @@
 #ifndef H89_TYPES_H_
 #define H89_TYPES_H_
 
+/// \cond
 #include <inttypes.h>
+/// \endcond
 
 ///
 /// \typedef WORD

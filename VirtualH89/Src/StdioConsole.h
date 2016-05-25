@@ -7,9 +7,12 @@
 #ifndef STDIOCONSOLE_H_
 #define STDIOCONSOLE_H_
 
-#include <assert.h>
 
 #include "Console.h"
+
+/// \cond
+#include <assert.h>
+/// \endcond
 
 /// \brief StdioConsole
 ///

@@ -10,8 +10,10 @@
 
 #include "GenericFloppyDisk.h"
 
+/// \cond
 #include <vector>
 #include <memory>
+/// \endcond
 
 class Track;
 class Sector;
@@ -41,7 +43,7 @@ class IMDFloppyDisk: public GenericFloppyDisk
     virtual void eject(const char* name);
     virtual void dump(void);
     virtual std::string getMediaName();
-    static std::shared_ptr<GenericFloppyDisk> getDiskette(std::vector<std::string> argv);
+    static GenericFloppyDisk_ptr getDiskette(std::vector<std::string> argv);
 
   private:
     const char*                                imageName_m;

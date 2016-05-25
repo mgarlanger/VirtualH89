@@ -13,7 +13,9 @@
 #include "GenericFloppyFormat.h"
 #include "logger.h"
 
+/// \cond
 #include <fstream>
+/// \endcond
 
 using namespace std;
 

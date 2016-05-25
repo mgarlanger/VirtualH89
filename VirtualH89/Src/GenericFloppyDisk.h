@@ -109,4 +109,6 @@ class GenericFloppyDisk
 
 };
 
+
+typedef std::shared_ptr<GenericFloppyDisk> GenericFloppyDisk_ptr;
 #endif // GENERICFLOPPYDISK_H_

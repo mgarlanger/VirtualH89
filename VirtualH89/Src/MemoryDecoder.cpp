@@ -11,8 +11,11 @@
 #include "H88MemoryDecoder.h"
 #include "H89MemoryDecoder.h"
 #include "MMS77318MemoryDecoder.h"
+
+/// \cond
 #include <string>
 #include <memory>
+/// \endcond
 
 using namespace std;
 

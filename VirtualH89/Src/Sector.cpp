@@ -10,7 +10,9 @@
 
 #include "logger.h"
 
+/// \cond
 #include <iostream>
+/// \endcond
 
 
 Sector::Sector(BYTE  headNum,

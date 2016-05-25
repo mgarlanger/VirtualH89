@@ -6,11 +6,14 @@
 
 #include "propertyutil.h"
 
+
+/// \cond
 #include <sstream>
 #include <fstream>
 #include <exception>
 #include <cstdarg>
 #include <memory>
+/// \endcond
 
 void
 PropertyUtil::read(const char*   filename,

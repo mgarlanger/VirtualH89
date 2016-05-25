@@ -38,7 +38,9 @@
 #include "logger.h"
 #include "propertyutil.h"
 
+/// \cond
 #include <vector>
+/// \endcond
 
 using namespace std;
 

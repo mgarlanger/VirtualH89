@@ -12,9 +12,11 @@
 #include "Track.h"
 #include "Sector.h"
 
+/// \cond
 #include <fstream>
 #include <strings.h>
 #include <memory>
+/// \endcond
 
 using namespace std;
 

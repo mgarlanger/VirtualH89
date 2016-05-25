@@ -15,8 +15,10 @@
 #include "MemoryLayout.h"
 #include "Memory8K.h"
 
+/// \cond
 #include <vector>
 #include <memory>
+/// \endcond
 
 class SystemMemory8K;
 

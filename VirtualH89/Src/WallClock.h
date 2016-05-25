@@ -7,9 +7,11 @@
 #ifndef WALLCLOCK_H_
 #define WALLCLOCK_H_
 
+/// \cond
 #include <cstdio>
 #include <list>
 #include <atomic>
+/// \endcond
 
 class ClockUser;
 

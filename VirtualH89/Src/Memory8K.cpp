@@ -7,7 +7,9 @@
 
 #include "Memory8K.h"
 
+/// \cond
 #include <string.h>
+/// \endcond
 
 
 Memory8K::Memory8K(WORD base): base_m(base)

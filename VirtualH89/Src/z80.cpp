@@ -9,11 +9,6 @@
 
 #include "z80.h"
 
-#include <ctime>
-#include <cassert>
-#include <strings.h>
-#include <unistd.h>
-
 #include "logger.h"
 #include "computer.h"
 #include "AddressBus.h"
@@ -23,6 +18,14 @@
 #include "propertyutil.h"
 
 #include "config.h"
+
+/// \cond
+#include <ctime>
+#include <cassert>
+#include <strings.h>
+#include <unistd.h>
+/// \endcond
+
 
 using namespace std;
 

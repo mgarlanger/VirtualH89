@@ -13,11 +13,13 @@
 #ifndef Z80_H_
 #define Z80_H_
 
-#include <csignal>
-#include <pthread.h>
-
 #include "cpu.h"
 #include "GppListener.h"
+
+/// \cond
+#include <csignal>
+#include <pthread.h>
+/// \endcond
 
 class Computer;
 class AddressBus;

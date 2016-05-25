@@ -10,7 +10,6 @@
 #define RAMEMORY8K_H_
 
 
-#include "h89Types.h"
 #include "Memory8K.h"
 
 class RAMemory8K: public Memory8K

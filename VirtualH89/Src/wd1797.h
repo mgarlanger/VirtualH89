@@ -10,6 +10,7 @@
 #define WD1797_H_
 
 #include "ClockUser.h"
+
 #include "h89Types.h"
 
 class GenericFloppyDrive;

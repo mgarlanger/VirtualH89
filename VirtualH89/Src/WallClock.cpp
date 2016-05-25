@@ -10,7 +10,10 @@
 
 #include "ClockUser.h"
 #include "logger.h"
+
+/// \cond
 #include <cstddef>
+/// \endcond
 
 
 WallClock* WallClock::_inst = nullptr;

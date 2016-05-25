@@ -12,9 +12,12 @@
 #ifndef STDIOPROXYCONSOLE_H_
 #define STDIOPROXYCONSOLE_H_
 
-#include <assert.h>
 
 #include "Console.h"
+
+/// \cond
+#include <assert.h>
+/// \endcond
 
 class H89Operator;
 

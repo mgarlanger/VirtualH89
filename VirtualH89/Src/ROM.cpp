@@ -9,9 +9,13 @@
 
 #include "ROM.h"
 
+#include "logger.h"
+
+/// \cond
 #include <cassert>
 #include <fstream>
-#include "logger.h"
+/// \endcond
+
 
 ROM::ROM(int size):
     data_m(0),

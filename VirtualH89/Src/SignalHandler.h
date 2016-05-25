@@ -7,9 +7,11 @@
 #ifndef SIGNALHANDLER_H_
 #define SIGNALHANDLER_H_
 
-#include "EventHandler.h"
+class EventHandler;
 
+/// \cond
 #include <csignal>
+/// \endcond
 
 /// Class to handle signals. This is a singleton.
 ///

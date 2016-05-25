@@ -10,8 +10,10 @@
 
 #include "GenericFloppyDisk.h"
 
+/// \cond
 #include <vector>
 #include <memory>
+/// \endcond
 
 class Track;
 class Sector;

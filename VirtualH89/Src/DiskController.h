@@ -38,6 +38,7 @@ class DiskController: public IODevice
     ///
     DiskController(BYTE base,
                    BYTE numPorts);
+    DiskController() = delete;
     virtual ~DiskController();
 
     // Return list of all connected disk drives.
@@ -62,8 +63,6 @@ class DiskController: public IODevice
   protected:
 
   private:
-    /// Hide default constructor.
-    DiskController();
 
 };
 

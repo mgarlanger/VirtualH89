@@ -7,6 +7,7 @@
 #include "StdioConsole.h"
 
 #include "logger.h"
+/// \cond
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -14,6 +15,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+/// \endcond
 
 extern const char* getopts;
 
@@ -25,23 +27,28 @@ StdioConsole::StdioConsole(int    argc,
 {
 }
 
-StdioConsole::~StdioConsole() {
+StdioConsole::~StdioConsole()
+{
 }
 
 void
-StdioConsole::init() {
+StdioConsole::init()
+{
 }
 
 void
-StdioConsole::reset() {
+StdioConsole::reset()
+{
 }
 
 void
-StdioConsole::display() {
+StdioConsole::display()
+{
 }
 
 void
-StdioConsole::processCharacter(char ch) {
+StdioConsole::processCharacter(char ch)
+{
 }
 
 void

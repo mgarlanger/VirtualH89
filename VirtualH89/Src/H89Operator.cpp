@@ -10,14 +10,6 @@
 
 #include "H89Operator.h"
 
-#include <stdio.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <signal.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <sstream>
 
 #include "cpu.h"
 #include "H89.h"
@@ -28,6 +20,18 @@
 #include "RawFloppyImage.h"
 #include "SectorFloppyImage.h"
 #include "propertyutil.h"
+
+/// \cond
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
+#include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <sstream>
+/// \endcond
+
 
 /// \brief H89Operator
 ///

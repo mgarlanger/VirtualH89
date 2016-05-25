@@ -50,7 +50,7 @@ AddressBus::writeByte(WORD addr,
 }
 
 void
-AddressBus::installMemory(shared_ptr<MemoryDecoder> memory)
+AddressBus::installMemory(MemoryDecoder_ptr memory)
 {
     mem_m = memory;
 }

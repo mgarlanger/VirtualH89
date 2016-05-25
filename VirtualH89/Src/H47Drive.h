@@ -10,6 +10,7 @@
 #define H47DISK_H_
 
 #include "DiskDrive.h"
+
 #include "h89Types.h"
 /// \cond
 #include <memory>

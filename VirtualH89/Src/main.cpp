@@ -10,11 +10,6 @@
 
 #include "main.h"
 
-#include <iostream>
-#include <signal.h>
-#include <stdlib.h>
-#include <string>
-#include <unistd.h>
 
 #include "H89.h"
 #include "Console.h"
@@ -23,6 +18,14 @@
 #include "StdioProxyConsole.h"
 #include "logger.h"
 #include "propertyutil.h"
+
+/// \cond
+#include <iostream>
+#include <signal.h>
+#include <stdlib.h>
+#include <string>
+#include <unistd.h>
+/// \endcond
 
 
 using namespace std;
