@@ -24,6 +24,40 @@ class AddressBus;
 class IOBus;
 
 ///
+/// \struct RP
+///
+/// \brief Register Pair
+///
+/// A union to allow the register to appear as an unsigned word, a signed word, 2 unsigned
+/// bytes, or 2 signed bytes. All without any special casting/conversions.
+///
+struct RP
+{
+    union
+    {
+        /// Option 1, register appears to be 2 unsigned bytes.
+        struct
+        {
+            BYTE lo;
+            BYTE hi;
+        };
+
+        /// Option 2, register appears to be 2 signed bytes.
+        struct
+        {
+            SBYTE slo;
+            SBYTE shi;
+        };
+
+        /// Option 3, register appears to be an unsigned word.
+        WORD  val;
+
+        /// Option 4, register appears to be a signed word.
+        SWORD sval;
+    };
+};
+
+///
 /// \brief  Zilog %Z80 %CPU simulator.
 ///
 /// Complete Z80 CPU simulator based on Z80Pack. The original code was converted
@@ -38,7 +72,9 @@ class Z80: public CPU, public GppListener
 
     void systemMutexCycle();
     // data
-    Computer* computer_m;
+    Computer*   computer_m;
+    AddressBus* ab_m;
+    IOBus*      io_m;
 
     // Registers
 
@@ -118,9 +154,6 @@ class Z80: public CPU, public GppListener
     volatile sig_atomic_t ticks;
 
     int                   lastInstTicks;
-
-    AddressBus*           ab_m;
-    IOBus*                io_m;
 
     static const int      maxNumInst = 4;
     BYTE                  curInst[maxNumInst];

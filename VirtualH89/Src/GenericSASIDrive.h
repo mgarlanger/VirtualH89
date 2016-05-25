@@ -14,7 +14,10 @@
 
 #include "h89Types.h"
 
+
+/// \cond
 #include <memory>
+/// \endcond
 
 class GenericFloppyDisk;
 

@@ -7,12 +7,11 @@
 
 #include "GeneralPurposePort.h"
 
-#include <stdlib.h>
-
 #include "logger.h"
 #include "propertyutil.h"
 #include "GppListener.h"
 #include "computer.h"
+
 
 using namespace std;
 

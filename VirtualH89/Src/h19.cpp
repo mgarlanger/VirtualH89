@@ -6,6 +6,13 @@
 
 #include "h19.h"
 
+#include "h19-font.h"
+#include "logger.h"
+
+
+#include "ascii.h"
+
+/// \cond
 #include <pthread.h>
 #include <unistd.h>
 #include <assert.h>
@@ -16,12 +23,8 @@
 #else
 #include <GL/glut.h>
 #endif
+/// \endcond
 
-#include "h19-font.h"
-#include "logger.h"
-
-
-#include "ascii.h"
 
 
 // \TODO make this run-time config.

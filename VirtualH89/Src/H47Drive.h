@@ -11,7 +11,9 @@
 
 #include "DiskDrive.h"
 #include "h89Types.h"
+/// \cond
 #include <memory>
+/// \endcond
 
 class H47Drive: public DiskDrive
 {

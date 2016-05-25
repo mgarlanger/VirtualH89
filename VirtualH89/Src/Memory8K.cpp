@@ -15,3 +15,9 @@ Memory8K::Memory8K(WORD base): base_m(base)
 
     memset(mem, 0, sizeof(mem));
 }
+
+WORD
+Memory8K::getBase()
+{
+    return base_m;
+}

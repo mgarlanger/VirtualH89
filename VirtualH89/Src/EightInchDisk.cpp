@@ -8,13 +8,17 @@
 
 #include "EightInchDisk.h"
 
-#include <iostream> // std::cout
-#include <fstream>  // std::ifstream
 
 #include "logger.h"
 #include "Track.h"
 #include "Sector.h"
 
+/// \cond
+#include <iostream> // std::cout
+#include <fstream>  // std::ifstream
+/// \endcond
+
+using namespace std;
 
 EightInchDisk::EightInchDisk()
 {
@@ -41,12 +45,12 @@ EightInchDisk::readRaw8(const char* name)
 {
     // Currently just supporting the RAW HDOS 3.0 disk images... 40 track, single density,
     // single sided, 10 sectors/track, 256 bytes/sector.
-    std::ifstream     file;
+    ifstream          file;
     unsigned long int fileSize;
     unsigned long int pos = 0;
     BYTE*             buf;
 
-    file.open(name, std::ios::binary);
+    file.open(name, ios::binary);
 
     if (!file.is_open())
     {
@@ -54,9 +58,9 @@ EightInchDisk::readRaw8(const char* name)
         return false;
     }
 
-    file.seekg(0, std::ios::end);
+    file.seekg(0, ios::end);
     fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
+    file.seekg(0, ios::beg);
 
     buf      = new BYTE[fileSize];
     file.read((char*) buf, fileSize);

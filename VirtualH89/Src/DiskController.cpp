@@ -9,7 +9,10 @@
 
 #include "DiskController.h"
 
+/// \cond
 #include <sstream>
+/// \endcond
+
 
 
 DiskController::DiskController(BYTE base,

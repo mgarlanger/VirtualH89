@@ -13,7 +13,9 @@
 #include "h-17-1.h"
 #include "h-17-4.h"
 
+/// \cond
 #include <memory>
+/// \endcond
 
 using namespace std;
 
@@ -32,7 +34,7 @@ DiskDrive::~DiskDrive()
 
 
 shared_ptr<DiskDrive>
-DiskDrive::getInstance(std::string type)
+DiskDrive::getInstance(string type)
 {
     shared_ptr<DiskDrive> drive = nullptr;
 

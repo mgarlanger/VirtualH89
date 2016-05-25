@@ -7,10 +7,13 @@
 #ifndef H89TIMER_H_
 #define H89TIMER_H_
 
-#include <pthread.h>
-
 #include "EventHandler.h"
 #include "GppListener.h"
+
+/// \cond
+#include <pthread.h>
+/// \endcond
+
 
 class CPU;
 class Computer;

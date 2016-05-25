@@ -10,10 +10,12 @@
 #ifndef DISKCONTROLLER_H_
 #define DISKCONTROLLER_H_
 
+#include "IODevice.h"
+
+/// \cond
 #include <vector>
 #include <string>
-
-#include "IODevice.h"
+/// \endcond
 
 class GenericDiskDrive;
 

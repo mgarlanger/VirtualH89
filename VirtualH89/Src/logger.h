@@ -7,8 +7,9 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
+/// \cond
 #include <cstdio>
-
+/// \endcond
 
 extern FILE* log_out;
 

@@ -10,7 +10,6 @@
 
 #include "logger.h"
 
-#include <memory>
 
 using namespace std;
 

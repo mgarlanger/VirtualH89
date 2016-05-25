@@ -13,9 +13,11 @@
 
 #include "h89Types.h"
 
+/// \cond
 #include <string>
 #include <memory>
 #include <vector>
+/// \endcond
 
 class Sector;
 class Track;

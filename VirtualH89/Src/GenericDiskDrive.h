@@ -10,8 +10,10 @@
 #ifndef GENERICDISKDRIVE_H_
 #define GENERICDISKDRIVE_H_
 
+/// \cond
 #include <string>
 #include <memory>
+/// \endcond
 
 class GenericFloppyDisk;
 

@@ -12,6 +12,10 @@
 
 #include "h89Types.h"
 
+/// \cond
+#include <memory>
+/// \endcond
+
 
 /// \todo make AddressBus a base class and this functionality in an H89AddressBus
 /// class
@@ -28,24 +32,22 @@ class InterruptController;
 class AddressBus
 {
   private:
-    MemoryDecoder*       mem_m;
-    InterruptController* ic_m;
+    std::shared_ptr<MemoryDecoder>  mem_m;
+    InterruptController*            ic_m;
 
   public:
     AddressBus(InterruptController* ic);
     virtual ~AddressBus();
 
     // setup memory
-    void installMemory(MemoryDecoder* mem);
+    void installMemory(std::shared_ptr<MemoryDecoder> mem);
 
-    // Wanted to use the [] operator, but unfortunately it can't be used since the
-    // emulated CPU may need to handle writing and reading differently.
     BYTE readByte(WORD addr,
                   bool interruptAck = false);
     void writeByte(WORD addr,
                    BYTE val);
-    void reset();
 
+    void reset();
 };
 
 #endif // ADDRESSBUS_H_

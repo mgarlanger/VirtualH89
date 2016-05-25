@@ -10,11 +10,17 @@
 #include "MMS77318MemoryDecoder.h"
 
 #include "MemoryLayout.h"
-#include "Memory64K.h"
+
+#include "RAMemory8K.h"
+
+#include "SystemMemory8K.h"
 
 #include "logger.h"
 
-const BYTE MMS77318MemoryDecoder::lockSeq[] = {
+using namespace std;
+
+
+const BYTE MMS77318MemoryDecoder::lockSeq[6] = {
     0b00000100,
     0b00001100,
     0b00000100,
@@ -23,23 +29,40 @@ const BYTE MMS77318MemoryDecoder::lockSeq[] = {
     0b00001000
 };
 
-/// 128K add-on board
-MMS77318MemoryDecoder::MMS77318MemoryDecoder(shared_ptr<MemoryLayout> h89_0): MemoryDecoder(8,
-                                                                                            h89_gppWatchedBits_c)
 
+MMS77318MemoryDecoder::MMS77318MemoryDecoder(systemMem_ptr systemMemory): MemoryDecoder(8,
+                                                                                        h89_gppWatchedBits_c)
 {
-    int                   x;
-    Memory64K*            rd6    = new Memory64K();
-    Memory64K*            rd7    = new Memory64K();
+    int          x;
+
+    Memory8K_ptr rd6[8];
+    Memory8K_ptr rd7[8];
+
+    for (x = 0; x < 8; x++)
+    {
+        rd6[x] = make_shared<RAMemory8K>(x << 13);
+        rd7[x] = make_shared<RAMemory8K>(x << 13);
+    }
 
     // 0: RESET state, ROM at 0x0000
+    MemoryLayout_ptr h89_0 = make_shared<MemoryLayout>();
+    h89_0->addPage(systemMemory);
+
+    // add 48k of memory starting at 8k upto 56k
+    for (x = 1; x < 7; x++)
+    {
+        h89_0->addPage(make_shared<RAMemory8K>(x << 13));
+    }
+
+    // save the 48k -> 56k bank for later
     shared_ptr<Memory8K>  ras2_1 = h89_0->getPage(6);
-    h89_0->addPage(rd6->getPage(7));
-    h89_0->addPage(rd6->getPage(6));
+    h89_0->addPage(rd6[6]);
+    h89_0->addPage(rd6[7]);
+
     addLayout(0, h89_0);
 
     // 1: CP/M state, 64K RAM
-    shared_ptr<MemoryLayout> h89_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr h89_1 = make_shared<MemoryLayout>();
     h89_1->addPageAt(ras2_1, 0x0000);
     for (x = 1; x < 8; ++x)
     {
@@ -49,62 +72,59 @@ MMS77318MemoryDecoder::MMS77318MemoryDecoder(shared_ptr<MemoryLayout> h89_0): Me
 
     // MMS 77318 additional layouts:
     // 2,3: Hi 56K always main, low 8K bank switched (HDOS)
-    shared_ptr<MemoryLayout> hdos56k_1 = make_shared<MemoryLayout>();
-    hdos56k_1->addPage(rd7->getPage(0));
+    MemoryLayout_ptr hdos56k_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr hdos56k_2 = make_shared<MemoryLayout>();
+
+    hdos56k_1->addPage(rd7[0]);
+    hdos56k_2->addPage(rd6[0]);
+
     for (x = 1; x < 8; ++x)
     {
         hdos56k_1->addPage(h89_1->getPage(x));
-    }
-    addLayout(2, hdos56k_1);
-
-    shared_ptr<MemoryLayout> hdos56k_2 = make_shared<MemoryLayout>();
-    hdos56k_2->addPage(rd6->getPage(0));
-    for (x = 1; x < 8; ++x)
-    {
         hdos56k_2->addPage(h89_1->getPage(x));
     }
+
+    addLayout(2, hdos56k_1);
     addLayout(3, hdos56k_2);
 
     // 4,5: Hi 16K always main, low 48K bank switched
-    shared_ptr<MemoryLayout> cpm64k_16k_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr cpm64k_16k_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr cpm64k_16k_2 = make_shared<MemoryLayout>();
     for (x = 0; x < 6; ++x)
     {
-        cpm64k_16k_1->addPage(rd7->getPage(x));
+        cpm64k_16k_1->addPage(rd7[x]);
+        cpm64k_16k_2->addPage(rd6[x]);
     }
-    cpm64k_16k_1->addPage(h89_1->getPage(6));
-    cpm64k_16k_1->addPage(h89_1->getPage(7));
-    addLayout(4, cpm64k_16k_1);
+    for (; x < 8; ++x)
+    {
+        cpm64k_16k_1->addPage(h89_1->getPage(x));
+        cpm64k_16k_2->addPage(h89_1->getPage(x));
+    }
 
-    shared_ptr<MemoryLayout> cpm64k_16k_2 = make_shared<MemoryLayout>();
-    for (x = 0; x < 6; ++x)
-    {
-        cpm64k_16k_2->addPage(rd6->getPage(x));
-    }
-    cpm64k_16k_2->addPage(h89_1->getPage(6));
-    cpm64k_16k_2->addPage(h89_1->getPage(7));
+    addLayout(4, cpm64k_16k_1);
     addLayout(5, cpm64k_16k_2);
 
     // 6,7: Hi 8K always main, low 56K bank switched
-    shared_ptr<MemoryLayout> cpm64k_8k_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr cpm64k_8k_1 = make_shared<MemoryLayout>();
+    MemoryLayout_ptr cpm64k_8k_2 = make_shared<MemoryLayout>();
     for (x = 0; x < 7; ++x)
     {
-        cpm64k_8k_1->addPage(rd7->getPage(x));
+        cpm64k_8k_1->addPage(rd7[x]);
+        cpm64k_8k_2->addPage(rd6[x]);
     }
+    cpm64k_8k_1->addPage(rd7[6]);
     cpm64k_8k_1->addPage(h89_1->getPage(7));
-    addLayout(6, cpm64k_8k_1);
 
-    shared_ptr<MemoryLayout> cpm64k_8k_2 = make_shared<MemoryLayout>();
-    for (x = 0; x < 6; ++x)
-    {
-        cpm64k_8k_2->addPage(rd6->getPage(x));
-    }
-    cpm64k_8k_2->addPageAt(rd7->getPage(7), 0xc000);
+    cpm64k_8k_2->addPageAt(rd7[7], 0xc000);
     cpm64k_8k_2->addPage(h89_1->getPage(7));
+
+    addLayout(6, cpm64k_8k_1);
     addLayout(7, cpm64k_8k_2);
 
     lockState = 1;
-    updateCurBank(0);
+    updateCurLayout(0);
 }
+
 
 MMS77318MemoryDecoder::~MMS77318MemoryDecoder()
 {
@@ -150,6 +170,5 @@ MMS77318MemoryDecoder::gppNewValue(BYTE gpo)
             lockState = 1;
         }
     }
-    updateCurBank(bnk);
-
+    updateCurLayout(bnk);
 }

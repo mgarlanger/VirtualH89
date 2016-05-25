@@ -8,21 +8,29 @@
 #include "MemoryDecoder.h"
 
 
+#include "H88MemoryDecoder.h"
+#include "H89MemoryDecoder.h"
+#include "MMS77318MemoryDecoder.h"
+#include <string>
+#include <memory>
 
-MemoryDecoder::MemoryDecoder(int  numBanks,
+using namespace std;
+
+
+MemoryDecoder::MemoryDecoder(int  numLayouts,
                              BYTE gppBits): GppListener(gppBits),
-                                            curBank_m(0),
-                                            bankMask_m(numBanks - 1),
-                                            numBanks_m(numBanks),
+                                            curLayoutNum_m(0),
+                                            layoutMask_m(numLayouts - 1),
+                                            numLayouts_m(numLayouts),
                                             curLayout_m(nullptr)
 {
     GppListener::addListener(this);
-    banks_m.resize(numBanks);
-    for (shared_ptr<MemoryLayout> bank : banks_m)
+    layouts_m.resize(numLayouts);
+    for (MemoryLayout_ptr layout : layouts_m)
     {
-        bank = nullptr;
+        layout = nullptr;
     }
-    curLayout_m = banks_m[curBank_m];
+    curLayout_m = layouts_m[curLayoutNum_m];
 }
 
 MemoryDecoder::~MemoryDecoder()
@@ -33,24 +41,54 @@ MemoryDecoder::~MemoryDecoder()
 void
 MemoryDecoder::reset()
 {
-    updateCurBank(0);
+    updateCurLayout(0);
 }
 
 void
-MemoryDecoder::addLayout(int                      ix,
-                         shared_ptr<MemoryLayout> lo)
+MemoryDecoder::addLayout(int              ix,
+                         MemoryLayout_ptr lo)
 {
-    if (ix >= 0 && ix < numBanks_m)
+    if (ix >= 0 && ix < numLayouts_m)
     {
-        banks_m[ix] = lo;
+        layouts_m[ix] = lo;
     }
-    curLayout_m = banks_m[curBank_m];
+    curLayout_m = layouts_m[curLayoutNum_m];
 
 }
 
 void
-MemoryDecoder::updateCurBank(BYTE bank)
+MemoryDecoder::updateCurLayout(BYTE layout)
 {
-    curBank_m   = bank;
-    curLayout_m = banks_m[curBank_m];
+    curLayoutNum_m = layout;
+    curLayout_m    = layouts_m[curLayoutNum_m];
+}
+
+
+shared_ptr<MemoryDecoder>
+MemoryDecoder::createMemoryDecoder(string                     type,
+                                   shared_ptr<SystemMemory8K> sysMem,
+                                   MemoryLayout::MemorySize_t memSize)
+{
+
+    shared_ptr<MemoryDecoder> memDecoder = nullptr;
+    if (type == "MMS77318")
+    {
+        memDecoder = make_shared<MMS77318MemoryDecoder>(sysMem);
+    }
+    else if (type == "H89")
+    {
+        memDecoder = make_shared<H89MemoryDecoder>(sysMem, memSize);
+    }
+    else
+    {
+        memDecoder = make_shared<H88MemoryDecoder>(sysMem, memSize);
+    }
+
+    return memDecoder;
+}
+
+int
+MemoryDecoder::numLayouts()
+{
+    return numLayouts_m;
 }

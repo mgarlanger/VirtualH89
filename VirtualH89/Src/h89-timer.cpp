@@ -6,8 +6,6 @@
 
 #include "h89-timer.h"
 
-#include <sys/time.h>
-#include <signal.h>
 
 #include "computer.h"
 #include "cpu.h"
@@ -15,6 +13,11 @@
 #include "WallClock.h"
 #include "logger.h"
 #include "config.h"
+
+/// \cond
+#include <sys/time.h>
+#include <signal.h>
+/// \endcond
 
 
 static const int TimerInterval_c = 2000;

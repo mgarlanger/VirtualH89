@@ -16,7 +16,6 @@
 #include "DiskDrive.h"
 #include "HardSectoredDisk.h"
 
-#include <memory>
 
 using namespace std;
 

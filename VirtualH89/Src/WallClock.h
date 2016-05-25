@@ -9,7 +9,7 @@
 
 #include <cstdio>
 #include <list>
-// #include <atomic>
+#include <atomic>
 
 class ClockUser;
 
@@ -28,16 +28,14 @@ class ClockUser;
 class WallClock
 {
   private:
-    long long unsigned int clock_m = 0;
-//    std::atomic_ullong clock_m = 0;
-    unsigned int           ticks_m = 0;
-//    std::atomic_uint ticks_m = 0;
+    std::atomic_ullong     clock_m; // = 0;
+    std::atomic_uint       ticks_m;// = 0;
     static WallClock*      _inst;
 
     unsigned long          ticksPerSecond = 2048000;
 
     WallClock();
-    virtual ~WallClock();
+    ~WallClock();
 
     /// use C++11 to avoid having to define copy constructor
     WallClock(WallClock const&)            = delete;

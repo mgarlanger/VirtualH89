@@ -7,9 +7,9 @@
 
 #include "MemoryLayout.h"
 
-#include "Memory64K.h"
 #include "NilMemory8K.h"
 
+using namespace std;
 
 
 MemoryLayout::MemoryLayout()
@@ -32,13 +32,4 @@ MemoryLayout::addPageAt(shared_ptr<Memory8K> mem, WORD address)
 {
     // error if not NULL?
     memPage_m[addressToPage(address)] = mem;
-}
-
-void
-MemoryLayout::addPage(Memory64K* mem64)
-{
-    for (int x = 0; x < 8; ++x)
-    {
-        addPage(mem64->getPage(x));
-    }
 }

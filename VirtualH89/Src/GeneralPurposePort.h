@@ -10,9 +10,12 @@
 #ifndef GENERALPURPOSEPORT_H_
 #define GENERALPURPOSEPORT_H_
 
-#include <string>
-
 #include "IODevice.h"
+
+/// \cond
+#include <string>
+/// \endcond
+
 
 class Computer;
 

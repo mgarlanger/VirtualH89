@@ -10,6 +10,8 @@
 #include "MemoryDecoder.h"
 #include "InterruptController.h"
 
+using namespace std;
+
 AddressBus::AddressBus(InterruptController* ic): ic_m(ic),
                                                  mem_m(nullptr)
 {
@@ -48,7 +50,7 @@ AddressBus::writeByte(WORD addr,
 }
 
 void
-AddressBus::installMemory(MemoryDecoder* memory)
+AddressBus::installMemory(shared_ptr<MemoryDecoder> memory)
 {
     mem_m = memory;
 }

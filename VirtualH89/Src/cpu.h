@@ -8,9 +8,12 @@
 #define CPU_H_
 
 
-#include <string>
 
 #include "h89Types.h"
+
+/// \cond
+#include <string>
+/// \endcond
 
 class AddressBus;
 class IOBus;

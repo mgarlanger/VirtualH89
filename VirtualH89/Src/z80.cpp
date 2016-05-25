@@ -24,6 +24,8 @@
 
 #include "config.h"
 
+using namespace std;
+
 /// Precalculated flag values for Z, S, & P
 ///
 /// Since 8 bit values are all we have to check, setting up a table
@@ -1687,10 +1689,10 @@ Z80::systemMutexCycle()
     computer_m->systemMutexAcquire();
 }
 
-std::string
+string
 Z80::dumpDebug()
 {
-    std::string ret = PropertyUtil::sprintf(
+    string ret = PropertyUtil::sprintf(
         "A=%02x PSW=%s %s %s %s %s %s %s %s    AF'=%04x\n"
         "BC=%04x    BC'=%04x\n"
         "DE=%04x    DE'=%04x\n"
