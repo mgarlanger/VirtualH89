@@ -1792,7 +1792,6 @@ Z80::execute(WORD numInst)
 
 #endif
 
-        /// \todo fix interrupt timings see http://www.z80.info/interrup.htm
         // CPU interrupt handling
         //
         if (int_type & Intr_NMI)
@@ -1804,6 +1803,7 @@ Z80::execute(WORD numInst)
             PC        = 0x66;
             mode      = cm_running;
             R++; // increment refresh register
+            ticks -= 11;
         }
         else if ((int_type & Intr_INT) && (IFF1))
         {
@@ -1816,6 +1816,7 @@ Z80::execute(WORD numInst)
             {
                 case 0:
                     debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
+                    ticks -= 2;
                     processingIntr = true;
                     break;
 
@@ -1824,7 +1825,7 @@ Z80::execute(WORD numInst)
                     int_type    &= ~Intr_INT;
                     lastInstByte = 0xff;
                     op_rst();
-                    ticks       -= 4;
+                    ticks       -= 2;
                     break;
 
                 case 2:
@@ -1906,22 +1907,23 @@ Z80::execute(WORD numInst)
 /// \brief No Operation
 ///
 /// \details
-/// <pre>
+///
 /// Operation: -
 ///
 /// Opcode: NOP
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|0|0|0|0|0|0|   0x00
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  00000000 |  0x00
 ///
 /// Description: The CPU performs no operation during this machine cycle.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// ---------+---------+-------------
-///    1          4          1.00
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    4      |   1.00
 ///
 /// Condition Bits Affected: None
-/// </pre>
+///
 ///
 /// \retval none
 ///
@@ -1936,24 +1938,24 @@ Z80::op_nop(void)
 /// \brief Halt
 ///
 /// \details
-/// <pre>
+///
 /// Operation: -
 ///
 /// Opcode: HALT
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|1|1|0|1|1|0|   0x76
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  01110110 |  0x76
 ///
 /// Description: The HALT instruction suspends CPU operation until a subsequent interrupt
 ///              or reset is received. While in the HALT state, the processor executes NOPs
 ///              to maintain memory refresh logic.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// ---------+---------+-------------
-///    1          4          1.00
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|-----------
+///    1     |    4      |     1.00
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -1969,28 +1971,27 @@ Z80::op_halt(void)
 /// \brief Set Carry Flag
 ///
 /// \details
-/// <pre>
 /// Operation: CY <- 1
 ///
 /// Opcode: SCF
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|1|0|1|1|1|   0x37
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  00110111 | 0x37
 ///
 /// Description: The Carry flag in the F register is set.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+----------+------------
-///    1          4          1.00
+/// M Cycles | T States |  4 MHz E.T.
+/// ---------|----------|------------
+///    1     |     4    |    1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is reset
-///     P/V is not affected
-///     N is reset
-///     C is set
-/// </pre>
+///  *   S is not affected
+///  *   Z is not affected
+///  *   H is reset
+///  *   P/V is not affected
+///  *   N is reset
+///  *   C is set
 ///
 /// \retval none
 ///
@@ -2004,28 +2005,27 @@ Z80::op_scf(void)
 ///
 /// \brief Complement Carry Flag
 ///
-/// <pre>
 /// Operation: CY <- !CY
 ///
 /// Opcode: CCF
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|1|0|1|1|1|   0x37
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  00110111 |  0x37
 ///
 /// Description: The Carry flag in the F register is inverted.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+----------+------------
-///    1          4          1.00
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    4      |   1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H previous carry is copied
-///     P/V is not affected
-///     N is reset
-///     C is set if CY was 0 before operation; reset otherwise
-/// </pre>
+///  *   S is not affected
+///  *   Z is not affected
+///  *   H previous carry is copied
+///  *   P/V is not affected
+///  *   N is reset
+///  *   C is set if CY was 0 before operation; reset otherwise
 ///
 /// \retval none
 ///
@@ -2049,29 +2049,29 @@ Z80::op_ccf(void)
 ///
 /// \brief Complement Accumulator
 ///
-/// <pre>
+///
 /// Operation: A <- !A
 ///
 /// Opcode: CPL
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|0|1|1|1|1|   0x2F
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  00101111 |  0x2F
 ///
 /// Description: The contents of the Accumulator (register A) are inverted (one's
 ///              complement).
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+----------+------------
-///    1          4          1.00
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|-------------
+///    1     |    4      |    1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is set
-///     P/V is not affected
-///     N is set
-///     C is not affected
-/// </pre>
+///  *   S is not affected
+///  *   Z is not affected
+///  *   H is set
+///  *   P/V is not affected
+///  *   N is set
+///  *   C is not affected
 ///
 /// \retval none
 ///
@@ -2086,33 +2086,32 @@ Z80::op_cpl(void)
 ///
 /// \brief Decimal Adjust AL (DAA)
 ///
-/// <pre>
 /// Operation:
 ///
 /// Opcode: DAA
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|0|0|1|1|1|   0x27
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  00100111 |  0x27
 ///
 /// Description: This instruction conditionally adjusts the Accumulator for BCD addition and
 ///              subtraction operations. For addition (ADD, ADC, INC) or subtraction (SUB,
 ///              SBC, DEC, NEG), the following table indicates the operation performed:
 ///
-///  - \todo - add table from manual here.
+///  \todo  add table from manual here.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// ---------+----------+------------
-///    1          4          1.00
+/// M Cycles | T States |  4 MHz E.T.
+/// ---------|----------|------------
+///    1     |    4     |    1.00
 ///
 /// Condition Bits Affected:
-///     S is set if most-significant bit of Accumulator is 1 after operation; reset
+///  *   S is set if most-significant bit of Accumulator is 1 after operation; reset
 ///       otherwise
-///     Z is set if Accumulator is zero after operation; reset otherwise
-///     H, see instruction
-///     P/V is set if Accumulator is even parity after operation; reset otherwise
-///     N is not affected
-///     C, see instruction
-/// </pre>
+///  *   Z is set if Accumulator is zero after operation; reset otherwise
+///  *   H, see instruction
+///  *   P/V is set if Accumulator is even parity after operation; reset otherwise
+///  *   N is not affected
+///  *   C, see instruction
 ///
 /// \note This took a LONG time to get all the results/flags accurate with a real Z80,
 ///       so any modifications should be done with extreme care and revalidated
@@ -2169,25 +2168,24 @@ Z80::op_daa(void)
 ///
 /// \brief Enable Interrupts (EI)
 ///
-/// <pre>
 /// Operation: IFF <- 1
 ///
 /// Opcode: EI
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|1|1|0|1|1|   0xFB
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  11111011 |  0xFB
 ///
 /// Description: The enable interrupt instruction sets both interrupt enable flip flops
 ///              (IFF1 and IFF2) to a logic 1, allowing recognition of any maskable
 ///              interrupt. Note that during the execution of this instruction and the
 ///              following instruction, maskable interrupts are disabled.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------  ---------  ------------
-///    1          4          1.00
+/// M Cycles | T States |  4 MHz E.T.
+/// ---------|----------|------------
+///    1     |    4     |    1.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2206,24 +2204,23 @@ Z80::op_ei(void)
 ///
 /// \brief Disable Interrupts (DI)
 ///
-/// <pre>
 /// Operation: IFF <- 0
 ///
 /// Opcode: DI
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|1|0|0|1|1|   0xF3
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  11110011 |  0xF3
 ///
 /// Description: DI disables the maskable interrupt by resetting the interrupt enable
 ///              flip-flops (IFF1 and IFF2). Note that this instruction disables the
 ///              maskable interrupt during its execution.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------  ---------  ------------
-///    1          4          1.00
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|-------------
+///    1     |     4     |     1.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2236,16 +2233,15 @@ Z80::op_di(void)
 ///
 /// \brief Read from Port (IN)
 ///
-/// <pre>
 /// Operation: A <- (n)
 ///
 /// Opcode: IN
 /// Operands: A, (n)
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|0|1|1|0|1|1|   0xDB
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///
+///   Binary  |  Hex
+/// ----------|-------
+///  11011011 |  0xDB
+///    n      |    n
 ///
 /// Description: The operand n is placed on the bottom half (A0 through A7) of the address
 ///              bus to select the I/O device at one of 256 possible ports. The contents of
@@ -2253,12 +2249,11 @@ Z80::op_di(void)
 ///              bus at this time. Then one byte from the selected port is placed on the data
 ///              bus and written to the Accumulator (register A) in the CPU.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------  ---------  ------------
-///    3      11(4,3,4)      2.75
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|-------------
+///    3     | 11(4,3,4) |     2.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2273,17 +2268,15 @@ Z80::op_in(void)
 ///
 /// \brief Write to Port (OUT)
 ///
-/// <pre>
 /// Operation: (n) <- A
 ///
 /// Opcode: OUT
 /// Operands: (n), A
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|0|1|0|0|1|1|   0xD3
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11010011 |  0xD3
+///    n      |    n
 ///
 /// Description: The operand n is placed on the bottom half (A0 through A7) of the address
 ///              bus to select the I/O device at one of 256 possible ports. The contents of
@@ -2291,12 +2284,11 @@ Z80::op_in(void)
 ///              the address bus at this time. Then the byte contained in the Accumulator is
 ///              placed on the data bus and written to the selected peripheral device.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------  ---------  ------------
-///    3      11(4,3,4)      2.75
+/// M Cycles | T States  |  4 MHz E.T.
+/// ---------|-----------|-------------
+///    3     | 11(4,3,4) |     2.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2311,39 +2303,34 @@ Z80::op_out(void)
 ///
 /// \brief Load Register (LD)
 ///
-/// <pre>
 /// Operation: r <- (n)
 ///
 /// Opcode: LD
 /// Operands: r, n
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|  r  |1|1|0|
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00-r-110 |
+///    n      |    n
 ///
 /// Description: The 8-bit integer n is loaded to any register r, where r identifies
 ///              register A, B, C, D, E, H, or L, assembled as follows in the object code:
 ///
-///          +--------+------+
-///          |Register|  r, C|
-///          +--------+------+
-///          |    A   |  111 |
-///          |    B   |  000 |
-///          |    C   |  001 |
-///          |    D   |  010 |
-///          |    E   |  011 |
-///          |    H   |  100 |
-///          |    L   |  101 |
-///          +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2356,25 +2343,23 @@ Z80::op_ld_x_n(void)
 ///
 /// \brief LD A, (BC)
 ///
-/// <pre>
 /// Operation: A <- (BC)
 ///
 /// Opcode: LD
 /// Operands: A, (BC)
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|0|0|1|0|1|0|  0x0A
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00001010 | 0x0A
 ///
 /// Description: The contents of the memory location specified by the contents of the BC
 ///              register pair are loaded to the Accumulator.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2387,25 +2372,23 @@ Z80::op_ld_a_ibc(void)
 ///
 /// \brief Load Accumulator
 ///
-/// <pre>
 /// Operation: A <- (DE)
 ///
 /// Opcode: LD
 /// Operands: A, (DE)
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|0|1|1|0|1|0|  0x1A
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///   00011010|  0x1A
 ///
 /// Description: The contents of the memory location specified by the register pair DE are
 ///              loaded to the Accumulator.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2418,30 +2401,26 @@ Z80::op_ld_a_ide(void)
 ///
 /// \brief Load immediate Accumulator
 ///
-/// <pre>
 /// Operation: A <- (nn)
 ///
 /// Opcode: LD
 /// Operands: A, (nn)
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|1|1|0|1|0|  0x3A
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///   00111010|  0x3A
+///           |    n
+///           |    n
 ///
 /// Description: The contents of the memory location specified by the operands nn are
 ///              loaded to the Accumulator. The first n operand after the Opcode is the
 ///              low order byte of a 2-byte memory address.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    4     13(4,3,3,3)      3.25
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    4     |13(4,3,3,3)|     3.25
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2454,25 +2433,23 @@ Z80::op_ld_a_inn(void)
 ///
 /// \brief Store Accumulator
 ///
-/// <pre>
 /// Operation: (BC) <- A
 ///
 /// Opcode: LD
 /// Operands: (BC), A
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|0|0|0|0|1|0|  0x02
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///   00000010|  0x02
 ///
 /// Description: The contents of the Accumulator are loaded to the memory location
 ///              specified by the contents of the register pair BC.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2485,25 +2462,23 @@ Z80::op_ld_ibc_a(void)
 ///
 /// \brief Store Accumulator
 ///
-/// <pre>
 /// Operation: (DE) <- A
 ///
 /// Opcode: LD
 /// Operands: (DE), A
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|0|1|0|0|1|0|  0x12
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00010010 |  0x12
 ///
 /// Description: The contents of the Accumulator are loaded to the memory location
 ///              specified by the contents of the DE register pair.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2516,30 +2491,26 @@ Z80::op_ld_ide_a(void)
 ///
 /// \brief Store immediate Accumulator
 ///
-/// <pre>
 /// Operation: (nn) <- A
 ///
 /// Opcode: LD
 /// Operands: (nn), A
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|1|0|0|1|0|  0x32
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00110010 |  0x32
+///           |    n
+///           |    n
 ///
 /// Description: The contents of the Accumulator are loaded to the memory address
 ///              specified by the operand nn. The first n operand after the Opcode is the
 ///              low order byte of nn.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    4     13(4,3,3,3)      3.25
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    4     |13(4,3,3,3)|     3.25
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2552,38 +2523,34 @@ Z80::op_ld_inn_a(void)
 ///
 /// \brief LD (HL), r
 ///
-/// <pre>
 /// Operation: (HL) <- r
 ///
 /// Opcode: LD
 /// Operands: (HL), r
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|1|1|0|  r  |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  01110-r- |
 ///
 /// Description: The contents of register r are loaded to the memory location specified by
 ///              the contents of the HL register pair. The symbol r identifies register A,
 ///              B, C, D, E, H, or L, assembled as follows in the object code:
 ///
-///          +--------+------+
-///          |Register|  r, C|
-///          +--------+------+
-///          |    A   |  111 |
-///          |    B   |  000 |
-///          |    C   |  001 |
-///          |    D   |  010 |
-///          |    E   |  011 |
-///          |    H   |  100 |
-///          |    L   |  101 |
-///          +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)      1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |  1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2596,27 +2563,24 @@ Z80::op_ld_ihl_x(void)
 ///
 /// \brief Store immediate
 ///
-/// <pre>
 /// Operation: (HL) <- n
 ///
 /// Opcode: LD
 /// Operands: (HL), n
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|1|1|0|1|1|0|  0x36
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00110110 |  0x36
+///           |    n
 ///
 /// Description: Integer n is loaded to the memory address specified by the contents of the
 ///              HL register pair.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    3      10(4,3,3)      3.25
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    3     | 10(4,3,3) |    3.25
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2634,38 +2598,34 @@ Z80::op_ld_ihl_n(void)
 ///
 /// \brief LD r, r'
 ///
-/// <pre>
 /// Operation: r <- r'
 ///
 /// Opcode: LD
 /// Operands: r, r'
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|  r  |  r' |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  01-r--r' |
 ///
 /// Description: The contents of any register r' are loaded to any other register r. r, r'
 ///              identifies any of the registers A, B, C, D, E, H, or L, assembled as follows
 ///              in the object code:
 ///
-///          +--------+------+
-///          |Register|  r,r'|
-///          +--------+------+
-///          |    A   |  111 |
-///          |    B   |  000 |
-///          |    C   |  001 |
-///          |    D   |  010 |
-///          |    E   |  011 |
-///          |    H   |  100 |
-///          |    L   |  101 |
-///          +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    1          4         1.00
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    4      |  1.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2678,38 +2638,34 @@ Z80::op_ld_x_x(void)
 ///
 /// \brief LD r,(HL)
 ///
-/// <pre>
 /// Operation: r <- (HL)
 ///
 /// Opcode: LD
 /// Operands: r, (HL)
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|  r  |1|1|0|
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  01-r-110 |
 ///
 /// Description: The 8-bit contents of memory location (HL) are loaded to register r,
 ///              where r identifies register A, B, C, D, E, H, or L, assembled as follows in
 ///              the object code:
 ///
-///          +--------+------+
-///          |Register|   r  |
-///          +--------+------+
-///          |    A   |  111 |
-///          |    B   |  000 |
-///          |    C   |  001 |
-///          |    D   |  010 |
-///          |    E   |  011 |
-///          |    H   |  100 |
-///          |    L   |  101 |
-///          +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        7(4,3)       1.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     |  7(4,3)   |   1.75
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2722,39 +2678,33 @@ Z80::op_ld_x_ihl(void)
 ///
 /// \brief LD  dd, nn
 ///
-/// <pre>
 /// Operation: dd <- nn
 ///
 /// Opcode: LD
 /// Operands: dd, nn
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|d|d|0|0|0|1|
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
-///          |       n       |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00dd0001 |
+///           |    n
+///           |    n
 ///
 /// Description: The 2-byte integer nn is loaded to the dd register pair, where dd
 ///              defines the BC, DE, HL, or SP register pairs, assembled as follows
 ///              in the object code:
 ///
-///     +----+--+
-///     |Pair|dd|
-///     +----+--+
-///     | BC |00|
-///     | DE |01|
-///     | HL |10|
-///     | SP |11|
-///     +----+--+
+///  Register Pair |  dd
+/// ---------------|-------
+///       BC       |  00
+///       DE       |  01
+///       HL       |  10
+///       SP       |  11
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2      10(4,3,3)       2.50
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    2     | 10(4,3,3) |     2.50
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2767,24 +2717,22 @@ Z80::op_ld_xx_nn(void)
 ///
 /// \brief LD SP, HL
 ///
-/// <pre>
 /// Operation: SP <- HL
 ///
 /// Opcode: LD
 /// Operands: SP, HL
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|1|1|0|0|1| 0xF9
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11111001 | 0xF9
 ///
 /// Description: The contents of the register pair HL are loaded to the Stack Pointer (SP).
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    1          6         1.50
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    6      |  1.50
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2829,35 +2777,31 @@ Z80::op_ld_inn_hl(void)
 ///
 /// \brief INC ss
 ///
-/// <pre>
 /// Operation: ss <- ss + 1
 ///
 /// Opcode: INC
 /// Operands: ss
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|s|s|0|0|1|1|
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00ss0011 |
 ///
-///             +----+--+
-///             |Pair|ss|
-///             +----+--+
-///             | BC |00|
-///             | DE |01|
-///             | HL |10|
-///             | SP |11|
-///             +----+--+
+///  Register Pair |  ss
+/// ---------------|-------
+///        BC      |  00
+///        DE      |  01
+///        HL      |  10
+///        SP      |  11
 ///
 /// Description: The contents of register pair ss (any of register pairs BC, DE, HL, or SP)
 ///              are incremented. Operand ss is specified as follows in the assembled
 ///              object code.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    1          6         1.50
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    6      |  1.50
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2872,35 +2816,31 @@ Z80::op_inc_xx(void)
 ///
 /// \brief Decrement ss
 ///
-/// <pre>
 /// Operation: ss <- ss - 1
 ///
 /// Opcode: DEC
 /// Operands: ss
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|s|s|1|0|1|1|
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00ss1011 |
 ///
-///             +----+--+
-///             |Pair|ss|
-///             +----+--+
-///             | BC |00|
-///             | DE |01|
-///             | HL |10|
-///             | SP |11|
-///             +----+--+
+///  Register Pair |  ss
+/// ---------------|-------
+///        BC      |  00
+///        DE      |  01
+///        HL      |  10
+///        SP      |  11
 ///
 /// Description: The contents of register pair ss (any of register pairs BC, DE, HL, or SP)
 ///              are incremented. Operand ss is specified as follows in the assembled
 ///              object code.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    1          6         1.50
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    1     |    6      |  1.50
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -2915,41 +2855,37 @@ Z80::op_dec_xx(void)
 ///
 /// \brief ADD HL, ss
 ///
-/// <pre>
 /// Operation: HL <- HL + ss
 ///
 /// Opcode:  ADD
 /// Operands: HL,ss
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |0|0|s|s|1|0|0|1|
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00ss1001 |
 ///
-///             +----+--+
-///             |Pair|ss|
-///             +----+--+
-///             | BC |00|
-///             | DE |01|
-///             | HL |10|
-///             | SP |11|
-///             +----+--+
+///  Register Pair |  ss
+/// ---------------|-------
+///        BC      |  00
+///        DE      |  01
+///        HL      |  10
+///        SP      |  11
 ///
 /// Description: The contents of register pair ss (any of register pairs BC, DE, HL, or SP)
 ///              are added to the contents of register pair HL and the result is stored in HL.
 ///              Operand ss is specified as follows in the assembled object code.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    3      11(4,4,3)      2.75
+/// M Cycles | T States  | 4 MHz E.T.
+/// ---------|-----------|------------
+///    3     | 11(4,4,3) |    2.75
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is set if carry out of bit 11; reset otherwise
-///     P/V is not affected
-///     N is reset
-///     C is set if carry from bit 15; reset otherwise
-/// </pre>
+///  *   S is not affected
+///  *   Z is not affected
+///  *   H is set if carry out of bit 11; reset otherwise
+///  *   P/V is not affected
+///  *   N is reset
+///  *   C is set if carry from bit 15; reset otherwise
 ///
 /// \retval none
 ///
@@ -2982,7 +2918,6 @@ Z80::op_add_hl_xx(void)
 ///
 /// \brief Logical AND
 ///
-/// <pre>
 /// Operation: A <- A ^ s
 ///
 /// Opcode:  AND
@@ -3017,38 +2952,35 @@ Z80::op_add_hl_xx(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: A logical AND operation is performed between the byte specified by the s
 ///              operand and the byte contained in the Accumulator; the result is stored in
 ///              the Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///   AND r       1          4          1.00
-///   AND n       2        7(4,3)       1.75
-///   AND (HL)    2        7(4,3)       1.75
-///   AND (IX+d)  5     19(4,4,3,5,3)   4.75
-///   AND (IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States    | 4 MHz E.T.
+///   ----------|----------|-------------|------------
+///   AND r     | 1        |  4          |  1.00
+///   AND n     | 2        |  7(4,3)     |  1.75
+///   AND (HL)  | 2        |  7(4,3)     |  1.75
+///   AND (IX+d)| 5        |19(4,4,3,5,3)|  4.75
+///   AND (IY+d)| 5        |19(4,4,3,5,3)|  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set
-///     P/V is reset if overflow; reset otherwise
-///     N is reset
-///     C is reset
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is set
+///   *  P/V is reset if overflow; reset otherwise
+///   *  N is reset
+///   *  C is reset
 ///
 /// \retval none
 ///
@@ -3101,7 +3033,6 @@ Z80::op_and_n(void)
 ///
 /// \brief OR
 ///
-/// <pre>
 /// Operation: A <- A v s
 ///
 /// Opcode:  OR
@@ -3137,38 +3068,35 @@ Z80::op_and_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: A logical OR operation is performed between the byte specified by the s
 ///              operand and the byte contained in the Accumulator; the result is stored in
 ///              the Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///    OR r       1          4          1.00
-///    OR n       2        7(4,3)       1.75
-///    OR (HL)    2        7(4,3)       1.75
-///    OR (IX+d)  5     19(4,4,3,5,3)   4.75
-///    OR (IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States      | 4 MHz E.T.
+///   ----------|----------|---------------|------------
+///    OR r     |  1       |      4        |  1.00
+///    OR n     |  2       |    7(4,3)     |  1.75
+///    OR (HL)  |  2       |    7(4,3)     |  1.75
+///    OR (IX+d)|  5       | 19(4,4,3,5,3) |  4.75
+///    OR (IY+d)|  5       | 19(4,4,3,5,3) |  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is reset
-///     P/V is set if overflow; reset otherwise
-///     N is reset
-///     C is reset
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is reset
+///   *  P/V is set if overflow; reset otherwise
+///   *  N is reset
+///   *  C is reset
 ///
 /// \retval none
 ///
@@ -3224,7 +3152,6 @@ Z80::op_or_n(void)
 ///
 /// \brief XOR (Exclusive OR)
 ///
-/// <pre>
 /// Operation: A <- A (+) s
 ///
 ///  Opcode:  XOR
@@ -3260,38 +3187,35 @@ Z80::op_or_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The logical exclusive-OR operation is performed between the byte
 ///              specified by the s operand and the byte contained in the Accumulator; the
 ///              result is stored in the Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///   XOR r       1          4          1.00
-///   XOR n       2        7(4,3)       1.75
-///   XOR (HL)    2        7(4,3)       1.75
-///   XOR (IX+d)  5     19(4,4,3,5,3)   4.75
-///   XOR (IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles  | T States    | 4 MHz E.T.
+///   ----------|-----------|-------------|------------
+///   XOR r     |   1       |     4       |   1.00
+///   XOR n     |   2       |   7(4,3)    |   1.75
+///   XOR (HL)  |   2       |   7(4,3)    |   1.75
+///   XOR (IX+d)|   5       |19(4,4,3,5,3)|   4.75
+///   XOR (IY+d)|   5       |19(4,4,3,5,3)|   4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is reset
-///     P/V is set if parity even; reset otherwise
-///     N is reset
-///     C is reset
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is reset
+///   *  P/V is set if parity even; reset otherwise
+///   *  N is reset
+///   *  C is reset
 ///
 /// \retval none
 ///
@@ -3346,44 +3270,40 @@ Z80::op_xor_n(void)
 ///
 /// \brief ADD
 ///
-/// <pre>
 /// Operation: A <- A + r
 ///
 /// Opcode: ADD
 /// Operands: A, r
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|0|0|0|0|  r  |
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  10000-r- |
 ///
-///          +--------+------+
-///          |Register|   r  |
-///          +--------+------+
-///          |    A   |  111 |
-///          |    B   |  000 |
-///          |    C   |  001 |
-///          |    D   |  010 |
-///          |    E   |  011 |
-///          |    H   |  100 |
-///          |    L   |  101 |
-///          +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The contents of register r are added to the contents of the Accumulator, and
 ///              the result is stored in the Accumulator. The symbol r identifies the
 ///              registers A, B, C, D, E, H, or L, assembled as follows in the object code:
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    1          4          1.00
+/// M Cycles|  T States |   4 MHz E.T.
+/// --------+-----------+-------------
+///    1    |      4    |      1.00
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if carry from bit 3; reset otherwise
-///     P/V is set if overflow; reset otherwise
-///     N is reset
-///     C is set if carry from bit 7; reset otherwise
-/// </pre>
+///  *   S is set if result is negative; reset otherwise
+///  *   Z is set if result is zero; reset otherwise
+///  *   H is set if carry from bit 3; reset otherwise
+///  *   P/V is set if overflow; reset otherwise
+///  *   N is reset
+///  *   C is set if carry from bit 7; reset otherwise
 ///
 /// \retval none
 ///
@@ -3442,7 +3362,6 @@ Z80::op_add_n(void)
 ///
 /// \brief ADC (Add w/ Carry)
 ///
-/// <pre>
 /// Operation: A <- A + s + CY
 ///
 /// Opcode: ADC
@@ -3478,38 +3397,35 @@ Z80::op_add_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The s operand, along with the Carry Flag (C in the F register) is added
 ///              to the contents of the Accumulator, and the result is stored in the
 ///              Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-/// ADC A,r       1          4          1.00
-/// ADC A,n       2        7(4,3)       1.75
-/// ADC A,(HL)    2        7(4,3)       1.75
-/// ADC A,(IX+d)  5     19(4,4,3,5,3)   4.75
-/// ADC A,(IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States      | 4 MHz E.T.
+///   ----------|----------|---------------|------------
+/// ADC A,r     |  1       |      4        |  1.00
+/// ADC A,n     |  2       |    7(4,3)     |  1.75
+/// ADC A,(HL)  |  2       |    7(4,3)     |  1.75
+/// ADC A,(IX+d)|  5       | 19(4,4,3,5,3) |  4.75
+/// ADC A,(IY+d)|  5       | 19(4,4,3,5,3) |  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if carry from bit 3; reset otherwise
-///     P/V is set if overflow; reset otherwise
-///     N is reset
-///     C is set if carry from bit 7: reset otherwise
-/// </pre>
+///  *   S is set if result is negative; reset otherwise
+///  *   Z is set if result is zero; reset otherwise
+///  *   H is set if carry from bit 3; reset otherwise
+///  *   P/V is set if overflow; reset otherwise
+///  *   N is reset
+///  *   C is set if carry from bit 7: reset otherwise
 ///
 /// \retval none
 ///
@@ -3569,7 +3485,6 @@ Z80::op_adc_n(void)
 ///
 /// \brief SUB (Subtract)
 ///
-/// <pre>
 /// Operation: A <- A - s
 ///
 /// Opcode: SUB
@@ -3605,37 +3520,34 @@ Z80::op_adc_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The s operand is subtracted from the contents of the Accumulator, and the
 ///              result is stored in the Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-/// SUB A,r       1          4          1.00
-/// SUB A,n       2        7(4,3)       1.75
-/// SUB A,(HL)    2        7(4,3)       1.75
-/// SUB A,(IX+d)  5     19(4,4,3,5,3)   4.75
-/// SUB A,(IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States      | 4 MHz E.T.
+///   ----------|----------|---------------|------------
+/// SUB A,r     |   1      |      4        |  1.00
+/// SUB A,n     |   2      |    7(4,3)     |  1.75
+/// SUB A,(HL)  |   2      |    7(4,3)     |  1.75
+/// SUB A,(IX+d)|   5      | 19(4,4,3,5,3) |  4.75
+/// SUB A,(IY+d)|   5      | 19(4,4,3,5,3) |  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if borrow from bit 4; reset otherwise
-///     P/V is set if overflow; reset otherwise
-///     N is set
-///     C is set if borrow; reset otherwise
-/// </pre>
+///  *   S is set if result is negative; reset otherwise
+///  *   Z is set if result is zero; reset otherwise
+///  *   H is set if borrow from bit 4; reset otherwise
+///  *   P/V is set if overflow; reset otherwise
+///  *   N is set
+///  *   C is set if borrow; reset otherwise
 ///
 /// \retval none
 ///
@@ -3694,7 +3606,6 @@ Z80::op_sub_n(void)
 ///
 /// \brief SBC (Subtract w/Carry)
 ///
-/// <pre>
 /// Operation: A <- A - s - CY
 ///
 /// Opcode: SBC
@@ -3730,38 +3641,35 @@ Z80::op_sub_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The s operand, along with the Carry flag (C in the F register) is subtracted
 ///              from the contents of the Accumulator, and the result is stored in the
 ///              Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-/// SBC A,r       1          4          1.00
-/// SBC A,n       2        7(4,3)       1.75
-/// SBC A,(HL)    2        7(4,3)       1.75
-/// SBC A,(IX+d)  5     19(4,4,3,5,3)   4.75
-/// SBC A,(IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States      | 4 MHz E.T.
+/// ------------|----------|---------------|------------
+/// SBC A,r     |   1      |      4        |  1.00
+/// SBC A,n     |   2      |   7(4,3)      |  1.75
+/// SBC A,(HL)  |   2      |   7(4,3)      |  1.75
+/// SBC A,(IX+d)|   5      | 19(4,4,3,5,3) |  4.75
+/// SBC A,(IY+d)|   5      | 19(4,4,3,5,3) |  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if borrow from bit 4; reset otherwise
-///     P/V is reset if overflow; reset otherwise
-///     N is set
-///     C is set if borrow; reset otherwise
-/// </pre>
+///  *   S is set if result is negative; reset otherwise
+///  *   Z is set if result is zero; reset otherwise
+///  *   H is set if borrow from bit 4; reset otherwise
+///  *   P/V is reset if overflow; reset otherwise
+///  *   N is set
+///  *   C is set if borrow; reset otherwise
 ///
 /// \retval none
 ///
@@ -3821,7 +3729,6 @@ Z80::op_sbc_n(void)
 ///
 /// \brief CP (compare)
 ///
-/// <pre>
 /// Operation: A - s
 ///
 /// Opcode: CP
@@ -3857,37 +3764,34 @@ Z80::op_sbc_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The s operand is subtracted from the contents of the Accumulator, and the
 ///              result is stored in the Accumulator.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///    CP r       1          4          1.00
-///    CP n       2        7(4,3)       1.75
-///    CP (HL)    2        7(4,3)       1.75
-///    CP (IX+d)  5     19(4,4,3,5,3)   4.75
-///    CP (IY+d)  5     19(4,4,3,5,3)   4.75
+///      Opcode | M Cycles | T States      | 4 MHz E.T.
+///   ----------|----------|---------------|------------
+///    CP r     |   1      |      4        |  1.00
+///    CP n     |   2      |    7(4,3)     |  1.75
+///    CP (HL)  |   2      |    7(4,3)     |  1.75
+///    CP (IX+d)|   5      | 19(4,4,3,5,3) |  4.75
+///    CP (IY+d)|   5      | 19(4,4,3,5,3) |  4.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if borrow from bit 4; reset otherwise
-///     P/V is set if overflow; reset otherwise
-///     N is set
-///     C is set if borrow; reset otherwise
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is set if borrow from bit 4; reset otherwise
+///   *  P/V is set if overflow; reset otherwise
+///   *  N is set
+///   *  C is set if borrow; reset otherwise
 ///
 /// \retval none
 ///
@@ -3946,7 +3850,6 @@ Z80::op_cp_n(void)
 ///
 /// \brief INC (increment)
 ///
-/// <pre>
 /// Operation: m <- m + 1
 ///
 /// Opcode: INC
@@ -3977,35 +3880,32 @@ Z80::op_cp_n(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The m operand is incremented by 1.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///   INC r       1          4          1.00
-///   INC (HL)    3       11(4,4,3)     2.75
-///   INC (IX+d)  6    23(4,4,3,5,4,3)  5.75
-///   INC (IY+d)  6    23(4,4,3,5,4,3)  5.75
+///      Opcode | M Cycles | T States        | 4 MHz E.T.
+///   ----------|----------|-----------------|------------
+///   INC r     |   1      |       4         |   1.00
+///   INC (HL)  |   3      |    11(4,4,3)    |   2.75
+///   INC (IX+d)|   6      | 23(4,4,3,5,4,3) |   5.75
+///   INC (IY+d)|   6      | 23(4,4,3,5,4,3) |   5.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if carry from bit 3; reset otherwise
-///     P/V is set if operand was 0x7f before operation; reset otherwise
-///     N is reset
-///     C is not affected
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is set if carry from bit 3; reset otherwise
+///   *  P/V is set if operand was 0x7f before operation; reset otherwise
+///   *  N is reset
+///   *  C is not affected
 ///
 /// \retval none
 ///
@@ -4056,7 +3956,6 @@ Z80::op_inc_ihl(void)
 ///
 /// \brief DEC (decrement)
 ///
-/// <pre>
 /// Operation: m <- m - 1
 ///
 /// Opcode: DEC
@@ -4087,35 +3986,32 @@ Z80::op_inc_ihl(void)
 ///                    |       d       |
 ///                    +-+-+-+-+-+-+-+-+
 ///
-///                    +--------+------+
-///                    |Register|   r  |
-///                    +--------+------+
-///                    |    A   |  111 |
-///                    |    B   |  000 |
-///                    |    C   |  001 |
-///                    |    D   |  010 |
-///                    |    E   |  011 |
-///                    |    H   |  100 |
-///                    |    L   |  101 |
-///                    +--------+------+
+///  Register|   r
+///  --------|-------
+///      A   |  111
+///      B   |  000
+///      C   |  001
+///      D   |  010
+///      E   |  011
+///      H   |  100
+///      L   |  101
 ///
 /// Description: The m operand decremented by 1.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///   DEC r       1          4          1.00
-///   DEC (HL)    3       11(4,4,3)     2.75
-///   DEC (IX+d)  6    23(4,4,3,5,4,3)  5.75
-///   DEC (IY+d)  6    23(4,4,3,5,4,3)  5.75
+///      Opcode | M Cycles | T States        | 4 MHz E.T.
+///   ----------|----------|-----------------|------------
+///   DEC r     |   1      |       4         |   1.00
+///   DEC (HL)  |   3      |    11(4,4,3)    |   2.75
+///   DEC (IX+d)|   6      | 23(4,4,3,5,4,3) |   5.75
+///   DEC (IY+d)|   6      | 23(4,4,3,5,4,3) |   5.75
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is zero; reset otherwise
-///     H is set if borrow from bit 4; reset otherwise
-///     P/V is set if m was 0x80 before operation; reset otherwise
-///     N is set
-///     C is not affected
-/// </pre>
+///   *  S is set if result is negative; reset otherwise
+///   *  Z is set if result is zero; reset otherwise
+///   *  H is set if borrow from bit 4; reset otherwise
+///   *  P/V is set if m was 0x80 before operation; reset otherwise
+///   *  N is set
+///   *  C is not affected
 ///
 /// \retval none
 ///
@@ -4166,7 +4062,6 @@ Z80::op_dec_ihl(void)
 ///
 /// \brief RLCA
 ///
-/// <pre>
 /// Operation:          +-------------+
 ///              [CY] <-+--[7 << 0]<--+
 ///                        [- A - ]
@@ -4174,26 +4069,25 @@ Z80::op_dec_ihl(void)
 /// Opcode: RLCA
 /// Operands: -
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |0|0|0|0|0|1|1|1|  0x07
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00000111 |  0x07
 ///
 /// Description: The contents of the Accumulator (register A) are rotated left
 ///              1-bit position. The sign bit (bit 7) is copied to the Carry flag
 ///              and also to bit 0. Bit 0 is the least-significant bit.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is reset
-///     P/V is not affected
-///     N is reset
-///     C is data from bit 7 of Accumulator
-/// </pre>
+///   *  S is not affected
+///   *  Z is not affected
+///   *  H is reset
+///   *  P/V is not affected
+///   *  N is reset
+///   *  C is data from bit 7 of Accumulator
 ///
 /// \retval none
 ///
@@ -4212,7 +4106,6 @@ Z80::op_rlc_a(void)
 ///
 /// \brief RRCA
 ///
-/// <pre>
 /// Operation:         +<-------------+
 ///                    +-->[7 >> 0]-->+--> [CY]
 ///                        [- A - ]
@@ -4220,26 +4113,25 @@ Z80::op_rlc_a(void)
 /// Opcode: RRCA
 /// Operands: -
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |0|0|0|0|1|1|1|1| 0x0F
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00001111 | 0x0F
 ///
 /// Description: The contents of the Accumulator (register A) are rotated right
 ///              1-bit position. Bit 0 is copied to the Carry flag and also
 ///              to bit 7. Bit 0 is the least-significant bit.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is reset
-///     P/V is not affected
-///     N is reset
-///     C is data from bit 0 of Accumulator
-/// </pre>
+///  *   S is not affected
+///  *   Z is not affected
+///  *   H is reset
+///  *   P/V is not affected
+///  *   N is reset
+///  *   C is data from bit 0 of Accumulator
 ///
 /// \retval none
 ///
@@ -4258,7 +4150,6 @@ Z80::op_rrc_a(void)
 ///
 /// \brief RLA
 ///
-/// <pre>
 /// Operation:    +-----------------------+
 ///               +---[7 << 0]<---[CY]<---+
 ///                    - A -
@@ -4266,27 +4157,26 @@ Z80::op_rrc_a(void)
 /// Opcode: RLA
 /// Operands: -
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |0|0|0|1|0|1|1|1|  0x17
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00010111 |  0x17
 ///
 /// Description: The contents of the Accumulator (register A) are rotated left
 ///              1-bit position through the Carry flag. The previous content of
 ///              the Carry flag is copied to bit 0. Bit 0 is the least-significant
 ///              bit.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is reset
-///     P/V is not affected
-///     N is reset
-///     C is data from bit 7 of Accumulator
-/// </pre>
+///   *  S is not affected
+///   *  Z is not affected
+///   *  H is reset
+///   *  P/V is not affected
+///   *  N is reset
+///   *  C is data from bit 7 of Accumulator
 ///
 /// \retval none
 ///
@@ -4305,7 +4195,6 @@ Z80::op_rl_a(void)
 ///
 /// \brief RRA
 ///
-/// <pre>
 /// Operation:         +<----------------------+
 ///                    +-->[7 >> 0]---->[CY]-->+
 ///                          - A -
@@ -4313,26 +4202,25 @@ Z80::op_rl_a(void)
 /// Opcode: RRA
 /// Operands: -
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |0|0|0|1|1|1|1|1| 0x1F
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00011111 | 0x1F
 ///
 /// Description: The contents of the Accumulator (register A) are rotated right
 ///              1-bit position through the Carry flag. The previous content of the
 ///              Carry flag is copied to bit 7. Bit 0 is the least-significant bit.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected:
-///     S is not affected
-///     Z is not affected
-///     H is reset
-///     P/V is not affected
-///     N is reset
-///     C is data from bit 0 of Accumulator
-/// </pre>
+///   *  S is not affected
+///   *  Z is not affected
+///   *  H is reset
+///   *  P/V is not affected
+///   *  N is reset
+///   *  C is data from bit 0 of Accumulator
 ///
 /// \retval none
 ///
@@ -4351,24 +4239,22 @@ Z80::op_rr_a(void)
 ///
 /// \brief EX DE, HL
 ///
-/// <pre>
 /// Operation:  DE <--> HL
 ///
 /// Opcode: EX
 /// Operands: DE, HL
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |1|1|1|0|1|0|1|1| 0xEB
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101011 | 0xEB
 ///
 /// Description: The 2-byte contents of register pairs DE and HL are exchanged.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4385,24 +4271,22 @@ Z80::op_ex_de_hl(void)
 ///
 /// \brief EX AF, AF'
 ///
-/// <pre>
 /// Operation:  AF <--> AF'
 ///
 /// Opcode: EX
 /// Operands: AF, AF'
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |0|0|0|0|1|0|0|0| 0x08
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  00001000 | 0x08
 ///
 /// Description: The 2-byte contents of register pairs AF and AF' are exchanged.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4419,25 +4303,23 @@ Z80::op_ex_af_af(void)
 ///
 /// \brief EXX
 ///
-/// <pre>
 /// Operation:  BC <--> BC', DE <--> DE', HL <--> HL'
 ///
 /// Opcode: EXX
 /// Operands: --
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |1|1|0|1|1|0|0|1| 0xD9
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11011001 | 0xD9
 ///
 /// Description: Each 2-byte value in register pairs BC, DE, and HL is exchanged with the
 ///              2-byte value in BC', DE', and HL', respectively.
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               1          4          1.00
+///  M Cycles| T States  | 4 MHz E.T.
+///  --------|-----------|------------
+///     1    |      4    |     1.00
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4462,27 +4344,25 @@ Z80::op_exx(void)
 ///
 /// \brief EX (SP), HL
 ///
-/// <pre>
 /// Operation:  H <--> (SP+1), L <--> (SP)
 ///
 /// Opcode: EX
 /// Operands: (SP), HL
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |1|1|1|0|0|0|1|1| 0xE3
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11100011 | 0xE3
 ///
 /// Description: The low order byte contained in register pair HL is exchanged with the
 ///              contents of the memory address specified by the contents of register pair
 ///              SP (Stack Pointer), and the high order byte of HL is exchanged with the
 ///              next highest memory address (SP+1).
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               5    19(4,3,4,3,5)    4.75
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///      5   | 19(4,3,4,3,5) |   4.75
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4500,24 +4380,21 @@ Z80::op_ex_isp_hl(void)
 ///
 /// \brief PUSH qq
 ///
-/// <pre>
 /// Operation:  (SP-2) <-- qqL, (SP-1) <-- qqH
 ///
 /// Opcode: PUSH
 /// Operands: qq
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |1|1|q|q|0|1|0|1|
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11qq0101 |
 ///
-///             +----+--+
-///             |Pair|qq|
-///             +----+--+
-///             | BC |00|
-///             | DE |01|
-///             | HL |10|
-///             | AF |11|
-///             +----+--+
+///  Register Pair |  qq
+/// ---------------|-------
+///       BC       |  00
+///       DE       |  01
+///       HL       |  10
+///       AF       |  11
 ///
 /// Description: The contents of the register pair qq are pushed to the external memory
 ///              LIFO (last-in, first-out) Stack. The Stack Pointer (SP) register pair
@@ -4528,12 +4405,11 @@ Z80::op_ex_isp_hl(void)
 ///              new address in the SP. The operand qq identifies register pair BC, DE, HL,
 ///              or AF, assembled as follows in the object code:
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               3       11(5,3,3)    2.75
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///       3  |     11(5,3,3) |   2.75
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4548,24 +4424,21 @@ Z80::op_push_xx(void)
 ///
 /// \brief POP qq
 ///
-/// <pre>
 /// Operation:  qqH <-- (SP+1), qqL <-- (SP)
 ///
 /// Opcode: POP
 /// Operands: qq
 ///
-///           +-+-+-+-+-+-+-+-+
-///           |1|1|q|q|0|1|0|1|
-///           +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11qq0101 |
 ///
-///             +----+--+
-///             |Pair|qq|
-///             +----+--+
-///             | BC |00|
-///             | DE |01|
-///             | HL |10|
-///             | AF |11|
-///             +----+--+
+///  Register Pair |  qq
+/// ---------------|-------
+///       BC       |  00
+///       DE       |  01
+///       HL       |  10
+///       AF       |  11
 ///
 /// Description: The top two bytes of the external memory LIFO (last-in, first-out) Stack
 ///              are popped to the register pair qq. The Stack Pointer (SP) register pair
@@ -4577,12 +4450,11 @@ Z80::op_push_xx(void)
 ///              identifies register pair BC, DE, HL, or AF, assembled as follows in the
 ///              object code:
 ///
-///            M Cycles  T States    4 MHz E.T.
-///            --------+-----------+------------
-///               3       10(4,3,3)    2.50
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///      3   |    10(4,3,3)  |  2.50
 ///
 /// Condition Bits Affected: None
-/// </pre>
 ///
 /// \retval none
 ///
@@ -4805,22 +4677,20 @@ Z80::op_jr_nc(void) // JR NC,n
 /// Opcode:  RST
 /// Operands: p
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|  t  |1|1|1|
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11-t-111 |
 ///
-///           +------+-----+
-///           |   p  |  t  |
-///           +------+-----+
-///           | 0x00 | 000 |
-///           | 0x08 | 001 |
-///           | 0x10 | 010 |
-///           | 0x18 | 011 |
-///           | 0x20 | 100 |
-///           | 0x28 | 101 |
-///           | 0x30 | 110 |
-///           | 0x38 | 111 |
-///           +------+-----+
+///     p  |  t
+///  ------|------
+///   0x00 | 000
+///   0x08 | 001
+///   0x10 | 010
+///   0x18 | 011
+///   0x20 | 100
+///   0x28 | 101
+///   0x30 | 110
+///   0x38 | 111
 ///
 /// Description: The current Program Counter (PC) contents are pushed onto the external
 ///              memory stack, and the page zero memory location given by operand p is
@@ -4837,9 +4707,9 @@ Z80::op_jr_nc(void) // JR NC,n
 ///              PC is loaded with 00H. The number selected from the p column of the table
 ///              is loaded to the low order byte of PC.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    3      11(5,3,3)      2.75
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///    3     |   11(5,3,3)   |  2.75
 ///
 /// Condition Bits Affected: None
 /// </pre>
@@ -5496,17 +5366,15 @@ Z80::op_ed_nop(void)
 ///
 /// \brief Interrupt Mode 0
 ///
-/// <pre>
 /// Operation: -
 ///
 /// Opcode: IM
 /// Operands: 0
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|0|0|1|1|0|  0x46
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01000110 |  0x46
 ///
 /// Description: The IM 0 instruction sets interrupt mode 0. In this mode, the interrupting
 ///              device can insert any instruction on the data bus for execution by the
@@ -5514,12 +5382,11 @@ Z80::op_ed_nop(void)
 ///              acknowledge cycle. Subsequent bytes are read in by a normal memory
 ///              read sequence.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        8(4,4)       2.00
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///    2     |    8(4,4)     |   2.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -5532,27 +5399,24 @@ Z80::op_im0(void)
 ///
 /// \brief Interrupt Mode 1
 ///
-/// <pre>
 /// Operation: -
 ///
 /// Opcode: IM
 /// Operands: 1
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|1|0|1|1|0|  0x56
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01010110 |  0x56
 ///
 /// Description: The IM 1 instruction sets interrupt mode 1. In this mode, the processor
 ///              responds to an interrupt by executing a restart to location 0038H.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        8(4,4)       2.00
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///    2     |    8(4,4)     |   2.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -5565,17 +5429,15 @@ Z80::op_im1(void)
 ///
 /// \brief Interrupt Mode 2
 ///
-/// <pre>
 /// Operation: -
 ///
 /// Opcode: IM
 /// Operands: 2
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|1|1|1|1|0|  0x5E
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01011110 |  0x5E
 ///
 /// Description: The IM 2 instruction sets the vectored interrupt mode 2. This mode allows
 ///              an indirect call to any memory location by an 8-bit vector supplied from the
@@ -5584,12 +5446,11 @@ Z80::op_im1(void)
 ///              significant eight bits. This address points to an address in a vector table
 ///              that is the starting address for the interrupt service routine.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        8(4,4)       2.00
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///    2     |    8(4,4)     |   2.00
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -5602,36 +5463,33 @@ Z80::op_im2(void)
 ///
 /// \brief Return from Interrupt
 ///
-/// <pre>
 /// Operation: Return from Interrupt
 ///
 /// Opcode: RETI
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|0|1|1|0|1|  0x4D
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01001101 |  0x4D
 ///
 /// Description: This instruction is used at the end of a maskable interrupt service routine
 ///              to:
-///              - Restore the contents of the Program Counter (PC) (analogous to the
-///                RET instruction)
-///              - Signal an I/O device that the interrupt routine is completed. The RETI
-///                instruction also facilitates the nesting of interrupts, allowing higher
-///                priority devices to temporarily suspend service of lower priority
-///                service routines. However, this instruction does not enable interrupts
-///                that were disabled when the interrupt routine was entered. Before
-///                doing the RETI instruction, the enable interrupt instruction (EI)
-///                should be executed to allow recognition of interrupts after completion
-///                of the current service routine.
+///   * Restore the contents of the Program Counter (PC) (analogous to the
+///     RET instruction)
+///   * Signal an I/O device that the interrupt routine is completed. The RETI
+///     instruction also facilitates the nesting of interrupts, allowing higher
+///     priority devices to temporarily suspend service of lower priority
+///     service routines. However, this instruction does not enable interrupts
+///     that were disabled when the interrupt routine was entered. Before
+///     doing the RETI instruction, the enable interrupt instruction (EI)
+///     should be executed to allow recognition of interrupts after completion
+///     of the current service routine.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    4     14(4,4,3,3)     3.50
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///      4   |  14(4,4,3,3)  |  3.50
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -5644,16 +5502,14 @@ Z80::op_reti(void)
 ///
 /// \brief Return from non-maskable interrupt
 ///
-/// <pre>
 /// Operation: Return from non maskable interrupt
 ///
 /// Opcode: RETN
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|0|0|1|0|1|  0x45
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01000101 |  0x45
 ///
 /// Description: This instruction is used at the end of a non-maskable interrupts service
 ///              routine to restore the contents of the Program Counter (PC) (analogous to
@@ -5661,12 +5517,11 @@ Z80::op_reti(void)
 ///              maskable interrupts are enabled immediately following the RETN if they
 ///              were enabled before the non-maskable interrupt.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    4     14(4,4,3,3)     3.50
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///      4   |  14(4,4,3,3)  |  3.50
 ///
 /// Condition Bits Affected: none
-/// </pre>
 ///
 /// \retval none
 ///
@@ -5681,34 +5536,31 @@ Z80::op_retn(void)
 ///
 /// \brief Negate
 ///
-/// <pre>
 /// Operation: A <- 0 - A
 ///
 /// Opcode: NEG
 ///
-///          +-+-+-+-+-+-+-+-+
-///          |1|1|1|0|1|1|0|1|  0xED
-///          +-+-+-+-+-+-+-+-+
-///          |0|1|0|0|0|1|0|0|  0x44
-///          +-+-+-+-+-+-+-+-+
+///   Binary  |  Hex
+/// ----------|-------
+///  11101101 |  0xED
+///  01000100 |  0x44
 ///
 ///
 /// Description: The contents of the Accumulator are negated (two's complement). This is
 ///              the same as subtracting the contents of the Accumulator from zero. Note
 ///              that 80H is left unchanged.
 ///
-/// M Cycles  T States    4 MHz E.T.
-/// --------+-----------+------------
-///    2        8(4,4)       2.00
+///  M Cycles|    T States   | 4 MHz E.T.
+///  --------|---------------|------------
+///    2     |    8(4,4)     |   2.00
 ///
 /// Condition Bits Affected:
-///     S is set if result is negative; reset otherwise
-///     Z is set if result is 0; reset otherwise
-///     H is set if borrow from bit 4; reset otherwise
-///     P/V is set if Accumulator was 80H before operation; reset otherwise
-///     N is set
-///     C is set if Accumulator was not 00H before operation; reset otherwise
-/// </pre>
+///  *   S is set if result is negative; reset otherwise
+///  *   Z is set if result is 0; reset otherwise
+///  *   H is set if borrow from bit 4; reset otherwise
+///  *   P/V is set if Accumulator was 80H before operation; reset otherwise
+///  *   N is set
+///  *   C is set if Accumulator was not 00H before operation; reset otherwise
 ///
 /// \retval none
 ///
