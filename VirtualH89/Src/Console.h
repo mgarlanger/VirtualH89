@@ -7,9 +7,13 @@
 #ifndef CONSOLE_H_
 #define CONSOLE_H_
 
-#include <string>
 
 #include "Terminal.h"
+
+/// \cond
+#include <string>
+/// \endcond
+
 
 /// \class Console
 ///

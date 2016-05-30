@@ -18,13 +18,15 @@
 #ifndef H89_H_
 #define H89_H_
 
-#include <string>
-#include <pthread.h>
 
 #include "computer.h"
 #include "propertyutil.h"
 
+/// \cond
+#include <string>
+#include <pthread.h>
 #include <memory>
+/// \endcond
 
 // Forward declare classes to avoid a tangled mess of includes.
 
@@ -45,9 +47,8 @@ class CPU;
 class Terminal;
 class FloppyDisk;
 class ParallelLink;
-class HDOSMemory8K;
+class SystemMemory8K;
 
-using namespace std;
 
 ///
 /// \brief Virtual Heathkit %H89 Computer
@@ -57,38 +58,33 @@ using namespace std;
 class H89: public Computer
 {
   private:
-    AddressBus*              ab;
-    InterruptController*     interruptController;
-    H89Timer*                timer;
+    AddressBus*                     ab;
+    InterruptController*            interruptController;
+    H89Timer*                       timer;
 
-    H89_IO*                  h89io;
+    H89_IO*                         h89io;
 
-    GeneralPurposePort*      gpp;
+    GeneralPurposePort*             gpp;
 
-    NMIPort*                 nmi1;
-    NMIPort*                 nmi2;
+    INS8250*                        consolePort;
+    INS8250*                        lpPort;
+    INS8250*                        modemPort;
+    INS8250*                        auxPort;
 
-    INS8250*                 consolePort;
-    INS8250*                 lpPort;
-    INS8250*                 modemPort;
-    INS8250*                 auxPort;
+    Console*                        console;
+    Z47Interface*                   z47If;
+    Z47Controller*                  z47Cntrl;
+    ParallelLink*                   z47Link;
 
-    Console*                 console;
-    Z47Interface*            z47If;
-    Z47Controller*           z47Cntrl;
-    ParallelLink*            z47Link;
+    DiskDrive*                      driveUnitE0;
+    DiskDrive*                      driveUnitE1;
 
-    DiskDrive*               driveUnitE0;
-    DiskDrive*               driveUnitE1;
+    FloppyDisk*                     eight0;
+    FloppyDisk*                     eight1;
 
-    FloppyDisk*              eight0;
-    FloppyDisk*              eight1;
+    CPU*                            cpu;
 
-    CPU*                     cpu;
-
-    ROM*                     monitorROM;
-    ROM*                     h17ROM;
-    shared_ptr<HDOSMemory8K> HDOS;
+    std::shared_ptr<SystemMemory8K> sysMem;
 
     /// Port Addresses
 

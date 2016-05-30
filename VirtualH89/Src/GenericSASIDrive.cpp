@@ -9,6 +9,9 @@
 
 #include "GenericSASIDrive.h"
 
+#include "logger.h"
+
+/// \cond
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -16,8 +19,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+/// \endcond
 
-#include "logger.h"
 
 /* Expected drive characteristic by drive: (XEBEC S1410 manual)
  * Drive        cyl  hd red-wr precomp

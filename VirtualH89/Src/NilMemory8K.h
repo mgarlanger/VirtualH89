@@ -14,15 +14,16 @@
 class NilMemory8K: public Memory8K
 {
   public:
-    NilMemory8K(WORD base):
-        Memory8K(base)
+    NilMemory8K(WORD base): Memory8K(base)
     {
     }
 
-    virtual ~NilMemory8K() {
+    virtual ~NilMemory8K()
+    {
     }
 
-    void writeByte(WORD adr, BYTE val) {
+    void writeByte(WORD adr, BYTE val)
+    {
     }
 };
 

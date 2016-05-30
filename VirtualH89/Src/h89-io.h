@@ -11,7 +11,9 @@
 
 #include "IOBus.h"
 
+/// \cond
 #include <vector>
+/// \endcond
 
 
 

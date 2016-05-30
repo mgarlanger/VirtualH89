@@ -12,8 +12,10 @@
 #include "NetworkServer.h"
 #include "propertyutil.h"
 
+/// \cond
 #include <dirent.h>
 #include <string>
+/// \endcond
 
 #define BDOS_FUNC(name)                                               \
     int name(uint8_t * msgbuf, int len);                              \

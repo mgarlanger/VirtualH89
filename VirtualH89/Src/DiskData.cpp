@@ -8,11 +8,14 @@
 
 #include "DiskData.h"
 
+#include "logger.h"
+
+/// \cond
 #include <fstream>
 #include <iostream>
 #include <string>
+/// \endcond
 
-#include "logger.h"
 
 using namespace std;
 

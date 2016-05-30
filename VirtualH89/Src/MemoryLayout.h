@@ -6,32 +6,43 @@
 /// \date Mar 05, 2016
 /// \author Douglas Miller
 ///
+
 #ifndef MEMORYLAYOUT_H_
 #define MEMORYLAYOUT_H_
 
 #include "h89Types.h"
 
+/// \cond
 #include <memory>
+/// \endcond
 
 class Memory8K;
-class Memory64K;
-
-using namespace std;
 
 class MemoryLayout
 {
   public:
-    MemoryLayout();
-    void addPage(shared_ptr<Memory8K> mem);
-    void addPageAt(shared_ptr<Memory8K> mem, WORD adr);
-    void addPage(Memory64K* mem64);
+    enum MemorySize_t
+    {
+        Mem_None,
+        Mem_16k,
+        Mem_32k,
+        Mem_48k,
+        Mem_64k
+    };
 
-    inline shared_ptr<Memory8K> getPageByAddress(WORD address)
+    MemoryLayout();
+
+    void addPage(std::shared_ptr<Memory8K> mem);
+    void addPageAt(std::shared_ptr<Memory8K> mem,
+                   WORD                      adr);
+
+    inline std::shared_ptr<Memory8K> getPageByAddress(WORD address)
     {
         // error if NULL?
         return memPage_m[addressToPage(address)];
     }
-    inline shared_ptr<Memory8K> getPage(BYTE page)
+
+    inline std::shared_ptr<Memory8K> getPage(BYTE page)
     {
         // error if NULL?
         if (page >= numPages_c)
@@ -41,21 +52,24 @@ class MemoryLayout
 
         return memPage_m[page & 0x7];
     }
-
-  protected:
     static const BYTE pageShiftFactor_c = 13;
     static const BYTE numPages_c        = 8;
 
-    BYTE addressToPage(WORD address)
+    static BYTE addressToPage(WORD address)
     {
         return (address >> pageShiftFactor_c) & 0x07;
     }
-    WORD pageToAddress(BYTE page)
+
+    static WORD pageToAddress(BYTE page)
     {
         return page << pageShiftFactor_c;
     }
 
-    shared_ptr<Memory8K> memPage_m[numPages_c]; // 8 8K regions in 64K addr space
+  protected:
+
+    std::shared_ptr<Memory8K> memPage_m[numPages_c]; // 8 8K regions in 64K addr space
 };
+
+typedef std::shared_ptr<MemoryLayout> MemoryLayout_ptr;
 
 #endif // MEMORYLAYOUT_H_

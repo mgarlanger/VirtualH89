@@ -6,6 +6,8 @@
 
 #include "SignalHandler.h"
 
+#include "EventHandler.h"
+
 SignalHandler* SignalHandler::_inst;
 EventHandler*  SignalHandler::signalHandlers[NSIG];
 

@@ -6,15 +6,6 @@
 ///  \author Douglas Miller
 ///
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-#include <fnmatch.h>
-#include <stdlib.h>
 
 #include "HostFileBdos.h"
 #ifdef __H89__
@@ -42,6 +33,19 @@ enum logLevel
     }
 
 #endif // !H89
+
+/// \cond
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
+#include <fnmatch.h>
+#include <stdlib.h>
+/// \endcond
+
 
 HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
                            std::vector<std::string> args, uint8_t srvId, uint8_t cltId):

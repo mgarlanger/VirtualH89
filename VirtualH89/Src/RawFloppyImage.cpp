@@ -9,6 +9,11 @@
 
 #include "RawFloppyImage.h"
 
+#include "logger.h"
+#include "GenericFloppyFormat.h"
+#include "GenericDiskDrive.h"
+
+/// \cond
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -16,10 +21,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
-#include "logger.h"
-#include "GenericFloppyFormat.h"
-#include "GenericDiskDrive.h"
+/// \endcond
 
 
 void

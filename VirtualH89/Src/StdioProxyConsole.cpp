@@ -12,6 +12,12 @@
 
 #include "StdioProxyConsole.h"
 
+#include "H89.h"
+#include "h89-io.h"
+#include "logger.h"
+#include "H89Operator.h"
+
+/// \cond
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -20,11 +26,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sstream>
-
-#include "H89.h"
-#include "h89-io.h"
-#include "logger.h"
-#include "H89Operator.h"
+/// \endcond
 
 extern const char* getopts;
 

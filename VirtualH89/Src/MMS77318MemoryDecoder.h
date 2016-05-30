@@ -12,10 +12,12 @@
 
 #include "MemoryDecoder.h"
 
+class SystemMemory8K;
+
 class MMS77318MemoryDecoder: public MemoryDecoder
 {
   public:
-    MMS77318MemoryDecoder(shared_ptr<MemoryLayout> h89_0);
+    MMS77318MemoryDecoder(std::shared_ptr<SystemMemory8K> systemMemory);
     virtual ~MMS77318MemoryDecoder();
 
     virtual void reset();

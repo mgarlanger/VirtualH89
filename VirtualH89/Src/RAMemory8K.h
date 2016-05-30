@@ -9,19 +9,18 @@
 #ifndef RAMEMORY8K_H_
 #define RAMEMORY8K_H_
 
-#include <string.h>
 
-#include "h89Types.h"
 #include "Memory8K.h"
 
 class RAMemory8K: public Memory8K
 {
   public:
-    RAMemory8K(WORD ba):
-        Memory8K(ba) {
+    RAMemory8K(WORD baseAddr): Memory8K(baseAddr) {
     }
-    virtual void writeByte(WORD adr, BYTE val) {
-        mem[adr & 0x1fff] = val;
+
+    virtual void writeByte(WORD addr, BYTE val)
+    {
+        mem[addr & MemoryAddressMask_c] = val;
     }
   protected:
 };

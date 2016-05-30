@@ -13,7 +13,9 @@
 #include "logger.h"
 #include "ParallelLink.h"
 
+/// \cond
 #include <string.h>
+/// \endcond
 
 Z47Controller::Z47Controller(): curDisk(invalidDisk_c),
                                 curLinkState(st_Link_Undefined_c),

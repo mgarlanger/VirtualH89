@@ -8,10 +8,11 @@
 
 #include "h89-io.h"
 
-#include "logger.h"
-#include "IODevice.h"
 #include "DiskController.h"
 
+#include "logger.h"
+
+using namespace std;
 
 H89_IO::H89_IO(): IOBus()
 {
@@ -26,7 +27,7 @@ H89_IO::~H89_IO()
 
 
 
-std::vector<DiskController*>&
+vector<DiskController*>&
 H89_IO::getDiskDevices()
 {
     return dsk_devs;

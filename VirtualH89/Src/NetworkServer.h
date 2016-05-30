@@ -10,7 +10,9 @@
 #ifndef NETWORKSERVER_H_
 #define NETWORKSERVER_H_
 
+/// \cond
 #include <stdint.h>
+/// \endcond
 
 class NetworkServer
 {

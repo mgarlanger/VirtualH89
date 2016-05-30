@@ -30,11 +30,8 @@
 		A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989E1C7A385C000CF03B /* wd1797.cpp */; };
 		A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */; };
 		A192FCD91CDFB68100B4E8D5 /* Memory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */; };
-		A192FCDB1CDFB7EF00B4E8D5 /* Memory64k.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCDA1CDFB7EF00B4E8D5 /* Memory64k.cpp */; };
 		A192FCDD1CDFBF7800B4E8D5 /* MemoryLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */; };
-		A192FCDF1CDFC27400B4E8D5 /* H88MemoryLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCDE1CDFC27400B4E8D5 /* H88MemoryLayout.cpp */; };
-		A192FCE11CDFC43E00B4E8D5 /* HDOSMemory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE01CDFC43E00B4E8D5 /* HDOSMemory8K.cpp */; };
-		A192FCE31CDFFB2500B4E8D5 /* Z64KMemoryLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE21CDFFB2500B4E8D5 /* Z64KMemoryLayout.cpp */; };
+		A192FCE11CDFC43E00B4E8D5 /* SystemMemory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */; };
 		A192FCE51CE00A7800B4E8D5 /* MemoryDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE41CE00A7800B4E8D5 /* MemoryDecoder.cpp */; };
 		A1A434371C7060430015F838 /* AddressBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D01C7060430015F838 /* AddressBus.cpp */; };
 		A1A434381C7060430015F838 /* ClockUser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A433D41C7060430015F838 /* ClockUser.cpp */; };
@@ -104,17 +101,14 @@
 		A13BEE641C96955A00C7E65A /* CPNetDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPNetDevice.h; sourceTree = "<group>"; };
 		A13BEE661C96956800C7E65A /* GppListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GppListener.cpp; sourceTree = "<group>"; };
 		A13BEE671C96956800C7E65A /* GppListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GppListener.h; sourceTree = "<group>"; };
-		A13BEE691C96957500C7E65A /* Z64KMemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z64KMemoryLayout.h; sourceTree = "<group>"; };
 		A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H88MemoryDecoder.cpp; sourceTree = "<group>"; };
 		A13BEE6B1C96957F00C7E65A /* H88MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H88MemoryDecoder.h; sourceTree = "<group>"; };
-		A13BEE6C1C96957F00C7E65A /* H88MemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H88MemoryLayout.h; sourceTree = "<group>"; };
 		A13BEE6E1C96959600C7E65A /* H89MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H89MemoryDecoder.cpp; sourceTree = "<group>"; };
 		A13BEE6F1C96959600C7E65A /* H89MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = H89MemoryDecoder.h; sourceTree = "<group>"; };
-		A13BEE711C96959F00C7E65A /* HDOSMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDOSMemory8K.h; sourceTree = "<group>"; };
+		A13BEE711C96959F00C7E65A /* SystemMemory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemMemory8K.h; sourceTree = "<group>"; };
 		A13BEE721C96959F00C7E65A /* HostFileBdos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HostFileBdos.cpp; sourceTree = "<group>"; };
 		A13BEE731C96959F00C7E65A /* HostFileBdos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HostFileBdos.h; sourceTree = "<group>"; };
 		A13BEE751C9695AC00C7E65A /* Memory8K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory8K.h; sourceTree = "<group>"; };
-		A13BEE761C9695AC00C7E65A /* Memory64K.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Memory64K.h; sourceTree = "<group>"; };
 		A13BEE771C9695AC00C7E65A /* MemoryDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryDecoder.h; sourceTree = "<group>"; };
 		A13BEE781C9695AC00C7E65A /* MemoryLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryLayout.h; sourceTree = "<group>"; };
 		A13BEE791C9695B700C7E65A /* MMS77318MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MMS77318MemoryDecoder.cpp; sourceTree = "<group>"; };
@@ -155,11 +149,8 @@
 		A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WD179xUserIf.cpp; sourceTree = "<group>"; };
 		A15861A81CB8DCE500D3382D /* WD179xUserIf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WD179xUserIf.h; sourceTree = "<group>"; };
 		A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory8K.cpp; sourceTree = "<group>"; };
-		A192FCDA1CDFB7EF00B4E8D5 /* Memory64k.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory64k.cpp; sourceTree = "<group>"; };
 		A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryLayout.cpp; sourceTree = "<group>"; };
-		A192FCDE1CDFC27400B4E8D5 /* H88MemoryLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = H88MemoryLayout.cpp; sourceTree = "<group>"; };
-		A192FCE01CDFC43E00B4E8D5 /* HDOSMemory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HDOSMemory8K.cpp; sourceTree = "<group>"; };
-		A192FCE21CDFFB2500B4E8D5 /* Z64KMemoryLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Z64KMemoryLayout.cpp; sourceTree = "<group>"; };
+		A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemMemory8K.cpp; sourceTree = "<group>"; };
 		A192FCE41CE00A7800B4E8D5 /* MemoryDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryDecoder.cpp; sourceTree = "<group>"; };
 		A1A433C01C705D310015F838 /* VirtualH89 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VirtualH89; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A433CB1C7060430015F838 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = doxygen.conf; sourceTree = "<group>"; };
@@ -392,8 +383,6 @@
 				A1A433FC1C7060430015F838 /* H47Drive.h */,
 				A13BEE6A1C96957F00C7E65A /* H88MemoryDecoder.cpp */,
 				A13BEE6B1C96957F00C7E65A /* H88MemoryDecoder.h */,
-				A192FCDE1CDFC27400B4E8D5 /* H88MemoryLayout.cpp */,
-				A13BEE6C1C96957F00C7E65A /* H88MemoryLayout.h */,
 				A1A433FD1C7060430015F838 /* h89-io.cpp */,
 				A1A433FE1C7060430015F838 /* h89-io.h */,
 				A1A433FF1C7060430015F838 /* H89-roms.h */,
@@ -408,8 +397,6 @@
 				A1A434041C7060430015F838 /* h89Types.h */,
 				A1A434051C7060430015F838 /* HardSectoredDisk.cpp */,
 				A1A434061C7060430015F838 /* HardSectoredDisk.h */,
-				A192FCE01CDFC43E00B4E8D5 /* HDOSMemory8K.cpp */,
-				A13BEE711C96959F00C7E65A /* HDOSMemory8K.h */,
 				A13BEE721C96959F00C7E65A /* HostFileBdos.cpp */,
 				A13BEE731C96959F00C7E65A /* HostFileBdos.h */,
 				A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */,
@@ -429,8 +416,6 @@
 				A1A434111C7060430015F838 /* main.h */,
 				A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */,
 				A13BEE751C9695AC00C7E65A /* Memory8K.h */,
-				A192FCDA1CDFB7EF00B4E8D5 /* Memory64k.cpp */,
-				A13BEE761C9695AC00C7E65A /* Memory64K.h */,
 				A192FCE41CE00A7800B4E8D5 /* MemoryDecoder.cpp */,
 				A13BEE771C9695AC00C7E65A /* MemoryDecoder.h */,
 				A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */,
@@ -473,6 +458,8 @@
 				A1A434291C7060430015F838 /* StdioConsole.h */,
 				A13C98981C7A3839000CF03B /* StdioProxyConsole.cpp */,
 				A13C98991C7A3839000CF03B /* StdioProxyConsole.h */,
+				A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */,
+				A13BEE711C96959F00C7E65A /* SystemMemory8K.h */,
 				A1CA80A61CD73EAE004A11B7 /* TD0FloppyDisk.cpp */,
 				A1CA80A71CD73EAE004A11B7 /* TD0FloppyDisk.h */,
 				A1A4342A1C7060430015F838 /* Terminal.cpp */,
@@ -489,8 +476,6 @@
 				A1A434311C7060430015F838 /* Z47Controller.h */,
 				A1A434321C7060430015F838 /* Z47Interface.cpp */,
 				A1A434331C7060430015F838 /* Z47Interface.h */,
-				A192FCE21CDFFB2500B4E8D5 /* Z64KMemoryLayout.cpp */,
-				A13BEE691C96957500C7E65A /* Z64KMemoryLayout.h */,
 				A1A434341C7060430015F838 /* z80.cpp */,
 				A1A434351C7060430015F838 /* z80.h */,
 			);
@@ -577,16 +562,14 @@
 				A1A4344B1C7060430015F838 /* h89-timer.cpp in Sources */,
 				A13BEE831C9695D100C7E65A /* SectorFloppyImage.cpp in Sources */,
 				A1A434571C7060430015F838 /* propertyutil.cpp in Sources */,
-				A192FCE31CDFFB2500B4E8D5 /* Z64KMemoryLayout.cpp in Sources */,
 				A1A434521C7060430015F838 /* main.cpp in Sources */,
-				A192FCE11CDFC43E00B4E8D5 /* HDOSMemory8K.cpp in Sources */,
+				A192FCE11CDFC43E00B4E8D5 /* SystemMemory8K.cpp in Sources */,
 				A1A4344E1C7060430015F838 /* INS8250.cpp in Sources */,
 				A13C987E1C7A37F7000CF03B /* DiskController.cpp in Sources */,
 				A13C988A1C7A3805000CF03B /* GenericFloppyDrive.cpp in Sources */,
 				A1A434401C7060430015F838 /* EightInchDisk.cpp in Sources */,
 				A1A434551C7060430015F838 /* ParallelLink.cpp in Sources */,
 				A1A4345F1C7060430015F838 /* Terminal.cpp in Sources */,
-				A192FCDB1CDFB7EF00B4E8D5 /* Memory64k.cpp in Sources */,
 				A1A434441C7060430015F838 /* h-17-1.cpp in Sources */,
 				A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */,
 				A13BEE801C9695C200C7E65A /* NetworkServer.cpp in Sources */,
@@ -607,7 +590,6 @@
 				A1A4343A1C7060430015F838 /* Console.cpp in Sources */,
 				A1A434561C7060430015F838 /* ParallelPortConnection.cpp in Sources */,
 				A1A434601C7060430015F838 /* Track.cpp in Sources */,
-				A192FCDF1CDFC27400B4E8D5 /* H88MemoryLayout.cpp in Sources */,
 				A13BEE7B1C9695B700C7E65A /* MMS77318MemoryDecoder.cpp in Sources */,
 				A1A4343D1C7060430015F838 /* disasm.cpp in Sources */,
 				A13C989A1C7A3839000CF03B /* StdioProxyConsole.cpp in Sources */,

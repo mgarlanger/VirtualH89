@@ -11,7 +11,9 @@
 
 #include "FloppyDisk.h"
 
+/// \cond
 #include <vector>
+/// \endcond
 
 class Track;
 

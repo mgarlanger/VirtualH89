@@ -7,8 +7,8 @@
 ///
 
 #include "Track.h"
-#include "Sector.h"
 
+#include "Sector.h"
 #include "logger.h"
 
 using namespace std;

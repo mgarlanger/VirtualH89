@@ -7,6 +7,10 @@
 #ifndef H19_H_
 #define H19_H_
 
+
+#include "Console.h"
+
+/// \cond
 //
 // OpenGL Headers
 //
@@ -15,9 +19,9 @@
 #else
 #include <GL/gl.h>
 #endif
+/// \endcond
 
 
-#include "Console.h"
 
 /// \brief Virtual %H19 %Terminal
 ///

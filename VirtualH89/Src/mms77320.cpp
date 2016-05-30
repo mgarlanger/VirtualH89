@@ -6,13 +6,16 @@
 /// \author Douglas Miller
 ///
 
-#include <string.h>
 
 #include "mms77320.h"
 
 #include "logger.h"
 #include "H89.h"
 #include "GenericSASIDrive.h"
+
+/// \cond
+#include <string.h>
+/// \endcond
 
 
 const char* MMS77320::MMS77320_Name_c = "MMS77320";

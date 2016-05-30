@@ -7,10 +7,12 @@
 #ifndef _PROPERTYUTIL_H
 #define _PROPERTYUTIL_H
 
+/// \cond
 #include <map>
 #include <string>
 #include <iostream>
 #include <vector>
+/// \endcond
 
 class PropertyUtil
 {

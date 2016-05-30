@@ -21,10 +21,13 @@
 #ifndef RAWFLOPPYIMAGE_H_
 #define RAWFLOPPYIMAGE_H_
 
-#include <sys/types.h>
-#include <vector>
 
 #include "GenericFloppyDisk.h"
+
+/// \cond
+#include <sys/types.h>
+#include <vector>
+/// \endcond
 
 
 class GenericFloppyDrive;

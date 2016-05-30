@@ -13,9 +13,10 @@
 #include "GenericFloppyFormat.h"
 #include "logger.h"
 
+/// \cond
 #include <fstream>
-
 #include <memory>
+/// \endcond
 
 using namespace std;
 

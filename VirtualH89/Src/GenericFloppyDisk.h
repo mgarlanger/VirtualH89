@@ -13,9 +13,11 @@
 
 #include "h89Types.h"
 
+/// \cond
 #include <string>
 #include <memory>
 #include <vector>
+/// \endcond
 
 class Sector;
 class Track;
@@ -107,4 +109,6 @@ class GenericFloppyDisk
 
 };
 
+
+typedef std::shared_ptr<GenericFloppyDisk> GenericFloppyDisk_ptr;
 #endif // GENERICFLOPPYDISK_H_

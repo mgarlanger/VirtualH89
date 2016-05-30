@@ -6,7 +6,6 @@
 /// \author Douglas Miller, cloned from h37.cpp by Mark Garlanger
 ///
 
-#include <string.h>
 
 #include "mms77316.h"
 
@@ -15,6 +14,10 @@
 #include "RawFloppyImage.h"
 #include "SectorFloppyImage.h"
 #include "InterruptController.h"
+
+/// \cond
+#include <string.h>
+/// \endcond
 
 const char* MMS77316::MMS77316_Name_c = "MMS77316";
 

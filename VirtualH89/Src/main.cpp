@@ -10,11 +10,6 @@
 
 #include "main.h"
 
-#include <iostream>
-#include <signal.h>
-#include <stdlib.h>
-#include <string>
-#include <unistd.h>
 
 #include "H89.h"
 #include "Console.h"
@@ -24,11 +19,19 @@
 #include "logger.h"
 #include "propertyutil.h"
 
+/// \cond
+#include <iostream>
+#include <signal.h>
+#include <stdlib.h>
+#include <string>
+#include <unistd.h>
+/// \endcond
+
 
 using namespace std;
 
-const char* Z80_COPYRIGHT_c   =
-    "Portions derived from Z80Pack Release 1.17 - Copyright (C) 1987-2008 by Udo Munk";
+const char* Z80_COPYRIGHT_c   = "Portions derived from Z80Pack Release 1.17"
+                                "- Copyright (C) 1987-2008 by Udo Munk";
 
 const char* RELEASE_VERSION_c = "1.93";
 const char* H89_COPYRIGHT_c   = "Copyright (C) 2009-2016 by Mark Garlanger";
@@ -126,7 +129,7 @@ main(int   argc,
 {
     int          c;
     extern char* optarg;
-    std::string  gui("H19");
+    string       gui("H19");
     int          quiet = 0;
     setDebugLevel();
 
@@ -172,11 +175,11 @@ main(int   argc,
     pthread_sigmask(SIG_BLOCK, &set, 0);
 
     // TODO: allow specification of config file via cmdline args.
-    std::string                cfg;
+    string                     cfg;
     char*                      env = getenv("V89_CONFIG");
     PropertyUtil::PropertyMapT props;
-    std::string                sw401;
-    std::string                sw402;
+    string                     sw401;
+    string                     sw402;
 
     // \todo - if file not found, default to something sane (h17 + 64k)
     if (env)
@@ -189,7 +192,7 @@ main(int   argc,
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception& e)
+        catch (exception& e)
         {
         }
     }
@@ -203,11 +206,10 @@ main(int   argc,
             PropertyUtil::read(cfg.c_str(), props);
         }
 
-        catch (std::exception& e)
+        catch (exception& e)
         {
         }
     }
-
 
     sw401 = props["sw401"];
     sw402 = props["sw402"];
@@ -224,8 +226,6 @@ main(int   argc,
     {
         console = new H19(sw401.c_str(), sw402.c_str());
     }
-
-
 
     h89.buildSystem(console, props);
 

@@ -11,8 +11,10 @@
 #ifndef H89OPERATOR_H_
 #define H89OPERATOR_H_
 
+/// \cond
 #include <assert.h>
 #include <string>
+/// \endcond
 
 
 class GenericDiskDrive;

@@ -11,8 +11,10 @@
 
 #include "h89Types.h"
 
+/// \cond
 #include <vector>
 #include <memory>
+/// \endcond
 
 class Sector;
 

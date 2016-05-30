@@ -7,12 +7,9 @@
 #include "H89.h"
 #include "H89-roms.h"
 #include "ROM.h"
-#include "HDOSMemory8K.h"
+#include "SystemMemory8K.h"
 #include "MemoryLayout.h"
-#include "H88MemoryLayout.h"
-#include "H88MemoryDecoder.h"
-#include "H89MemoryDecoder.h"
-#include "MMS77318MemoryDecoder.h"
+#include "MemoryDecoder.h"
 #include "z80.h"
 #include "AddressBus.h"
 #include "InterruptController.h"
@@ -41,7 +38,11 @@
 #include "logger.h"
 #include "propertyutil.h"
 
+/// \cond
 #include <vector>
+/// \endcond
+
+using namespace std;
 
 H89::H89(): Computer()
 {
@@ -53,7 +54,7 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
 {
     this->console = console;
 
-    std::string s; // for general property queries.
+    string s; // for general property queries.
 
     // TODO: use properties to configure rest of hardware.
     // Possibly set defaults and write/create file.
@@ -79,8 +80,8 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     }
     h89io->addDevice(gpp);
 
-    monitorROM = nullptr;
-    s          = props["monitor_rom"];
+    ROM*  monitorROM = nullptr;
+    s = props["monitor_rom"];
 
     if (!s.empty())
     {
@@ -94,27 +95,75 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
         monitorROM->initialize(&MTR90_2_ROM[0], 4096);
     }
 
-    h17ROM = new ROM(2048);
+    ROM*                       h17ROM = new ROM(2048);
     h17ROM->setBaseAddress(6 * 1024);
     h17ROM->initialize(&H17_ROM[0], 2048);
 
-    std::vector<std::string> memslots     = {"slot_p501", "slot_p502", "slot_p503"};
-    bool                     have16K      = false;
-    bool                     haveMMS77318 = false;
-    // in reality, only P503 can contain the 16K/128K add-on board.
-    // \todo make sure only one is specified and it's on P503.
+    vector<string>             memslots        = {"slot_p501", "slot_p502", "slot_p503"};
+    bool                       memorySpecified = false;
+    bool                       haveMMS77318    = false;
+    bool                       ORG_Zero        = true;
+    MemoryLayout::MemorySize_t memSize         = MemoryLayout::Mem_48k;
+
+    s = props["ORG0"];
+
+    // Allow config file to turn off ORG-0, but default to true;
+    if (s.compare("False") == 0)
+    {
+        ORG_Zero        = false;
+        memorySpecified = true;
+    }
+    s = props["CPU_Memory"];
+
+    if (s.compare("16K") == 0)
+    {
+        memSize         = MemoryLayout::Mem_16k;
+        memorySpecified = true;
+    }
+    else if (s.compare("32K") == 0)
+    {
+        memSize         = MemoryLayout::Mem_32k;
+        memorySpecified = true;
+    }
+    else if (s.compare("48K") == 0)
+    {
+        memSize         = MemoryLayout::Mem_48k;
+        memorySpecified = true;
+    }
+    else if (s.compare("64K") == 0)
+    {
+        memSize         = MemoryLayout::Mem_64k;
+        memorySpecified = true;
+        // \todo error if ORG_Zero
+    }
+
+    // only P503 can contain the 16K/128K add-on board.
+    //
     for (int x = 0; x < memslots.size(); ++x)
     {
-        s = props[memslots[x]];
-        if (s.compare("MMS77311") == 0 || s.compare("WH-88-16") == 0)
+        if (memslots[x] == "slot_p503")
         {
-            have16K      = true;
-            haveMMS77318 = false;
-        }
-        else if (s.compare("MMS77318") == 0)
-        {
-            have16K      = false;
-            haveMMS77318 = true;
+            s = props[memslots[x]];
+            if (s.compare("MMS77311") == 0 || s.compare("WH-88-16") == 0)
+            {
+                memSize = MemoryLayout::Mem_64k;
+            }
+            else if (s.compare("MMS77318") == 0)
+            {
+                haveMMS77318 = true;
+            }
+            else if (s.compare("Empty") == 0)
+            {
+                // do nothing.
+            }
+            else
+            {
+                // default to 64k if config didn't specify memory size
+                if (!memorySpecified)
+                {
+                    memSize = MemoryLayout::Mem_64k;
+                }
+            }
         }
     }
 
@@ -141,22 +190,16 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
         cpu->enableFast();
     }
 
-    HDOS = make_shared<HDOSMemory8K>();
-    HDOS->installROM(monitorROM);
-    HDOS->installROM(h17ROM);
-    HDOS->enableRAM(0x1400, 1024);
-
-    MemoryDecoder*            memDecoder;
-    // All sytems have the core 48K + ROM.
-    // \TODO Allow for 16K/32K  - also make support ORG-0 configurable.
-    shared_ptr<MemoryLayout>  h89_0 = make_shared<H88MemoryLayout>(HDOS); // creates 48K RAM at 0x2000...
-
+    sysMem = make_shared<SystemMemory8K>();
+    sysMem->installROM(monitorROM);
+    sysMem->installROM(h17ROM);
+    sysMem->enableRAM(0x1400, 1024);
 
     // H17
-    H17*                      h17 = nullptr;
+    H17*     h17 = nullptr;
 
     // Z37
-    Z_89_37*                  h37 = nullptr;
+    Z_89_37* h37 = nullptr;
 
     // Z47
     z47If       = nullptr;
@@ -167,9 +210,9 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     eight0      = nullptr;
     eight1      = nullptr;
 
-    MMS77316*                m316 = nullptr;
-    MMS77320*                m320 = nullptr;
-    CPNetDevice*             cpn  = CPNetDevice::install_CPNetDevice(props);
+    MMS77316*    m316 = nullptr;
+    MMS77320*    m320 = nullptr;
+    CPNetDevice* cpn  = CPNetDevice::install_CPNetDevice(props);
 
     if (cpn != nullptr)
     {
@@ -178,9 +221,9 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
 
     // TODO: not all slots are identical, handle restrictions...
     // Could have a Slot object with more details...
-    std::vector<std::string> devslots  = {"slot_p504", "slot_p505", "slot_p506"};
-    bool                     dev_slots = false;
-    bool                     ser_slots = true;
+    vector<string> devslots  = {"slot_p504", "slot_p505", "slot_p506"};
+    bool           dev_slots = false;
+    bool           ser_slots = true;
 
     for (int x = 0; x < devslots.size(); ++x)
     {
@@ -283,25 +326,26 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
     cpu->setAddressBus(ab);
     timer = new H89Timer(this, cpu);
 
-    nmi1  = new NMIPort(cpu, NMI_BaseAddress_1_c, NMI_NumPorts_1_c);
-    nmi2  = new NMIPort(cpu, NMI_BaseAddress_2_c, NMI_NumPorts_2_c);
-    h89io->addDevice(nmi1);
-    h89io->addDevice(nmi2);
+    h89io->addDevice(new NMIPort(cpu, NMI_BaseAddress_1_c, NMI_NumPorts_1_c));
+    h89io->addDevice(new NMIPort(cpu, NMI_BaseAddress_2_c, NMI_NumPorts_2_c));
 
-    if (have16K)
+    string memDecoderType;
+    if (haveMMS77318)
     {
-        memDecoder = new H89MemoryDecoder(h89_0);
+        memDecoderType = "MMS77318";
     }
-    else if (haveMMS77318)
+    else if (ORG_Zero)
     {
-        memDecoder = new MMS77318MemoryDecoder(h89_0);
+        memDecoderType = "H89";
     }
     else
     {
-        memDecoder = new H88MemoryDecoder(h89_0);
+        memDecoderType = "H88";
     }
 
-    ab->installMemory(memDecoder);
+    ab->installMemory(MemoryDecoder::createMemoryDecoder(memDecoderType,
+                                                         sysMem,
+                                                         memSize));
 
     if (!dev_slots)
     {
@@ -379,12 +423,9 @@ H89::~H89()
     systemMutexAcquire();
 
     // eject all the disk files
-    std::vector<DiskController*> dsks = h89io->getDiskDevices();
 
-    for (int x = 0; x < dsks.size(); ++x)
+    for (DiskController* dev : h89io->getDiskDevices())
     {
-        DiskController* dev = dsks[x];
-
         if (dev != nullptr)
         {
             dev->~DiskController();
@@ -417,13 +458,13 @@ H89::init()
 void
 H89::writeProtectH17RAM()
 {
-    HDOS->writeProtect(0x1400, 1024);
+    sysMem->writeProtect(0x1400, 1024);
 }
 
 void
 H89::writeEnableH17RAM()
 {
-    HDOS->writeEnable(0x1400, 1024);
+    sysMem->writeEnable(0x1400, 1024);
 }
 
 void
@@ -497,10 +538,10 @@ H89::getCPU()
     return (*cpu);
 }
 
-std::string
+string
 H89::dumpDebug()
 {
-    std::string ret = gpp->dumpDebug();
+    string ret = gpp->dumpDebug();
     // Note: INT should be part of H89 (or InterruptController), not CPU...
     // And... the signals are not actually latched on motherboard, only in
     // respective I/O adapters. But for convenience they should be latched
@@ -511,8 +552,11 @@ H89::dumpDebug()
 
 // DEPRECATED
 void
-H89::keypress(BYTE ch) {
+H89::keypress(BYTE ch)
+{
 }
+
 void
-H89::display() {
+H89::display()
+{
 }

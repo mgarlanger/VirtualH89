@@ -7,9 +7,9 @@
 ///
 
 #include "GenericFloppyDisk.h"
+
 #include "IMDFloppyDisk.h"
 #include "TD0FloppyDisk.h"
-
 #include "logger.h"
 
 using namespace std;
@@ -63,7 +63,7 @@ GenericFloppyDisk::determineFileType(std::string filename)
 }
 
 
-shared_ptr<GenericFloppyDisk>
+GenericFloppyDisk_ptr
 GenericFloppyDisk::loadDiskImage(vector<string> argv)
 {
 

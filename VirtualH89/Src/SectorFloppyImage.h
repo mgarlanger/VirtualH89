@@ -11,14 +11,16 @@
 #ifndef SECTORFLOPPYIMAGE_H_
 #define SECTORFLOPPYIMAGE_H_
 
-#include <sys/types.h>
-#include <string>
-#include <vector>
 
 #include "h89Types.h"
 #include "GenericFloppyDisk.h"
 
+/// \cond
+#include <sys/types.h>
+#include <string>
+#include <vector>
 #include <memory>
+/// \endcond
 
 class GenericDiskDrive;
 

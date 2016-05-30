@@ -39,13 +39,15 @@
 
 #include "disasm.h"
 
-#include <stdio.h>
-#include <string.h>
-
 
 #include "H89.h"
 #include "logger.h"
 #include "AddressBus.h"
+
+/// \cond
+#include <stdio.h>
+#include <string.h>
+/// \endcond
 
 //
 //  Forward declarations

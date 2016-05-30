@@ -10,11 +10,14 @@
 #define CPNETDEVICE_H_
 
 #include "IODevice.h"
+
 #include "NetworkServer.h"
 #include "propertyutil.h"
 
+/// \cond
 #include <dirent.h>
 #include <string>
+/// \endcond
 
 
 

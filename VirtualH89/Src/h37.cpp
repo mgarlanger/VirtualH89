@@ -9,12 +9,13 @@
 #include "logger.h"
 #include "DiskDrive.h"
 #include "wd1797.h"
-#include "SoftSectoredDisk.h"
 #include "InterruptController.h"
 #include "GenericFloppyDrive.h"
 #include "computer.h"
 #include "GenericFloppyDisk.h"
 
+
+using namespace std;
 
 Z_89_37::Z_89_37(Computer*            computer,
                  int                  baseAddr,
@@ -75,23 +76,22 @@ Z_89_37::install_H37(Computer*                   computer,
                      BYTE                        baseAddr,
                      InterruptController*        ic,
                      PropertyUtil::PropertyMapT& props,
-                     std::string                 slot)
+                     string                      slot)
 {
-    std::string                   s;
-    Z_89_37*                      z37 = new Z_89_37(computer, baseAddr, ic);
+    string      s;
+    Z_89_37*    z37 = new Z_89_37(computer, baseAddr, ic);
 
     debugss(ssH37, INFO, "entering\n");
 
     for (BYTE i = 0; i < numDisks_c; ++i)
     {
 
-        std::string prop = "h37_drive";
+        string prop = "h37_drive";
         prop += ('0' + i + 1);
         s     = props[prop];
 
         if (!s.empty())
         {
-#if 1
             GenericFloppyDrive* drive = GenericFloppyDrive::getInstance(s);
             if (drive)
             {
@@ -104,35 +104,11 @@ Z_89_37::install_H37(Computer*                   computer,
 
                 if (!s.empty())
                 {
-                    /*SoftSectoredDisk* disk = new SoftSectoredDisk(
-                                                                  s.c_str(), SoftSectoredDisk::dif_RAW);
-                       drive->insertDisk(disk);*/
                     drive->insertDisk(GenericFloppyDisk::loadDiskImage(PropertyUtil::splitArgs(s)));
                 }
 
             }
 
-#else
-            DiskDrive* drive = DiskDrive::getInstance(s);
-            if (drive)
-            {
-
-                z37->connectDrive(i, drive);
-                prop  = "z37_disk";
-                prop += ('0' + i + 1);
-                s     = props[prop];
-
-                s     = props["z37_disk1"];
-
-                if (!s.empty())
-                {
-                    SoftSectoredDisk* disk = new SoftSectoredDisk(
-                        s.c_str(), SoftSectoredDisk::dif_RAW);
-                    drive->insertDisk(disk);
-                }
-
-            }
-#endif
         }
     }
 
@@ -188,7 +164,6 @@ Z_89_37::in(BYTE addr)
             {
                 debugss(ssH37, INFO, "(DataPort)\n");
                 val = wd1797->in(WD1797::DataPort_Offset_c);
-
             }
 
             break;
@@ -312,14 +287,12 @@ Z_89_37::out(BYTE addr,
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "(SectorPort): %d\n", val);
-
                 wd1797->out(WD1797::SectorPort_Offset_c, val);
             }
             else
             {
                 debugss(ssH37, INFO, "(CommandPort): %d\n", val);
                 wd1797->out(WD1797::CommandPort_Offset_c, val);
-
             }
 
             break;

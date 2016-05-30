@@ -1,31 +1,33 @@
 ///
-/// \file HDOSMemory8K.cpp
+/// \file SystemMemory8K.cpp
 ///
 ///
 ///  \author  Mark Garlanger
 ///  \date    May 8, 2016
 
-#include "HDOSMemory8K.h"
+#include "SystemMemory8K.h"
 
 #include "ROM.h"
 
-HDOSMemory8K::HDOSMemory8K(): RAMemory8K(0x0000),
-                              maskRO(0),
-                              maskInstalled(0),
-                              RAM(nullptr)
+using namespace std;
+
+SystemMemory8K::SystemMemory8K(): RAMemory8K(0x0000),
+                                  maskRO(0),
+                                  maskInstalled(0),
+                                  RAM(nullptr)
 {
 }
 
 void
-HDOSMemory8K::overlayRAM(Memory8K* ram)
+SystemMemory8K::overlayRAM(shared_ptr<Memory8K> ram)
 {
     RAM = ram;
 }
 
 void
-HDOSMemory8K::enableRAM(WORD base, WORD len)
+SystemMemory8K::enableRAM(WORD base, WORD len)
 {
-    WORD adr = base & 0x1fff;
+    WORD adr = base & MemoryAddressMask_c;
     if (adr + len > sizeof(mem))
     {
         // error? or just trim?
@@ -41,7 +43,7 @@ HDOSMemory8K::enableRAM(WORD base, WORD len)
 }
 
 void
-HDOSMemory8K::writeProtect(WORD adr, WORD len)
+SystemMemory8K::writeProtect(WORD adr, WORD len)
 {
     int a = (adr >> 10) & 0x07;
     int n = a + (((len + 0x03ff) >> 10) & 0x07);
@@ -53,7 +55,7 @@ HDOSMemory8K::writeProtect(WORD adr, WORD len)
 }
 
 void
-HDOSMemory8K::writeEnable(WORD adr, WORD len)
+SystemMemory8K::writeEnable(WORD adr, WORD len)
 {
     int a = (adr >> 10) & 0x07;
     int n = a + (((len + 0x03ff) >> 10) & 0x07);
@@ -65,9 +67,9 @@ HDOSMemory8K::writeEnable(WORD adr, WORD len)
 }
 
 void
-HDOSMemory8K::installROM(ROM* rom)
+SystemMemory8K::installROM(ROM* rom)
 {
-    WORD adr = rom->getBase() & 0x1fff;
+    WORD adr = rom->getBase() & MemoryAddressMask_c;
     int  len = rom->getSize();
     if (adr + len > sizeof(mem))
     {

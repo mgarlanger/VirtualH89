@@ -9,7 +9,9 @@
 #include "HardSectoredDisk.h"
 #include "logger.h"
 
+/// \cond
 #include <cstring>
+/// \endcond
 
 HardSectoredDisk::HardSectoredDisk(const char* name)
 {

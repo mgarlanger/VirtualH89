@@ -10,13 +10,17 @@
 
 #include "ClockUser.h"
 #include "logger.h"
+
+/// \cond
 #include <cstddef>
+/// \endcond
 
 
 WallClock* WallClock::_inst = nullptr;
 
 
-WallClock::WallClock()
+WallClock::WallClock(): clock_m(0),
+                        ticks_m(0)
 {
 
 }

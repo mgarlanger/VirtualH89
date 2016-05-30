@@ -11,11 +11,14 @@
 
 #include "MemoryDecoder.h"
 
+class SystemMemory8K;
 
 class H89MemoryDecoder: public MemoryDecoder
 {
   public:
-    H89MemoryDecoder(shared_ptr<MemoryLayout> h89_0);
+    H89MemoryDecoder(std::shared_ptr<SystemMemory8K>  systemRam,
+                     MemoryLayout::MemorySize_t       memSize = MemoryLayout::Mem_64k);
+
     virtual ~H89MemoryDecoder();
 
   private:

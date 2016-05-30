@@ -15,7 +15,9 @@
 #include "GppListener.h"
 #include "propertyutil.h"
 
+/// \cond
 #include <memory>
+/// \endcond
 
 class DiskDrive;
 

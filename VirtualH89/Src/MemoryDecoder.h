@@ -10,70 +10,87 @@
 #ifndef MEMORYDECODER_H_
 #define MEMORYDECODER_H_
 
-#include "MemoryLayout.h"
 #include "GppListener.h"
 
+#include "MemoryLayout.h"
 #include "Memory8K.h"
+
+/// \cond
 #include <vector>
+#include <memory>
+/// \endcond
+
+class SystemMemory8K;
+
+class MemoryDecoder;
+
+typedef std::shared_ptr<MemoryDecoder> MemoryDecoder_ptr;
 
 class MemoryDecoder: public GppListener
 {
   public:
-    MemoryDecoder(int numBanks, BYTE gppBits);
+
+    static MemoryDecoder_ptr createMemoryDecoder(std::string                     type,
+                                                 std::shared_ptr<SystemMemory8K> sysMem,
+                                                 MemoryLayout::MemorySize_t      memSize);
+
+    MemoryDecoder(int  numLayouts,
+                  BYTE gppBits);
+
     virtual ~MemoryDecoder();
 
     virtual void reset();
 
-    virtual void addLayout(int                      ix,
-                           shared_ptr<MemoryLayout> lo);
+    virtual void addLayout(int              ix,
+                           MemoryLayout_ptr lo);
 
-    inline shared_ptr<MemoryLayout> getLayout(int ix)
+    inline MemoryLayout_ptr getLayout(int ix)
     {
-        return banks_m[ix & bankMask_m];
+        return layouts_m[ix & layoutMask_m];
     }
 
-    inline int numLayouts()
-    {
-        return numBanks_m;
-    }
+    inline int numLayouts();
 
-    inline int getCurrentBank()
+    inline int getCurrentLayoutNum()
     {
-        return curBank_m;
+        return curLayoutNum_m;
     }
 
     inline BYTE readByte(int  ix,
-                         WORD adr)
+                         WORD addr)
     {
-        return getLayout(ix)->getPageByAddress(adr)->readByte(adr);
+        return getLayout(ix)->getPageByAddress(addr)->readByte(addr);
     }
 
-    inline void writeByte(int ix, WORD adr,
+    inline void writeByte(int  ix,
+                          WORD addr,
                           BYTE val)
     {
-        getLayout(ix)->getPageByAddress(adr)->writeByte(adr, val);
+        getLayout(ix)->getPageByAddress(addr)->writeByte(addr, val);
     }
 
     inline BYTE readByte(WORD address)
     {
         return curLayout_m->getPageByAddress(address)->readByte(address);
     }
+
     inline void writeByte(WORD address,
                           BYTE val)
     {
         curLayout_m->getPageByAddress(address)->writeByte(address, val);
     }
 
-
   protected:
-    virtual void updateCurBank(BYTE bank);
-    BYTE                                   curBank_m;
-    int                                    bankMask_m;
-    int                                    numBanks_m;
 
-    std::vector<shared_ptr<MemoryLayout> > banks_m;
+    BYTE                          curLayoutNum_m;
+    int                           layoutMask_m;
+    int                           numLayouts_m;
 
-    shared_ptr<MemoryLayout>               curLayout_m;
+    std::vector<MemoryLayout_ptr> layouts_m;
+
+    MemoryLayout_ptr              curLayout_m;
+
+    virtual void updateCurLayout(BYTE layout);
 };
 
 #endif // MEMORYDECODER_H_

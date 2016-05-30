@@ -13,10 +13,12 @@
 
 #include "h89Types.h"
 
+/// \cond
 #include <vector>
 #include <memory>
+/// \endcond
 
-class GppListener: std::enable_shared_from_this<GppListener>
+class GppListener: public std::enable_shared_from_this<GppListener>
 {
   public:
     GppListener(BYTE bits = 0xff);

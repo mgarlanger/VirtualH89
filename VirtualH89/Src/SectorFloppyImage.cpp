@@ -7,6 +7,15 @@
 /// \author Douglas Miller
 ///
 
+
+#include "SectorFloppyImage.h"
+
+#include "RawFloppyImage.h"
+#include "GenericFloppyDrive.h"
+#include "GenericFloppyFormat.h"
+#include "logger.h"
+
+/// \cond
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -15,12 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-
-#include "SectorFloppyImage.h"
-#include "RawFloppyImage.h"
-#include "GenericFloppyDrive.h"
-#include "GenericFloppyFormat.h"
-#include "logger.h"
+/// \endcond
 
 using namespace std;
 

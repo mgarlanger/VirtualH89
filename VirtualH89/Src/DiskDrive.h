@@ -13,8 +13,10 @@
 
 #include "h89Types.h"
 
+/// \cond
 #include <string>
 #include <memory>
+/// \endcond
 
 class FloppyDisk;
 

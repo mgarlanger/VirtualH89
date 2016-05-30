@@ -11,23 +11,30 @@
 
 #include "h89Types.h"
 
+/// \cond
+#include <memory>
+/// \endcond
+
 
 class Memory8K
 {
   public:
     Memory8K(WORD base);
 
-    inline WORD getBase() {
-        return base_m;
-    }
-    inline BYTE readByte(WORD adr) {
-        return mem[adr & 0x1fff];
+    WORD getBase();
+
+    inline BYTE readByte(WORD adr)
+    {
+        return mem[adr & MemoryAddressMask_c];
     }
     virtual void writeByte(WORD adr, BYTE val) = 0;
 
   protected:
-    WORD base_m;
-    BYTE mem[8 * 1024];
+    WORD              base_m;
+    BYTE              mem[8 * 1024];
+    static const WORD MemoryAddressMask_c = 0x1fff;
 };
+
+typedef std::shared_ptr<Memory8K> Memory8K_ptr;
 
 #endif // MEMORY8K_H_
