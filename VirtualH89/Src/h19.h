@@ -10,10 +10,10 @@
 
 #include "Console.h"
 
-/// \cond
 //
 // OpenGL Headers
 //
+/// \cond
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
@@ -31,7 +31,7 @@
 class H19: public Console // , public BaseThread
 {
   public:
-    H19(std::string sw401, std::string sw402);
+    H19(std::string sw401 = "10001100", std::string sw402 = "00000101");
     virtual ~H19();
 
     virtual void init();
@@ -63,13 +63,13 @@ class H19: public Console // , public BaseThread
                         int y);
     static H19*               h19; // for static callback funcs
     static const unsigned int screenRefresh_c = 1000 / 60;
-    static unsigned int       screenRefresh;
+    static unsigned int       screenRefresh_m;
     void initGl();
 
     // screen size
-    static const unsigned int cols     = 80;
-    static const unsigned int rows     = 25;
-    static const unsigned int rowsMain = 24;
+    static const unsigned int cols_c     = 80;
+    static const unsigned int rows_c     = 25;
+    static const unsigned int rowsMain_c = 24;
 
     // state variables
     enum InputMode
@@ -81,36 +81,36 @@ class H19: public Console // , public BaseThread
         SetMode,
         ResetMode
     };
-    InputMode    mode;
-    bool         updated;
+    InputMode    mode_m;
+    bool         updated_m;
     BYTE         sw401_m;
     BYTE         sw402_m;
 
     // display modes
-    bool         reverseVideo;
-    bool         graphicMode;
-    bool         insertMode;
-    bool         line25;
-    bool         holdScreen;
-    bool         cursorOff;
-    bool         cursorBlock;
-    bool         wrapEOL;
-    bool         autoLF;
-    bool         autoCR;
+    bool         reverseVideo_m;
+    bool         graphicMode_m;
+    bool         insertMode_m;
+    bool         line25_m;
+    bool         holdScreen_m;
+    bool         cursorOff_m;
+    bool         cursorBlock_m;
+    bool         wrapEOL_m;
+    bool         autoLF_m;
+    bool         autoCR_m;
 
-    bool         keyboardEnabled;
-    bool         keyClick;
-    bool         keypadShifted;
-    bool         altKeypadMode;
+    bool         keyboardEnabled_m;
+    bool         keyClick_m;
+    bool         keypadShifted_m;
+    bool         altKeypadMode_m;
 
-    bool         offline;
+    bool         offline_m;
 
-    GLuint       fontOffset;
-    GLuint       screen[cols][rows + 1]; // extra row for GLUT wraparound.
+    GLuint       fontOffset_m;
+    GLuint       screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
 
-    bool         curCursor;
-    unsigned int PosX, PosY;
-    unsigned int SaveX, SaveY;
+    bool         curCursor_m;
+    unsigned int posX_m, posY_m;
+    unsigned int saveX_m, saveY_m;
 
     //
     // internal routines to handle control characters.
@@ -122,15 +122,15 @@ class H19: public Console // , public BaseThread
 
     inline virtual void scroll()
     {
-        for (unsigned int y = 0; y < (rowsMain - 1); ++y)
+        for (unsigned int y = 0; y < (rowsMain_c - 1); ++y)
         {
-            for (unsigned int x = 0; x < cols; ++x)
+            for (unsigned int x = 0; x < cols_c; ++x)
             {
-                screen[x][y] = screen[x][y + 1];
+                screen_m[x][y] = screen_m[x][y + 1];
             }
         }
 
-        eraseLine(rowsMain - 1);
+        eraseLine(rowsMain_c - 1);
     };
 
     //
@@ -173,7 +173,7 @@ class H19: public Console // , public BaseThread
 
     inline bool onLine25()
     {
-        return (PosX == (rows - 1));
+        return (posX_m == (rows_c - 1));
     };
     virtual void bell(void);
 
