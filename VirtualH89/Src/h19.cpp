@@ -843,7 +843,7 @@ H19::displayCharacter(unsigned int ch)
     screen_m[posX_m][posY_m] = symbol;
     posX_m++;
 
-    updated_m = true;
+    updated_m                = true;
 }
 
 /// \brief Process Carriage Return
@@ -1211,7 +1211,7 @@ H19::deleteChar()
     // clear the last column
     screen_m[cols_c - 1][posY_m] = ascii::SP;
 
-    updated_m = true;
+    updated_m                    = true;
 }
 
 void

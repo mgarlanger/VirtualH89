@@ -626,7 +626,8 @@ SoftSectoredDisk::readSectorData(BYTE  side,
 {
     debugss(ssFloppyDisk, ALL, "side: %d track: %d sector: %d pos: %d\n", side, track, sector, pos);
 
-    return tracks_m[side][track]->readSectorData(sector, pos, data);
+    // return tracks_m[side][track]->readSectorData(sector, pos, data);
+    return false;
 }
 
 void

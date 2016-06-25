@@ -14,6 +14,7 @@
 #include "RawFloppyImage.h"
 #include "SectorFloppyImage.h"
 #include "InterruptController.h"
+#include "wd1797.h"
 
 /// \cond
 #include <string.h>
@@ -22,7 +23,7 @@
 const char* MMS77316::MMS77316_Name_c = "MMS77316";
 
 GenericFloppyDrive*
-MMS77316::getCurDrive()
+MMS77316::getCurrentDrive()
 {
     // This could be NULL
     return drives_m[controlReg_m & ctrl_DriveSel_c];
@@ -37,12 +38,15 @@ MMS77316::getClockPeriod()
 MMS77316::MMS77316(int                  baseAddr,
                    InterruptController* ic): DiskController(baseAddr,
                                                             MMS77316_NumPorts_c),
-                                             WD1797(baseAddr + Wd1797_Offset_c),
+                                             intrqRaised_m(false),
+                                             drqRaised_m(false),
                                              ic_m(ic),
                                              controlReg_m(0),
                                              intLevel_m(MMS77316_Intr_c),
                                              drqCount_m(0)
 {
+    wd1797_m = new WD1797(this);
+
     for (int x = 0; x < numDisks_c; ++x)
     {
         drives_m[x] = nullptr;
@@ -173,7 +177,7 @@ MMS77316::reset(void)
     ic_m->setIntrq(intrqRaised_m);
     ic_m->setDrq(drqRaised_m);
 
-    WD1797::reset();
+    wd1797_m->reset();
 }
 
 BYTE
@@ -185,7 +189,8 @@ MMS77316::in(BYTE addr)
     // case ControlPort_Offset_c: NOT READABLE
     if (offset >= Wd1797_Offset_c)
     {
-        if (offset - Wd1797_Offset_c == DataPort_Offset_c)
+        offset -= Wd1797_Offset_c;
+        if (offset == WD1797::DataPort_Offset_c)
         {
             // might need to simulate WAIT states...
             // Must NOT wait too long - this blocks all other progress.
@@ -201,11 +206,11 @@ MMS77316::in(BYTE addr)
             while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
                 // TODO: this stalls
-                waitForData();
+                wd1797_m->waitForData();
             }
         }
 
-        val = WD1797::in(addr);
+        val = wd1797_m->in(offset);
     }
     else
     {
@@ -226,18 +231,20 @@ MMS77316::out(BYTE addr,
 
     if (offset >= Wd1797_Offset_c)
     {
-        if (offset - Wd1797_Offset_c == DataPort_Offset_c)
+        offset -= Wd1797_Offset_c;
+
+        if (offset == WD1797::DataPort_Offset_c)
         {
             // See notes for MMS77316::in()...
             int timeout = 0;
 
             while (burstMode() && !drqRaised_m && !intrqRaised_m && ++timeout < 16)
             {
-                waitForData();
+                wd1797_m->waitForData();
             }
         }
 
-        WD1797::out(addr, val);
+        wd1797_m->out(offset, val);
     }
     else if (offset == ControlPort_Offset_c)
     {
@@ -247,13 +254,15 @@ MMS77316::out(BYTE addr,
 
         if ((controlReg_m & ctrl_525DriveSel_c) != 0)
         {
-            GenericFloppyDrive* drive = getCurDrive();
+            GenericFloppyDrive* drive = getCurrentDrive();
 
             if (drive)
             {
                 drive->motor(true);
             }
         }
+
+        wd1797_m->setDoubleDensity((controlReg_m & ctrl_SetMFMRecordingN_c) == 0);
 
         if ((controlReg_m & ctrl_EnableIntReq_c) != 0 && (intrqRaised_m || drqRaised_m))
         {
@@ -278,6 +287,18 @@ MMS77316::getDrive(BYTE unitNum)
     }
 
     return NULL;
+}
+
+bool
+MMS77316::readReady()
+{
+    GenericFloppyDrive* drive = getCurrentDrive();
+    if (drive)
+    {
+        return drive->isReady();
+    }
+
+    return false;
 }
 
 bool
@@ -364,7 +385,7 @@ void
 MMS77316::loadHead(bool load)
 {
     debugss(ssMMS77316, INFO, "\n");
-    WD1797::loadHead(load);
+    // wd1797_m->loadHead(load);
 
     if (!load)
     {
@@ -380,12 +401,12 @@ MMS77316::dumpDebug()
 {
     std::string ret = PropertyUtil::sprintf(
         "CTRL=%02x\n"
-        "FDC-STS=%02x FDC-CMD=%02x\n"
-        "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n"
+   // "FDC-STS=%02x FDC-CMD=%02x\n"
+   // "FDC-TRK=%d FDC-SEC=%d FDC-DAT=%02x\n"
         "DRQ=%d INTRQ=%d\n",
         controlReg_m,
-        statusReg_m, cmdReg_m,
-        trackReg_m, sectorReg_m, dataReg_m,
+        // statusReg_m, cmdReg_m,
+   // trackReg_m, sectorReg_m, dataReg_m,
         drqRaised_m, intrqRaised_m);
     return ret;
 }

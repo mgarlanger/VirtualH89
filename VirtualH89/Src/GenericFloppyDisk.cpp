@@ -15,21 +15,15 @@
 using namespace std;
 
 
-GenericFloppyDisk::GenericFloppyDisk(): writeProtect_m(true),
+GenericFloppyDisk::GenericFloppyDisk(): writeProtect_m(false),
                                         doubleDensity_m(false),
                                         numTracks_m(0),
                                         numSectors_m(0),
                                         numSides_m(0),
                                         secSize_m(0),
-                                        mediaSize_m(0)/*,
-                                                         imageName_m(nullptr),
-                                                         curSector_m(nullptr),
-                                                         dataPos_m(0),
-                                                         sectorLength_m(0),
-                                                         secLenCode_m(0),
-                                                         hypoTrack_m(false),
-                                                         hyperTrack_m(false),
-                                                         ready_m(true)*/
+                                        mediaSize_m(0),
+                                        hypoTrack_m(false),
+                                        hyperTrack_m(false)
 {
 }
 
@@ -55,10 +49,12 @@ GenericFloppyDisk::determineFileType(std::string filename)
     {
         return IMD;
     }
+
     if (extension == "td0")
     {
         return TD0;
     }
+
     return Unknown;
 }
 
@@ -77,18 +73,16 @@ GenericFloppyDisk::loadDiskImage(vector<string> argv)
 
     FileType_t fileType = determineFileType(filename);
 
+    switch (fileType)
     {
-        switch (fileType)
-        {
-            case IMD:
-                return IMDFloppyDisk::getDiskette(argv);
+        case IMD:
+            return IMDFloppyDisk::getDiskette(argv);
 
-            case TD0:
-                return TD0FloppyDisk::getDiskette(argv);
+        case TD0:
+            return TD0FloppyDisk::getDiskette(argv);
 
-            case Unknown:
-                return nullptr;
-        }
+        case Unknown:
+            return nullptr;
     }
 }
 
@@ -98,7 +92,8 @@ GenericFloppyDisk::setDriveType(BYTE numTracks)
 {
     if (numTracks == numTracks_m)
     {
-        hypoTrack_m = hyperTrack_m = false;
+        hypoTrack_m  = false;
+        hyperTrack_m = false;
     }
     else if ((numTracks == 40) && (numTracks_m == 80))
     {
@@ -110,4 +105,23 @@ GenericFloppyDisk::setDriveType(BYTE numTracks)
         hyperTrack_m = false;
         hypoTrack_m  = true;
     }
+    else
+    {
+        debugss(ssFloppyDisk, ERROR, "unknown drive/disk tracks: %d/%d\n", numTracks, numTracks_m);
+    }
+}
+
+BYTE
+GenericFloppyDisk::getRealTrackNumber(BYTE track)
+{
+    if (hyperTrack_m)
+    {
+        return track * 2;
+    }
+    else if (hypoTrack_m)
+    {
+        return track / 2;
+    }
+
+    return track;
 }

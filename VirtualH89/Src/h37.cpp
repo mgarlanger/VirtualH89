@@ -29,7 +29,6 @@ Z_89_37::Z_89_37(Computer*            computer,
                                            dataReady_m(false),
                                            lostDataStatus_m(false),
                                            sectorTrackAccess_m(false),
-                                           dataEncoding_m(FM),
                                            curDiskDrive_m(numDisks_c),
                                            intLevel_m(z_89_37_Intr_c),
                                            curPos_m(0),
@@ -38,7 +37,7 @@ Z_89_37::Z_89_37(Computer*            computer,
                                            drqAllowed_m(false),
                                            cycleCount_m(0)
 {
-    wd1797               = new WD1797(this);
+    wd1797_m             = new WD1797(this);
 
     drives_m[ds0]        = nullptr;
     drives_m[ds1]        = nullptr;
@@ -67,7 +66,7 @@ Z_89_37::reset(void)
     motorOn_m           = false;
     dataReady_m         = false;
     lostDataStatus_m    = false;
-    wd1797->reset();
+    wd1797_m->reset();
 }
 
 
@@ -144,12 +143,12 @@ Z_89_37::in(BYTE addr)
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "(SectorPort)\n");
-                val = wd1797->in(WD1797::SectorPort_Offset_c);
+                val = wd1797_m->in(WD1797::SectorPort_Offset_c);
             }
             else
             {
                 debugss(ssH37, INFO, "(StatusPort)\n");
-                val = wd1797->in(WD1797::StatusPort_Offset_c);
+                val = wd1797_m->in(WD1797::StatusPort_Offset_c);
             }
 
             break;
@@ -158,12 +157,12 @@ Z_89_37::in(BYTE addr)
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "(TrackPort)\n");
-                val = wd1797->in(WD1797::TrackPort_Offset_c);
+                val = wd1797_m->in(WD1797::TrackPort_Offset_c);
             }
             else
             {
                 debugss(ssH37, INFO, "(DataPort)\n");
-                val = wd1797->in(WD1797::DataPort_Offset_c);
+                val = wd1797_m->in(WD1797::DataPort_Offset_c);
             }
 
             break;
@@ -216,22 +215,17 @@ Z_89_37::out(BYTE addr,
             if (val & ctrl_SetMFMRecording_c)
             {
                 debugss_nts(ssH37, INFO, " SetMFM");
-                dataEncoding_m = MFM;
+                wd1797_m->setDoubleDensity(true);
             }
             else
             {
-                dataEncoding_m = FM;
+                wd1797_m->setDoubleDensity(false);
             }
 
             motorOn(val & ctrl_MotorsOn_c);
             if (val & ctrl_MotorsOn_c)
             {
                 debugss_nts(ssH37, INFO, " MotorsOn");
-                motorOn_m = true;
-            }
-            else
-            {
-                motorOn_m = false;
             }
 
             if (val & ctrl_Drive_0_c)
@@ -287,12 +281,12 @@ Z_89_37::out(BYTE addr,
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "(SectorPort): %d\n", val);
-                wd1797->out(WD1797::SectorPort_Offset_c, val);
+                wd1797_m->out(WD1797::SectorPort_Offset_c, val);
             }
             else
             {
                 debugss(ssH37, INFO, "(CommandPort): %d\n", val);
-                wd1797->out(WD1797::CommandPort_Offset_c, val);
+                wd1797_m->out(WD1797::CommandPort_Offset_c, val);
             }
 
             break;
@@ -301,12 +295,12 @@ Z_89_37::out(BYTE addr,
             if (sectorTrackAccess_m)
             {
                 debugss(ssH37, INFO, "(TrackPort): %d\n", val);
-                wd1797->out(WD1797::TrackPort_Offset_c, val);
+                wd1797_m->out(WD1797::TrackPort_Offset_c, val);
             }
             else
             {
                 debugss(ssH37, INFO, "(DataPort): %d\n", val);
-                wd1797->out(WD1797::DataPort_Offset_c, val);
+                wd1797_m->out(WD1797::DataPort_Offset_c, val);
             }
 
             break;
@@ -337,6 +331,7 @@ Z_89_37::motorOn(bool motor)
 GenericFloppyDrive*
 Z_89_37::getCurrentDrive()
 {
+
     if (curDiskDrive_m < numDisks_c)
     {
         return genericDrives_m[curDiskDrive_m];
@@ -466,13 +461,6 @@ Z_89_37::lowerDrq()
 
 }
 
-bool
-Z_89_37::doubleDensity()
-{
-    debugss(ssH37, ALL, "\n");
-
-    return dataEncoding_m == MFM;
-}
 
 bool
 Z_89_37::readReady()

@@ -24,42 +24,6 @@ const int  WD1797::sectorLengths[2][4] =
     {128, 256, 512,  1024} // [1]
 };
 
-void
-WD1797::updateReady(GenericFloppyDrive* drive)
-{
-
-    if (drive->isWriteProtect())
-    {
-        statusReg_m |= stat_WriteProtect_c;
-    }
-    else
-    {
-        statusReg_m &= ~stat_WriteProtect_c;
-    }
-
-
-    bool ready;
-
-    // H37 has ready pin tied to +5V.
-    if (userIf_m)
-    {
-        ready = userIf_m->readReady();
-    }
-    else
-    {
-        ready = drive->isReady();
-    }
-
-    if (ready)
-    {
-        statusReg_m &= ~stat_NotReady_c;
-    }
-    else
-    {
-        statusReg_m |= stat_NotReady_c;
-    }
-}
-
 
 WD1797::WD1797(int baseAddr): ClockUser(),
                               basePort_m(baseAddr),
@@ -88,8 +52,15 @@ WD1797::WD1797(int baseAddr): ClockUser(),
                               stepDirection_m(dir_out),
                               curPos_m(0),
                               sectorPos_m(InitialSectorPos_c),
+                              cmdIV_readyToNotReady(false),
+                              cmdIV_notReadyToReady(false),
+                              cmdIV_indexPulse(false),
                               userIf_m(nullptr),
-                              cycleCount_m(0)
+                              curNotification(&WD1797::noneNotification),
+                              cycleCount_m(0),
+                              formattingState_m(fs_none),
+                              doubleDensity_m(false),
+                              immediateInterruptSet_m(false)
 {
 
 }
@@ -107,33 +78,38 @@ WD1797::~WD1797()
 void
 WD1797::reset(void)
 {
-    trackReg_m        = 0;
-    sectorReg_m       = 0;
-    dataReg_m         = 0;
-    cmdReg_m          = 0;
-    statusReg_m       = 0;
-    dataReady_m       = false;
-    intrqRaised_m     = false;
-    drqRaised_m       = false;
-    headLoaded_m      = false;
-    sectorLength_m    = 0;
-    lastIndexStatus_m = false;
-    indexCount_m      = 0;
-    stepUpdate_m      = false;
-    stepSettle_m      = 0;
-    missCount_m       = 0;
-    seekSpeed_m       = 0;
-    verifyTrack_m     = false;
-    multiple_m        = false;
-    delay_m           = false;
-    side_m            = 0;
-    deleteDAM_m       = false;
-    curCommand_m      = noneCmd;
-    stepDirection_m   = dir_out;
-    // leave curPos_m alone, diskette is still spinning...
-    sectorPos_m       = InitialSectorPos_c;
-}
+    trackReg_m              = 0;
+    sectorReg_m             = 0;
+    dataReg_m               = 0;
+    cmdReg_m                = 0;
+    statusReg_m             = 0;
+    dataReady_m             = false;
+    intrqRaised_m           = false;
+    drqRaised_m             = false;
+    headLoaded_m            = false;
+    sectorLength_m          = 0;
+    lastIndexStatus_m       = false;
+    indexCount_m            = 0;
+    stepUpdate_m            = false;
+    stepSettle_m            = 0;
+    missCount_m             = 0;
+    seekSpeed_m             = 0;
+    verifyTrack_m           = false;
+    multiple_m              = false;
+    delay_m                 = false;
+    side_m                  = 0;
+    deleteDAM_m             = false;
+    curCommand_m            = noneCmd;
+    cmdIV_readyToNotReady   = false;
+    cmdIV_notReadyToReady   = false;
+    cmdIV_indexPulse        = false;
+    immediateInterruptSet_m = false;
 
+    curNotification         = &WD1797::noneNotification;
+    stepDirection_m         = dir_out;
+    // leave curPos_m alone, diskette is still spinning...
+    sectorPos_m             = InitialSectorPos_c;
+}
 
 
 BYTE
@@ -142,15 +118,19 @@ WD1797::in(BYTE addr)
     BYTE offset = addr - basePort_m;
     BYTE val    = 0;
 
-    debugss(ssWD1797, ALL, "(%d)\n", addr);
+    debugss(ssWD1797, INFO, "(%d)\n", addr);
 
     switch (offset)
     {
         case StatusPort_Offset_c:
-            debugss(ssWD1797, VERBOSE, "(StatusPort) (%02x) trk=%02x sec=%02x dat=%02x\n",
+            debugss(ssWD1797, INFO, "(StatusPort) (0x%02x) trk=%d sec=%d dat=0x%02x\n",
                     statusReg_m, trackReg_m, sectorReg_m, dataReg_m);
+
             val = statusReg_m;
-            lowerIntrq();
+            if (!immediateInterruptSet_m)
+            {
+                lowerIntrq();
+            }
             break;
 
         case TrackPort_Offset_c:
@@ -187,7 +167,7 @@ WD1797::out(BYTE addr,
 {
     BYTE offset = addr - basePort_m;
 
-    debugss(ssWD1797, ALL, "(%d, %d (0x%x))\n", addr, val, val);
+    debugss(ssWD1797, INFO, "(%d, %d (0x%x))\n", addr, val, val);
 
     switch (offset)
     {
@@ -202,7 +182,7 @@ WD1797::out(BYTE addr,
             break;
 
         case TrackPort_Offset_c:
-            debugss(ssWD1797, VERBOSE, "(TrackPort): %d\n", val);
+            debugss(ssWD1797, INFO, "(TrackPort): %d\n", val);
             trackReg_m = val;
             break;
 
@@ -212,7 +192,7 @@ WD1797::out(BYTE addr,
             break;
 
         case DataPort_Offset_c:
-            debugss(ssWD1797, VERBOSE, "(DataPort): %02x\n", val);
+            debugss(ssWD1797, INFO, "(DataPort): %02x\n", val);
 
             // unpredictable results if !dataReady_m... (data changed while being written).
             // other mechanisms detect lostData, which is different.
@@ -251,15 +231,12 @@ WD1797::processCmd(BYTE cmd)
     // for now, start the new command.
     if ((statusReg_m & stat_Busy_c) == stat_Busy_c)
     {
-        debugss(ssWD1797, WARNING, "New command while still busy: %d\n", cmd);
+        debugss(ssWD1797, ERROR, "New command while still busy: %d\n", cmd);
         // TODO determine the proper behavior.
         // return;
     }
 
-    // Can't reference drive here... it could be about to change.
-    // GenericFloppyDrive *drive = getCurDrive();
-
-    // set Busy flag - clear everything else
+    // set Busy flag
     statusReg_m = stat_Busy_c;
     debugss(ssWD1797, INFO, "Setting busy flag\n")
 
@@ -283,44 +260,52 @@ WD1797::processCmd(BYTE cmd)
 void
 WD1797::processCmdTypeI(BYTE cmd)
 {
+    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
+
     verifyTrack_m = ((cmd & cmdop_VerifyTrack_c) != 0);
     seekSpeed_m   = speeds[cmd & cmdop_StepMask_c];
-    lowerDrq();
     dataReady_m   = false;
 
-    if (getClockPeriod() > 500)
+    if (userIf_m->getClockPeriod() > 500)
     {
         seekSpeed_m *= 2;
     }
 
     loadHead((cmd & cmdop_HeadLoad_c) != 0);
-    stepUpdate_m = false;
+    stepUpdate_m = true;
 
-    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
     // reset CRC Error, Seek Error, DRQ, INTRQ
+
     statusReg_m &= ~(stat_CRCError_c | stat_SeekError_c);
     lowerDrq();
-    lowerIntrq();
+    if (!immediateInterruptSet_m)
+    {
+        lowerIntrq();
+    }
 
     if ((cmd & 0xf0) == 0x00)
     {
-        debugss(ssWD1797, INFO, "Restore\n");
+        debugss(ssWD1797, WARNING, "Restore: %dms, v=%d\n", seekSpeed_m, verifyTrack_m);
+
         curCommand_m = restoreCmd;
+        trackReg_m   = 255;
     }
-    else if ((cmd & 0xc0) == 0x00)
+    else if ((cmd & 0xe0) == 0x00)
     {
-        debugss(ssWD1797, INFO, "Seek\n");
+        // Some of the documentation shows two different bit patterns for seek,
+        // but none for plain 'step', this is an apparent typo, the version of
+        // the document in the Z-89-37 seems to be the correct one and the
+        // pattern "0 0 1 T h V r1 r2" is the step command not the seek command.
+
+        debugss(ssWD1797, WARNING, "Seek: %d, %dms, v=%d\n", dataReg_m, seekSpeed_m, verifyTrack_m);
         curCommand_m = seekCmd;
-        // For the 1797 version, there are two bit patterns that
-        // are defined as SEEK,  0 0 0 1 x x x x and 0 0 1 T x x x x
-        // wasn't clear in the documentation if the first one updated the track
-        // reg, but assuming it does.
-        stepUpdate_m = (cmd & cmdop_TrackUpdate_c) != 0;
     }
     else
     {
         // One of the Step commands
-        debugss(ssWD1797, INFO, "Step\n");
+        stepUpdate_m = (cmd & cmdop_TrackUpdate_c) != 0;
+        debugss(ssWD1797, WARNING, "Step: %dms, v=%d ut: %d\n", seekSpeed_m, verifyTrack_m,
+                stepUpdate_m);
         curCommand_m = stepCmd;
 
         stepUpdate_m = (cmd & cmdop_TrackUpdate_c) != 0;
@@ -331,24 +316,21 @@ WD1797::processCmdTypeI(BYTE cmd)
             if ((cmd & 0x20) == 0x20)
             {
                 // Step Out
-                debugss(ssWD1797, INFO, "Step Out\n");
+                debugss(ssWD1797, WARNING, "Step Out\n");
                 stepDirection_m = dir_out;
             }
             else
             {
                 // Step In
-                debugss(ssWD1797, INFO, "Step In\n");
+                debugss(ssWD1797, WARNING, "Step In\n");
                 stepDirection_m = dir_in;
             }
         }
     }
 
     // Drive selection might change, need to delay start of command...
-    stepSettle_m = 50;
-
-    // TODO: detect track0
-    // statusReg_m |= stat_TrackZero_c;
-
+    stepSettle_m    = HeadSettleTimeInTicks_c;
+    curNotification = &WD1797::cmdTypeI_Notification;
 }
 
 void
@@ -360,8 +342,7 @@ WD1797::processCmdTypeII(BYTE cmd)
     side_m         = ((cmd & cmdop_UpdateSSO_c) >> cmdop_UpdateSSO_Shift_c);
     loadHead(true);
 
-
-    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
+    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
     lowerDrq();
     dataReady_m = false;
     sectorPos_m = InitialSectorPos_c;
@@ -388,7 +369,8 @@ WD1797::processCmdTypeII(BYTE cmd)
         curCommand_m = readSectorCmd;
     }
 
-    stepSettle_m = HeadSettleTimeInTicks_c; // give host time to get ready...
+    stepSettle_m    = HeadSettleTimeInTicks_c; // give host time to get ready...
+    curNotification = &WD1797::cmdTypeII_Notification;
 }
 
 void
@@ -401,29 +383,31 @@ WD1797::processCmdTypeIII(BYTE cmd)
     dataReady_m = false;
     sectorPos_m = InitialSectorPos_c;
 
-    debugss(ssWD1797, INFO, "cmd: %d\n", cmd);
+    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
 
     if ((cmd & 0xf0) == 0xc0)
     {
         // Read Address
         debugss(ssWD1797, INFO, "Read Address\n");
-        curCommand_m = readAddressCmd;
 
+        curCommand_m = readAddressCmd;
     }
     else if ((cmd & 0xf0) == 0xf0)
     {
         // write Track
-        debugss(ssWD1797, INFO, "Write Track: %d\n", trackReg_m);
-        curCommand_m = writeTrackCmd;
-        raiseDrq();
+        debugss(ssWD1797, ERROR, "Write Track: %d\n", trackReg_m);
 
+        userIf_m->getCurrentDrive()->startTrackFormat(trackReg_m);
+
+        curCommand_m      = writeTrackCmd;
+        formattingState_m = fs_waitingForIndex;
+        raiseDrq();
     }
     else if ((cmd & 0xf0) == 0xe0)
     {
         // read Track
-        debugss(ssWD1797, INFO, "Read Track: %d\n", trackReg_m);
+        debugss(ssWD1797, ERROR, "Read Track: %d\n", trackReg_m);
         curCommand_m = readTrackCmd;
-
     }
     else
     {
@@ -432,14 +416,16 @@ WD1797::processCmdTypeIII(BYTE cmd)
         return;
     }
 
-    stepSettle_m = HeadSettleTimeInTicks_c; // give host time to get ready...
+    stepSettle_m    = HeadSettleTimeInTicks_c; // give host time to get ready...
+    curNotification = &WD1797::cmdTypeIII_Notification;
 }
 
 // 'drive' might be NULL.
 void
 WD1797::processCmdTypeIV(BYTE cmd)
 {
-    debugss(ssWD1797, INFO, "cmd: 0x%02x\n", cmd);
+    debugss(ssWD1797, INFO, "cmd-IV: 0x%02x\n", cmd);
+
     loadHead(false);
     // we assume drive won't change for Type IV commands...
     GenericFloppyDrive* drive = getCurDrive();
@@ -452,7 +438,6 @@ WD1797::processCmdTypeIV(BYTE cmd)
         debugss(ssWD1797, INFO, "Aborting Command\n");
         // still running, abort command and reset busy
         abortCmd();
-        statusReg_m &= ~stat_Busy_c;
     }
     else if (drive)
     {
@@ -460,52 +445,83 @@ WD1797::processCmdTypeIV(BYTE cmd)
         // try more-surgical repair of status register.
         statusReg_m &= ~stat_SeekError_c;
         statusReg_m &= ~stat_CRCError_c;
-        // if previous command was Tyype II or III, need to clear
+        // if previous command was Type II or III, need to clear
         // stat_LostData_c and stat_DataRequest_c ? But not if Type I.
         debugss(ssWD1797, INFO, "updating statusReg: %d\n", statusReg_m);
     }
     else
     {
-        debugss(ssWD1797, ERROR, "Type IV with no drive\n");
-        statusReg_m |= stat_NotReady_c;
+        debugss(ssWD1797, WARNING, "Type IV with no drive\n");
+        statusReg_m = stat_NotReady_c;
     }
 
     if ((cmd & 0x0f) != 0x00)
     {
-        // TODO: Fix this, must setup background "task" waiting for event...
-
         // at least one bit is set.
-        if ((cmd & cmdop_NotReadyToReady_c) == cmdop_NotReadyToReady_c)
-        {
-            debugss(ssWD1797, ERROR, "Not Ready to Ready - not implemented\n");
+        cmdIV_notReadyToReady = ((cmd & cmdop_NotReadyToReady_c) == cmdop_NotReadyToReady_c);
+        debugss(ssWD1797, INFO, "Not Ready to Ready - %d\n", cmdIV_notReadyToReady);
 
-        }
+        cmdIV_readyToNotReady = ((cmd & cmdop_ReadyToNotReady_c) == cmdop_ReadyToNotReady_c);
+        debugss(ssWD1797, INFO, "Ready to Not Ready - %d\n", cmdIV_readyToNotReady);
 
-        if ((cmd & cmdop_ReadyToNotReady_c) == cmdop_ReadyToNotReady_c)
-        {
-            debugss(ssWD1797, ERROR, "Ready to Not Ready - not implemented\n");
-
-        }
-
-        if ((cmd & cmdop_IndexPulse_c) == cmdop_IndexPulse_c)
-        {
-            debugss(ssWD1797, ERROR, "Index Pulse - not implemented\n");
-
-        }
+        cmdIV_indexPulse      = ((cmd & cmdop_IndexPulse_c) == cmdop_IndexPulse_c);
+        debugss(ssWD1797, INFO, "Index Pulse - %d\n", cmdIV_indexPulse);
 
         if ((cmd & cmdop_ImmediateInterrupt_c) == cmdop_ImmediateInterrupt_c)
         {
             debugss(ssWD1797, INFO, "Immediate Interrupt\n");
-            statusReg_m &= ~stat_Busy_c;
+            statusReg_m            &= ~stat_Busy_c;
+            immediateInterruptSet_m = true;
             raiseIntrq();
         }
+        curNotification = &WD1797::cmdTypeIV_Notification;
     }
     else
     {
         debugss(ssWD1797, INFO, "No Interrupt/ Clear Busy\n");
-        statusReg_m &= ~stat_Busy_c;
-        curCommand_m = noneCmd;
+        statusReg_m            &= ~stat_Busy_c;
+        curCommand_m            = noneCmd;
+        curNotification         = &WD1797::noneNotification;
+        immediateInterruptSet_m = false;
+        lowerIntrq();
+        updateStatusTypeI(drive);
     }
+}
+
+void
+WD1797::verifyTrack(GenericFloppyDrive* drive)
+{
+    int track, sector, side;
+
+    if (drive)
+    {
+        // TODO: confirm this works...
+        if (!drive->readAddress(track, sector, side))
+        {
+            statusReg_m |= stat_CRCError_c;
+        }
+        else if (track != trackReg_m)
+        {
+            statusReg_m |= stat_SeekError_c;
+        }
+    }
+    else
+    {
+        debugss(ssWD1797, INFO, "seekCmd no drive: %d\n", trackReg_m);
+        statusReg_m |= stat_SeekError_c;
+    }
+}
+
+void
+WD1797::completeCmd()
+{
+    debugss(ssWD1797, INFO, "\n");
+
+    curCommand_m      = noneCmd;
+    statusReg_m      &= ~stat_Busy_c;
+    formattingState_m = fs_none;
+    raiseIntrq();
+    curNotification   = &WD1797::noneNotification;
 }
 
 void
@@ -513,67 +529,48 @@ WD1797::abortCmd()
 {
     debugss(ssWD1797, INFO, "\n");
 
-    curCommand_m = noneCmd;
+    curCommand_m      = noneCmd;
+    statusReg_m      &= ~stat_Busy_c;
+    formattingState_m = fs_none;
+    curNotification   = &WD1797::noneNotification;
 }
 
 void
 WD1797::raiseIntrq()
 {
     debugss(ssWD1797, INFO, "\n");
+
     intrqRaised_m = true;
-    if (userIf_m)
-    {
-        userIf_m->raiseIntrq();
-    }
+    userIf_m->raiseIntrq();
 }
 
 void
 WD1797::raiseDrq()
 {
     debugss(ssWD1797, INFO, "\n");
-    drqRaised_m = true;
-    if (userIf_m)
-    {
-        userIf_m->raiseDrq();
-    }
 
+    drqRaised_m = true;
+    userIf_m->raiseDrq();
 }
 
 void
 WD1797::lowerIntrq()
 {
     debugss(ssWD1797, INFO, "\n");
-    intrqRaised_m = false;
-    if (userIf_m)
-    {
-        userIf_m->lowerIntrq();
-    }
 
+    intrqRaised_m = false;
+    userIf_m->lowerIntrq();
 }
 
 void
 WD1797::lowerDrq()
 {
     debugss(ssWD1797, INFO, "\n");
+
     drqRaised_m = false;
-    if (userIf_m)
-    {
-        userIf_m->lowerDrq();
-    }
-
+    userIf_m->lowerDrq();
 }
 
-bool
-WD1797::doubleDensity()
-{
-    if (!userIf_m)
-    {
-        return false;
-    }
-
-    return userIf_m->doubleDensity();
-
-}
 
 void
 WD1797::loadHead(bool load)
@@ -585,24 +582,7 @@ WD1797::loadHead(bool load)
 GenericFloppyDrive*
 WD1797::getCurDrive()
 {
-    if (!userIf_m)
-    {
-        return nullptr;
-    }
-
     return userIf_m->getCurrentDrive();
-}
-
-
-int
-WD1797::getClockPeriod()
-{
-    if (!userIf_m)
-    {
-        return 1000;
-    }
-
-    return userIf_m->getClockPeriod();
 }
 
 void
@@ -619,70 +599,73 @@ WD1797::transferData(int data)
     raiseDrq();
 }
 
-bool
-WD1797::checkAddr(BYTE addr[6])
-{
-    return (addr[0] == trackReg_m && addr[1] == side_m && addr[2] == sectorReg_m);
-}
-
-int
-WD1797::sectorLen(BYTE addr[6])
-{
-    int x = addr[3] & 0x03;
-    return sectorLengths[sectorLength_m][x];
-}
 
 void
 WD1797::notification(unsigned int cycleCount)
 {
-
     cycleCount_m += cycleCount;
 
-    unsigned long       charPos   = 0;
-    GenericFloppyDrive* drive     = getCurDrive();
-    bool                indexEdge = false;
+    (this->*curNotification)(cycleCount);
+}
 
-    if (!drive)
+// new notification function
+void
+WD1797::noneNotification(unsigned int cycleCount)
+{
+    if (userIf_m->readReady())
     {
-
-        // TODO: set some status indicator.
-        bool notReady = true;
-        // the H37 has the ready signal tied to +5.
-        if (userIf_m && userIf_m->readReady())
-        {
-            notReady = false;
-        }
-
-        if (notReady)
-        {
-            statusReg_m |= stat_NotReady_c;
-
-            // TODO only type II & III commands are aborted on a not ready
-            if (curCommand_m != noneCmd)
-            {
-                abortCmd();
-                // TODO: shouldn't abortCmd() do all this?
-                raiseIntrq();
-                statusReg_m &= ~stat_Busy_c;
-            }
-
-            return;
-        }
-        // TODO - Type one commands are not affected by the ready input, those
-        // should still continue, but currently no protection for drive-> uses
-        // below.
-        return;
+        // Clear notReady
+        statusReg_m &= ~stat_NotReady_c;
+    }
+    else
+    {
+        // Set notReady
+        statusReg_m |= stat_NotReady_c;
     }
 
-    statusReg_m &= ~stat_NotReady_c;
+    GenericFloppyDrive* drive = getCurDrive();
 
-    drive->notification(cycleCount);
-
-    if (drive->getIndexPulse())
+    if (drive)
     {
+        if (drive->isWriteProtect())
+        {
+            statusReg_m |= stat_WriteProtect_c;
+        }
+        else
+        {
+            statusReg_m &= ~stat_WriteProtect_c;
+        }
+        if (drive->getIndexPulse())
+        {
+            statusReg_m |= stat_IndexPulse_c;
+        }
+        else
+        {
+            statusReg_m &= ~stat_IndexPulse_c;
+        }
+    }
+}
+
+void
+WD1797::cmdTypeI_Notification(unsigned int cycleCount)
+{
+
+    if (userIf_m->readReady())
+    {
+        statusReg_m &= ~stat_NotReady_c;
+    }
+    else
+    {
+        statusReg_m |= stat_NotReady_c;
+    }
+
+    GenericFloppyDrive* drive = getCurDrive();
+
+    if (drive && drive->getIndexPulse())
+    {
+        statusReg_m |= stat_IndexPulse_c;
         if (!lastIndexStatus_m)
         {
-            indexEdge = true;
             ++indexCount_m;
         }
 
@@ -690,10 +673,9 @@ WD1797::notification(unsigned int cycleCount)
     }
     else
     {
+        statusReg_m      &= ~stat_IndexPulse_c;
         lastIndexStatus_m = false;
     }
-
-    updateReady(drive);
 
     if (stepSettle_m > 0)
     {
@@ -710,67 +692,63 @@ WD1797::notification(unsigned int cycleCount)
         }
     }
 
-    charPos = drive->getCharPos(doubleDensity());
-
-    if (charPos == curPos_m)
-    {
-        // TODO density shouldn't affect timing for later - and shouldn't depend on drive/disk
-        // Position hasn't changed just return
-        return;
-    }
-
-    debugss(ssWD1797, ALL, "New character Pos - old: %ld, new: %ld\n", curPos_m, charPos);
-    curPos_m = charPos;
-
     switch (curCommand_m)
     {
         case restoreCmd:
-        {
-            // TODO - set track to 255, and error out if it gets to zero before drive reports zero
-            debugss(ssWD1797, ALL, "restoreCmd\n");
-            if (!drive->getTrackZero())
-            {
-                drive->step(false);
-                stepSettle_m = HeadSettleTimeInTicks_c; // millisecToTicks(seekSpeed_m);
-            }
-            else
+            if (drive && drive->getTrackZero())
             {
                 trackReg_m   = 0;
                 statusReg_m |= stat_TrackZero_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
-            }
+                if (verifyTrack_m)
+                {
+                    verifyTrack(drive);
+                }
 
+                completeCmd();
+            }
+            else
+            {
+                if (trackReg_m)
+                {
+                    --trackReg_m;
+                    if (drive)
+                    {
+                        drive->step(false);
+                    }
+
+                    stepSettle_m = HeadSettleTimeInTicks_c;
+                }
+                else
+                {
+                    // went 255 steps, still not seeing track 0.
+                    if (verifyTrack_m)
+                    {
+                        statusReg_m |= stat_SeekError_c;
+                    }
+                    completeCmd();
+                }
+            }
             break;
-        }
 
         case seekCmd:
             if (dataReg_m != trackReg_m)
             {
                 bool dir = (dataReg_m > trackReg_m);
-                drive->step(dir);
+                if (drive)
+                {
+                    drive->step(dir);
+                }
                 trackReg_m  += (dir ? 1 : -1);
-                stepSettle_m = HeadSettleTimeInTicks_c; // millisecToTicks(seekSpeed_m);
+                stepSettle_m = HeadSettleTimeInTicks_c;
             }
             else
             {
                 if (verifyTrack_m)
                 {
-                    int track, sector, side;
-
-                    // TODO: confirm this works...
-                    if (!drive->readAddress(track, sector, side))
-                    {
-                        statusReg_m |= stat_CRCError_c;
-                    }
-                    else if (track != trackReg_m)
-                    {
-                        statusReg_m |= stat_SeekError_c;
-                    }
+                    verifyTrack(drive);
                 }
 
-                if (drive->getTrackZero())
+                if (drive && drive->getTrackZero())
                 {
                     statusReg_m |= stat_TrackZero_c;
                 }
@@ -778,12 +756,8 @@ WD1797::notification(unsigned int cycleCount)
                 {
                     statusReg_m &= ~stat_TrackZero_c;
                 }
-
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                completeCmd();
             }
-
             break;
 
         case stepCmd:
@@ -791,38 +765,34 @@ WD1797::notification(unsigned int cycleCount)
             {
                 debugss(ssWD1797, INFO, "step out\n");
 
-                if (!drive->getTrackZero())
+                if (drive && drive->getTrackZero())
                 {
-                    drive->step(false);
-
-                    if (drive->getTrackZero())
+                    statusReg_m |= stat_TrackZero_c;
+                }
+                else
+                {
+                    if (drive)
                     {
-                        statusReg_m |= stat_TrackZero_c;
-                    }
-                    else
-                    {
-                        statusReg_m &= ~stat_TrackZero_c;
+                        drive->step(false);
                     }
 
-                    stepSettle_m = HeadSettleTimeInTicks_c; // millisecToTicks(seekSpeed_m);
+                    stepSettle_m = HeadSettleTimeInTicks_c;
 
                     if (stepUpdate_m)
                     {
                         trackReg_m--;
                     }
                 }
-                else
-                {
-                    statusReg_m |= stat_TrackZero_c;
-                }
             }
             else if (stepDirection_m == dir_in)
             {
                 debugss(ssWD1797, INFO, "step in\n");
-
-                drive->step(true);
+                if (drive)
+                {
+                    drive->step(true);
+                }
                 statusReg_m &= ~stat_TrackZero_c;
-                stepSettle_m = HeadSettleTimeInTicks_c; // millisecToTicks(seekSpeed_m);
+                stepSettle_m = HeadSettleTimeInTicks_c;
 
                 if (stepUpdate_m)
                 {
@@ -834,7 +804,7 @@ WD1797::notification(unsigned int cycleCount)
             break;
 
         case stepDoneCmd:
-            if (drive->getTrackZero())
+            if (drive && drive->getTrackZero())
             {
                 statusReg_m |= stat_TrackZero_c;
             }
@@ -843,44 +813,94 @@ WD1797::notification(unsigned int cycleCount)
                 statusReg_m &= ~stat_TrackZero_c;
             }
 
-            statusReg_m &= ~stat_Busy_c;
-            raiseIntrq();
-            curCommand_m = noneCmd;
-            break;
-
-        case noneCmd:
+            completeCmd();
             break;
 
         default:
-            debugss(ssWD1797, WARNING, "default1: %d\n", curCommand_m);
+            debugss(ssWD1797, ERROR, "unexpect command: %d\n", curCommand_m);
             break;
     }
+
+}
+
+void
+WD1797::cmdTypeII_Notification(unsigned int cycleCount)
+{
+    if (userIf_m->readReady())
+    {
+        // Clear notReady
+        statusReg_m &= ~stat_NotReady_c;
+    }
+    else
+    {
+        // Set notReady
+        statusReg_m |= stat_NotReady_c;
+
+        abortCmd();
+        raiseIntrq();
+
+        return;
+    }
+
+    GenericFloppyDrive* drive = getCurDrive();
+
+    if (drive)
+    {
+        if (drive->getIndexPulse())
+        {
+            if (!lastIndexStatus_m)
+            {
+                ++indexCount_m;
+            }
+
+            lastIndexStatus_m = true;
+        }
+        else
+        {
+            lastIndexStatus_m = false;
+        }
+    }
+
+    if (stepSettle_m > 0)
+    {
+
+        if (stepSettle_m > cycleCount)
+        {
+            stepSettle_m -= cycleCount;
+            return;
+        }
+
+        stepSettle_m = 0;
+        missCount_m  = 0;
+    }
+
+    if (!drive)
+    {
+        debugss(ssWD1797, WARNING, "No drive\n");
+        // TODO determine right way to handle this... on MMS controller, ready would
+        // not be set, so it would abort above, abort for now on the H37
+        abortCmd();
+        raiseIntrq();
+
+        return;
+    }
+
+    unsigned long charPos = drive->getCharPos(doubleDensity_m);
+
+    if (charPos == curPos_m)
+    {
+        // Position hasn't changed just return
+        return;
+    }
+    debugss(ssWD1797, ALL, "New character Pos - old: %ld, new: %ld\n", curPos_m, charPos);
+    curPos_m = charPos;
 
     int data;
     int result;
 
     switch (curCommand_m)
     {
-        case restoreCmd:
-        case seekCmd:
-        case stepCmd:
-        case stepDoneCmd: // won't match, but added to silence compiler warning
-        case noneCmd:
-            updateReady(drive);
-
-            if (lastIndexStatus_m)
-            {
-                statusReg_m |= stat_IndexPulse_c;
-            }
-            else
-            {
-                statusReg_m &= ~stat_IndexPulse_c;
-            }
-
-            break;
-
         case readSectorCmd:
-
             debugss(ssWD1797, WARNING, "readSectorCmd - dataReady_m: %d\n", dataReady_m);
             // user may choose to ignore data... must not hang here!
             if (dataReady_m)
@@ -901,7 +921,19 @@ WD1797::notification(unsigned int cycleCount)
             drive->selectSide(side_m);
             debugss(ssWD1797, WARNING, "track: %d, sector: %d, sectorPos_m- %d\n", trackReg_m,
                     sectorReg_m, sectorPos_m);
-            data = drive->readData(doubleDensity(), trackReg_m,
+
+            // TODO only do this once per sector.
+            if (!drive->verifyTrackSector(trackReg_m, sectorReg_m))
+            {
+                debugss(ssWD1797, WARNING, "sector not found track: %d, sector: %d\n", trackReg_m,
+                        sectorReg_m);
+
+                statusReg_m |= stat_RecordNotFound_c;
+                completeCmd();
+                return;
+            }
+
+            data = drive->readData(doubleDensity_m, trackReg_m,
                                    side_m, sectorReg_m, sectorPos_m);
             debugss(ssWD1797, WARNING, "data- %d\n", data);
 
@@ -919,14 +951,11 @@ WD1797::notification(unsigned int cycleCount)
             {
                 BYTE sectors = drive->getMaxSectors(side_m, trackReg_m);
                 debugss(ssWD1797, WARNING, "CRC - sectors: %d\n", sectors);
-                /// \TODO determine proper way to know the number of sectors on the disk.
 
-                if (!multiple_m || sectorReg_m == sectors) // drive->getMaxSectors(side_m, trackReg_m))
+                if (!multiple_m || sectorReg_m == sectors)
                 {
-                    sectorPos_m  = ErrorSectorPos_c;
-                    statusReg_m &= ~stat_Busy_c;
-                    raiseIntrq();
-                    curCommand_m = noneCmd;
+                    sectorPos_m = ErrorSectorPos_c;
+                    completeCmd();
                 }
                 else
                 {
@@ -940,82 +969,27 @@ WD1797::notification(unsigned int cycleCount)
                 // probably ERROR
                 sectorPos_m  = ErrorSectorPos_c;
                 statusReg_m |= stat_CRCError_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                completeCmd();
             }
             else
             {
                 transferData(data);
                 ++sectorPos_m;
             }
-
-            break;
-
-        case readAddressCmd:
-
-            // user may choose to ignore data... must not hang here!
-            if (dataReady_m)
-            {
-                if ((statusReg_m & stat_LostData_c) == 0 && ++missCount_m < 4)
-                {
-                    // wait a little for host to catch up
-                    break;
-                }
-
-                statusReg_m |= stat_LostData_c;
-            }
-
-            missCount_m = 0;
-            drive->selectSide(side_m);
-            // sector '0xfd' indicates a read address
-            data        = drive->readData(doubleDensity(), trackReg_m, side_m,
-                                          0xfd, sectorPos_m);
-
-            if (data == GenericFloppyFormat::NO_DATA)
-            {
-                // just wait for sector to come around..
-                // should never happen, as long as track was formatted.
-            }
-            else if (data == GenericFloppyFormat::ID_AM)
-            {
-                sectorPos_m = 0;
-            }
-            else if (data == GenericFloppyFormat::CRC)
-            {
-                debugss(ssWD1797, INFO, "read address %d - done\n", sectorPos_m);
-                sectorPos_m  = ErrorSectorPos_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
-            }
-            else if (data < 0)
-            {
-                // probably ERROR
-                sectorPos_m  = ErrorSectorPos_c;
-                statusReg_m |= stat_CRCError_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
-            }
-            else
-            {
-                if (sectorPos_m == 0)
-                {
-                    sectorReg_m = data;
-                }
-
-                debugss(ssWD1797, INFO, "read address %d - %02x\n", sectorPos_m, data);
-
-                transferData(data);
-                ++sectorPos_m;
-            }
-
             break;
 
         case writeSectorCmd:
+
+            // TODO only do this once per sector.
+            if (!drive->verifyTrackSector(trackReg_m, sectorReg_m))
+            {
+                statusReg_m |= stat_RecordNotFound_c;
+                completeCmd();
+                return;
+            }
+
             drive->selectSide(side_m);
-            result = drive->writeData(doubleDensity(), trackReg_m, side_m, sectorReg_m,
+            result = drive->writeData(doubleDensity_m, trackReg_m, side_m, sectorReg_m,
                                       sectorPos_m, dataReg_m, dataReady_m);
 
             if (result == GenericFloppyFormat::NO_DATA)
@@ -1034,19 +1008,26 @@ WD1797::notification(unsigned int cycleCount)
             }
             else if (result == GenericFloppyFormat::CRC)
             {
-                sectorPos_m  = ErrorSectorPos_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                BYTE sectors = drive->getMaxSectors(side_m, trackReg_m);
+                debugss(ssWD1797, WARNING, "CRC - sectors: %d\n", sectors);
+
+                if (!multiple_m || sectorReg_m == sectors)
+                {
+                    sectorPos_m = ErrorSectorPos_c;
+                    completeCmd();
+                }
+                else
+                {
+                    sectorReg_m++;
+                    sectorPos_m = InitialSectorPos_c;
+                }
             }
             else if (result < 0)
             {
                 // other errors
                 sectorPos_m  = ErrorSectorPos_c;
                 statusReg_m |= stat_WriteFault_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                completeCmd();
             }
             else
             {
@@ -1054,11 +1035,116 @@ WD1797::notification(unsigned int cycleCount)
                 ++sectorPos_m;
                 raiseDrq();
             }
-
             break;
 
-        case readTrackCmd:
+        default:
+            debugss(ssWD1797, ERROR, "Unexpected cmd: %d\n", curCommand_m);
+            break;
 
+    }
+}
+
+void
+WD1797::cmdTypeIII_Notification(unsigned int cycleCount)
+{
+    if (userIf_m->readReady())
+    {
+        // Clear notReady
+        statusReg_m &= ~stat_NotReady_c;
+    }
+    else
+    {
+        // Set notReady
+        statusReg_m |= stat_NotReady_c;
+
+        // check to see if the current command requires the drive to be ready
+        switch (curCommand_m)
+        {
+            case readTrackCmd:
+            case writeTrackCmd:
+            case readAddressCmd:
+                abortCmd();
+                raiseIntrq();
+                break;
+
+            default:
+                debugss(ssWD1797, ERROR, "Unexpected command: %d\n", curCommand_m);
+
+        }
+        return;
+    }
+
+    GenericFloppyDrive* drive = getCurDrive();
+
+    if (drive)
+    {
+        if (drive->getIndexPulse())
+        {
+            if (!lastIndexStatus_m)
+            {
+                ++indexCount_m;
+                if (formattingState_m == fs_waitingForIndex)
+                {
+                    formattingState_m = fs_writing;
+                }
+            }
+
+            lastIndexStatus_m = true;
+        }
+        else
+        {
+            lastIndexStatus_m = false;
+        }
+    }
+
+    if (stepSettle_m > 0)
+    {
+        if (stepSettle_m > cycleCount)
+        {
+            stepSettle_m -= cycleCount;
+            return;
+        }
+
+        stepSettle_m = 0;
+        missCount_m  = 0;
+    }
+
+    if (!drive)
+    {
+        debugss(ssWD1797, WARNING, "No drive\n");
+        return;
+    }
+
+    unsigned long charPos = 0;
+
+    switch (curCommand_m)
+    {
+        case readTrackCmd:
+        case writeTrackCmd:
+        case readAddressCmd:
+
+            charPos = drive->getCharPos(doubleDensity_m);
+            if (charPos == curPos_m)
+            {
+                // Position hasn't changed just return
+                return;
+            }
+            debugss(ssWD1797, ALL, "New character Pos - old: %ld, new: %ld\n", curPos_m, charPos);
+            curPos_m = charPos;
+            break;
+
+        default:
+            debugss(ssWD1797, ERROR, "Unexpected cmd: %d\n", curCommand_m);
+            break;
+
+    }
+
+    int data;
+    int result;
+
+    switch (curCommand_m)
+    {
+        case readAddressCmd:
             // user may choose to ignore data... must not hang here!
             if (dataReady_m)
             {
@@ -1073,7 +1159,62 @@ WD1797::notification(unsigned int cycleCount)
 
             missCount_m = 0;
             drive->selectSide(side_m);
-            data        = drive->readData(doubleDensity(), trackReg_m, side_m,
+            // sector '0xfd' indicates a read address
+            data        = drive->readData(doubleDensity_m, trackReg_m, side_m,
+                                          0xfd, sectorPos_m);
+
+            if (data == GenericFloppyFormat::NO_DATA)
+            {
+                // just wait for sector to come around..
+                // should never happen, as long as track was formatted.
+            }
+            else if (data == GenericFloppyFormat::ID_AM)
+            {
+                sectorPos_m = 0;
+            }
+            else if (data == GenericFloppyFormat::CRC)
+            {
+                debugss(ssWD1797, INFO, "read address %d - done\n", sectorPos_m);
+                sectorPos_m = ErrorSectorPos_c;
+                completeCmd();
+            }
+            else if (data < 0)
+            {
+                // probably ERROR
+                sectorPos_m  = ErrorSectorPos_c;
+                statusReg_m |= stat_CRCError_c;
+                completeCmd();
+            }
+            else
+            {
+                if (sectorPos_m == 0)
+                {
+                    sectorReg_m = data;
+                }
+
+                debugss(ssWD1797, INFO, "read address %d - %02x\n", sectorPos_m, data);
+
+                transferData(data);
+                ++sectorPos_m;
+            }
+            break;
+
+        case readTrackCmd:
+            // user may choose to ignore data... must not hang here!
+            if (dataReady_m)
+            {
+                if ((statusReg_m & stat_LostData_c) == 0 && ++missCount_m < 4)
+                {
+                    // wait a little for host to catch up
+                    break;
+                }
+
+                statusReg_m |= stat_LostData_c;
+            }
+
+            missCount_m = 0;
+            drive->selectSide(side_m);
+            data        = drive->readData(doubleDensity_m, trackReg_m, side_m,
                                           0xff, sectorPos_m);
 
             if (data == GenericFloppyFormat::NO_DATA)
@@ -1086,36 +1227,28 @@ WD1797::notification(unsigned int cycleCount)
             }
             else if (data == GenericFloppyFormat::CRC)
             {
-                sectorPos_m  = ErrorSectorPos_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                sectorPos_m = ErrorSectorPos_c;
+                completeCmd();
             }
-
             else if (data < 0)
             {
                 // probably ERROR
                 sectorPos_m  = ErrorSectorPos_c;
                 statusReg_m |= stat_CRCError_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                completeCmd();
             }
-
             else
             {
                 transferData(data);
                 ++sectorPos_m;
             }
-
             break;
 
         case writeTrackCmd:
-
             drive->selectSide(side_m);
 
             // \todo
-            result = drive->writeData(doubleDensity(), trackReg_m, side_m, 0xff,
+            result = drive->writeData(doubleDensity_m, trackReg_m, side_m, 0xff,
                                       sectorPos_m, dataReg_m, dataReady_m);
 
             if (result == GenericFloppyFormat::NO_DATA)
@@ -1134,20 +1267,16 @@ WD1797::notification(unsigned int cycleCount)
             }
             else if (result == GenericFloppyFormat::CRC)
             {
-                sectorPos_m  = ErrorSectorPos_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                sectorPos_m = ErrorSectorPos_c;
+                completeCmd();
             }
             else if (result < 0)
             {
                 // other errors
-                debugss(ssWD1797, ERROR, "Error in write track\n");
+                debugss(ssWD1797, WARNING, "Error in write track\n");
                 sectorPos_m  = ErrorSectorPos_c;
                 statusReg_m |= stat_WriteFault_c;
-                statusReg_m &= ~stat_Busy_c;
-                raiseIntrq();
-                curCommand_m = noneCmd;
+                completeCmd();
             }
             else
             {
@@ -1155,14 +1284,112 @@ WD1797::notification(unsigned int cycleCount)
                 ++sectorPos_m;
                 raiseDrq();
             }
-
             break;
 
-        case forceInterruptCmd:
-            // TODO: watch for event(s) and raise interrupt when seen...
+        default:
+            debugss(ssWD1797, ERROR, "Unexpected cmd: %d\n", curCommand_m);
             break;
+
+    }
+}
+
+void
+WD1797::cmdTypeIV_Notification(unsigned int cycleCount)
+{
+    // TODO - determine if once condition is met, does the command terminate.
+
+    if (userIf_m->readReady())
+    {
+        if (cmdIV_notReadyToReady && ((statusReg_m & stat_NotReady_c) == 1))
+        {
+            raiseIntrq();
+        }
+        // Clear notReady
+        statusReg_m &= ~stat_NotReady_c;
+    }
+    else
+    {
+        if (cmdIV_readyToNotReady && ((statusReg_m & stat_NotReady_c) == 0))
+        {
+            raiseIntrq();
+        }
+        // Set notReady
+        statusReg_m |= stat_NotReady_c;
     }
 
+    GenericFloppyDrive* drive = getCurDrive();
+
+    if (drive)
+    {
+        if (drive->getIndexPulse())
+        {
+            if (!lastIndexStatus_m)
+            {
+                ++indexCount_m;
+                if (cmdIV_indexPulse)
+                {
+                    raiseIntrq();
+                }
+            }
+
+            lastIndexStatus_m = true;
+        }
+        else
+        {
+            lastIndexStatus_m = false;
+        }
+    }
+}
+
+
+void
+WD1797::updateStatusTypeI(GenericFloppyDrive* drive)
+{
+    statusReg_m = 0;
+    if (!userIf_m->readReady())
+    {
+        statusReg_m |= stat_NotReady_c;
+    }
+    else
+    {
+        statusReg_m &= ~stat_NotReady_c;
+    }
+
+    if (drive)
+    {
+        if (drive->isWriteProtect())
+        {
+            statusReg_m |= stat_WriteProtect_c;
+        }
+        else
+        {
+            statusReg_m &= ~stat_WriteProtect_c;
+        }
+        /// \todo head load status
+        if (drive->getTrackZero())
+        {
+            statusReg_m |= stat_TrackZero_c;
+        }
+        else
+        {
+            statusReg_m &= ~stat_TrackZero_c;
+        }
+        if (drive->getIndexPulse())
+        {
+            statusReg_m |= stat_IndexPulse_c;
+        }
+        else
+        {
+            statusReg_m &= ~stat_IndexPulse_c;
+        }
+    }
+}
+
+
+void
+WD1797::setDoubleDensity(bool dd)
+{
+    doubleDensity_m = dd;
 }
 
 unsigned long

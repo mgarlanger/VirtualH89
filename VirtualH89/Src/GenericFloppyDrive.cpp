@@ -25,7 +25,8 @@ GenericFloppyDrive::GenericFloppyDrive(unsigned int heads,
                                                                 track_m(0),
                                                                 headSel_m(0),
                                                                 cycleCount_m(0),
-                                                                disk_m(nullptr)
+                                                                disk_m(nullptr),
+                                                                writeProtected_m(false)
 {
     // Can this change on-the-fly?
     ticksPerSec_m = WallClock::instance()->getTicksPerSecond();
@@ -43,7 +44,7 @@ GenericFloppyDrive::GenericFloppyDrive(unsigned int heads,
 
     ticksPerRev_m = (ticksPerSec_m * 60) / driveRpm_m;
     motor_m       = (mediaSize_m == 8);
-    head_m        = (mediaSize_m == 5);
+    headLoaded_m  = (mediaSize_m == 5);
 }
 
 GenericFloppyDrive*
@@ -112,6 +113,12 @@ GenericFloppyDrive::insertDisk(shared_ptr<GenericFloppyDisk> disk)
     if (disk_m)
     {
         disk_m->setDriveType(numTracks_m);
+        writeProtected_m = disk_m->checkWriteProtect();
+
+    }
+    else
+    {
+        writeProtected_m = false;
     }
 }
 
@@ -171,7 +178,6 @@ GenericFloppyDrive::readData(bool dd,
 
     if (dd != disk_m->doubleDensity())
     {
-        // TODO determine why CP/M didn't handle fallback properly.
         debugss(ssGenericFloppyDrive, WARNING, "DD mismatch(%d)\n", dd);
         return GenericFloppyFormat::ERROR;
     }
@@ -206,7 +212,7 @@ GenericFloppyDrive::writeData(bool dd,
                               BYTE data,
                               bool dataReady)
 {
-    int result = GenericFloppyFormat::ERROR;
+    int result = GenericFloppyFormat::NO_DATA;
 
     if (!disk_m)
     {
@@ -226,6 +232,11 @@ GenericFloppyDrive::writeData(bool dd,
         return GenericFloppyFormat::ERROR;
     }
 
+    if ((track_m != track) || (headSel_m != side))
+    {
+        debugss(ssGenericFloppyDrive, ERROR, "track/head mismatch - track(%d - %d) head(%d - %d)\n",
+                track_m, track, headSel_m, side);
+    }
     // override FDC track/side with our own - it's the real one
     if (!disk_m->writeData(track_m, headSel_m, sector, inSector, data, dataReady, result))
     {
@@ -236,14 +247,14 @@ GenericFloppyDrive::writeData(bool dd,
     return result;
 }
 
-// TODO have to restruture this since the wd1797 requires timing..
+
 void
 GenericFloppyDrive::notification(unsigned int cycleCount)
 {
-    // if (disk_m == NULL || !motor_m)
-    // {
-    //    return;
-    // }
+    if (disk_m == NULL || !motor_m)
+    {
+        return;
+    }
 
     cycleCount_m += cycleCount;
     cycleCount_m %= ticksPerRev_m;
@@ -287,6 +298,30 @@ GenericFloppyDrive::readAddress(int& track,
     return true;
 }
 
+
+bool
+GenericFloppyDrive::verifyTrackSector(BYTE track, BYTE sector)
+{
+    if (disk_m == NULL || !motor_m)
+    {
+        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == NULL,
+                motor_m);
+        return false;
+    }
+
+    BYTE realTrack = disk_m->getRealTrackNumber(track_m);
+    BYTE maxSector = disk_m->getMaxSectors(headSel_m, realTrack);
+
+    if ((sector > maxSector) || (realTrack != track))
+    {
+        debugss(ssGenericFloppyDrive, ERROR, "sector/max: %d:%d\n", sector, maxSector);
+        debugss(ssGenericFloppyDrive, ERROR, "realTrack/track: %d:%d\n", realTrack, track);
+        return false;
+    }
+
+    return true;
+}
+
 BYTE
 GenericFloppyDrive::getMaxSectors(BYTE side,
                                   BYTE track)
@@ -299,9 +334,8 @@ GenericFloppyDrive::getMaxSectors(BYTE side,
 
     if (disk_m)
     {
-        return disk_m->getMaxSectors(headSel_m, track_m);
+        return disk_m->getMaxSectors(headSel_m, track);
     }
-
 
     return 0;
 }
@@ -311,7 +345,7 @@ GenericFloppyDrive::headLoad(bool load)
 {
     if (mediaSize_m == 8)
     {
-        head_m = load;
+        headLoaded_m = load;
     }
 }
 
@@ -340,4 +374,22 @@ std::string
 GenericFloppyDrive::getMediaName()
 {
     return (disk_m != NULL ? disk_m->getMediaName() : "");
+}
+
+void
+GenericFloppyDrive::startTrackFormat(BYTE trackNum)
+{
+
+}
+
+void
+GenericFloppyDrive::getDriveStatus(bool& writeProtected,
+                                   bool& headLoaded,
+                                   bool& trackZero,
+                                   bool& indexPulse)
+{
+    writeProtected = writeProtected_m;
+    headLoaded     = headLoaded_m;
+    trackZero      = (track_m == 0);
+    indexPulse     = indexPulse_m;
 }

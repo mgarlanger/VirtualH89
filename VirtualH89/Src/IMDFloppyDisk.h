@@ -57,9 +57,6 @@ class IMDFloppyDisk: public GenericFloppyDisk
     BYTE                                       secLenCode_m;
     bool                                       ready_m;
 
-    bool                                       hypoTrack_m;  // ST media in DT drive
-    bool                                       hyperTrack_m; // DT media in ST drive
-
     // bool          interlaced_m;
     // int           mediaLat_m;
     // BYTE          secLenCode_m;

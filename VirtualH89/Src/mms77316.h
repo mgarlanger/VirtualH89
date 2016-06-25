@@ -10,13 +10,14 @@
 #define MMS77316_H_
 
 
-#include "wd1797.h"
+#include "WD179xUserIf.h"
 #include "DiskController.h"
 #include "propertyutil.h"
 
 class GenericFloppyDrive;
 class GenericDiskDrive;
 class InterruptController;
+class WD1797;
 
 ///
 /// \brief Virtual soft-sectored disk controller
@@ -25,7 +26,7 @@ class InterruptController;
 ///
 /// The MMS77316 uses the 1797-02 controller.
 ///
-class MMS77316: public DiskController, WD1797
+class MMS77316: public DiskController, WD179xUserIf
 {
   public:
     static const int numDisks_c = 8;
@@ -64,19 +65,20 @@ class MMS77316: public DiskController, WD1797
     static const char* MMS77316_Name_c;
 
   private:
+    bool               intrqRaised_m;
+    bool               drqRaised_m;
     void raiseIntrq();
     void raiseDrq();
     void lowerIntrq();
     void lowerDrq();
 
-    static const BYTE MMS77316_NumPorts_c  = 8;
+    static const BYTE    MMS77316_NumPorts_c  = 8;
 
-    static const BYTE BasePort_c           = 0x38;
-    static const BYTE ControlPort_Offset_c = 0;
-    static const BYTE Wd1797_Offset_c      = 4;
-    BYTE              controlReg_m;
+    static const BYTE    BasePort_c           = 0x38;
+    static const BYTE    ControlPort_Offset_c = 0;
+    static const BYTE    Wd1797_Offset_c      = 4;
+    BYTE                 controlReg_m;
 
-    GenericFloppyDrive* getCurDrive();
     int getClockPeriod();
 
     InterruptController* ic_m;
@@ -105,12 +107,12 @@ class MMS77316: public DiskController, WD1797
         return (controlReg_m & ctrl_EnableIntReq_c) != 0 &&
                ((controlReg_m & ctrl_EnableBurstN_c) != 0 || drqCount_m < 1);
     }
-    // These are virtual in wd1797 so it can use it.
-    bool doubleDensity()
-    {
-        return (controlReg_m & ctrl_SetMFMRecordingN_c) == 0;
-    }
     void loadHead(bool load);
+
+    virtual GenericFloppyDrive* getCurrentDrive();
+    virtual bool readReady();
+
+    WD1797* wd1797_m;
 };
 
 #endif // MMS77316_H_

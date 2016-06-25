@@ -8,6 +8,7 @@
 #include "WallClock.h"
 
 #define ANSI 0
+#define PRINT_CLOCK 1
 
 unsigned     debugLevel[ssMax];
 extern FILE* log_out;
@@ -40,7 +41,7 @@ setDebugLevel()
     debugLevel[ssAddressBus]             = defaultLevel; // Address Bus
     debugLevel[ssIO]                     = defaultLevel; // I/O ports
     debugLevel[ssH17]                    = defaultLevel; // H17 controller
-    debugLevel[ssH37]                    = INFO;         // H37 controller
+    debugLevel[ssH37]                    = defaultLevel; // H37 controller
     debugLevel[ssH47]                    = defaultLevel; // H47 controller
     debugLevel[ssH67]                    = defaultLevel; // H67 controller
     debugLevel[ssDiskDrive]              = defaultLevel; // Floppy disks
@@ -52,7 +53,7 @@ setDebugLevel()
     debugLevel[ss8250]                   = defaultLevel; // 8250 Serial Port
     debugLevel[ssTimer]                  = defaultLevel; // 2 mSec Timer
     debugLevel[ssWallClock]              = defaultLevel; // Wall Clock.
-    debugLevel[ssFloppyDisk]             = INFO;         // Floppy Disk
+    debugLevel[ssFloppyDisk]             = defaultLevel; // Floppy Disk
     debugLevel[ssGpp]                    = defaultLevel; // General Purpose Port
     debugLevel[ssParallel]               = defaultLevel; // Parallel Port Interface (Z47)
     debugLevel[ssStdioConsole]           = defaultLevel;
@@ -104,7 +105,9 @@ __debugss(enum logLevel level, const char* functionName, const char* fmt, ...)
     fprintf(log_out, "\x1b[37m");
 #endif
 
+#if PRINT_CLOCK
     WallClock::instance()->printTime(log_out);
+#endif
 
 #if ANSI
     fprintf(log_out, "\x1b[36m%s: \x1b[%dm", functionName, __val);
