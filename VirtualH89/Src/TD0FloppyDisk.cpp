@@ -388,6 +388,7 @@ TD0FloppyDisk::findSector(int side,
                           int sector)
 {
 
+    debugss(ssFloppyDisk, INFO, "findSector - side: %d track %d sector: %d\n", side, track, sector);
     if (hypoTrack_m)
     {
         if ((track & 1) != 0)
@@ -401,6 +402,8 @@ TD0FloppyDisk::findSector(int side,
     {
         track *= 2;
     }
+    debugss(ssFloppyDisk, INFO, "findSector2 - side: %d track %d sector: %d\n", side, track,
+            sector);
 
     if (!tracks_m[side][track])
     {
@@ -445,6 +448,8 @@ TD0FloppyDisk::findSector(int side,
             curSector_m = nullptr;
             return false;
     }
+
+    debugss(ssFloppyDisk, INFO, "findSector - found\n");
 
     return true;
 }

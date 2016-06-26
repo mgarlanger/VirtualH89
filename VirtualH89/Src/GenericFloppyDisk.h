@@ -52,7 +52,9 @@ class GenericFloppyDisk
                            int  inSector,
                            BYTE data,
                            bool dataReady,
-                           int& result)    = 0;
+                           int& result) = 0;
+
+    virtual BYTE getRealTrackNumber(BYTE track);
     virtual BYTE getMaxSectors(BYTE side,
                                BYTE track) = 0;
 
@@ -93,7 +95,6 @@ class GenericFloppyDisk
 
     ///
 /*
-    const char*               imageName_m;
     static const unsigned int maxHeads_c = 2;
 
     std::vector <Track*>      tracks_m[maxHeads_c];

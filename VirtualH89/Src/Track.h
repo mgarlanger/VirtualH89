@@ -47,6 +47,18 @@ class Track
     Density                                density_m;
     DataRate                               dataRate_m;
 
+    enum FormattingState
+    {
+        fs_none,
+        fs_waitingForIndex,
+        fs_writingGap,
+        fs_writingIdRecord,
+        fs_writingUserData
+    };
+
+    FormattingState formattingMode_m;
+
+
   public:
     Track(BYTE sideNum,
           BYTE trackNum);
@@ -61,10 +73,12 @@ class Track
 
     std::shared_ptr<Sector> findSector(BYTE sector);
 
-    bool readSectorData(BYTE  sector,
-                        WORD  pos,
-                        BYTE& data);
+    // bool readSectorData(BYTE  sector,
+    //                    WORD  pos,
+    //                    BYTE& data);
     BYTE getMaxSectors();
+
+    void startFormat();
 
 };
 

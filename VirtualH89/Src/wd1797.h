@@ -25,7 +25,6 @@ class WD179xUserIf;
 class WD1797: public ClockUser
 {
   public:
-    WD1797(int baseAddr = 0);
     WD1797(WD179xUserIf* userIf);
 
     virtual ~WD1797();
@@ -45,10 +44,13 @@ class WD1797: public ClockUser
     static const BYTE TrackPort_Offset_c   = 1;
     static const BYTE SectorPort_Offset_c  = 2;
     static const BYTE DataPort_Offset_c    = 3;
+    void waitForData();
+
+    void setDoubleDensity(bool dd);
 
   protected:
+    WD1797(int baseAddr = 0);
     virtual GenericFloppyDrive* getCurDrive();
-    virtual int getClockPeriod();
     BYTE              basePort_m;
 
     static const BYTE WD1797_NumPorts_c = 4;
@@ -111,13 +113,15 @@ class WD1797: public ClockUser
 
     int               sectorPos_m;
 
-    void waitForData();
     void processCmd(BYTE cmd);
     void processCmdTypeI(BYTE cmd);
     void processCmdTypeII(BYTE cmd);
     void processCmdTypeIII(BYTE cmd);
     void processCmdTypeIV(BYTE cmd);
 
+    void verifyTrack(GenericFloppyDrive* drive);
+
+    void completeCmd();
     void abortCmd();
     unsigned long millisecToTicks(unsigned long ms);
 
@@ -127,7 +131,6 @@ class WD1797: public ClockUser
     virtual void lowerIntrq();
     virtual void lowerDrq();
     virtual void loadHead(bool load);
-    virtual bool doubleDensity();
 
     ///
     /// Commands sent to CommandPort_c
@@ -314,20 +317,46 @@ class WD1797: public ClockUser
     /// stat_DataRequest_c    - 0x02;
     /// stat_Busy_c           - 0x01;
 
-    static const int   sectorLengths[2][4];
-    static const int   HeadSettleTimeInTicks_c = 100;
-    static const int   InitialSectorPos_c      = -11;
-    static const int   ErrorSectorPos_c        = -1;
+    static const int sectorLengths[2][4];
+    static const int HeadSettleTimeInTicks_c = 100;
+    static const int InitialSectorPos_c      = -11;
+    static const int ErrorSectorPos_c        = -1;
 
   private:
+    typedef void (WD1797::* notificationMethod)(unsigned int cycleCount);
+
+    notificationMethod curNotification;
+
+    void noneNotification(unsigned int cycleCount);
+    void cmdTypeI_Notification(unsigned int cycleCount);
+    void cmdTypeII_Notification(unsigned int cycleCount);
+    void cmdTypeIII_Notification(unsigned int cycleCount);
+    void cmdTypeIV_Notification(unsigned int cycleCount);
+
+    bool               cmdIV_readyToNotReady;
+    bool               cmdIV_notReadyToReady;
+    bool               cmdIV_indexPulse;
+
     WD179xUserIf*      userIf_m;
 
     unsigned long long cycleCount_m;
 
+    enum FormattingState
+    {
+        fs_none,
+        fs_waitingForIndex,
+        fs_writing
+    };
+
+    FormattingState formattingState_m;
+
+    bool            doubleDensity_m;
+    bool            immediateInterruptSet_m;
+
+    void updateStatusTypeI(GenericFloppyDrive* drive);
     void transferData(int data);
-    void updateReady(GenericFloppyDrive* drive);
-    bool               checkAddr(BYTE addr[6]);
-    int                sectorLen(BYTE addr[6]);
+    // bool checkAddr(BYTE addr[6]);
+    // int  sectorLen(BYTE addr[6]);
 
 };
 

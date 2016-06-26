@@ -79,7 +79,6 @@ class Z_89_37: public DiskController, WD179xUserIf
     virtual void raiseDrq();
     virtual void lowerIntrq();
     virtual void lowerDrq();
-    virtual bool doubleDensity();
     virtual bool readReady();
     // virtual void loadHead(bool load);
     virtual int getClockPeriod();
@@ -88,7 +87,7 @@ class Z_89_37: public DiskController, WD179xUserIf
     void motorOn(bool motor);
 
     Computer*            computer_m;
-    WD1797*              wd1797;
+    WD1797*              wd1797_m;
     InterruptController* ic_m;
 
     static const BYTE    H37_NumPorts_c = 4;
@@ -144,7 +143,6 @@ class Z_89_37: public DiskController, WD179xUserIf
 
     bool                sectorTrackAccess_m;
 
-    Encoding            dataEncoding_m;
     DiskDrive*          drives_m[numDisks_c];
     GenericFloppyDrive* genericDrives_m[numDisks_c];
     Disks               curDiskDrive_m;

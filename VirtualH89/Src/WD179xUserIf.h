@@ -21,7 +21,6 @@ class WD179xUserIf
     virtual void lowerIntrq()                     = 0;
     virtual void lowerDrq()                       = 0;
     virtual void loadHead(bool load);
-    virtual bool doubleDensity()                  = 0;
     virtual GenericFloppyDrive* getCurrentDrive() = 0;
     virtual int getClockPeriod()                  = 0;
     virtual bool readReady()                      = 0;

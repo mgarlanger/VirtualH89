@@ -14,6 +14,8 @@
 
 #include "h89Types.h"
 
+#include "ClockUser.h"
+
 /// \cond
 #include <memory>
 /// \endcond
@@ -26,7 +28,7 @@ class GenericFloppyDisk;
 /// Implements a virtual floppy disk drive. Supports 48/96 tpi 5.25",
 /// 48 tpi 8", either can be SS or DS. Note, the media determines density.
 ///
-class GenericFloppyDrive: public GenericDiskDrive
+class GenericFloppyDrive: public GenericDiskDrive, ClockUser
 {
   public:
     enum DriveType
@@ -46,7 +48,7 @@ class GenericFloppyDrive: public GenericDiskDrive
     bool readAddress(int& track,
                      int& sector,
                      int& side);
-
+    bool verifyTrackSector(BYTE track, BYTE sector);
     void step(bool direction);
     void selectSide(BYTE side);
 
@@ -73,6 +75,10 @@ class GenericFloppyDrive: public GenericDiskDrive
 
     void headLoad(bool load); // Ignored on 5.25" drives?
     void motor(bool on);      // Ignored on 8" drives
+    void getDriveStatus(bool& writeProtected,
+                        bool& headLoaded,
+                        bool& trackZero,
+                        bool& indexPulse);
     bool getIndexPulse()
     {
         return indexPulse_m;
@@ -90,6 +96,8 @@ class GenericFloppyDrive: public GenericDiskDrive
 
     std::string getMediaName();
 
+    void startTrackFormat(BYTE trackNum);
+
   private:
     unsigned int                       numTracks_m;
     unsigned int                       numHeads_m;
@@ -105,7 +113,8 @@ class GenericFloppyDrive: public GenericDiskDrive
     int                                headSel_m;
     int                                track_m;
     bool                               motor_m;
-    bool                               head_m;
+    bool                               headLoaded_m;
+    bool                               writeProtected_m;
 
     GenericFloppyDrive(unsigned int heads,
                        unsigned int tracks,

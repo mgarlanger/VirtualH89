@@ -40,8 +40,6 @@ IMDFloppyDisk::IMDFloppyDisk(vector<string> argv): GenericFloppyDisk(),
                                                    dataPos_m(0),
                                                    sectorLength_m(0),
                                                    secLenCode_m(0),
-                                                   hypoTrack_m(false),
-                                                   hyperTrack_m(false),
                                                    ready_m(true)
 {
     if (argv.size() < 1)
@@ -410,7 +408,19 @@ IMDFloppyDisk::readData(BYTE track,
         switch (inSector)
         {
             case 0:
-                data = track;
+                if (hypoTrack_m)
+                {
+                    data = track / 2;
+                }
+                else if (hyperTrack_m)
+                {
+                    data = track * 2;
+                }
+                else
+                {
+                    data = track;
+                }
+                break;
                 break;
 
             case 1:
@@ -548,7 +558,7 @@ BYTE
 IMDFloppyDisk::getMaxSectors(BYTE side,
                              BYTE track)
 {
-    if (!tracks_m[side][track])
+    if ((track > tracks_m[side].size()) || !tracks_m[side][track])
     {
         return 0;
     }

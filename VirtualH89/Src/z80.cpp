@@ -1803,7 +1803,7 @@ Z80::execute(WORD numInst)
             PC        = 0x66;
             mode      = cm_running;
             R++; // increment refresh register
-            ticks -= 11;
+            ticks    -= 11;
         }
         else if ((int_type & Intr_INT) && (IFF1))
         {
@@ -1816,7 +1816,7 @@ Z80::execute(WORD numInst)
             {
                 case 0:
                     debugss(ssZ80, VERBOSE, "Processing interrupt mode 0\n");
-                    ticks -= 2;
+                    ticks         -= 2;
                     processingIntr = true;
                     break;
 
