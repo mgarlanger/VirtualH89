@@ -4,7 +4,6 @@
 /// \author Mark Garlanger
 ///
 
-
 #include "INS8250.h"
 
 #include "computer.h"
@@ -12,7 +11,6 @@
 #include "logger.h"
 
 #include "SerialPortDevice.h"
-
 
 INS8250::INS8250(Computer* computer,
                  BYTE      base,
@@ -37,7 +35,6 @@ INS8250::INS8250(Computer* computer,
                                       saveMCR(0),
                                       saveLSR(0),
                                       saveMSR(MSB_ClearToSend | MSB_DataSetReady)
-
 {
     intLevel_m = intLevel;
 
@@ -100,7 +97,6 @@ INS8250::in(BYTE addr)
                         val                     = RecvBuf;
                     }
                 }
-
                 break;
 
             case IER: // Interrupt Enable Register
@@ -114,7 +110,6 @@ INS8250::in(BYTE addr)
                 {
                     val = saveIER;
                 }
-
                 break;
 
             case IIR: // Interrupt Identification Register
@@ -126,7 +121,6 @@ INS8250::in(BYTE addr)
                 {
                     val = IIR_NoInterruptPending;
                 }
-
                 break;
 
             case LCR: // Line Control Register
@@ -170,7 +164,6 @@ INS8250::in(BYTE addr)
                     val |= LSB_ParityError;
                     PE_m = false;
                 }
-
                 break;
 
             case MSR: // Modem Status Register
@@ -231,7 +224,6 @@ INS8250::out(BYTE addr,
 
                     debugss(ss8250, INFO, "baud_m = %d\n", baud_m);
                 }
-
                 break;
 
             case IER:
@@ -247,7 +239,6 @@ INS8250::out(BYTE addr,
                     {
                         ERBFI_m = false;
                     }
-
                 }
                 else
                 {
@@ -263,7 +254,6 @@ INS8250::out(BYTE addr,
 
                     debugss(ss8250, INFO, "baud_m = %d\n", baud_m);
                 }
-
                 break;
 
             case IIR:

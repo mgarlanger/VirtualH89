@@ -26,9 +26,8 @@
 /// \endcond
 
 
-
 // \TODO make this run-time config.
-#define CONSOLE_LOG 0
+#define CONSOLE_LOG 1
 
 static pthread_mutex_t h19_mutex;
 
@@ -36,6 +35,8 @@ H19*                   H19::h19;
 unsigned int           H19::screenRefresh_m = screenRefresh_c;
 
 H19::H19(std::string sw401, std::string sw402): Console(0, nullptr),
+                                                countdownToSend_m(0),
+                                                characterDelay_m(2133),
                                                 updated_m(true),
                                                 offline_m(false),
                                                 curCursor_m(false)
@@ -110,7 +111,6 @@ H19::setSW402(BYTE sw402)
     cursorBlock_m = ((sw402 & BlockCursor) == BlockCursor);
 }
 
-
 bool
 H19::checkUpdated()
 {
@@ -168,8 +168,8 @@ void
 H19::display()
 {
     pthread_mutex_lock(&h19_mutex);
-    // GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
-    GLfloat color[3] = {0.0, 1.0, 0.0}; // green
+    GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
+    //GLfloat color[3] = {0.0, 1.0, 0.0}; // green
     // GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
     // GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
     // GLfloat color[3] = { 0.0, 0.8, 0.0 };
@@ -217,7 +217,6 @@ void
 H19::keypress(char ch)
 {
     pthread_mutex_lock(&h19_mutex);
-    /// \todo - Send the key to the serial port unless offline.
 
     /// \todo fix this
     if (offline_m)
@@ -234,7 +233,6 @@ H19::keypress(char ch)
             // has separate cursor keys that are always active,
             // so it is as if the user pressed SHIFT to get the code.
             sendData(ascii::ESC);
-            usleep(2000);
             sendData(ch & 0x7f);
         }
         else
@@ -280,6 +278,15 @@ H19::reset()
     }
 }
 
+void
+H19::consoleLog(std::string message)
+{
+#if CONSOLE_LOG
+    fprintf(console_out, "%s", message.c_str());
+#endif
+
+}
+
 
 void
 H19::processCharacter(char ch)
@@ -322,23 +329,16 @@ H19::processCharacter(char ch)
 
             case ascii::BEL: // Rings the bell.
                 /// \todo - implement ringing bell.
-#if CONSOLE_LOG
-                fprintf(console_out, "<BEL>");
-#endif
-
+                consoleLog("<BEL>");
                 break;
 
             case ascii::BS: // Backspace
-#if CONSOLE_LOG
-                fprintf(console_out, "<BS>");
-#endif
+                consoleLog("<BS>");
                 processBS();
                 break;
 
             case ascii::HT: // Horizontal Tab
-#if CONSOLE_LOG
-                fprintf(console_out, "<TAB>");
-#endif
+                consoleLog("<TAB>");
                 processTAB();
                 break;
 
@@ -350,9 +350,7 @@ H19::processCharacter(char ch)
                     processCR();
                 }
 
-#if CONSOLE_LOG
-                fprintf(console_out, "\n");
-#endif
+                consoleLog("\n");
                 break;
 
             case ascii::CR: // Carriage Return
@@ -370,10 +368,7 @@ H19::processCharacter(char ch)
 
             case ascii::ESC: // Escape
                 mode_m = Escape;
-#if CONSOLE_LOG
-                fprintf(console_out, "<ESC>");
-#endif
-
+                consoleLog("<ESC>");
                 break;
 
             default:
@@ -1512,3 +1507,42 @@ H19::run()
 
     glutMainLoop();
 }
+
+bool
+H19::sendData(BYTE data)
+{
+    if (countdownToSend_m == 0)
+    {
+        Console::sendData(data);
+        countdownToSend_m = characterDelay_m;
+    }
+    else
+    {
+        charToSend.push(data);
+    }
+    return true;
+}
+
+void
+H19::notification(unsigned int cycleCount)
+{
+    if (countdownToSend_m < cycleCount)
+    {
+        if (charToSend.empty())
+        {
+            countdownToSend_m = 0;
+        }
+        else
+        {
+            Console::sendData(charToSend.front());
+            charToSend.pop();
+            countdownToSend_m = characterDelay_m;
+        }
+    }
+    else
+    {
+        countdownToSend_m -= cycleCount;
+        return;
+    }
+}
+

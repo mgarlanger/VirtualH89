@@ -9,6 +9,7 @@
 
 
 #include "Console.h"
+#include "ClockUser.h"
 
 //
 // OpenGL Headers
@@ -19,6 +20,7 @@
 #else
 #include <GL/gl.h>
 #endif
+#include <queue>
 /// \endcond
 
 
@@ -28,7 +30,7 @@
 /// Virtual Heathkit H19 Terminal that utilizes the GLUT framework to
 /// render a pixel accurate emulation of the terminal.
 ///
-class H19: public Console // , public BaseThread
+class H19: public Console, public ClockUser // , public BaseThread
 {
   public:
     H19(std::string sw401 = "10001100", std::string sw402 = "00000101");
@@ -39,18 +41,18 @@ class H19: public Console // , public BaseThread
 
     virtual void display();
     virtual void processCharacter(char ch);
-
     virtual void keypress(char ch);
-
     virtual void receiveData(BYTE);
 
     virtual bool checkUpdated();
-
     virtual unsigned int getBaudRate();
 
     virtual void run();
+    void notification(unsigned int cycleCount);
+    virtual bool sendData(BYTE data);
 
   private:
+    
     static void glDisplay();
     static void reshape(int w,
                         int h);
@@ -66,6 +68,8 @@ class H19: public Console // , public BaseThread
     static unsigned int       screenRefresh_m;
     void initGl();
 
+    void consoleLog(std::string message);
+    
     // screen size
     static const unsigned int cols_c     = 80;
     static const unsigned int rows_c     = 25;
@@ -85,6 +89,10 @@ class H19: public Console // , public BaseThread
     bool         updated_m;
     BYTE         sw401_m;
     BYTE         sw402_m;
+
+    std::queue<BYTE> charToSend;
+    unsigned long countdownToSend_m;
+    unsigned long characterDelay_m;
 
     // display modes
     bool         reverseVideo_m;
