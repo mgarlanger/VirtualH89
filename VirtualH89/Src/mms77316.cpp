@@ -251,16 +251,16 @@ MMS77316::out(BYTE addr,
         debugss(ssMMS77316, VERBOSE, "(ControlPort) %02x\n", val);
         controlReg_m = val;
         drqCount_m   = 0;
+        GenericFloppyDrive* drive = getCurrentDrive();
 
         if ((controlReg_m & ctrl_525DriveSel_c) != 0)
         {
-            GenericFloppyDrive* drive = getCurrentDrive();
-
             if (drive)
             {
                 drive->motor(true);
             }
         }
+        wd1797_m->setCurrentDrive(drive);
 
         wd1797_m->setDoubleDensity((controlReg_m & ctrl_SetMFMRecordingN_c) == 0);
 

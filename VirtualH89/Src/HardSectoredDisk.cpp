@@ -174,6 +174,18 @@ HardSectoredDisk::writeData(BYTE          side,
 
     if (initialized_m)
     {
+        // if we write beyond the current max, update it, since it's likely
+        // being  formatted.
+        if (side == sides_m)
+        {
+            sides_m = side + 1;
+        }
+        /* \TODO have to handle 80/40 tracks on drive vs disk better.
+           if (track == tracks_m && tracks_m == 40)
+           {
+            tracks_m = 80;
+           }*/
+
         if ((track < maxTracksPerSide_c) && (pos < bytesPerTrack_c))
         {
             rawImage_m[side][track][pos] = data;
@@ -244,7 +256,7 @@ HardSectoredDisk::defaultHoleStatus(unsigned long pos)
 void
 HardSectoredDisk::dump()
 {
-    debugss(ssFloppyDisk, ALL, "Not Implemented\n");
+    debugss(ssFloppyDisk, ERROR, "Not Implemented\n");
 }
 
 void
@@ -285,6 +297,6 @@ HardSectoredDisk::readSectorData(BYTE  side,
                                  WORD  pos,
                                  BYTE& data)
 {
-    debugss(ssFloppyDisk, ALL, "Not Implemented\n");
+    debugss(ssFloppyDisk, ERROR, "Not Implemented\n");
     return false;
 }

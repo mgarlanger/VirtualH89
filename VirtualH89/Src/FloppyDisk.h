@@ -13,8 +13,6 @@
 #include "h89Types.h"
 
 
-class DiskData;
-
 /// \class FloppyDisk
 ///
 /// \brief A virtual floppy disk base class.
@@ -55,6 +53,7 @@ class FloppyDisk
 
   private:
     bool         writeProtect_m;
+
   protected:
     BYTE         maxTrack_m;
     unsigned int maxPos_m;

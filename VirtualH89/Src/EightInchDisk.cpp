@@ -5,7 +5,7 @@
 /// \date Aug 5, 2013
 /// \author Mark Garlanger
 ///
-
+#if 0
 #include "EightInchDisk.h"
 
 
@@ -178,4 +178,5 @@ EightInchDisk::dump(void)
 {
     SoftSectoredDisk::dump();
 }
+#endif
 #endif

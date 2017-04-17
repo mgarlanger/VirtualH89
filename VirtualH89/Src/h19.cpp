@@ -168,8 +168,8 @@ void
 H19::display()
 {
     pthread_mutex_lock(&h19_mutex);
-    GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
-    //GLfloat color[3] = {0.0, 1.0, 0.0}; // green
+    GLfloat color[3] = {1.0, 1.0, 0.0}; // amber
+    // GLfloat color[3] = {0.0, 1.0, 0.0}; // green
     // GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
     // GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
     // GLfloat color[3] = { 0.0, 0.8, 0.0 };
@@ -1545,4 +1545,3 @@ H19::notification(unsigned int cycleCount)
         return;
     }
 }
-

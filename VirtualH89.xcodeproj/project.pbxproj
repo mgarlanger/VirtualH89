@@ -29,6 +29,7 @@
 		A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989B1C7A3850000CF03B /* RawFloppyImage.cpp */; };
 		A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989E1C7A385C000CF03B /* wd1797.cpp */; };
 		A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */; };
+		A18890C41D22297000268050 /* DiskSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A18890C21D22297000268050 /* DiskSide.cpp */; };
 		A192FCD91CDFB68100B4E8D5 /* Memory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */; };
 		A192FCDD1CDFBF7800B4E8D5 /* MemoryLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */; };
 		A192FCE11CDFC43E00B4E8D5 /* SystemMemory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */; };
@@ -79,6 +80,9 @@
 		A1A434641C7060430015F838 /* z80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434341C7060430015F838 /* z80.cpp */; };
 		A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434651C7063C40015F838 /* OpenGL.framework */; };
 		A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A434671C7063CF0015F838 /* GLUT.framework */; };
+		A1A905C71D96533200E0E198 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A905C61D96533200E0E198 /* main.cpp */; };
+		A1A905CB1D96589200E0E198 /* H89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434021C7060430015F838 /* H89.cpp */; };
+		A1A905CC1D96589900E0E198 /* z80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A434341C7060430015F838 /* z80.cpp */; };
 		A1CA80A21CC20F7D004A11B7 /* IOBus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1CA80A01CC20F7D004A11B7 /* IOBus.cpp */; };
 		A1CA80A51CC46F5E004A11B7 /* IMDFloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */; };
 		A1CA80A81CD73EAE004A11B7 /* TD0FloppyDisk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1CA80A61CD73EAE004A11B7 /* TD0FloppyDisk.cpp */; };
@@ -86,6 +90,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		A1A433BE1C705D310015F838 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		A1A905C21D96533200E0E198 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -148,6 +161,8 @@
 		A13C989F1C7A385C000CF03B /* wd1797.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wd1797.h; sourceTree = "<group>"; };
 		A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WD179xUserIf.cpp; sourceTree = "<group>"; };
 		A15861A81CB8DCE500D3382D /* WD179xUserIf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WD179xUserIf.h; sourceTree = "<group>"; };
+		A18890C21D22297000268050 /* DiskSide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskSide.cpp; sourceTree = "<group>"; };
+		A18890C31D22297000268050 /* DiskSide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskSide.h; sourceTree = "<group>"; };
 		A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory8K.cpp; sourceTree = "<group>"; };
 		A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryLayout.cpp; sourceTree = "<group>"; };
 		A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemMemory8K.cpp; sourceTree = "<group>"; };
@@ -253,6 +268,8 @@
 		A1A434651C7063C40015F838 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		A1A434671C7063CF0015F838 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		A1A4346C1C719B560015F838 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		A1A905C41D96533200E0E198 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1A905C61D96533200E0E198 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A1CA80A01CC20F7D004A11B7 /* IOBus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOBus.cpp; sourceTree = "<group>"; };
 		A1CA80A11CC20F7D004A11B7 /* IOBus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOBus.h; sourceTree = "<group>"; };
 		A1CA80A31CC46F5E004A11B7 /* IMDFloppyDisk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IMDFloppyDisk.cpp; sourceTree = "<group>"; };
@@ -268,6 +285,13 @@
 			files = (
 				A1A4346B1C7197F70015F838 /* GLUT.framework in Frameworks */,
 				A1A434661C7063C40015F838 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1A905C11D96533200E0E198 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +313,7 @@
 				A1A434671C7063CF0015F838 /* GLUT.framework */,
 				A1A434651C7063C40015F838 /* OpenGL.framework */,
 				A1A433C21C705D310015F838 /* VirtualH89 */,
+				A1A905C51D96533200E0E198 /* Test */,
 				A1A433C11C705D310015F838 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -297,6 +322,7 @@
 			isa = PBXGroup;
 			children = (
 				A1A433C01C705D310015F838 /* VirtualH89 */,
+				A1A905C41D96533200E0E198 /* Test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -347,6 +373,8 @@
 				A1A433E21C7060430015F838 /* DiskData.h */,
 				A1A433E31C7060430015F838 /* DiskDrive.cpp */,
 				A1A433E41C7060430015F838 /* DiskDrive.h */,
+				A18890C21D22297000268050 /* DiskSide.cpp */,
+				A18890C31D22297000268050 /* DiskSide.h */,
 				A1A433E51C7060430015F838 /* EightInchDisk.cpp */,
 				A1A433E61C7060430015F838 /* EightInchDisk.h */,
 				A1A433E71C7060430015F838 /* EventHandler.cpp */,
@@ -482,6 +510,14 @@
 			path = Src;
 			sourceTree = "<group>";
 		};
+		A1A905C51D96533200E0E198 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				A1A905C61D96533200E0E198 /* main.cpp */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -502,17 +538,37 @@
 			productReference = A1A433C01C705D310015F838 /* VirtualH89 */;
 			productType = "com.apple.product-type.tool";
 		};
+		A1A905C31D96533200E0E198 /* Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1A905CA1D96533200E0E198 /* Build configuration list for PBXNativeTarget "Test" */;
+			buildPhases = (
+				A1A905C01D96533200E0E198 /* Sources */,
+				A1A905C11D96533200E0E198 /* Frameworks */,
+				A1A905C21D96533200E0E198 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test;
+			productName = Test;
+			productReference = A1A905C41D96533200E0E198 /* Test */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		A1A433B81C705D310015F838 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Mark Garlanger";
 				TargetAttributes = {
 					A1A433BF1C705D310015F838 = {
 						CreatedOnToolsVersion = 7.2.1;
+					};
+					A1A905C31D96533200E0E198 = {
+						CreatedOnToolsVersion = 7.3.1;
 					};
 				};
 			};
@@ -529,6 +585,7 @@
 			projectRoot = "";
 			targets = (
 				A1A433BF1C705D310015F838 /* VirtualH89 */,
+				A1A905C31D96533200E0E198 /* Test */,
 			);
 		};
 /* End PBXProject section */
@@ -543,6 +600,7 @@
 				A1A434371C7060430015F838 /* AddressBus.cpp in Sources */,
 				A13C98891C7A3805000CF03B /* GenericFloppyDisk.cpp in Sources */,
 				A13C98951C7A382D000CF03B /* MMS316IntrCtrlr.cpp in Sources */,
+				A18890C41D22297000268050 /* DiskSide.cpp in Sources */,
 				A1A434611C7060430015F838 /* WallClock.cpp in Sources */,
 				A1A4345A1C7060430015F838 /* Sector.cpp in Sources */,
 				A13BEE861C9A809100C7E65A /* H37InterruptController.cpp in Sources */,
@@ -614,6 +672,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1A905C01D96533200E0E198 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1A905CC1D96589900E0E198 /* z80.cpp in Sources */,
+				A1A905CB1D96589200E0E198 /* H89.cpp in Sources */,
+				A1A905C71D96533200E0E198 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -630,8 +698,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -673,8 +743,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -718,6 +790,22 @@
 			};
 			name = Release;
 		};
+		A1A905C81D96533200E0E198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A1A905C91D96533200E0E198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -735,6 +823,15 @@
 			buildConfigurations = (
 				A1A433C81C705D310015F838 /* Debug */,
 				A1A433C91C705D310015F838 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1A905CA1D96533200E0E198 /* Build configuration list for PBXNativeTarget "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A905C81D96533200E0E198 /* Debug */,
+				A1A905C91D96533200E0E198 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

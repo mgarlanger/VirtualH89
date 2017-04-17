@@ -251,7 +251,7 @@ H17::out(BYTE addr,
             break;
 
         case FillPortOffset_c:
-            debugss(ssH17, ERROR, " h17.out(Fill) - 0x%02x\n", val);
+            debugss(ssH17, INFO, " h17.out(Fill) - 0x%02x\n", val);
 
             fillChar_m = val;
             break;

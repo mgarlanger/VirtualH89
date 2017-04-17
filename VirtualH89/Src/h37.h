@@ -13,7 +13,6 @@
 #include "propertyutil.h"
 
 class GenericFloppyDrive;
-class DiskDrive;
 class WD1797;
 class InterruptController;
 class Computer;
@@ -22,11 +21,10 @@ class Computer;
 /// \brief Virtual soft-sectored disk controller
 ///
 /// A virtual Heathkit soft-sectored disk controller (Z-89-37).
-/// Note: this is NOT complete or even marginally functional.
 ///
 /// The Z-89-37 uses the 1797-02 controller.
 ///
-class Z_89_37: public DiskController, WD179xUserIf
+class Z_89_37: public DiskController, public WD179xUserIf
 {
   public:
     Z_89_37(Computer* computer, int baseAddr, InterruptController* ic);
@@ -41,8 +39,6 @@ class Z_89_37: public DiskController, WD179xUserIf
     virtual void out(BYTE addr,
                      BYTE val);
 
-    virtual bool connectDrive(BYTE       unitNum,
-                              DiskDrive* drive);
     virtual bool connectDrive(BYTE                unitNum,
                               GenericFloppyDrive* drive);
 
@@ -51,8 +47,6 @@ class Z_89_37: public DiskController, WD179xUserIf
     virtual bool removeDrive(BYTE unitNum);
 
     virtual void reset(void);
-
-    static const BYTE z_89_37_Intr_c = 4;
 
     // TODO: implement this
     std::vector<GenericDiskDrive*> getDiskDrives()
@@ -80,7 +74,6 @@ class Z_89_37: public DiskController, WD179xUserIf
     virtual void lowerIntrq();
     virtual void lowerDrq();
     virtual bool readReady();
-    // virtual void loadHead(bool load);
     virtual int getClockPeriod();
 
   private:
@@ -93,7 +86,7 @@ class Z_89_37: public DiskController, WD179xUserIf
     static const BYTE    H37_NumPorts_c = 4;
 
     ///
-    /// DK.PORT  - 0170 (0x78) base port.
+    /// DK.PORT  - Octal - 0170 (0x78) base port.
     ///
     // DK.PORT
     static const BYTE BasePort_c                = 0x78;
@@ -126,12 +119,6 @@ class Z_89_37: public DiskController, WD179xUserIf
     bool              dataReady_m;
     bool              lostDataStatus_m;
 
-    enum Encoding
-    {
-        FM  = 0,
-        MFM = 1
-    };
-
     enum Disks
     {
         ds0        = 0,
@@ -143,14 +130,8 @@ class Z_89_37: public DiskController, WD179xUserIf
 
     bool                sectorTrackAccess_m;
 
-    DiskDrive*          drives_m[numDisks_c];
     GenericFloppyDrive* genericDrives_m[numDisks_c];
     Disks               curDiskDrive_m;
-
-    unsigned char       intLevel_m;
-    unsigned long int   curPos_m;
-
-    int                 sectorPos_m;
 
     bool                intrqAllowed_m;
     bool                drqAllowed_m;
@@ -159,22 +140,28 @@ class Z_89_37: public DiskController, WD179xUserIf
 
 
     /// Bits set in cmd_ControlPort_c - DK.CON
-    static const BYTE   ctrl_EnableIntReq_c    = 0x01;
-    static const BYTE   ctrl_EnableDrqInt_c    = 0x02;
-    static const BYTE   ctrl_SetMFMRecording_c = 0x04;
-    static const BYTE   ctrl_MotorsOn_c        = 0x08;
-    static const BYTE   ctrl_Drive_0_c         = 0x10;
-    static const BYTE   ctrl_Drive_1_c         = 0x20;
-    static const BYTE   ctrl_Drive_2_c         = 0x40;
-    static const BYTE   ctrl_Drive_3_c         = 0x80;
+    enum ControlBits : BYTE
+    {
+        ctrl_EnableIntReq_c    = 0x01,
+        ctrl_EnableDrqInt_c    = 0x02,
+        ctrl_SetMFMRecording_c = 0x04,
+        ctrl_MotorsOn_c        = 0x08,
+        ctrl_Drive_0_c         = 0x10,
+        ctrl_Drive_1_c         = 0x20,
+        ctrl_Drive_2_c         = 0x40,
+        ctrl_Drive_3_c         = 0x80
+    };
 
     /// Bits to set alternate registers on InterfaceControl_c - DK.INT
-    static const BYTE   if_SelectCommandData_c = 0x00;
-    static const BYTE   if_SelectSectorTrack_c = 0x01;
+    enum InterfaceControlBits : BYTE
+    {
+        if_SelectCommandData_c = 0x00,
+        if_SelectSectorTrack_c = 0x01
+    };
 
     /// Floppy disk related items
-    static const int    bytesPerTrack_c        = 6400;
-    static const int    clocksPerByte_c        = 64;
+    // static const int    bytesPerTrack_c        = 6400;
+    // static const int    clocksPerByte_c        = 64;
 };
 
 #endif // Z_89_37_H_

@@ -431,7 +431,7 @@ HostFileBdos::readSeq(uint8_t* msgbuf, int len)
         len *= 128;
         lseek(fd, len, SEEK_SET);
     }
-    int rc = read(fd, &msgbuf[37], 128);
+    ssize_t rc = read(fd, &msgbuf[37], 128);
     if (fcb->cr > 127)
     {
         fcb->cr   = 0;
@@ -468,7 +468,7 @@ HostFileBdos::writeSeq(uint8_t* msgbuf, int len)
         msgbuf[0] = 9;
         return 1;
     }
-    int rc = write(fd, &msgbuf[37], 128);
+    ssize_t rc = write(fd, &msgbuf[37], 128);
     if (fcb->cr > 127)
     {
         fcb->cr   = 0;
@@ -562,7 +562,7 @@ HostFileBdos::readRand(uint8_t* msgbuf, int len)
         return 1;
     }
     seekFile(fcb);
-    int rc = read(fd, &msgbuf[37], 128);
+    ssize_t rc = read(fd, &msgbuf[37], 128);
     seekFile(fcb);
     if (rc < 0)
     {
@@ -592,7 +592,7 @@ HostFileBdos::writeRand(uint8_t* msgbuf, int len)
         return 1;
     }
     seekFile(fcb);
-    int rc = write(fd, &msgbuf[37], 128);
+    ssize_t rc = write(fd, &msgbuf[37], 128);
     seekFile(fcb);
     if (rc < 0)
     {

@@ -26,7 +26,7 @@ class WD1797;
 ///
 /// The MMS77316 uses the 1797-02 controller.
 ///
-class MMS77316: public DiskController, WD179xUserIf
+class MMS77316: public DiskController, public WD179xUserIf
 {
   public:
     static const int numDisks_c = 8;
@@ -67,6 +67,7 @@ class MMS77316: public DiskController, WD179xUserIf
   private:
     bool               intrqRaised_m;
     bool               drqRaised_m;
+
     void raiseIntrq();
     void raiseDrq();
     void lowerIntrq();

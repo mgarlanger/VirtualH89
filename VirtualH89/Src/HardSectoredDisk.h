@@ -11,7 +11,6 @@
 
 #include "FloppyDisk.h"
 
-class DiskData;
 
 /// \class HardSectoredDisk
 ///

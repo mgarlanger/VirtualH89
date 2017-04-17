@@ -52,7 +52,7 @@ class H19: public Console, public ClockUser // , public BaseThread
     virtual bool sendData(BYTE data);
 
   private:
-    
+
     static void glDisplay();
     static void reshape(int w,
                         int h);
@@ -69,7 +69,7 @@ class H19: public Console, public ClockUser // , public BaseThread
     void initGl();
 
     void consoleLog(std::string message);
-    
+
     // screen size
     static const unsigned int cols_c     = 80;
     static const unsigned int rows_c     = 25;
@@ -85,40 +85,40 @@ class H19: public Console, public ClockUser // , public BaseThread
         SetMode,
         ResetMode
     };
-    InputMode    mode_m;
-    bool         updated_m;
-    BYTE         sw401_m;
-    BYTE         sw402_m;
+    InputMode        mode_m;
+    bool             updated_m;
+    BYTE             sw401_m;
+    BYTE             sw402_m;
 
     std::queue<BYTE> charToSend;
-    unsigned long countdownToSend_m;
-    unsigned long characterDelay_m;
+    unsigned long    countdownToSend_m;
+    unsigned long    characterDelay_m;
 
     // display modes
-    bool         reverseVideo_m;
-    bool         graphicMode_m;
-    bool         insertMode_m;
-    bool         line25_m;
-    bool         holdScreen_m;
-    bool         cursorOff_m;
-    bool         cursorBlock_m;
-    bool         wrapEOL_m;
-    bool         autoLF_m;
-    bool         autoCR_m;
+    bool             reverseVideo_m;
+    bool             graphicMode_m;
+    bool             insertMode_m;
+    bool             line25_m;
+    bool             holdScreen_m;
+    bool             cursorOff_m;
+    bool             cursorBlock_m;
+    bool             wrapEOL_m;
+    bool             autoLF_m;
+    bool             autoCR_m;
 
-    bool         keyboardEnabled_m;
-    bool         keyClick_m;
-    bool         keypadShifted_m;
-    bool         altKeypadMode_m;
+    bool             keyboardEnabled_m;
+    bool             keyClick_m;
+    bool             keypadShifted_m;
+    bool             altKeypadMode_m;
 
-    bool         offline_m;
+    bool             offline_m;
 
-    GLuint       fontOffset_m;
-    GLuint       screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
+    GLuint           fontOffset_m;
+    GLuint           screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
 
-    bool         curCursor_m;
-    unsigned int posX_m, posY_m;
-    unsigned int saveX_m, saveY_m;
+    bool             curCursor_m;
+    unsigned int     posX_m, posY_m;
+    unsigned int     saveX_m, saveY_m;
 
     //
     // internal routines to handle control characters.

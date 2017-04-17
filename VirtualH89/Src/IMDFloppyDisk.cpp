@@ -35,7 +35,7 @@ IMDFloppyDisk::getDiskette(vector<string> argv)
 
 
 IMDFloppyDisk::IMDFloppyDisk(vector<string> argv): GenericFloppyDisk(),
-                                                   imageName_m(nullptr),
+   // imageName_m(nullptr),
                                                    curSector_m(nullptr),
                                                    dataPos_m(0),
                                                    sectorLength_m(0),
@@ -72,9 +72,9 @@ IMDFloppyDisk::~IMDFloppyDisk()
 }
 
 bool
-IMDFloppyDisk::findSector(int side,
-                          int track,
-                          int sector)
+IMDFloppyDisk::findSector(BYTE side,
+                          BYTE track,
+                          BYTE sector)
 {
 
     if (hypoTrack_m)
@@ -150,6 +150,11 @@ IMDFloppyDisk::readIMD(const char* name)
     debugss(ssFloppyDisk, INFO, "file: %s\n", name);
 
     file.open(name, ios::binary);
+    if (!file.is_open())
+    {
+        debugss(ssFloppyDisk, ERROR, "file not found: %s\n", name);
+        return false;
+    }
     file.seekg(0, ios::end);
     fileSize = file.tellg();
     file.seekg(0, ios::beg);
@@ -435,6 +440,7 @@ IMDFloppyDisk::readData(BYTE track,
                 data = secLenCode_m;
                 break;
 
+            // TODO calculated and provide the actual CRC here.
             case 4:
                 data = 0; // CRC 1
                 break;
@@ -554,17 +560,6 @@ IMDFloppyDisk::writeData(BYTE track,
     return true;
 }
 
-BYTE
-IMDFloppyDisk::getMaxSectors(BYTE side,
-                             BYTE track)
-{
-    if ((track > tracks_m[side].size()) || !tracks_m[side][track])
-    {
-        return 0;
-    }
-
-    return tracks_m[side][track]->getMaxSectors();
-}
 bool
 IMDFloppyDisk::isReady()
 {
@@ -572,7 +567,7 @@ IMDFloppyDisk::isReady()
 }
 
 void
-IMDFloppyDisk::eject(const char* name)
+IMDFloppyDisk::eject(const string name)
 {
 
 }
@@ -581,15 +576,4 @@ void
 IMDFloppyDisk::dump(void)
 {
 
-}
-
-string
-IMDFloppyDisk::getMediaName()
-{
-    if (!imageName_m)
-    {
-        return "NONE";
-    }
-
-    return imageName_m;
 }

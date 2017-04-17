@@ -25,15 +25,18 @@ class WD179xUserIf;
 class WD1797: public ClockUser
 {
   public:
-    WD1797(WD179xUserIf* userIf);
 
+    WD1797(WD179xUserIf* userIf);
     virtual ~WD1797();
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr,
                      BYTE val);
 
+    virtual void setCurrentDrive(GenericFloppyDrive* drive);
+
     virtual void reset(void);
+
     void notification(unsigned int cycleCount);
 
     void eject(char const* file);
@@ -44,13 +47,13 @@ class WD1797: public ClockUser
     static const BYTE TrackPort_Offset_c   = 1;
     static const BYTE SectorPort_Offset_c  = 2;
     static const BYTE DataPort_Offset_c    = 3;
+
     void waitForData();
 
     void setDoubleDensity(bool dd);
 
   protected:
     WD1797(int baseAddr = 0);
-    virtual GenericFloppyDrive* getCurDrive();
     BYTE              basePort_m;
 
     static const BYTE WD1797_NumPorts_c = 4;
@@ -333,13 +336,14 @@ class WD1797: public ClockUser
     void cmdTypeIII_Notification(unsigned int cycleCount);
     void cmdTypeIV_Notification(unsigned int cycleCount);
 
-    bool               cmdIV_readyToNotReady;
-    bool               cmdIV_notReadyToReady;
-    bool               cmdIV_indexPulse;
+    bool                cmdIV_readyToNotReady;
+    bool                cmdIV_notReadyToReady;
+    bool                cmdIV_indexPulse;
 
-    WD179xUserIf*      userIf_m;
+    WD179xUserIf*       userIf_m;
 
-    unsigned long long cycleCount_m;
+    GenericFloppyDrive* currentDrive_m;
+    unsigned long long  cycleCount_m;
 
     enum FormattingState
     {

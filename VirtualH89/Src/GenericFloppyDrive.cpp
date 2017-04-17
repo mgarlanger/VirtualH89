@@ -72,7 +72,7 @@ GenericFloppyDrive::getInstance(std::string type)
             return nullptr;
         }
     }
-    else if (type.find("FDD_8" == 0))
+    else if (type.find("FDD_8") == 0)
     {
         mediaSize = 8;
         tracks    = 77;
@@ -281,26 +281,9 @@ GenericFloppyDrive::getCharPos(bool doubleDensity)
 }
 
 bool
-GenericFloppyDrive::readAddress(int& track,
-                                int& sector,
-                                int& side)
-{
-    if (disk_m == NULL || !motor_m)
-    {
-        return false;
-    }
-
-    // For now, just report what we think is there.
-    // TODO: consult media to see if it knows.
-    track  = track_m;
-    sector = 0; // TODO: use charPos and media to approximate
-    side   = headSel_m;
-    return true;
-}
-
-
-bool
-GenericFloppyDrive::verifyTrackSector(BYTE track, BYTE sector)
+GenericFloppyDrive::readAddress(int& trackNum,
+                                int& sectorNum,
+                                int& sideNum)
 {
     if (disk_m == NULL || !motor_m)
     {
@@ -309,35 +292,34 @@ GenericFloppyDrive::verifyTrackSector(BYTE track, BYTE sector)
         return false;
     }
 
-    BYTE realTrack = disk_m->getRealTrackNumber(track_m);
-    BYTE maxSector = disk_m->getMaxSectors(headSel_m, realTrack);
-
-    if ((sector > maxSector) || (realTrack != track))
-    {
-        debugss(ssGenericFloppyDrive, ERROR, "sector/max: %d:%d\n", sector, maxSector);
-        debugss(ssGenericFloppyDrive, ERROR, "realTrack/track: %d:%d\n", realTrack, track);
-        return false;
-    }
-
+    // consult media to see if it knows.
+    trackNum  = disk_m->getRealTrackNumber(track_m);
+    sectorNum = 0; // TODO: use charPos and media to approximate
+    sideNum   = headSel_m;
     return true;
 }
 
-BYTE
-GenericFloppyDrive::getMaxSectors(BYTE side,
-                                  BYTE track)
+
+bool
+GenericFloppyDrive::verifyTrackSector(BYTE trackNum,
+                                      BYTE sectorNum)
 {
-    if (track_m != track || headSel_m != side)
+    if (disk_m == NULL || !motor_m)
     {
-        debugss(ssGenericFloppyDrive, WARNING, "mismatch trk %d:%d sid %d:%d\n", track_m, track,
-                headSel_m, side);
+        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == NULL,
+                motor_m);
+        return false;
     }
 
-    if (disk_m)
+    BYTE realTrackNum = disk_m->getRealTrackNumber(track_m);
+
+    if (realTrackNum != trackNum)
     {
-        return disk_m->getMaxSectors(headSel_m, track);
+        debugss(ssGenericFloppyDrive, ERROR, "realTrack/track: %d:%d\n", realTrackNum, trackNum);
+        return false;
     }
 
-    return 0;
+    return disk_m->findSector(headSel_m, realTrackNum, sectorNum);
 }
 
 void

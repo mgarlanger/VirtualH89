@@ -7,7 +7,6 @@
 #include "h37.h"
 
 #include "logger.h"
-#include "DiskDrive.h"
 #include "wd1797.h"
 #include "InterruptController.h"
 #include "GenericFloppyDrive.h"
@@ -30,19 +29,12 @@ Z_89_37::Z_89_37(Computer*            computer,
                                            lostDataStatus_m(false),
                                            sectorTrackAccess_m(false),
                                            curDiskDrive_m(numDisks_c),
-                                           intLevel_m(z_89_37_Intr_c),
-                                           curPos_m(0),
-                                           sectorPos_m(-10),
                                            intrqAllowed_m(false),
                                            drqAllowed_m(false),
                                            cycleCount_m(0)
 {
     wd1797_m             = new WD1797(this);
 
-    drives_m[ds0]        = nullptr;
-    drives_m[ds1]        = nullptr;
-    drives_m[ds2]        = nullptr;
-    drives_m[ds3]        = nullptr;
     genericDrives_m[ds0] = nullptr;
     genericDrives_m[ds1] = nullptr;
     genericDrives_m[ds2] = nullptr;
@@ -131,40 +123,19 @@ Z_89_37::in(BYTE addr)
 
         case InterfaceControl_Offset_c:
             debugss(ssH37, INFO, "(InterfaceControl) - %d\n", sectorTrackAccess_m);
-
-            if (sectorTrackAccess_m)
-            {
-                val = interfaceReg_m;
-            }
-
+            val = interfaceReg_m;
             break;
 
         case StatusPort_Offset_c:
-            if (sectorTrackAccess_m)
-            {
-                debugss(ssH37, INFO, "(SectorPort)\n");
-                val = wd1797_m->in(WD1797::SectorPort_Offset_c);
-            }
-            else
-            {
-                debugss(ssH37, INFO, "(StatusPort)\n");
-                val = wd1797_m->in(WD1797::StatusPort_Offset_c);
-            }
-
+            debugss(ssH37, INFO, "(%sPort)\n", sectorTrackAccess_m ? "Sector" : "Status");
+            val = wd1797_m->in(
+                sectorTrackAccess_m ? WD1797::SectorPort_Offset_c : WD1797::StatusPort_Offset_c);
             break;
 
         case DataPort_Offset_c:
-            if (sectorTrackAccess_m)
-            {
-                debugss(ssH37, INFO, "(TrackPort)\n");
-                val = wd1797_m->in(WD1797::TrackPort_Offset_c);
-            }
-            else
-            {
-                debugss(ssH37, INFO, "(DataPort)\n");
-                val = wd1797_m->in(WD1797::DataPort_Offset_c);
-            }
-
+            debugss(ssH37, INFO, "(%sPort)\n", sectorTrackAccess_m ? "Track" : "Data");
+            val = wd1797_m->in(
+                sectorTrackAccess_m ? WD1797::TrackPort_Offset_c : WD1797::DataPort_Offset_c);
             break;
 
         default:
@@ -173,7 +144,7 @@ Z_89_37::in(BYTE addr)
 
     }
 
-    return (val);
+    return val;
 }
 
 void
@@ -194,22 +165,26 @@ Z_89_37::out(BYTE addr,
             {
                 debugss_nts(ssH37, INFO, " EnableIntReq");
                 intrqAllowed_m = true;
+                // setAllowIntrq(true);
             }
             else
             {
                 debugss_nts(ssH37, INFO, " DisableIntReq");
                 intrqAllowed_m = false;
+                // setAllowIntrq(false);
             }
 
             if (val & ctrl_EnableDrqInt_c)
             {
                 debugss_nts(ssH37, INFO, " EnableDrqInt");
                 drqAllowed_m = true;
+                // setAllowDrq(true);
             }
             else
             {
                 debugss_nts(ssH37, INFO, " DisableDrqReq");
                 drqAllowed_m = false;
+                // setAllowDrq(false);
             }
 
             if (val & ctrl_SetMFMRecording_c)
@@ -228,29 +203,34 @@ Z_89_37::out(BYTE addr,
                 debugss_nts(ssH37, INFO, " MotorsOn");
             }
 
+            // Only allow one to be set.
             if (val & ctrl_Drive_0_c)
             {
                 debugss_nts(ssH37, INFO, " Drive0");
                 curDiskDrive_m = ds0;
             }
-
-            if (val & ctrl_Drive_1_c)
+            else if (val & ctrl_Drive_1_c)
             {
                 debugss_nts(ssH37, INFO, " Drive1");
                 curDiskDrive_m = ds1;
             }
-
-            if (val & ctrl_Drive_2_c)
+            else if (val & ctrl_Drive_2_c)
             {
                 debugss_nts(ssH37, INFO, " Drive2");
                 curDiskDrive_m = ds2;
             }
-
-            if (val & ctrl_Drive_3_c)
+            else if (val & ctrl_Drive_3_c)
             {
                 debugss_nts(ssH37, INFO, " Drive3");
                 curDiskDrive_m = ds3;
             }
+            else
+            {
+                debugss_nts(ssH37, INFO, " no Drive");
+                curDiskDrive_m = numDisks_c;
+            }
+
+            wd1797_m->setCurrentDrive(getCurrentDrive());
 
             debugss_nts(ssH37, INFO, "\n");
 
@@ -278,31 +258,19 @@ Z_89_37::out(BYTE addr,
             break;
 
         case CommandPort_Offset_c:
-            if (sectorTrackAccess_m)
-            {
-                debugss(ssH37, INFO, "(SectorPort): %d\n", val);
-                wd1797_m->out(WD1797::SectorPort_Offset_c, val);
-            }
-            else
-            {
-                debugss(ssH37, INFO, "(CommandPort): %d\n", val);
-                wd1797_m->out(WD1797::CommandPort_Offset_c, val);
-            }
-
+            debugss(ssH37, INFO, "(%sPort): %d\n", sectorTrackAccess_m ? "Sector" : "Command",
+                    val);
+            wd1797_m->out(
+                sectorTrackAccess_m ? WD1797::SectorPort_Offset_c : WD1797::CommandPort_Offset_c,
+                val);
             break;
 
         case DataPort_Offset_c:
-            if (sectorTrackAccess_m)
-            {
-                debugss(ssH37, INFO, "(TrackPort): %d\n", val);
-                wd1797_m->out(WD1797::TrackPort_Offset_c, val);
-            }
-            else
-            {
-                debugss(ssH37, INFO, "(DataPort): %d\n", val);
-                wd1797_m->out(WD1797::DataPort_Offset_c, val);
-            }
-
+            debugss(ssH37, INFO, "(%sPort): %d\n", sectorTrackAccess_m ? "Track" : "Data",
+                    val);
+            wd1797_m->out(
+                sectorTrackAccess_m ? WD1797::TrackPort_Offset_c : WD1797::DataPort_Offset_c,
+                val);
             break;
 
         default:
@@ -337,35 +305,6 @@ Z_89_37::getCurrentDrive()
         return genericDrives_m[curDiskDrive_m];
     }
     return nullptr;
-}
-
-
-bool
-Z_89_37::connectDrive(BYTE       unitNum,
-                      DiskDrive* drive)
-{
-    bool retVal = false;
-
-    debugss(ssH37, INFO, "unit (%d), drive (%p)\n", unitNum, drive);
-
-    if (unitNum < numDisks_c)
-    {
-        if (drives_m[unitNum] == 0)
-        {
-            drives_m[unitNum] = drive;
-            retVal            = true;
-        }
-        else
-        {
-            debugss(ssH37, ERROR, "drive already connect\n");
-        }
-    }
-    else
-    {
-        debugss(ssH37, ERROR, "Invalid unit number (%d)\n", unitNum);
-    }
-
-    return (retVal);
 }
 
 bool
@@ -431,7 +370,6 @@ Z_89_37::raiseDrq()
     }
 
     debugss(ssH37, INFO, "not allowed.\n");
-
 }
 
 void
@@ -439,12 +377,11 @@ Z_89_37::lowerIntrq()
 {
     debugss(ssH37, INFO, "\n");
 
-    // \todo - if intrqAllowed_m is disabled, should THAT trigger the
-    // setting intrq to false.
-    if (1) // (!intrqAllowed_m)
-    {
-        ic_m->setIntrq(false);
-    }
+    // not sure but with this check, at least CP/M does not boot.
+    // if (!intrqAllowed_m)
+    // {
+    ic_m->setIntrq(false);
+    // }
 }
 
 void
@@ -452,20 +389,17 @@ Z_89_37::lowerDrq()
 {
     debugss(ssH37, INFO, "\n");
 
-    // \todo - if drqAllowed_m is disabled, should THAT trigger the
-    // setting drq to false.
-    if (1) // (!drqAllowed_m)
-    {
-        ic_m->setDrq(false);
-    }
-
+    // not sure but with this check, at least CP/M does not boot.
+    // if (!drqAllowed_m)
+    // {
+    ic_m->setDrq(false);
+    // }
 }
-
 
 bool
 Z_89_37::readReady()
 {
-    // the H-37 has this line set to +5V.
+    // the H-37 has this line tied to +5V.
     return true;
 }
 
