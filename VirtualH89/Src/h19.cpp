@@ -6,7 +6,7 @@
 
 #include "h19.h"
 
-#include "h19-font.h"
+//#include "h19-font.h"
 #include "logger.h"
 
 
@@ -135,27 +135,6 @@ H19::checkUpdated()
 void
 H19::init()
 {
-}
-
-void
-H19::initGl()
-{
-    GLuint i;
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    fontOffset_m = glGenLists(0x101);
-
-    for (i = 0; i < 0x100; i++)
-    {
-        glNewList(fontOffset_m + i, GL_COMPILE);
-        glBitmap(8, 20, 0.0, 0.0, 0.0, -20.0, &fontTable[i * 20]);
-        glEndList();
-    }
-
-    // Special character to wrap around.
-    glNewList(fontOffset_m + 0x100, GL_COMPILE);
-    glBitmap(8, 20, 0.0, 0.0, 8.0, 500.0, &fontTable[32 * 20]);
-    glEndList();
 }
 
 
@@ -1359,22 +1338,7 @@ H19::getBaudRate()
 
 
 void
-H19::reshape(int w,
-             int h)
-{
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, w, 0.0, h, -1.0, 1.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void
-H19::timer(int i)
+H19::timer(void)
 {
     static int count = 0;
 
@@ -1383,90 +1347,13 @@ H19::timer(int i)
         fflush(console_out);
     }
 
-    // Tell glut to redisplay the scene:
-    if (h19->checkUpdated())
-    {
-        glutPostRedisplay();
-    }
-
-    // Need to call this method again after the desired amount of time has passed:
-    glutTimerFunc(screenRefresh_m, timer, i);
+    return;
 }
 
 void
-H19::keyboard(unsigned char key,
-              int           x,
-              int           y)
+H19::keyboard(unsigned char key)
 {
     h19->keypress(key);
-}
-
-void
-H19::special(int key,
-             int x,
-             int y)
-{
-    // NOTE: GLUT has already differentiated exact keystrokes
-    // based on modern keyboard standards. Here we just encode
-    // the modern key codes into something convenient to use
-    // in the H19 class.
-    switch (key)
-    {
-        case GLUT_KEY_F1:
-            h19->keypress('S' | 0x80);
-            break;
-
-        case GLUT_KEY_F2:
-            h19->keypress('T' | 0x80);
-            break;
-
-        case GLUT_KEY_F3:
-            h19->keypress('U' | 0x80);
-            break;
-
-        case GLUT_KEY_F4:
-            h19->keypress('V' | 0x80);
-            break;
-
-        case GLUT_KEY_F5:
-            h19->keypress('W' | 0x80);
-            break;
-
-        case GLUT_KEY_F6:
-            h19->keypress('P' | 0x80);
-            break;
-
-        case GLUT_KEY_F7:
-            h19->keypress('Q' | 0x80);
-            break;
-
-        case GLUT_KEY_F8:
-            h19->keypress('R' | 0x80);
-            break;
-
-        case GLUT_KEY_HOME:
-            h19->keypress('H' | 0x80);
-            break;
-
-        case GLUT_KEY_UP:
-            h19->keypress('A' | 0x80);
-            break;
-
-        case GLUT_KEY_DOWN:
-            h19->keypress('B' | 0x80);
-            break;
-
-        case GLUT_KEY_LEFT:
-            h19->keypress('D' | 0x80);
-            break;
-
-        case GLUT_KEY_RIGHT:
-            h19->keypress('C' | 0x80);
-            break;
-
-        default:
-            break;
-    }
 }
 
 void
@@ -1479,31 +1366,11 @@ H19::glDisplay()
 void
 H19::run()
 {
-    int   dummy_argc = 1;
-    char* dummy_argv = (char*) "dummy";
+    TheGUI->InitGUI();
 
-    glutInit(&dummy_argc, &dummy_argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(640 + 40, 500 + 40);
-    glutInitWindowPosition(500, 100);
-    glutCreateWindow((char*) "Virtual Heathkit H-89 All-in-One Computer");
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-    // glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glBlendFunc(GL_ONE, GL_ONE);
-    // glBlendEquation(GL_FUNC_ADD);
-    glBlendColor(0.5, 0.5, 0.5, 0.9);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-
-    glShadeModel(GL_FLAT);
-    initGl();
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(special);
-    glutDisplayFunc(glDisplay);
-    glutTimerFunc(screenRefresh_m, timer, 1);
-    glutIgnoreKeyRepeat(1);
+    TheGUI->SetKeyboardFunc(keyboard);
+    TheGUI->SetDisplayFunc(glDisplay);
+    TheGUI->SetTimerFunc(screenRefresh_m, timer);
 
     glutMainLoop();
 }

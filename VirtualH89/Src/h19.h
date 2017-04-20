@@ -23,7 +23,8 @@
 #include <queue>
 /// \endcond
 
-
+// H19 needs access to the GUI engine.
+#include "GUI.h"
 
 /// \brief Virtual %H19 %Terminal
 ///
@@ -51,22 +52,16 @@ class H19: public Console, public ClockUser // , public BaseThread
     void notification(unsigned int cycleCount);
     virtual bool sendData(BYTE data);
 
+    inline static H19 *GetH19(void) {return h19;};
+
   private:
     
     static void glDisplay();
-    static void reshape(int w,
-                        int h);
-    static void timer(int i);
-    static void keyboard(unsigned char key,
-                         int           x,
-                         int           y);
-    static void special(int key,
-                        int x,
-                        int y);
+    static void timer(void);
+    static void keyboard(unsigned char key);
     static H19*               h19; // for static callback funcs
     static const unsigned int screenRefresh_c = 1000 / 60;
     static unsigned int       screenRefresh_m;
-    void initGl();
 
     void consoleLog(std::string message);
     
@@ -113,7 +108,10 @@ class H19: public Console, public ClockUser // , public BaseThread
 
     bool         offline_m;
 
+  public:
+    // Will be removed when display() is abstracted.
     GLuint       fontOffset_m;
+  private:
     GLuint       screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
 
     bool         curCursor_m;
