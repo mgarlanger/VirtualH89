@@ -8,7 +8,6 @@
 ///
 
 #include <cassert>
-
 #include "GUIglut.h"
 
 #include "h19-font.h"
@@ -19,6 +18,11 @@ tDisplayFunc GUIglut::GUITimerFunc;
 
 unsigned int GUIglut::m_ms;
 
+// GLUT routine used to redisplay the screen when needed.
+
+#define max(a, b)    ((a) > (b) ? (a) : (b))
+#define min(a, b)    ((a) < (b) ? (a) : (b))
+
 GUIglut::GUIglut()
 {
   // TODO Auto-generated constructor stub
@@ -28,6 +32,46 @@ GUIglut::GUIglut()
 GUIglut::~GUIglut()
 {
   // TODO Auto-generated destructor stub
+}
+
+void GUIglut::GUIDisplay(void)
+{
+  GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
+  //GLfloat color[3] = {0.0, 1.0, 0.0}; // green
+  // GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
+  // GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
+  // GLfloat color[3] = { 0.0, 0.8, 0.0 };
+  // GLfloat color[3] = { 0.9, 0.9, 0.0 };  // amber
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  glColor3fv(color);
+
+  glRasterPos2i(20, 24 * 20 + 20);
+
+  glPushAttrib(GL_LIST_BIT);
+  glListBase(fontOffset_m);
+  glCallLists(26 * H19::GetH19()->cols_c, GL_UNSIGNED_INT, (GLuint*) H19::GetH19()->screen_m);
+  glPopAttrib();
+  glEnable(GL_COLOR_LOGIC_OP);
+
+  if ((!H19::GetH19()->cursorOff_m) && (H19::GetH19()->curCursor_m))
+  {
+
+      glRasterPos2i(20 + min(H19::GetH19()->posX_m, 79) * 8, (24 - H19::GetH19()->posY_m) * 20 + 20);
+
+      glPushAttrib(GL_LIST_BIT);
+      //  glEnable(GL_COLOR_LOGIC_OP);
+      glLogicOp(GL_COPY);
+      glListBase(fontOffset_m);
+      GLuint cursor = (H19::GetH19()->cursorBlock_m) ? (128 + 32) : 27;
+      glCallLists(1, GL_UNSIGNED_INT, &cursor);
+      glPopAttrib();
+  }
+
+  glLogicOp(GL_COPY);
+  glutSwapBuffers();
+
+  return;
 }
 
 void GUIglut::InitGUI(void)
@@ -57,17 +101,17 @@ void GUIglut::InitGUI(void)
   GLuint i;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  H19::GetH19()->fontOffset_m = glGenLists(0x101);
+  fontOffset_m = glGenLists(0x101);
 
   for (i = 0; i < 0x100; i++)
   {
-      glNewList(H19::GetH19()->fontOffset_m + i, GL_COMPILE);
+      glNewList(fontOffset_m + i, GL_COMPILE);
       glBitmap(8, 20, 0.0, 0.0, 0.0, -20.0, &fontTable[i * 20]);
       glEndList();
   }
 
   // Special character to wrap around.
-  glNewList(H19::GetH19()->fontOffset_m + 0x100, GL_COMPILE);
+  glNewList(fontOffset_m + 0x100, GL_COMPILE);
   glBitmap(8, 20, 0.0, 0.0, 8.0, 500.0, &fontTable[32 * 20]);
   glEndList();
 
@@ -75,6 +119,13 @@ void GUIglut::InitGUI(void)
   glutSpecialFunc(special);
 
   glutIgnoreKeyRepeat(1);
+
+  return;
+}
+
+void GUIglut::StartGUI(void)
+{
+  glutMainLoop();
 
   return;
 }

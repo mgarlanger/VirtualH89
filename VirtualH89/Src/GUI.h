@@ -26,10 +26,12 @@ public:
 
   // Interface functions.
 public:
+  virtual void GUIDisplay(void) = 0;
   virtual void InitGUI(void) = 0;
   virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc) = 0;
   virtual void SetDisplayFunc(tDisplayFunc KeyboardFunc) = 0;
   virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc) = 0;
+  virtual void StartGUI(void) = 0;
 };
 
 // All client GUI access is through this pointer to the base GUI class.

@@ -36,7 +36,9 @@ public:
   ~GUIglut();
 
   // Interface functions.
+  virtual void GUIDisplay(void);
   virtual void InitGUI(void);
+  virtual void StartGUI(void);
 
   // Callback functions.
   virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc);
@@ -61,6 +63,7 @@ private:
                       int x,
                       int y);
 
+  unsigned int fontOffset_m;
 };
 
 #endif /* GUIGLUT_H_ */

@@ -11,27 +11,46 @@
 #include "Console.h"
 #include "ClockUser.h"
 
-//
-// OpenGL Headers
-//
 /// \cond
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
 #include <queue>
 /// \endcond
 
 // H19 needs access to the GUI engine.
 #include "GUI.h"
 
+/// \brief Virtual %H19 %Terminal Screen Buffer
+///
+/// The screen buffer is shared between the GUI and H19 logic.
+/// This class abstracts the screen buffer from the H19 logic.
+///
+
+class H19Screen
+{
+public:
+  H19Screen(void) : curCursor_m(false) { return; }
+  ~H19Screen(void) { return; }
+
+public:
+  // screen size
+  static const unsigned int cols_c     = 80;
+  static const unsigned int rows_c     = 25;
+  static const unsigned int rowsMain_c = 24;
+
+  // Will be removed when display() is abstracted.
+  unsigned int screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
+
+  bool         curCursor_m;
+  unsigned int posX_m, posY_m;
+  bool         cursorBlock_m;
+  bool         cursorOff_m;
+};
+
 /// \brief Virtual %H19 %Terminal
 ///
-/// Virtual Heathkit H19 Terminal that utilizes the GLUT framework to
-/// render a pixel accurate emulation of the terminal.
+/// Virtual Heathkit H19 Terminal logic that renders a pixel accurate emulation of the terminal.
+/// Uses "TheGUI" abstraction for GUI.
 ///
-class H19: public Console, public ClockUser // , public BaseThread
+class H19: public Console, public ClockUser, public H19Screen // , public BaseThread
 {
   public:
     H19(std::string sw401 = "10001100", std::string sw402 = "00000101");
@@ -56,7 +75,7 @@ class H19: public Console, public ClockUser // , public BaseThread
 
   private:
     
-    static void glDisplay();
+    static void GUIDisplay();
     static void timer(void);
     static void keyboard(unsigned char key);
     static H19*               h19; // for static callback funcs
@@ -64,11 +83,6 @@ class H19: public Console, public ClockUser // , public BaseThread
     static unsigned int       screenRefresh_m;
 
     void consoleLog(std::string message);
-    
-    // screen size
-    static const unsigned int cols_c     = 80;
-    static const unsigned int rows_c     = 25;
-    static const unsigned int rowsMain_c = 24;
 
     // state variables
     enum InputMode
@@ -95,8 +109,6 @@ class H19: public Console, public ClockUser // , public BaseThread
     bool         insertMode_m;
     bool         line25_m;
     bool         holdScreen_m;
-    bool         cursorOff_m;
-    bool         cursorBlock_m;
     bool         wrapEOL_m;
     bool         autoLF_m;
     bool         autoCR_m;
@@ -108,14 +120,6 @@ class H19: public Console, public ClockUser // , public BaseThread
 
     bool         offline_m;
 
-  public:
-    // Will be removed when display() is abstracted.
-    GLuint       fontOffset_m;
-  private:
-    GLuint       screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
-
-    bool         curCursor_m;
-    unsigned int posX_m, posY_m;
     unsigned int saveX_m, saveY_m;
 
     //

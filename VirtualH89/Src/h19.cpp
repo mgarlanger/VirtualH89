@@ -16,13 +16,6 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <assert.h>
-
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
 /// \endcond
 
 
@@ -38,8 +31,10 @@ H19::H19(std::string sw401, std::string sw402): Console(0, nullptr),
                                                 countdownToSend_m(0),
                                                 characterDelay_m(2133),
                                                 updated_m(true),
-                                                offline_m(false),
-                                                curCursor_m(false)
+                                                offline_m(false)
+// TODO: Remove
+//,
+//                                                curCursor_m(false)
 {
     h19 = this;
     pthread_mutex_init(&h19_mutex, nullptr);
@@ -138,49 +133,13 @@ H19::init()
 }
 
 
-// GLUT routine used to redisplay the screen when needed.
-
-#define max(a, b)    ((a) > (b) ? (a) : (b))
-#define min(a, b)    ((a) < (b) ? (a) : (b))
-
 void
 H19::display()
 {
     pthread_mutex_lock(&h19_mutex);
-    GLfloat color[3] = { 1.0, 1.0, 0.0 };  // amber
-    //GLfloat color[3] = {0.0, 1.0, 0.0}; // green
-    // GLfloat color[3] = { 1.0, 1.0, 1.0 };  // white
-    // GLfloat color[3] = { 0.5, 0.0, 1.0 };  // purple
-    // GLfloat color[3] = { 0.0, 0.8, 0.0 };
-    // GLfloat color[3] = { 0.9, 0.9, 0.0 };  // amber
 
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3fv(color);
+    TheGUI->GUIDisplay();
 
-    glRasterPos2i(20, 24 * 20 + 20);
-
-    glPushAttrib(GL_LIST_BIT);
-    glListBase(h19->fontOffset_m);
-    glCallLists(26 * cols_c, GL_UNSIGNED_INT, (GLuint*) screen_m);
-    glPopAttrib();
-    glEnable(GL_COLOR_LOGIC_OP);
-
-    if ((!cursorOff_m) && (curCursor_m))
-    {
-
-        glRasterPos2i(20 + min(posX_m, 79) * 8, (24 - posY_m) * 20 + 20);
-
-        glPushAttrib(GL_LIST_BIT);
-        //  glEnable(GL_COLOR_LOGIC_OP);
-        glLogicOp(GL_COPY);
-        glListBase(fontOffset_m);
-        GLuint cursor = (cursorBlock_m) ? (128 + 32) : 27;
-        glCallLists(1, GL_UNSIGNED_INT, &cursor);
-        glPopAttrib();
-    }
-
-    glLogicOp(GL_COPY);
-    glutSwapBuffers();
     pthread_mutex_unlock(&h19_mutex);
 }
 
@@ -1357,7 +1316,7 @@ H19::keyboard(unsigned char key)
 }
 
 void
-H19::glDisplay()
+H19::GUIDisplay()
 {
     h19->display();
 }
@@ -1369,10 +1328,12 @@ H19::run()
     TheGUI->InitGUI();
 
     TheGUI->SetKeyboardFunc(keyboard);
-    TheGUI->SetDisplayFunc(glDisplay);
+    TheGUI->SetDisplayFunc(GUIDisplay);
     TheGUI->SetTimerFunc(screenRefresh_m, timer);
 
-    glutMainLoop();
+    TheGUI->StartGUI();
+
+    return;
 }
 
 bool
