@@ -26,17 +26,14 @@ public:
 
   // Interface functions.
 public:
-  inline virtual void InitGUI(void) {IncorrectClassDerivation(); return;}
-  inline virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc) {IncorrectClassDerivation(); return;}
-  inline virtual void SetDisplayFunc(tDisplayFunc KeyboardFunc) {IncorrectClassDerivation(); return;}
-  inline virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc) {IncorrectClassDerivation(); return;}
-
-private:
-  inline void IncorrectClassDerivation(void) {std::cerr << "GUI class not derived correctly." << std::endl; exit(1); return;}
+  virtual void InitGUI(void) = 0;
+  virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc) = 0;
+  virtual void SetDisplayFunc(tDisplayFunc KeyboardFunc) = 0;
+  virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc) = 0;
 };
 
 // All client GUI access is through this pointer to the base GUI class.
-// Access is achieved by adding #include "GUI.h".  Including a GUI instance does this.
+// Access is achieved by adding #include "GUI.h".  The include gives the access.
 
 extern GUI *TheGUI;
 
