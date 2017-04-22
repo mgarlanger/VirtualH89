@@ -64,6 +64,9 @@ private:
                       int y);
 
   unsigned int fontOffset_m;
+
+  unsigned char *fontTable;
+
 };
 
 #endif /* GUIGLUT_H_ */

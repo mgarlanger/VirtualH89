@@ -25,8 +25,10 @@ unsigned int GUIglut::m_ms;
 
 GUIglut::GUIglut()
 {
-  // TODO Auto-generated constructor stub
+  // Set inverted character generator for GLUT.
+  fontTable = (unsigned char *) fontTableInverted;
 
+  return;
 }
 
 GUIglut::~GUIglut()
