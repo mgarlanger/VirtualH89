@@ -32,34 +32,34 @@ class MMS77316: public DiskController, public WD179xUserIf
     static const int numDisks_c = 8;
 
     MMS77316(int baseAddr, InterruptController* ic);
-    virtual ~MMS77316();
+    virtual ~MMS77316() override;
 
     static MMS77316* install_MMS77316(InterruptController*        ic,
                                       PropertyUtil::PropertyMapT& props,
                                       std::string                 slot);
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
     virtual bool connectDrive(BYTE                unitNum,
                               GenericFloppyDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
     virtual GenericFloppyDrive* getDrive(BYTE unitNum);
 
-    virtual void reset(void);
+    virtual void reset(void) override;
 
     static const BYTE MMS77316_Intr_c = 5; // INT 5
 
     // TODO: implement this
-    std::vector<GenericDiskDrive*> getDiskDrives();
-    std::string getDriveName(int index);
-    std::string getDeviceName()
+    std::vector<GenericDiskDrive*> getDiskDrives() override;
+    std::string getDriveName(int index) override;
+    std::string getDeviceName() override
     {
         return MMS77316_Name_c;
     }
-    GenericDiskDrive* findDrive(std::string ident);
-    std::string dumpDebug();
+    GenericDiskDrive* findDrive(std::string ident) override;
+    std::string dumpDebug() override;
 
   protected:
     static const char* MMS77316_Name_c;
@@ -68,10 +68,10 @@ class MMS77316: public DiskController, public WD179xUserIf
     bool               intrqRaised_m;
     bool               drqRaised_m;
 
-    void raiseIntrq();
-    void raiseDrq();
-    void lowerIntrq();
-    void lowerDrq();
+    void raiseIntrq() override;
+    void raiseDrq() override;
+    void lowerIntrq() override;
+    void lowerDrq() override;
 
     static const BYTE    MMS77316_NumPorts_c  = 8;
 
@@ -80,7 +80,7 @@ class MMS77316: public DiskController, public WD179xUserIf
     static const BYTE    Wd1797_Offset_c      = 4;
     BYTE                 controlReg_m;
 
-    int getClockPeriod();
+    int getClockPeriod() override;
 
     InterruptController* ic_m;
     GenericFloppyDrive*  drives_m[numDisks_c];
@@ -108,10 +108,10 @@ class MMS77316: public DiskController, public WD179xUserIf
         return (controlReg_m & ctrl_EnableIntReq_c) != 0 &&
                ((controlReg_m & ctrl_EnableBurstN_c) != 0 || drqCount_m < 1);
     }
-    void loadHead(bool load);
+    void loadHead(bool load) override;
 
     virtual GenericFloppyDrive* getCurrentDrive();
-    virtual bool readReady();
+    virtual bool readReady() override;
 
     WD1797* wd1797_m;
 };

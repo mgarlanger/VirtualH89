@@ -33,10 +33,10 @@ class HostFileBdos: public NetworkServer
   public:
     HostFileBdos(PropertyUtil::PropertyMapT& props,
                  std::vector<std::string> args, uint8_t srvId, uint8_t cltId);
-    virtual ~HostFileBdos();
+    virtual ~HostFileBdos() override;
 
-    virtual int checkRecvMsg(uint8_t clientId, uint8_t* msgbuf, int len);
-    virtual int sendMsg(uint8_t* msgbuf, int len);
+    virtual int checkRecvMsg(uint8_t clientId, uint8_t* msgbuf, int len) override;
+    virtual int sendMsg(uint8_t* msgbuf, int len) override;
   private:
     char*   dir;
     uint8_t serverId;

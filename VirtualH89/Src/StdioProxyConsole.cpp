@@ -128,7 +128,7 @@ StdioProxyConsole::run()
     int         x = 0;
     int         c;
 
-    // setbuf(stdin, NULL);
+    // setbuf(stdin, nullptr);
 
     while ((c = fgetc(stdin)) != EOF)
     {

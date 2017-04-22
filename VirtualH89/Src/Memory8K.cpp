@@ -18,6 +18,11 @@ Memory8K::Memory8K(WORD base): base_m(base)
     memset(mem, 0, sizeof(mem));
 }
 
+Memory8K::~Memory8K()
+{
+
+}
+
 WORD
 Memory8K::getBase()
 {

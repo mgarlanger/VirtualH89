@@ -19,10 +19,10 @@ class H89MemoryDecoder: public MemoryDecoder
     H89MemoryDecoder(std::shared_ptr<SystemMemory8K>  systemRam,
                      MemoryLayout::MemorySize_t       memSize = MemoryLayout::Mem_64k);
 
-    virtual ~H89MemoryDecoder();
+    virtual ~H89MemoryDecoder() override;
 
   private:
-    virtual void gppNewValue(BYTE gpo);
+    virtual void gppNewValue(BYTE gpo) override;
     static const BYTE h89_gppOrg0Bit_c = 0b00100000;
 };
 

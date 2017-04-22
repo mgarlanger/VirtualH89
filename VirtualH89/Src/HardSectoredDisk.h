@@ -24,27 +24,27 @@ class HardSectoredDisk: public FloppyDisk
   public:
     HardSectoredDisk(const char* name);
     HardSectoredDisk();
-    virtual ~HardSectoredDisk();
+    virtual ~HardSectoredDisk() override;
 
     virtual bool readData(BYTE          side,
                           BYTE          track,
                           unsigned long pos,
-                          BYTE&         data);
+                          BYTE&         data) override;
     virtual bool writeData(BYTE          side,
                            BYTE          track,
                            unsigned long pos,
-                           BYTE          data);
+                           BYTE          data) override;
     virtual void getControlInfo(unsigned long pos,
                                 bool&         hole,
-                                bool&         writeProtect);
-    void dump();
+                                bool&         writeProtect) override;
+    void dump() override;
 
     virtual bool readSectorData(BYTE  side,
                                 BYTE  track,
                                 BYTE  sector,
                                 WORD  pos,
-                                BYTE& data);
-    virtual void eject(const char* name);
+                                BYTE& data) override;
+    virtual void eject(const char* name) override;
 
   private:
     // Hard sectored disks on Heath, only support single density (FM encoding)

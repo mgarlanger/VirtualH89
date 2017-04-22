@@ -31,14 +31,14 @@ class GeneralPurposePort: public virtual IODevice
   public:
     GeneralPurposePort(Computer* computer);
     GeneralPurposePort(Computer* computer, std::string settings);
-    virtual ~GeneralPurposePort();
+    virtual ~GeneralPurposePort() override;
 
-    virtual BYTE in(BYTE addr);
-    virtual void out(BYTE addr,
-                     BYTE val);
+    BYTE in(BYTE addr) override;
+    void out(BYTE addr,
+             BYTE val) override;
 
     virtual std::string dumpDebug();
-    void reset();
+    void reset() override;
 
   private:
     Computer*         computer_m;

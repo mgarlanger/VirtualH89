@@ -230,7 +230,7 @@ PropertyUtil::write(std::ostream& os,
                     PropertyMapT& map,
                     const char*   header)
 {
-    if (header != NULL)
+    if (header != nullptr)
     {
         os << '#' << header << std::endl;
     }

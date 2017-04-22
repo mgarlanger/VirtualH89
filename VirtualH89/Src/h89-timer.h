@@ -31,15 +31,15 @@ class H89Timer: public EventHandler, public GppListener
     H89Timer(Computer*     computer,
              CPU*          cpu,
              unsigned char intlvl = 1);
-    virtual ~H89Timer();
+    virtual ~H89Timer() override;
 
-    virtual int handleSignal(int signum);
+    virtual int handleSignal(int signum) override;
 
     void reset();
     void start();
 
   private:
-    virtual void gppNewValue(BYTE gpo);
+    virtual void gppNewValue(BYTE gpo) override;
     static const BYTE h89timer_gpp2msIntEnBit_c = 0b00000010;
     Computer*         computer_m;
     CPU*              cpu_m;

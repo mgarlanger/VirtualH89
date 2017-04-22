@@ -25,18 +25,18 @@ class INS8250: public IODevice
     INS8250(Computer* computer,
             BYTE      baseAddr,
             int       IntLevel = -1);
-    virtual ~INS8250();
+    virtual ~INS8250() override;
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
     virtual bool attachDevice(SerialPortDevice* dev);
 
     virtual bool receiveReady();
     virtual void receiveData(BYTE data);
 
-    void reset();
+    void reset() override;
 
     // TODO - add all the status, both for the device to set it's status
     //        and for the port to set the status.

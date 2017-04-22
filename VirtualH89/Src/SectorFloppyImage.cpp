@@ -137,9 +137,9 @@ SectorFloppyImage::dump()
 // TODO: If constructor fails, the drive should not mount this disk!
 SectorFloppyImage::SectorFloppyImage(GenericDiskDrive*        drive,
                                      std::vector<std::string> argv): GenericFloppyDisk(),
-                                                                     imageName_m(NULL),
+                                                                     imageName_m(nullptr),
                                                                      imageFd_m(-1),
-                                                                     secBuf_m(NULL),
+                                                                     secBuf_m(nullptr),
                                                                      bufferedTrack_m(-1),
                                                                      bufferedSide_m(-1),
                                                                      bufferedSector_m(-1),
@@ -511,7 +511,7 @@ SectorFloppyImage::isReady()
 std::string
 SectorFloppyImage::getMediaName()
 {
-    if (imageName_m == NULL)
+    if (imageName_m == nullptr)
     {
         return "BAD";
     }

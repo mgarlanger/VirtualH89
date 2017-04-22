@@ -114,7 +114,7 @@ SoftSectoredDisk::findSector(BYTE sideNum,
 void
 SoftSectoredDisk::addTrack(std::shared_ptr<Track> track)
 {
-    BYTE sideNumber = track->getSideNumber();
+    // BYTE sideNumber = track->getSideNumber();
     // BYTE trackNumber = track->getTrackNumber();
 /*    if ()
     {

@@ -23,7 +23,7 @@ class TD0FloppyDisk: public SoftSectoredDisk
 {
   public:
     TD0FloppyDisk(std::vector<std::string> argv);
-    virtual ~TD0FloppyDisk();
+    virtual ~TD0FloppyDisk() override;
 
     static std::shared_ptr<GenericFloppyDisk> getDiskette(std::vector<std::string> argv);
 

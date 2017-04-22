@@ -28,16 +28,16 @@ class Z_89_37: public DiskController, public WD179xUserIf
 {
   public:
     Z_89_37(Computer* computer, int baseAddr, InterruptController* ic);
-    virtual ~Z_89_37();
+    virtual ~Z_89_37() override;
 
     static Z_89_37* install_H37(Computer*                   computer,
                                 BYTE                        baseAddr,
                                 InterruptController*        ic,
                                 PropertyUtil::PropertyMapT& props,
                                 std::string                 slot);
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
     virtual bool connectDrive(BYTE                unitNum,
                               GenericFloppyDrive* drive);
@@ -46,35 +46,35 @@ class Z_89_37: public DiskController, public WD179xUserIf
 
     virtual bool removeDrive(BYTE unitNum);
 
-    virtual void reset(void);
+    virtual void reset(void) override;
 
     // TODO: implement this
-    std::vector<GenericDiskDrive*> getDiskDrives()
+    std::vector<GenericDiskDrive*> getDiskDrives() override
     {
         return *(new std::vector<GenericDiskDrive*>());
     }
-    std::string getDeviceName()
+    std::string getDeviceName() override
     {
         return "H37";
     }
-    GenericDiskDrive* findDrive(std::string ident)
+    GenericDiskDrive* findDrive(std::string ident) override
     {
         return nullptr;
     }
-    std::string getDriveName(int index)
+    std::string getDriveName(int index) override
     {
         return "";
     }
-    std::string dumpDebug()
+    std::string dumpDebug() override
     {
         return "";
     }
-    virtual void raiseIntrq();
-    virtual void raiseDrq();
-    virtual void lowerIntrq();
-    virtual void lowerDrq();
-    virtual bool readReady();
-    virtual int getClockPeriod();
+    virtual void raiseIntrq() override;
+    virtual void raiseDrq() override;
+    virtual void lowerIntrq() override;
+    virtual void lowerDrq() override;
+    virtual bool readReady() override;
+    virtual int getClockPeriod() override;
 
   private:
     void motorOn(bool motor);

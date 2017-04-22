@@ -86,8 +86,8 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE* e;
-        int   p = strtoul((char*) b, (char**) &e, 0);
+        BYTE*    e;
+        unsigned p = (unsigned) strtoul((char*) b, (char**) &e, 0);
 
         // TODO: removable flag, others?
         // NOTE: removable media requires many more changes.
@@ -140,7 +140,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
     dataOffset(0),
     driveCode(0),
     driveCnum(0),
-    driveMedia(NULL),
+    driveMedia(nullptr),
     driveType(INVALID),
     mediaSpt(0),
     mediaSsz(0),
@@ -151,7 +151,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
     senseIx(0),
     dcbIx(0),
     stsIx(0),
-    dataBuf(NULL),
+    dataBuf(nullptr),
     dataLength(0),
     dataIx(0)
 {
@@ -297,7 +297,7 @@ GenericSASIDrive::getInstance(std::string type,
     else
     {
         debugss(ssMMS77320, ERROR, "Invalid controller/drive combination: %s\n", type.c_str());
-        return NULL;
+        return nullptr;
     }
 
     /*
@@ -879,6 +879,8 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
             {
                 debugss(ssMMS77320, ERROR, "Host drive characteristics "
                         " mismatch\n");
+                debugss(ssMMS77320, ERROR, "cyl: %d, hds: %d, rwc: %d, wpc: %d, ebl: %d",
+                        cyl, hds, rwc, wpc, ebl);
                 // TODO: what to do. Host will be sending commands based
                 // on a different geometry. Can we return an error?
                 // startError(ctrl, 0x??);
@@ -897,5 +899,5 @@ GenericSASIDrive::processDCB(BYTE& dataIn,
 std::string
 GenericSASIDrive::getMediaName()
 {
-    return (driveMedia != NULL ? driveMedia : "");
+    return (driveMedia != nullptr ? driveMedia : "");
 }

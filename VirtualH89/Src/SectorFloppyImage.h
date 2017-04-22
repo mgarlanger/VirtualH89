@@ -32,20 +32,20 @@ class SectorFloppyImage: public GenericFloppyDisk
 {
   public:
     SectorFloppyImage(GenericDiskDrive* drive, std::vector<std::string> argv);
-    ~SectorFloppyImage();
+    virtual ~SectorFloppyImage() override;
     static std::shared_ptr<GenericFloppyDisk> getDiskette(GenericDiskDrive*        drive,
                                                           std::vector<std::string> argv);
 
-    bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data);
+    bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data) override;
     bool writeData(BYTE track, BYTE side, BYTE sector, int inSector,
-                   BYTE data, bool dataReady, int& result);
+                   BYTE data, bool dataReady, int& result) override;
     bool findSector(BYTE side,
                     BYTE track,
-                    BYTE sector);
-    bool isReady();
-    void eject(const std::string name);
-    void dump(void);
-    std::string getMediaName();
+                    BYTE sector) override;
+    bool isReady() override;
+    void eject(const std::string name) override;
+    void dump(void) override;
+    std::string getMediaName() override;
 
   private:
     const char*   imageName_m;

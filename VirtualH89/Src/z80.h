@@ -185,34 +185,34 @@ class Z80: public CPU, public GppListener
     static const opCodeMethod op_cb[256];
     static const opCodeMethod op_ed[256];
     static const opCodeMethod op_xxcb[32];
-    virtual void gppNewValue(BYTE gpo);
+    virtual void gppNewValue(BYTE gpo) override;
     static const BYTE         z80_gppSpeedSelBit_c = 0b00010000;
 
   public:
     Z80(Computer* computer,
         int       clockRate,
         int       ticksPerSecond);
-    virtual ~Z80();
+    virtual ~Z80() override;
 
-    std::string dumpDebug();
+    std::string dumpDebug() override;
 
-    virtual void continueRunning(void);
-    virtual void waitState(void);
+    virtual void continueRunning(void) override;
+    virtual void waitState(void) override;
 
-    virtual void reset(void);
+    virtual void reset(void) override;
 
-    virtual BYTE execute(WORD numInst = 0);
-    virtual BYTE step(void);
+    virtual BYTE execute(WORD numInst = 0) override;
+    virtual BYTE step(void) override;
 
-    virtual void raiseNMI(void);
-    virtual void addClockTicks(void);
-    virtual void setAddressBus(AddressBus* ab);
-    virtual void setIOBus(IOBus* io);
-    virtual void setSpeedup(int factor);
-    virtual void enableFast();
+    virtual void raiseNMI(void) override;
+    virtual void addClockTicks(void) override;
+    virtual void setAddressBus(AddressBus* ab) override;
+    virtual void setIOBus(IOBus* io) override;
+    virtual void setSpeedup(int factor) override;
+    virtual void enableFast() override;
 
-    virtual void raiseINT();
-    virtual void lowerINT();
+    virtual void raiseINT() override;
+    virtual void lowerINT() override;
 
     void traceInstructions(void);
 

@@ -18,11 +18,11 @@ class NilMemory8K: public Memory8K
     {
     }
 
-    virtual ~NilMemory8K()
+    virtual ~NilMemory8K() override
     {
     }
 
-    void writeByte(WORD adr, BYTE val)
+    void writeByte(WORD adr, BYTE val) override
     {
     }
 };
