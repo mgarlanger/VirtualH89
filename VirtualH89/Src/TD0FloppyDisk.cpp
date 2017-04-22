@@ -5,6 +5,8 @@
 ///  \date   May 2, 2016
 ///
 
+#include <cstring>
+
 #include "TD0FloppyDisk.h"
 
 #include "Track.h"

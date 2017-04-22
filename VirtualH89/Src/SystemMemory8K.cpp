@@ -9,6 +9,8 @@
 
 #include "ROM.h"
 
+#include <cstring>
+
 using namespace std;
 
 SystemMemory8K::SystemMemory8K(): RAMemory8K(0x0000),

@@ -20,3 +20,4 @@ build/
 *.xccheckout
 xcuserdata/
 *.moved-aside
+/Debug/

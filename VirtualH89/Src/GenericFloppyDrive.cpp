@@ -72,7 +72,7 @@ GenericFloppyDrive::getInstance(std::string type)
             return nullptr;
         }
     }
-    else if (type.find("FDD_8" == 0))
+    else if (type.find("FDD_8") == 0)
     {
         mediaSize = 8;
         tracks    = 77;
