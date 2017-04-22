@@ -86,8 +86,8 @@ GenericSASIDrive::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE* e;
-        unsigned   p = (unsigned) strtoul((char*) b, (char**) &e, 0);
+        BYTE*    e;
+        unsigned p = (unsigned) strtoul((char*) b, (char**) &e, 0);
 
         // TODO: removable flag, others?
         // NOTE: removable media requires many more changes.

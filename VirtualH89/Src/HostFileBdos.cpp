@@ -1237,7 +1237,7 @@ HostFileBdos::fullSearch(uint8_t* dirbuf, struct search* search, const char* ff)
         ff      = doSearch(search);
     }
     while (ff != nullptr && ix < search->maxdc); // never includes SFCB
-    search->lastit = search->iter;            // if >= saveIter+maxdc then no error
+    search->lastit = search->iter;               // if >= saveIter+maxdc then no error
     search->iter   = saveIter;
     while (ix < 4)
     {
