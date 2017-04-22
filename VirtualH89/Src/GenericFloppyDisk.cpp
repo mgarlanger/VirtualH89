@@ -6,6 +6,8 @@
 /// \author Douglas Miller
 ///
 
+#include <algorithm>
+
 #include "GenericFloppyDisk.h"
 
 #include "IMDFloppyDisk.h"

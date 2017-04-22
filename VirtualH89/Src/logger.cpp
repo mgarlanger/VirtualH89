@@ -4,6 +4,8 @@
 /// \author Mark Garlanger
 ///
 
+#include <cstdarg>
+
 #include "logger.h"
 #include "WallClock.h"
 

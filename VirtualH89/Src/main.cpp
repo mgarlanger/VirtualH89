@@ -18,6 +18,7 @@
 #include "StdioProxyConsole.h"
 #include "logger.h"
 #include "propertyutil.h"
+#include "GUIglut.h"
 
 /// \cond
 #include <iostream>
@@ -132,6 +133,9 @@ main(int   argc,
     string       gui("H19");
     int          quiet = 0;
     setDebugLevel();
+
+    // Start a GUI engine.
+    TheGUI = new GUIglut;
 
     while ((c = getopt(argc, argv, getopts)) != EOF)
     {
