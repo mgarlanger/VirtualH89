@@ -64,6 +64,9 @@ class Track
           BYTE trackNum);
     virtual ~Track();
 
+    BYTE getTrackNumber();
+    BYTE getSideNumber();
+
     bool addSector(std::shared_ptr<Sector> sector);
 
     void setDensity(Density density);
@@ -72,11 +75,6 @@ class Track
     void dump();
 
     std::shared_ptr<Sector> findSector(BYTE sector);
-
-    // bool readSectorData(BYTE  sector,
-    //                    WORD  pos,
-    //                    BYTE& data);
-    BYTE getMaxSectors();
 
     void startFormat();
 

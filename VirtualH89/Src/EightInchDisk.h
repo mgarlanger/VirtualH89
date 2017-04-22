@@ -10,7 +10,7 @@
 #define EIGHTINCHDISK_H_
 
 #include "SoftSectoredDisk.h"
-
+#if 0
 class EightInchDisk: public SoftSectoredDisk
 {
   public:
@@ -20,21 +20,21 @@ class EightInchDisk: public SoftSectoredDisk
 
     virtual ~EightInchDisk();
 
-//    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE &data);
-//    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
-//    virtual void getControlInfo(unsigned int pos, bool &hole, bool &writeProtect);
-//    virtual void setWriteProtect(bool value);
-//    virtual bool checkWriteProtect(void);
+    //    virtual bool readData(BYTE side, BYTE track, unsigned int pos, BYTE &data);
+    //    virtual bool writeData(BYTE side, BYTE track, unsigned int pos, BYTE data);
+    //    virtual void getControlInfo(unsigned int pos, bool &hole, bool &writeProtect);
+    //    virtual void setWriteProtect(bool value);
+    //    virtual bool checkWriteProtect(void);
 
-//    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE &data);
+    //    virtual bool readSectorData(BYTE side, BYTE track, BYTE sector, unsigned int pos, BYTE &data);
 
-//    virtual void eject(const char *name);
+    //    virtual void eject(const char *name);
 
-//    virtual void dump(void);
+    //    virtual void dump(void);
 
   private:
 
 
 };
-
+#endif
 #endif // EIGHTINCHDISK_H_

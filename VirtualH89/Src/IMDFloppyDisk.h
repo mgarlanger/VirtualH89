@@ -15,6 +15,7 @@
 #include <memory>
 /// \endcond
 
+class DiskSide;
 class Track;
 class Sector;
 
@@ -37,19 +38,21 @@ class IMDFloppyDisk: public GenericFloppyDisk
                            BYTE data,
                            bool dataReady,
                            int& result);
-    virtual BYTE getMaxSectors(BYTE sides,
-                               BYTE track);
     virtual bool isReady();
-    virtual void eject(const char* name);
+    virtual void eject(const std::string name);
     virtual void dump(void);
-    virtual std::string getMediaName();
+    bool findSector(BYTE side,
+                    BYTE track,
+                    BYTE sector);
+
     static GenericFloppyDisk_ptr getDiskette(std::vector<std::string> argv);
 
   private:
-    const char*                                imageName_m;
+    const std::string                          imageName_m;
     static const unsigned int                  maxHeads_c = 2;
 
     std::vector <std::shared_ptr<Track> >      tracks_m[maxHeads_c];
+    std::vector<std::shared_ptr<DiskSide> >    sideData_m;
 
     std::shared_ptr<Sector>                    curSector_m;
     int                                        dataPos_m;
@@ -57,22 +60,15 @@ class IMDFloppyDisk: public GenericFloppyDisk
     BYTE                                       secLenCode_m;
     bool                                       ready_m;
 
-    // bool          interlaced_m;
-    // int           mediaLat_m;
-    // BYTE          secLenCode_m;
     // int           gapLen_m;
     // int           indexGapLen_m;
     // unsigned long writePos_m;
     // bool          trackWrite_m;
-    // int           dataPos_m;
-    // int           dataLen_m;
 
-    // bool checkHeader(BYTE* buf, int n);
-    // bool cacheSector(int side, int track, int sector);
 
   protected:
     bool readIMD(const char* name);
-    bool findSector(int side, int track, int sector);
+
 
 };
 

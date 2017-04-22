@@ -36,8 +36,8 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
 
     while (*b != '\n' && *b != '\0' && b - buf < n)
     {
-        BYTE* e;
-        int   p = strtoul((char*) b, (char**) &e, 0);
+        BYTE*         e;
+        unsigned long p = strtoul((char*) b, (char**) &e, 0);
 
         switch (tolower(*e))
         {
@@ -48,7 +48,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
                 }
 
                 m          |= 0x01;
-                mediaSize_m = p;
+                mediaSize_m = (int) p;
                 break;
 
             case 'z':
@@ -58,7 +58,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
                 }
 
                 m        |= 0x02;
-                secSize_m = p;
+                secSize_m = (int) p;
                 break;
 
             case 'p':
@@ -68,7 +68,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
                 }
 
                 m           |= 0x04;
-                numSectors_m = p;
+                numSectors_m = (int) p;
                 break;
 
             case 's':
@@ -78,7 +78,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
                 }
 
                 m         |= 0x08;
-                numSides_m = p;
+                numSides_m = (int) p;
                 break;
 
             case 't':
@@ -88,7 +88,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
                 }
 
                 m          |= 0x10;
-                numTracks_m = p;
+                numTracks_m = (int) p;
                 break;
 
             case 'd':
@@ -103,7 +103,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
 
             case 'l': // optional ?
                 // m |= 0x80;
-                mediaLat_m = p;
+                mediaLat_m = (int) p;
                 break;
 
             default:
@@ -122,7 +122,7 @@ SectorFloppyImage::checkHeader(BYTE* buf, int n)
 }
 
 void
-SectorFloppyImage::eject(char const* file)
+SectorFloppyImage::eject(const string file)
 {
     // flush data...
     close(imageFd_m);
@@ -183,6 +183,7 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive*        drive,
     if (fd < 0)
     {
         debugss(ssSectorFloppyImage, ERROR, "unable to open file - %s\n", name);
+        free((void*) name);
         return;
     }
 
@@ -193,12 +194,13 @@ SectorFloppyImage::SectorFloppyImage(GenericDiskDrive*        drive,
     {
         // empty file... can't access...
         debugss(ssSectorFloppyImage, ERROR, "file is empty - %s\n", name);
+        free((void*) name);
         return;
     }
 
     lseek(fd, end - sizeof(buf), SEEK_SET);
-    int  x    = read(fd, buf, sizeof(buf));
-    bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
+    ssize_t x    = read(fd, buf, sizeof(buf));
+    bool    done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
     if (!done)
     {
@@ -279,7 +281,11 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
     if (bufferDirty_m && bufferedSide_m != -1 && bufferedTrack_m != -1 && bufferedSector_m != -1)
     {
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-        int rd = write(imageFd_m, secBuf_m, secSize_m);
+        ssize_t rd = write(imageFd_m, secBuf_m, secSize_m);
+        if (rd != secSize_m)
+        {
+            debugss(ssSectorFloppyImage, ERROR, "Unable to write to file %s\n", imageName_m);
+        }
         bufferDirty_m = false;
     }
 
@@ -314,7 +320,7 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
     }
 
     lseek(imageFd_m, bufferOffset_m, SEEK_SET);
-    int rd = read(imageFd_m, secBuf_m, secSize_m);
+    ssize_t rd = read(imageFd_m, secBuf_m, secSize_m);
 
     if (rd != secSize_m)
     {
@@ -329,6 +335,14 @@ SectorFloppyImage::cacheSector(int side, int track, int sector)
     bufferedSector_m = sector;
     return true;
 
+}
+
+bool
+SectorFloppyImage::findSector(BYTE sideNum,
+                              BYTE trackNum,
+                              BYTE sectorNum)
+{
+    return cacheSector(sideNum, trackNum, sectorNum);
 }
 
 bool
@@ -486,13 +500,6 @@ SectorFloppyImage::writeData(BYTE track, BYTE side, BYTE sector, int inSector,
     }
 
     return true;
-}
-
-BYTE
-SectorFloppyImage::getMaxSectors(BYTE sides,
-                                 BYTE track)
-{
-    return numSectors_m & 0xff;
 }
 
 bool

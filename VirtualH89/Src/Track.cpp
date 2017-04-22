@@ -35,6 +35,20 @@ Track::startFormat()
 
 }
 
+BYTE
+Track::getTrackNumber()
+{
+
+    return trackNum_m;
+}
+
+BYTE
+Track::getSideNumber()
+{
+
+    return sideNum_m;
+}
+
 bool
 Track::addSector(shared_ptr<Sector> sector)
 {
@@ -68,25 +82,8 @@ Track::setDataRate(DataRate datarate)
 {
     dataRate_m = datarate;
 }
-/*
-   bool
-   Track::readSectorData(BYTE  sectorNum,
-                      WORD  pos,
-                      BYTE& data)
-   {
-    debugss(ssFloppyDisk, INFO, "sector: %d pos: %d\n", sectorNum, pos);
 
-    shared_ptr<Sector> sector = findSector(sectorNum);
-    if (sector)
-    {
-        return sector->readData(pos, data);
-    }
 
-    debugss(ssFloppyDisk, INFO, "Not found\n");
-
-    return false;
-   }
- */
 shared_ptr<Sector>
 Track::findSector(BYTE sectorNum)
 {
@@ -101,22 +98,4 @@ Track::findSector(BYTE sectorNum)
     }
 
     return nullptr;
-}
-
-BYTE
-Track::getMaxSectors()
-{
-    BYTE max = 0;
-
-    for (shared_ptr<Sector> sector : sectors_m)
-    {
-        BYTE sectorNum = sector->getSectorNum();
-
-        if (sectorNum > max)
-        {
-            max = sectorNum;
-        }
-    }
-
-    return max;
 }

@@ -58,9 +58,10 @@ class RawFloppyImage: public GenericFloppyDisk
                    bool dataReady,
                    int& result);
     bool isReady();
-    virtual BYTE getMaxSectors(BYTE side,
-                               BYTE track);
-    void eject(const char* name);
+    bool findSector(BYTE side,
+                    BYTE track,
+                    BYTE sector);
+    void eject(const std::string name);
     void dump(void);
     std::string getMediaName();
 

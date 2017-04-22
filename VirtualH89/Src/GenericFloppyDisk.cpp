@@ -36,15 +36,21 @@ GenericFloppyDisk::~GenericFloppyDisk()
 GenericFloppyDisk::FileType_t
 GenericFloppyDisk::determineFileType(std::string filename)
 {
+    // Currently just using file extension to choose
+
+    // look for last period
     size_t pos = filename.rfind('.');
 
+    // check if none was found.
     if (pos == string::npos)
     {
         return Unknown;
     }
 
+    // extract the extension
     std::string extension = filename.substr(pos + 1);
 
+    // convert to lower case.
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
     if (extension == "imd")
@@ -57,6 +63,7 @@ GenericFloppyDisk::determineFileType(std::string filename)
         return TD0;
     }
 
+    // Doesn't match an existing known format.
     return Unknown;
 }
 
@@ -92,18 +99,22 @@ GenericFloppyDisk::loadDiskImage(vector<string> argv)
 void
 GenericFloppyDisk::setDriveType(BYTE numTracks)
 {
+    // Check if drive/disk match
     if (numTracks == numTracks_m)
     {
+        // they match
         hypoTrack_m  = false;
         hyperTrack_m = false;
     }
     else if ((numTracks == 40) && (numTracks_m == 80))
     {
+        // drive is only 40 tracks but disk is 80.
         hyperTrack_m = true;
         hypoTrack_m  = false;
     }
     else if ((numTracks == 80) && (numTracks_m == 40))
     {
+        // drive is 80 tracks and disk is 40.
         hyperTrack_m = false;
         hypoTrack_m  = true;
     }
@@ -113,17 +124,38 @@ GenericFloppyDisk::setDriveType(BYTE numTracks)
     }
 }
 
+void
+GenericFloppyDisk::setWriteProtect(bool value)
+{
+    writeProtect_m = value;
+}
+
 BYTE
 GenericFloppyDisk::getRealTrackNumber(BYTE track)
 {
+    // possibly update track if format mismatch between drive and disk
     if (hyperTrack_m)
     {
+        // skip every other track
         return track * 2;
     }
     else if (hypoTrack_m)
     {
+        // read each track twice
         return track / 2;
     }
 
     return track;
+}
+
+
+string
+GenericFloppyDisk::getMediaName()
+{
+    if (imageName_m.empty())
+    {
+        return "NONE";
+    }
+
+    return imageName_m;
 }

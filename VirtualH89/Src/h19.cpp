@@ -1373,4 +1373,3 @@ H19::notification(unsigned int cycleCount)
         return;
     }
 }
-

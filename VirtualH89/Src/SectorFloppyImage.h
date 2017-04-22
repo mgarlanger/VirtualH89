@@ -39,10 +39,11 @@ class SectorFloppyImage: public GenericFloppyDisk
     bool readData(BYTE track, BYTE side, BYTE sector, int inSector, int& data);
     bool writeData(BYTE track, BYTE side, BYTE sector, int inSector,
                    BYTE data, bool dataReady, int& result);
-    virtual BYTE getMaxSectors(BYTE sides,
-                               BYTE track);
+    bool findSector(BYTE side,
+                    BYTE track,
+                    BYTE sector);
     bool isReady();
-    void eject(const char* name);
+    void eject(const std::string name);
     void dump(void);
     std::string getMediaName();
 

@@ -8,9 +8,13 @@
 
 #include "SoftSectoredDisk.h"
 
-#include "logger.h"
+#include "DiskSide.h"
 #include "Track.h"
 #include "Sector.h"
+
+#include "GenericFloppyFormat.h"
+
+#include "logger.h"
 
 /// \cond
 #include <fstream>
@@ -20,6 +24,308 @@
 
 using namespace std;
 
+SoftSectoredDisk::SoftSectoredDisk(): GenericFloppyDisk(),
+                                      curSector_m(nullptr),
+                                      sectorPos_m(0),
+                                      sectorLength_m(0),
+                                      secLenCode_m(0),
+                                      ready_m(true)
+{
+
+}
+
+SoftSectoredDisk::~SoftSectoredDisk()
+{
+
+}
+
+bool
+SoftSectoredDisk::findSector(BYTE sideNum,
+                             BYTE trackNum,
+                             BYTE sectorNum)
+{
+
+    debugss(ssFloppyDisk, INFO, "findSector - side: %d track %d sector: %d\n", sideNum, trackNum,
+            sectorNum);
+    if (hypoTrack_m)
+    {
+        if ((trackNum & 1) != 0)
+        {
+            // return false;
+        }
+
+        trackNum /= 2;
+    }
+    else if (hyperTrack_m)
+    {
+        trackNum *= 2;
+    }
+    debugss(ssFloppyDisk, INFO, "findSector2 - side: %d track %d sector: %d\n", sideNum, trackNum,
+            sectorNum);
+
+    if (sideNum < numSides_m)
+    {
+        curSector_m = sideData_m[sideNum]->findSector(trackNum, sectorNum);
+    }
+
+    if (!curSector_m)
+    {
+        return false;
+    }
+
+    if (curSector_m->getHeadNum() != sideNum)
+    {
+        curSector_m = nullptr;
+        return false;
+    }
+
+    sectorLength_m = curSector_m->getSectorLength();
+    // TODO handle if the L options is set to '0'.
+    switch (sectorLength_m)
+    {
+        case 128:
+            secLenCode_m = 0;
+            break;
+
+        case 256:
+            secLenCode_m = 1;
+            break;
+
+        case 512:
+            secLenCode_m = 2;
+            break;
+
+        case 1024:
+            secLenCode_m = 3;
+            break;
+
+        default:
+            debugss(ssFloppyDisk, ERROR, "bad sector size: %d\n", sectorLength_m);
+            curSector_m = nullptr;
+            return false;
+    }
+
+    debugss(ssFloppyDisk, INFO, "findSector - found\n");
+
+    return true;
+}
+
+
+void
+SoftSectoredDisk::addTrack(std::shared_ptr<Track> track)
+{
+    BYTE sideNumber = track->getSideNumber();
+    // BYTE trackNumber = track->getTrackNumber();
+/*    if ()
+    {
+
+    }
+ */
+}
+
+
+bool
+SoftSectoredDisk::readData(BYTE track,
+                           BYTE side,
+                           BYTE sector,
+                           int  inSector,
+                           int& data)
+{
+
+    if (inSector < 0)
+    {
+        if (sector == 0xfd)
+        {
+            data = GenericFloppyFormat::ID_AM;
+        }
+        else if (sector == 0xff)
+        {
+            data = GenericFloppyFormat::INDEX_AM;
+        }
+        else if (findSector(side, track, sector))
+        {
+            sectorPos_m = 0;
+            data        = GenericFloppyFormat::DATA_AM;
+        }
+        else
+        {
+            data = GenericFloppyFormat::NO_DATA;
+        }
+
+        return true;
+    }
+
+    if (sector == 0xfd)
+    {
+        switch (inSector)
+        {
+            case 0:
+                if (hypoTrack_m)
+                {
+                    data = track / 2;
+                }
+                else if (hyperTrack_m)
+                {
+                    data = track * 2;
+                }
+                else
+                {
+                    data = track;
+                }
+                break;
+
+            case 1:
+                data = side;
+                break;
+
+            case 2:
+                data = 1; // anything will do? 'sector' is 0xfd...
+                break;
+
+            case 3:
+                data = secLenCode_m;
+                break;
+
+            case 4:
+                data = 0; // CRC 1
+                break;
+
+            case 5:
+                data = 0; // CRC 2
+                break;
+
+            default:
+                data = GenericFloppyFormat::CRC;
+                break;
+        }
+
+        return true;
+    }
+    else if (sector == 0xff)
+    {
+        if (inSector < sectorLength_m)
+        {
+            // TODO: implement this
+            data = 0;
+        }
+        else
+        {
+            data = GenericFloppyFormat::CRC;
+        }
+
+        return true;
+    }
+
+    if (sectorPos_m < sectorLength_m)
+    {
+        if (curSector_m)
+        {
+            BYTE sectorData;
+            curSector_m->readData(sectorPos_m++, sectorData);
+            data = sectorData;
+        }
+        else
+        {
+            debugss(ssFloppyDisk, ERROR, "curSector_m not set\n");
+        }
+    }
+    else
+    {
+        debugss(ssFloppyDisk, INFO, "data done %d %d %d\n", track, side, sector);
+        data = GenericFloppyFormat::CRC;
+    }
+
+    return true;
+}
+
+bool
+SoftSectoredDisk::writeData(BYTE track,
+                            BYTE side,
+                            BYTE sector,
+                            int  inSector,
+                            BYTE data,
+                            bool dataReady,
+                            int& result)
+{
+
+    if (checkWriteProtect())
+    {
+        debugss(ssSectorFloppyImage, ERROR, "write protect\n");
+        return false;
+    }
+
+    if (inSector < 0)
+    {
+        if (sector == 0xff || sector == 0xfe)
+        {
+            result = GenericFloppyFormat::ERROR;
+        }
+        else if (findSector(side, track, sector))
+        {
+            sectorPos_m = 0;
+            result      = GenericFloppyFormat::DATA_AM;
+        }
+        else
+        {
+            result = GenericFloppyFormat::NO_DATA;
+        }
+        return true;
+    }
+
+    debugss(ssSectorFloppyImage, INFO, "pos=%d data=%02x\n", inSector, data);
+
+    if (sectorPos_m < sectorLength_m)
+    {
+
+        if (!dataReady)
+        {
+            debugss(ssSectorFloppyImage, ERROR, "data not read pos=%d\n", inSector);
+            result = GenericFloppyFormat::NO_DATA;
+        }
+        else
+        {
+            if (curSector_m)
+            {
+                curSector_m->writeData(sectorPos_m++, data);
+
+                result = data;
+            }
+            else
+            {
+                debugss(ssFloppyDisk, ERROR, "curSector_m not set\n");
+            }
+        }
+    }
+    else
+    {
+        debugss(ssSectorFloppyImage, INFO, "CRC pos=%d data=%02x\n", inSector, data);
+        result = GenericFloppyFormat::CRC;
+    }
+
+    return true;
+}
+
+bool
+SoftSectoredDisk::isReady()
+{
+    return ready_m;
+}
+
+void
+SoftSectoredDisk::eject(const string name)
+{
+    // \todo implement
+
+}
+
+void
+SoftSectoredDisk::dump(void)
+{
+    // \todo implement
+}
+
+
+#if 0
 SoftSectoredDisk::SoftSectoredDisk(const char*     name,
                                    DiskImageFormat format): initialized_m(false)
 {
@@ -68,7 +374,7 @@ SoftSectoredDisk::SoftSectoredDisk()
     maxTrack_m    = tracksPerSide_c;
 
     initialized_m = true;
-    setWriteProtect(false);
+    // setWriteProtect(false);
 }
 
 SoftSectoredDisk::~SoftSectoredDisk()
@@ -331,6 +637,8 @@ SoftSectoredDisk::readIMD(const char* name)
         debugss(ssFloppyDisk, ALL, "Head:    %d\n", head);
 
         Track* trk = new Track(head, cyl);
+        trk->setDataRate(dataRate);
+        trk->setDensity(density);
 
         numSec        = buf[pos++];
         debugss(ssFloppyDisk, ALL, "Num Sectors:    %d\n", numSec);
@@ -635,3 +943,4 @@ SoftSectoredDisk::eject(const char* name)
 {
 
 }
+#endif

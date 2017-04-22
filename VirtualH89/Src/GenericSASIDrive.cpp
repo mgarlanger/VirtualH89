@@ -206,7 +206,7 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
         mediaSpt  = sectorsPerTrack;
         mediaLat  = 1;
         memset(buf, 0, sizeof(buf));
-        int l = sprintf((char*) buf, "%dc%dh%dz%dp%dl\n", mediaCyl, mediaHead,
+        int l = sprintf((char*) buf, "%ldc%ldh%ldz%ldp%ldl\n", mediaCyl, mediaHead,
                         mediaSsz, mediaSpt, mediaLat);
         // NOTE: 'buf' includes a '\n'...
         debugss(ssMMS77320, ERROR, "Initializing new media %s as %s", driveMedia, buf);
@@ -218,8 +218,8 @@ GenericSASIDrive::GenericSASIDrive(DriveType   type,
     {
         // first, trying reading the last 128 bytes...
         lseek(driveFd, end - sizeof(buf), SEEK_SET);
-        int  x    = read(driveFd, buf, sizeof(buf));
-        bool done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
+        ssize_t x    = read(driveFd, buf, sizeof(buf));
+        bool    done = (x == sizeof(buf) && checkHeader(buf, sizeof(buf)));
 
         if (!done)
         {

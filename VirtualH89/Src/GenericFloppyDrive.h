@@ -28,7 +28,7 @@ class GenericFloppyDisk;
 /// Implements a virtual floppy disk drive. Supports 48/96 tpi 5.25",
 /// 48 tpi 8", either can be SS or DS. Note, the media determines density.
 ///
-class GenericFloppyDrive: public GenericDiskDrive, ClockUser
+class GenericFloppyDrive: public GenericDiskDrive, public ClockUser
 {
   public:
     enum DriveType
@@ -45,10 +45,11 @@ class GenericFloppyDrive: public GenericDiskDrive, ClockUser
 
     static GenericFloppyDrive* getInstance(std::string type);
     bool getTrackZero();
-    bool readAddress(int& track,
-                     int& sector,
-                     int& side);
-    bool verifyTrackSector(BYTE track, BYTE sector);
+    bool readAddress(int& trackNum,
+                     int& sectorNum,
+                     int& sideNum);
+    bool verifyTrackSector(BYTE trackNum,
+                           BYTE sectorNum);
     void step(bool direction);
     void selectSide(BYTE side);
 
@@ -64,9 +65,6 @@ class GenericFloppyDrive: public GenericDiskDrive, ClockUser
                   int  inSector,
                   BYTE data,
                   bool dataReady);
-
-    BYTE getMaxSectors(BYTE side,
-                       BYTE track);
 
     void insertDisk(std::shared_ptr<GenericFloppyDisk> disk);
 

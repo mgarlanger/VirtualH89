@@ -29,8 +29,9 @@
 		A13C989D1C7A3850000CF03B /* RawFloppyImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989B1C7A3850000CF03B /* RawFloppyImage.cpp */; };
 		A13C98A01C7A385C000CF03B /* wd1797.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A13C989E1C7A385C000CF03B /* wd1797.cpp */; };
 		A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */; };
-		A169338F1EAAEE01005BE143 /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A169338B1EAAEE01005BE143 /* GUI.cpp */; };
-		A16933901EAAEE01005BE143 /* GUIglut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A169338D1EAAEE01005BE143 /* GUIglut.cpp */; };
+		A16933971EAAFAF0005BE143 /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A16933911EAAFAF0005BE143 /* GUI.cpp */; };
+		A16933981EAAFAF0005BE143 /* GUIglut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A16933931EAAFAF0005BE143 /* GUIglut.cpp */; };
+		A16933991EAAFAF0005BE143 /* DiskSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A16933951EAAFAF0005BE143 /* DiskSide.cpp */; };
 		A192FCD91CDFB68100B4E8D5 /* Memory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */; };
 		A192FCDD1CDFBF7800B4E8D5 /* MemoryLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */; };
 		A192FCE11CDFC43E00B4E8D5 /* SystemMemory8K.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */; };
@@ -150,10 +151,12 @@
 		A13C989F1C7A385C000CF03B /* wd1797.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wd1797.h; sourceTree = "<group>"; };
 		A15861A71CB8DCE500D3382D /* WD179xUserIf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WD179xUserIf.cpp; sourceTree = "<group>"; };
 		A15861A81CB8DCE500D3382D /* WD179xUserIf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WD179xUserIf.h; sourceTree = "<group>"; };
-		A169338B1EAAEE01005BE143 /* GUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUI.cpp; sourceTree = "<group>"; };
-		A169338C1EAAEE01005BE143 /* GUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUI.h; sourceTree = "<group>"; };
-		A169338D1EAAEE01005BE143 /* GUIglut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIglut.cpp; sourceTree = "<group>"; };
-		A169338E1EAAEE01005BE143 /* GUIglut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIglut.h; sourceTree = "<group>"; };
+		A16933911EAAFAF0005BE143 /* GUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUI.cpp; sourceTree = "<group>"; };
+		A16933921EAAFAF0005BE143 /* GUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUI.h; sourceTree = "<group>"; };
+		A16933931EAAFAF0005BE143 /* GUIglut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIglut.cpp; sourceTree = "<group>"; };
+		A16933941EAAFAF0005BE143 /* GUIglut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIglut.h; sourceTree = "<group>"; };
+		A16933951EAAFAF0005BE143 /* DiskSide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskSide.cpp; sourceTree = "<group>"; };
+		A16933961EAAFAF0005BE143 /* DiskSide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskSide.h; sourceTree = "<group>"; };
 		A192FCD81CDFB68100B4E8D5 /* Memory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Memory8K.cpp; sourceTree = "<group>"; };
 		A192FCDC1CDFBF7800B4E8D5 /* MemoryLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryLayout.cpp; sourceTree = "<group>"; };
 		A192FCE01CDFC43E00B4E8D5 /* SystemMemory8K.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemMemory8K.cpp; sourceTree = "<group>"; };
@@ -328,6 +331,12 @@
 		A1A433CE1C7060430015F838 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				A16933911EAAFAF0005BE143 /* GUI.cpp */,
+				A16933921EAAFAF0005BE143 /* GUI.h */,
+				A16933931EAAFAF0005BE143 /* GUIglut.cpp */,
+				A16933941EAAFAF0005BE143 /* GUIglut.h */,
+				A16933951EAAFAF0005BE143 /* DiskSide.cpp */,
+				A16933961EAAFAF0005BE143 /* DiskSide.h */,
 				A1A433CF1C7060430015F838 /* .gitignore */,
 				A1A433D01C7060430015F838 /* AddressBus.cpp */,
 				A1A433D11C7060430015F838 /* AddressBus.h */,
@@ -372,10 +381,6 @@
 				A13C98871C7A3805000CF03B /* GenericSASIDrive.h */,
 				A13BEE661C96956800C7E65A /* GppListener.cpp */,
 				A13BEE671C96956800C7E65A /* GppListener.h */,
-				A169338B1EAAEE01005BE143 /* GUI.cpp */,
-				A169338C1EAAEE01005BE143 /* GUI.h */,
-				A169338D1EAAEE01005BE143 /* GUIglut.cpp */,
-				A169338E1EAAEE01005BE143 /* GUIglut.h */,
 				A1A433F01C7060430015F838 /* h-17-1.cpp */,
 				A1A433F11C7060430015F838 /* h-17-1.h */,
 				A1A433F21C7060430015F838 /* h-17-4.cpp */,
@@ -518,7 +523,7 @@
 		A1A433B81C705D310015F838 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Mark Garlanger";
 				TargetAttributes = {
 					A1A433BF1C705D310015F838 = {
@@ -567,7 +572,7 @@
 				A13C98971C7A382D000CF03B /* mms77320.cpp in Sources */,
 				A13BEE6D1C96957F00C7E65A /* H88MemoryDecoder.cpp in Sources */,
 				A1A4344F1C7060430015F838 /* InterruptController.cpp in Sources */,
-				A169338F1EAAEE01005BE143 /* GUI.cpp in Sources */,
+				A16933971EAAFAF0005BE143 /* GUI.cpp in Sources */,
 				A1A434411C7060430015F838 /* EventHandler.cpp in Sources */,
 				A1A4343C1C7060430015F838 /* crc-ccitt.cpp in Sources */,
 				A1A4344B1C7060430015F838 /* h89-timer.cpp in Sources */,
@@ -613,12 +618,13 @@
 				A1A434451C7060430015F838 /* h-17-4.cpp in Sources */,
 				A1A4343B1C7060430015F838 /* cpu.cpp in Sources */,
 				A13C98961C7A382D000CF03B /* mms77316.cpp in Sources */,
+				A16933991EAAFAF0005BE143 /* DiskSide.cpp in Sources */,
 				A1A434631C7060430015F838 /* Z47Interface.cpp in Sources */,
 				A1A434431C7060430015F838 /* GeneralPurposePort.cpp in Sources */,
 				A1A434641C7060430015F838 /* z80.cpp in Sources */,
 				A1A434491C7060430015F838 /* H47Drive.cpp in Sources */,
 				A1A4343F1C7060430015F838 /* DiskDrive.cpp in Sources */,
-				A16933901EAAEE01005BE143 /* GUIglut.cpp in Sources */,
+				A16933981EAAFAF0005BE143 /* GUIglut.cpp in Sources */,
 				A15861A91CB8DCE500D3382D /* WD179xUserIf.cpp in Sources */,
 				A1A4345D1C7060430015F838 /* SoftSectoredDisk.cpp in Sources */,
 				A1A4345C1C7060430015F838 /* SignalHandler.cpp in Sources */,
@@ -642,10 +648,8 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -687,10 +691,8 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";

@@ -59,7 +59,7 @@ H37InterruptController::readDataBus()
     {
         debugss(ssH37InterruptController, INFO, "intrq set\n");
 
-        // RST 20H
+        // RST 20H (Interrupt 4)
         opCode = 0xe7;
     }
     else if (drqRaised_m)

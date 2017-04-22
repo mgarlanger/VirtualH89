@@ -9,18 +9,43 @@
 #ifndef SOFTSECTOREDDISK_H_
 #define SOFTSECTOREDDISK_H_
 
-#include "FloppyDisk.h"
+// #include "FloppyDisk.h"
+#include "GenericFloppyDisk.h"
 
 /// \cond
 #include <vector>
 /// \endcond
 
+class DiskSide;
 class Track;
+class Sector;
 
-class SoftSectoredDisk: public FloppyDisk
+class SoftSectoredDisk: public GenericFloppyDisk
 {
   public:
-    enum DiskImageFormat
+    SoftSectoredDisk();
+    virtual ~SoftSectoredDisk();
+
+    virtual bool readData(BYTE track,
+                          BYTE side,
+                          BYTE sector,
+                          int  inSector,
+                          int& data);
+    virtual bool writeData(BYTE track,
+                           BYTE side,
+                           BYTE sector,
+                           int  inSector,
+                           BYTE data,
+                           bool dataReady,
+                           int& result);
+    bool findSector(BYTE sideNum,
+                    BYTE trackNum,
+                    BYTE sectorNum);
+    virtual bool isReady();
+    virtual void eject(const std::string name);
+    virtual void dump(void);
+
+/*    enum DiskImageFormat
     {
         dif_Unknown,
         dif_RAW,
@@ -52,9 +77,19 @@ class SoftSectoredDisk: public FloppyDisk
                                 WORD  pos,
                                 BYTE& data);
     virtual void eject(const char* name);
+ */
+  protected:
+    std::vector<std::shared_ptr<DiskSide> > sideData_m;
+    BYTE                                    numSides_m;
+    std::shared_ptr<Sector>                 curSector_m;
+    unsigned                                sectorPos_m;
+    unsigned                                sectorLength_m;
+    BYTE                                    secLenCode_m;
+    bool                                    ready_m;
 
-  private:
-    static const unsigned int bytesPerTrack_c = 6400;
+    virtual void addTrack(std::shared_ptr<Track> track);
+
+/*    static const unsigned int bytesPerTrack_c = 6400;
 
     static const unsigned int tracksPerSide_c = 80;
     static const unsigned int maxHeads_c      = 2;
@@ -69,7 +104,7 @@ class SoftSectoredDisk: public FloppyDisk
     BYTE                      numSectors_m  = 10;
 
     // move these to track, that is how it is encoded in IMD files.
-//    DataRate dataRate_m;
+   //    DataRate dataRate_m;
 
     bool defaultHoleStatus(unsigned long pos);
 
@@ -80,9 +115,9 @@ class SoftSectoredDisk: public FloppyDisk
     bool readRaw(const char* name);
     bool readRaw8(const char* name);
 
-  protected:
+   protected:
     void dump();
-
+ */
 };
 
 #endif // SOFTSECTOREDDISK_H_

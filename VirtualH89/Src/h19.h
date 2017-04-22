@@ -94,14 +94,14 @@ class H19: public Console, public ClockUser, public H19Screen // , public BaseTh
         SetMode,
         ResetMode
     };
-    InputMode    mode_m;
-    bool         updated_m;
-    BYTE         sw401_m;
-    BYTE         sw402_m;
+    InputMode        mode_m;
+    bool             updated_m;
+    BYTE             sw401_m;
+    BYTE             sw402_m;
 
     std::queue<BYTE> charToSend;
-    unsigned long countdownToSend_m;
-    unsigned long characterDelay_m;
+    unsigned long    countdownToSend_m;
+    unsigned long    characterDelay_m;
 
     // display modes
     bool         reverseVideo_m;

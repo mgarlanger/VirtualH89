@@ -31,8 +31,8 @@
 #include "h-17-4.h"
 #include "H47Drive.h"
 #include "HardSectoredDisk.h"
-#include "SoftSectoredDisk.h"
-#include "EightInchDisk.h"
+// #include "SoftSectoredDisk.h"
+// #include "EightInchDisk.h"
 #include "CPNetDevice.h"
 #include "Console.h"
 #include "logger.h"
@@ -270,6 +270,8 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
         }
         else if (s.compare("H47") == 0)
         {
+            // Not functional
+
             // select port based on slot - p504 -> 0170 p506 -> 0174
             z47If    = new Z47Interface(devslots[x].compare("slot_p506") == 0 ?
                                         Z47_BaseAddress_2_c : Z47_BaseAddress_1_c);
@@ -289,15 +291,15 @@ H89::buildSystem(Console* console, PropertyUtil::PropertyMapT props)
                 s = "diskA.eightdisk";
             }
 
-            eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
-            s      = props["z47_disk2"];
+            // eight0 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+            s = props["z47_disk2"];
 
             if (s.empty())
             {
                 s = "diskB.eightdisk";
             }
 
-            eight1 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
+            // eight1 = new EightInchDisk(s.c_str(), EightInchDisk::dif_8RAW);
 
         }
         else if (s.compare("H_88_3") == 0)

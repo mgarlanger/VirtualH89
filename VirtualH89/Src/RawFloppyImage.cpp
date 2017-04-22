@@ -64,7 +64,7 @@ RawFloppyImage::getAddrMark(BYTE* tp,
 }
 
 void
-RawFloppyImage::eject(char const* file)
+RawFloppyImage::eject(const std::string file)
 {
     // flush data...
     cacheTrack(-1, -1);
@@ -194,19 +194,19 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         return;
     }
 
-    BYTE* tp     = trackBuffer_m;
-    BYTE* idx    = NULL;
-    BYTE* dat    = NULL;
-    BYTE* end    = NULL;
-    long  trklen = 0;
-    int   seclen = 0;
-    int   numsec = 0;
-    long  idxgap = 0;
-    long  gaplen = 0;
-    int   id_tk  = -1;
-    int   id_sd  = -1;
-    int   id_sc  = -1;
-    int   id_sl  = -1;
+    BYTE*    tp     = trackBuffer_m;
+    BYTE*    idx    = NULL;
+    BYTE*    dat    = NULL;
+    BYTE*    end    = NULL;
+    unsigned trklen = 0;
+    int      seclen = 0;
+    int      numsec = 0;
+    unsigned idxgap = 0;
+    unsigned gaplen = 0;
+    int      id_tk  = -1;
+    int      id_sd  = -1;
+    int      id_sc  = -1;
+    int      id_sl  = -1;
 
     while (nbytes > 0)
     {
@@ -218,7 +218,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             }
             else
             {
-                trklen = (tp - idx);
+                trklen = (unsigned) (tp - idx);
                 // We could continue into next track, and check how side-1
                 // is handled.
                 break;
@@ -262,11 +262,11 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
             if (dat == NULL)
             {
                 dat    = tp + 1;
-                idxgap = dat - trackBuffer_m;
+                idxgap = (unsigned) (dat - trackBuffer_m);
             }
             else if (gaplen == 0)
             {
-                gaplen = tp + 1 - end;
+                gaplen = (unsigned)  (tp + 1 - end);
             }
             else if (gaplen != tp + 1 - end)
             {
@@ -514,7 +514,10 @@ RawFloppyImage::cacheTrack(int side,
         // Must write to disk...
         lseek(imageFd_m, bufferOffset_m, SEEK_SET);
         long rd = write(imageFd_m, trackBuffer_m, trackLen_m);
-        // TODO: what to do if this failed? Also might not know unitl close().
+        if (rd != trackLen_m)
+        {
+            debugss(ssRawFloppyImage, ERROR, "Unable to write to file %s\n", imageName_m);
+        }
         bufferDirty_m = false;
     }
 
@@ -640,6 +643,19 @@ RawFloppyImage::locateSector(BYTE track,
     }
 
     return false;
+}
+
+bool
+RawFloppyImage::findSector(BYTE sideNum,
+                           BYTE trackNum,
+                           BYTE sectorNum)
+{
+    if (!cacheTrack(sideNum, trackNum))
+    {
+        return false;
+    }
+    return locateSector(sideNum, trackNum, sectorNum);
+    // return cacheSector(sideNum, trackNum, sectorNum);
 }
 
 bool
@@ -795,13 +811,6 @@ RawFloppyImage::writeData(BYTE track,
 
     debugss(ssRawFloppyImage, INFO, "writeData pos=%d data=%02x\n", inSector, data);
     return true;
-}
-
-BYTE
-RawFloppyImage::getMaxSectors(BYTE side,
-                              BYTE track)
-{
-    return numSectors_m & 0xff;
 }
 
 bool
