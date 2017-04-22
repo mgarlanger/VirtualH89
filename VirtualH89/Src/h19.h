@@ -26,23 +26,27 @@
 
 class H19Screen
 {
-public:
-  H19Screen(void) : curCursor_m(false) { return; }
-  ~H19Screen(void) { return; }
+  public:
+    H19Screen(void): curCursor_m(false) {
+        return;
+    }
+    ~H19Screen(void) {
+        return;
+    }
 
-public:
-  // screen size
-  static const unsigned int cols_c     = 80;
-  static const unsigned int rows_c     = 25;
-  static const unsigned int rowsMain_c = 24;
+  public:
+    // screen size
+    static const unsigned int cols_c     = 80;
+    static const unsigned int rows_c     = 25;
+    static const unsigned int rowsMain_c = 24;
 
-  // Will be removed when display() is abstracted.
-  unsigned int screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
+    // Will be removed when display() is abstracted.
+    unsigned int              screen_m[cols_c][rows_c + 1]; // extra row for GLUT wraparound.
 
-  bool         curCursor_m;
-  unsigned int posX_m, posY_m;
-  bool         cursorBlock_m;
-  bool         cursorOff_m;
+    bool                      curCursor_m;
+    unsigned int              posX_m, posY_m;
+    bool                      cursorBlock_m;
+    bool                      cursorOff_m;
 };
 
 /// \brief Virtual %H19 %Terminal
@@ -71,10 +75,12 @@ class H19: public Console, public ClockUser, public H19Screen // , public BaseTh
     void notification(unsigned int cycleCount);
     virtual bool sendData(BYTE data);
 
-    inline static H19 *GetH19(void) {return h19;};
+    inline static H19* GetH19(void) {
+        return h19;
+    };
 
   private:
-    
+
     static void GUIDisplay();
     static void timer(void);
     static void keyboard(unsigned char key);
@@ -104,23 +110,23 @@ class H19: public Console, public ClockUser, public H19Screen // , public BaseTh
     unsigned long    characterDelay_m;
 
     // display modes
-    bool         reverseVideo_m;
-    bool         graphicMode_m;
-    bool         insertMode_m;
-    bool         line25_m;
-    bool         holdScreen_m;
-    bool         wrapEOL_m;
-    bool         autoLF_m;
-    bool         autoCR_m;
+    bool             reverseVideo_m;
+    bool             graphicMode_m;
+    bool             insertMode_m;
+    bool             line25_m;
+    bool             holdScreen_m;
+    bool             wrapEOL_m;
+    bool             autoLF_m;
+    bool             autoCR_m;
 
-    bool         keyboardEnabled_m;
-    bool         keyClick_m;
-    bool         keypadShifted_m;
-    bool         altKeypadMode_m;
+    bool             keyboardEnabled_m;
+    bool             keyClick_m;
+    bool             keypadShifted_m;
+    bool             altKeypadMode_m;
 
-    bool         offline_m;
+    bool             offline_m;
 
-    unsigned int saveX_m, saveY_m;
+    unsigned int     saveX_m, saveY_m;
 
     //
     // internal routines to handle control characters.

@@ -6,7 +6,7 @@
 
 #include "h19.h"
 
-//#include "h19-font.h"
+// #include "h19-font.h"
 #include "logger.h"
 
 
@@ -33,7 +33,7 @@ H19::H19(std::string sw401, std::string sw402): Console(0, nullptr),
                                                 updated_m(true),
                                                 offline_m(false)
 // TODO: Remove
-//,
+// ,
 //                                                curCursor_m(false)
 {
     h19 = this;

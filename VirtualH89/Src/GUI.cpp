@@ -13,23 +13,23 @@
 #include "GUI.h"
 
 // All GUI access is through this pointer to the base GUI class.
-GUI *TheGUI = nullptr;
+GUI* TheGUI = nullptr;
 
 GUI::GUI()
 {
-  // There can only be one GUI engine in the system.
-  assert(TheGUI == nullptr);
+    // There can only be one GUI engine in the system.
+    assert(TheGUI == nullptr);
 
-  // This is not the one and only GUI enging.
-  TheGUI = this;
+    // This is not the one and only GUI enging.
+    TheGUI = this;
 
-  return;
+    return;
 }
 
 GUI::~GUI()
 {
-  // We no longer have a GUI engine.
-  TheGUI = nullptr;
+    // We no longer have a GUI engine.
+    TheGUI = nullptr;
 
-  return;
+    return;
 }
