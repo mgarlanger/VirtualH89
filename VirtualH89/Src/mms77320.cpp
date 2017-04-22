@@ -37,7 +37,7 @@ MMS77320::MMS77320(int baseAddr,
                                   statusReg_m(0),
                                   switchReg_m(switches),
                                   ctrlBus_m(0),
-                                  curDrive_m(NULL),
+                                  curDrive_m(nullptr),
                                   intLevel_m(intLevel)
 {
     for (int x = 0; x < numDisks_c; ++x)
@@ -68,7 +68,7 @@ MMS77320::getDriveName(int index)
 {
     if (index < 0 || index >= numDisks_c)
     {
-        return NULL;
+        return nullptr;
     }
 
     char        buf[32];
@@ -83,7 +83,7 @@ MMS77320::findDrive(std::string ident)
 
     if (ident.find(MMS77320_Name_c) != 0 || ident[strlen(MMS77320_Name_c)] != '-')
     {
-        return NULL;
+        return nullptr;
     }
 
     char*         e;
@@ -91,7 +91,7 @@ MMS77320::findDrive(std::string ident)
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {
-        return NULL;
+        return nullptr;
     }
 
     return drives_m[x - 1];
@@ -143,7 +143,7 @@ MMS77320::install_MMS77320(PropertyUtil::PropertyMapT& props,
 
     if (!s.empty())
     {
-        sw = (unsigned int) strtoul(s.c_str(), NULL, 2);
+        sw = (unsigned int) strtoul(s.c_str(), nullptr, 2);
     }
 
     dir = props["mms77320_dir"];
@@ -175,10 +175,10 @@ MMS77320::~MMS77320()
 {
     for (int x = 0; x < numDisks_c; ++x)
     {
-        if (drives_m[x] != NULL)
+        if (drives_m[x] != nullptr)
         {
             delete drives_m[x];
-            drives_m[x] = NULL;
+            drives_m[x] = nullptr;
         }
     }
 }
@@ -192,7 +192,7 @@ MMS77320::reset(void)
     control1Reg_m = -1;
     statusReg_m   = 0;
     ctrlBus_m     = 0;
-    curDrive_m    = NULL;
+    curDrive_m    = nullptr;
     h89.lowerINT(intLevel_m);
     // TODO: reset all drives?
 }
@@ -210,7 +210,7 @@ MMS77320::in(BYTE addr)
         val = dataInReg_m;
         debugss(ssMMS77320, INFO, "MMS77320::in(DataPort) %02x\n", val);
 
-        if (curDrive_m != NULL)
+        if (curDrive_m != nullptr)
         {
             ctrlBus_m |= GenericSASIDrive::ctl_Ack_i_c;
             curDrive_m->ack(dataInReg_m, dataOutReg_m, ctrlBus_m);
@@ -294,7 +294,7 @@ MMS77320::out(BYTE addr,
         debugss(ssMMS77320, INFO, "MMS77320::out(DataPort) %02x\n", val);
         dataOutReg_m = val;
 
-        if (curDrive_m != NULL)
+        if (curDrive_m != nullptr)
         {
             ctrlBus_m |= GenericSASIDrive::ctl_Ack_i_c;
             curDrive_m->ack(dataInReg_m, dataOutReg_m, ctrlBus_m);
@@ -310,7 +310,7 @@ MMS77320::out(BYTE addr,
 
         if (diff)
         {
-            if (curDrive_m != NULL)
+            if (curDrive_m != nullptr)
             {
                 // anything to do to de-select drive?
                 curDrive_m->deselect(dataInReg_m, dataOutReg_m, ctrlBus_m);
@@ -327,10 +327,10 @@ MMS77320::out(BYTE addr,
         val &= 0xf0;
         int diffs = (control0Reg_m ^ val);
         debugss(ssMMS77320, INFO, "MMS77320::out(Control0Port) %02x [%02x] (%s)\n", val, diffs,
-                curDrive_m != NULL ? "OK" : "null");
+                curDrive_m != nullptr ? "OK" : "null");
         control0Reg_m = val;
 
-        if (diffs && curDrive_m != NULL)
+        if (diffs && curDrive_m != nullptr)
         {
             if (control0Reg_m == 0)
             {
@@ -366,7 +366,7 @@ MMS77320::getDrive(BYTE unitNum)
         return drives_m[unitNum];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool
@@ -379,7 +379,7 @@ MMS77320::connectDrive(BYTE              unitNum,
 
     if (unitNum < numDisks_c)
     {
-        if (drives_m[unitNum] == NULL)
+        if (drives_m[unitNum] == nullptr)
         {
             drives_m[unitNum] = drive;
             retVal            = true;

@@ -20,12 +20,12 @@ class H88MemoryDecoder: public MemoryDecoder
     H88MemoryDecoder(std::shared_ptr<SystemMemory8K>  systemRam,
                      MemoryLayout::MemorySize_t       memSize = MemoryLayout::Mem_48k);
 
-    virtual ~H88MemoryDecoder();
+    virtual ~H88MemoryDecoder() override;
 
   private:
     const static unsigned NumMemoryLayouts_c = 1;
     const static BYTE     gppMask_c          = 0;
-    void                  gppNewValue(BYTE);
+    void                  gppNewValue(BYTE) override;
 };
 
 #endif // H88MEMORYDECODER_H_

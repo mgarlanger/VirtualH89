@@ -41,7 +41,7 @@ class GenericFloppyDrive: public GenericDiskDrive, public ClockUser
         FDD_8_DS,
     };
 
-    virtual ~GenericFloppyDrive();
+    virtual ~GenericFloppyDrive() override;
 
     static GenericFloppyDrive* getInstance(std::string type);
     bool getTrackZero();
@@ -66,9 +66,9 @@ class GenericFloppyDrive: public GenericDiskDrive, public ClockUser
                   BYTE data,
                   bool dataReady);
 
-    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk);
+    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk) override;
 
-    void notification(unsigned int cycleCount);
+    void notification(unsigned int cycleCount) override;
     unsigned long getCharPos(bool doubleDensity);
 
     void headLoad(bool load); // Ignored on 5.25" drives?
@@ -81,18 +81,18 @@ class GenericFloppyDrive: public GenericDiskDrive, public ClockUser
     {
         return indexPulse_m;
     }
-    int getNumTracks()
+    int getNumTracks() override
     {
         return numTracks_m;
     }
-    int getRawBytesPerTrack()
+    int getRawBytesPerTrack() override
     {
         return rawSDBytesPerTrack_m;
     }
-    bool isReady();
-    bool isWriteProtect();
+    bool isReady() override;
+    bool isWriteProtect() override;
 
-    std::string getMediaName();
+    std::string getMediaName() override;
 
     void startTrackFormat(BYTE trackNum);
 

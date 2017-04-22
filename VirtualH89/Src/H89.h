@@ -132,24 +132,24 @@ class H89: public Computer
 
   public:
     H89();
-    virtual ~H89();
+    virtual ~H89() override;
     void buildSystem(Console* console, PropertyUtil::PropertyMapT props);
 
-    virtual void reset();
-    virtual BYTE run();
+    virtual void reset() override;
+    virtual BYTE run() override;
 
-    virtual void init();
+    virtual void init() override;
 
-    virtual void keypress(BYTE ch);
-    virtual void display();
+    virtual void keypress(BYTE ch) override;
+    virtual void display() override;
 
-    virtual void systemMutexAcquire();
-    virtual void systemMutexRelease();
-    virtual void raiseINT(int level);
-    virtual void lowerINT(int level);
-    virtual void raiseNMI(void);
-    virtual void continueCPU(void);
-    virtual void waitCPU(void);
+    virtual void systemMutexAcquire() override;
+    virtual void systemMutexRelease() override;
+    virtual void raiseINT(int level) override;
+    virtual void lowerINT(int level) override;
+    virtual void raiseNMI(void) override;
+    virtual void continueCPU(void) override;
+    virtual void waitCPU(void) override;
     std::string dumpDebug();
 
     virtual void writeProtectH17RAM();
@@ -158,7 +158,7 @@ class H89: public Computer
     virtual H89_IO&     getIO();
 
 
-    virtual AddressBus& getAddressBus();
+    virtual AddressBus& getAddressBus() override;
     virtual CPU&        getCPU();
 };
 

@@ -18,11 +18,11 @@ class MMS77318MemoryDecoder: public MemoryDecoder
 {
   public:
     MMS77318MemoryDecoder(std::shared_ptr<SystemMemory8K> systemMemory);
-    virtual ~MMS77318MemoryDecoder();
+    virtual ~MMS77318MemoryDecoder() override;
 
-    virtual void reset();
+    virtual void reset() override;
   private:
-    virtual void gppNewValue(BYTE gpo);
+    virtual void gppNewValue(BYTE gpo) override;
     static const BYTE h89_gppBnkSelBit0_c  = 0b00100000;
     static const BYTE h89_gppBnkSelBit1_c  = 0b00000100;
     static const BYTE h89_gppBnkSelBit2_c  = 0b00010000;

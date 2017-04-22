@@ -38,6 +38,7 @@ class GenericDiskDrive
     virtual int getRawBytesPerTrack()                                = 0;
     virtual int getNumTracks()                                       = 0;
     virtual bool isReady()                                           = 0;
+    virtual bool isWriteProtect()                                    = 0;
 
   private:
 };

@@ -111,7 +111,7 @@ StdioConsole::run()
     fprintf(stdout, "Press ESC to quit.\n");
     fflush(stdout);
 
-    setbuf(stdin, NULL);
+    setbuf(stdin, nullptr);
     ret = tcgetattr(0, &termios);
 
     if (ret == 0)

@@ -19,7 +19,7 @@ class Terminal: public SerialPortDevice
 {
   public:
     Terminal();
-    virtual ~Terminal();
+    virtual ~Terminal() override;
 
     virtual void init()                    = 0;
     virtual void reset()                   = 0;

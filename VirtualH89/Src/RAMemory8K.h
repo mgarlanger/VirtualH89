@@ -15,10 +15,14 @@
 class RAMemory8K: public Memory8K
 {
   public:
-    RAMemory8K(WORD baseAddr): Memory8K(baseAddr) {
+    RAMemory8K(WORD baseAddr): Memory8K(baseAddr)
+    {
     }
+    virtual ~RAMemory8K()
+    {
+    };
 
-    virtual void writeByte(WORD addr, BYTE val)
+    virtual void writeByte(WORD addr, BYTE val) override
     {
         mem[addr & MemoryAddressMask_c] = val;
     }

@@ -21,20 +21,20 @@ class Z47Controller: virtual public ClockUser, virtual public ParallelPortConnec
 {
   public:
     Z47Controller();
-    virtual ~Z47Controller();
+    virtual ~Z47Controller() override;
 
     bool removeDrive(BYTE unitNum);
     bool connectDrive(BYTE       unitNum,
                       DiskDrive* drive);
 
-    virtual void notification(unsigned int cycleCount);
+    virtual void notification(unsigned int cycleCount) override;
 
     void connectHostLink(ParallelLink* link);
 
 
-    virtual void raiseSignal(SignalType sigType);
-    virtual void lowerSignal(SignalType sigType);
-    virtual void pulseSignal(SignalType sigType);
+    virtual void raiseSignal(SignalType sigType) override;
+    virtual void lowerSignal(SignalType sigType) override;
+    virtual void pulseSignal(SignalType sigType) override;
 
     void loadDisk(void);
 

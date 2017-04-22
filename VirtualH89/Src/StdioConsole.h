@@ -22,17 +22,17 @@ class StdioConsole: public Console
   public:
     StdioConsole(int    argc,
                  char** argv);
-    virtual ~StdioConsole();
+    virtual ~StdioConsole() override;
 
-    virtual void init();
-    virtual void reset();
-    virtual void display();
-    virtual void processCharacter(char ch);
-    virtual void keypress(char ch);
-    virtual void receiveData(BYTE);
-    virtual bool checkUpdated();
-    virtual unsigned int getBaudRate();
-    virtual void run();
+    virtual void init() override;
+    virtual void reset() override;
+    virtual void display() override;
+    virtual void processCharacter(char ch) override;
+    virtual void keypress(char ch) override;
+    virtual void receiveData(BYTE) override;
+    virtual bool checkUpdated() override;
+    virtual unsigned int getBaudRate() override;
+    virtual void run() override;
 
   private:
 };

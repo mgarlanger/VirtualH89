@@ -20,6 +20,7 @@ class Memory8K
 {
   public:
     Memory8K(WORD base);
+    virtual ~Memory8K();
 
     WORD getBase();
 

@@ -20,39 +20,39 @@ class Z47Interface: public virtual DiskController,
 {
   public:
     Z47Interface(int baseAddr);
-    virtual ~Z47Interface();
+    virtual ~Z47Interface() override;
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
-    virtual void reset(void);
-    virtual void notification(unsigned int cycleCount);
+    virtual void reset(void) override;
+    virtual void notification(unsigned int cycleCount) override;
     void connectDriveLink(ParallelLink* link);
 
-    virtual void raiseSignal(SignalType sigType);
-    virtual void lowerSignal(SignalType sigType);
-    virtual void pulseSignal(SignalType sigType);
+    virtual void raiseSignal(SignalType sigType) override;
+    virtual void lowerSignal(SignalType sigType) override;
+    virtual void pulseSignal(SignalType sigType) override;
 
     // TODO: implement this
-    std::vector<GenericDiskDrive*> getDiskDrives()
+    std::vector<GenericDiskDrive*> getDiskDrives() override
     {
         return *(new std::vector<GenericDiskDrive*>());
     }
-    std::string getDeviceName()
+    std::string getDeviceName() override
     {
         return "Z47";
     }
-    GenericDiskDrive* findDrive(std::string ident)
+    GenericDiskDrive* findDrive(std::string ident) override
     {
         return nullptr;
     }
-    std::string getDriveName(int index)
+    std::string getDriveName(int index) override
     {
         return "";
     }
 
-    std::string dumpDebug()
+    std::string dumpDebug() override
     {
         return "";
     }

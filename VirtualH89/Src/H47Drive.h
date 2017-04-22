@@ -20,22 +20,22 @@ class H47Drive: public DiskDrive
 {
   public:
     H47Drive();
-    virtual ~H47Drive();
+    virtual ~H47Drive() override;
 
     virtual void getControlInfo(unsigned long pos,
                                 bool&         hole,
                                 bool&         trackZero,
-                                bool&         writeProtect);
+                                bool&         writeProtect) override;
 
-    virtual void selectSide(BYTE side);
-    virtual void step(bool direction);
+    virtual void selectSide(BYTE side) override;
+    virtual void step(bool direction) override;
 
-    virtual BYTE readData(unsigned long pos);
+    virtual BYTE readData(unsigned long pos) override;
     virtual void writeData(unsigned long pos,
-                           BYTE          data);
+                           BYTE          data) override;
     virtual BYTE readSectorData(BYTE          sector,
-                                unsigned long pos);
-    virtual void insertDisk(std::shared_ptr<FloppyDisk> disk);
+                                unsigned long pos) override;
+    virtual void insertDisk(std::shared_ptr<FloppyDisk> disk) override;
 
   private:
     static const unsigned int maxTracks_c          = 77;

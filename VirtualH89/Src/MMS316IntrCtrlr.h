@@ -29,14 +29,14 @@ class MMS316IntrCtrlr: public InterruptController
 
   public:
     MMS316IntrCtrlr(CPU* cpu);
-    virtual ~MMS316IntrCtrlr();
+    virtual ~MMS316IntrCtrlr() override;
 
-    void setINTLine();
+    void setINTLine() override;
 
     // reading instructions for interrupts
-    virtual BYTE readDataBus();
-    virtual void setDrq(bool raise);
-    virtual void setIntrq(bool raise);
+    virtual BYTE readDataBus() override;
+    virtual void setDrq(bool raise) override;
+    virtual void setIntrq(bool raise) override;
 
 };
 

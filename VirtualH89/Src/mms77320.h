@@ -32,31 +32,31 @@ class MMS77320: public DiskController
     MMS77320(int baseAddr,
              int intLevel,
              int switches);
-    virtual ~MMS77320();
+    virtual ~MMS77320() override;
 
     static MMS77320* install_MMS77320(PropertyUtil::PropertyMapT& props,
                                       std::string                 slot);
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
     virtual bool connectDrive(BYTE              unitNum,
                               GenericSASIDrive* drive);
     virtual bool removeDrive(BYTE unitNum);
     virtual GenericSASIDrive* getDrive(BYTE unitNum);
 
-    virtual void reset(void);
+    virtual void reset(void) override;
 
     // TODO: implement this
-    std::vector<GenericDiskDrive*> getDiskDrives();
-    std::string getDriveName(int index);
-    std::string getDeviceName()
+    std::vector<GenericDiskDrive*> getDiskDrives() override;
+    std::string getDriveName(int index) override;
+    std::string getDeviceName() override
     {
         return MMS77320_Name_c;
     }
-    GenericDiskDrive* findDrive(std::string ident);
-    std::string dumpDebug();
+    GenericDiskDrive* findDrive(std::string ident) override;
+    std::string dumpDebug() override;
 
     bool interResponder(BYTE& opCode);
 

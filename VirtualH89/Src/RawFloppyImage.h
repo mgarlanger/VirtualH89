@@ -43,27 +43,27 @@ class RawFloppyImage: public GenericFloppyDisk
   public:
     RawFloppyImage(GenericDiskDrive*        drive,
                    std::vector<std::string> argv);
-    ~RawFloppyImage();
+    ~RawFloppyImage() override;
 
     bool readData(BYTE track,
                   BYTE side,
                   BYTE sector,
                   int  inSector,
-                  int& data);
+                  int& data) override;
     bool writeData(BYTE track,
                    BYTE side,
                    BYTE sector,
                    int  inSector,
                    BYTE data,
                    bool dataReady,
-                   int& result);
-    bool isReady();
+                   int& result) override;
+    bool isReady() override;
     bool findSector(BYTE side,
                     BYTE track,
-                    BYTE sector);
-    void eject(const std::string name);
-    void dump(void);
-    std::string getMediaName();
+                    BYTE sector) override;
+    void eject(const std::string name) override;
+    void dump(void) override;
+    std::string getMediaName() override;
 
   private:
     const char*   imageName_m;

@@ -32,17 +32,17 @@ class GUIglut: public GUI
 {
   public:
     GUIglut();
-    virtual ~GUIglut();
+    virtual ~GUIglut() override;
 
     // Interface functions.
-    virtual void GUIDisplay(void);
-    virtual void InitGUI(void);
-    virtual void StartGUI(void);
+    virtual void GUIDisplay(void) override;
+    virtual void InitGUI(void) override;
+    virtual void StartGUI(void) override;
 
     // Callback functions.
-    virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc);
-    virtual void SetDisplayFunc(tDisplayFunc DisplayFunc);
-    virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc);
+    virtual void SetKeyboardFunc(tKeyboardFunc KeyboardFunc) override;
+    virtual void SetDisplayFunc(tDisplayFunc DisplayFunc) override;
+    virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc) override;
 
   private:
     static void GLUTTimerFunc(int i);

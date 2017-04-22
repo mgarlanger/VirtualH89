@@ -23,27 +23,27 @@ class IMDFloppyDisk: public GenericFloppyDisk
 {
   public:
     IMDFloppyDisk(std::vector<std::string> argv);
-    virtual ~IMDFloppyDisk();
+    virtual ~IMDFloppyDisk() override;
 
 
     virtual bool readData(BYTE track,
                           BYTE side,
                           BYTE sector,
                           int  inSector,
-                          int& data);
+                          int& data) override;
     virtual bool writeData(BYTE track,
                            BYTE side,
                            BYTE sector,
                            int  inSector,
                            BYTE data,
                            bool dataReady,
-                           int& result);
-    virtual bool isReady();
-    virtual void eject(const std::string name);
-    virtual void dump(void);
+                           int& result) override;
+    virtual bool isReady() override;
+    virtual void eject(const std::string name) override;
+    virtual void dump(void) override;
     bool findSector(BYTE side,
                     BYTE track,
-                    BYTE sector);
+                    BYTE sector) override;
 
     static GenericFloppyDisk_ptr getDiskette(std::vector<std::string> argv);
 

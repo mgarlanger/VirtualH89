@@ -30,7 +30,7 @@ class H89_IO: public IOBus
 {
   public:
     H89_IO();
-    virtual ~H89_IO();
+    virtual ~H89_IO() override;
 
     std::vector<DiskController*>& getDiskDevices();
     virtual bool addDiskDevice(DiskController* device);

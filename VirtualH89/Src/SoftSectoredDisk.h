@@ -24,26 +24,26 @@ class SoftSectoredDisk: public GenericFloppyDisk
 {
   public:
     SoftSectoredDisk();
-    virtual ~SoftSectoredDisk();
+    virtual ~SoftSectoredDisk() override;
 
     virtual bool readData(BYTE track,
                           BYTE side,
                           BYTE sector,
                           int  inSector,
-                          int& data);
+                          int& data) override;
     virtual bool writeData(BYTE track,
                            BYTE side,
                            BYTE sector,
                            int  inSector,
                            BYTE data,
                            bool dataReady,
-                           int& result);
+                           int& result) override;
     bool findSector(BYTE sideNum,
                     BYTE trackNum,
-                    BYTE sectorNum);
-    virtual bool isReady();
-    virtual void eject(const std::string name);
-    virtual void dump(void);
+                    BYTE sectorNum) override;
+    virtual bool isReady() override;
+    virtual void eject(const std::string name) override;
+    virtual void dump(void) override;
 
 /*    enum DiskImageFormat
     {

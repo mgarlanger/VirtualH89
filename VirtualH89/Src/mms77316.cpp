@@ -71,7 +71,7 @@ MMS77316::getDriveName(int index)
 {
     if (index < 0 || index >= numDisks_c)
     {
-        return NULL;
+        return nullptr;
     }
 
     char        buf[32];
@@ -86,7 +86,7 @@ MMS77316::findDrive(std::string ident)
 
     if (ident.find(MMS77316_Name_c) != 0 || ident[strlen(MMS77316_Name_c)] != '-')
     {
-        return NULL;
+        return nullptr;
     }
 
     char*         e;
@@ -94,7 +94,7 @@ MMS77316::findDrive(std::string ident)
 
     if (*e != '\0' || x == 0 || x > numDisks_c)
     {
-        return NULL;
+        return nullptr;
     }
 
     return drives_m[x - 1];
@@ -128,7 +128,7 @@ MMS77316::install_MMS77316(InterruptController*        ic,
 
         for (int x = 0; x < numDisks_c; ++x)
         {
-            if (mmsdrives[x] != NULL)
+            if (mmsdrives[x] != nullptr)
             {
                 m316->connectDrive(x, mmsdrives[x]);
             }
@@ -147,7 +147,7 @@ MMS77316::install_MMS77316(InterruptController*        ic,
         {
             GenericFloppyDrive* drv = m316->getDrive(x);
 
-            if (drv != NULL)
+            if (drv != nullptr)
             {
                 drv->insertDisk(SectorFloppyImage::getDiskette(drv, PropertyUtil::splitArgs(s)));
             }
@@ -161,9 +161,9 @@ MMS77316::~MMS77316()
 {
     for (int x = 0; x < numDisks_c; ++x)
     {
-        if (drives_m[x] != NULL)
+        if (drives_m[x] != nullptr)
         {
-            drives_m[x]->insertDisk(NULL);
+            drives_m[x]->insertDisk(nullptr);
         }
     }
 }
@@ -286,7 +286,7 @@ MMS77316::getDrive(BYTE unitNum)
         return drives_m[unitNum];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool
@@ -311,7 +311,7 @@ MMS77316::connectDrive(BYTE                unitNum,
 
     if (unitNum < numDisks_c)
     {
-        if (drives_m[unitNum] == NULL)
+        if (drives_m[unitNum] == nullptr)
         {
             drives_m[unitNum] = drive;
             retVal            = true;

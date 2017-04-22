@@ -32,15 +32,15 @@ class H17: public DiskController, public ClockUser, public GppListener
 {
   public:
     H17(int BaseAddr);
-    virtual ~H17();
+    virtual ~H17() override;
 
     static H17* install_H17(BYTE                        basePort,
                             PropertyUtil::PropertyMapT& props,
                             std::string                 slot);
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
+                     BYTE val) override;
 
     virtual bool connectDrive(BYTE                       unitNum,
                               std::shared_ptr<DiskDrive> drive);
@@ -48,35 +48,36 @@ class H17: public DiskController, public ClockUser, public GppListener
 
     virtual void selectSide(BYTE side);
 
-    virtual void notification(unsigned int cycleCount);
+    virtual void notification(unsigned int cycleCount) override;
 
     // TODO: implement this
-    std::vector<GenericDiskDrive*> getDiskDrives()
+    std::vector<GenericDiskDrive*> getDiskDrives() override
     {
         return *(new std::vector<GenericDiskDrive*>());
     }
 
-    std::string getDeviceName()
+    std::string getDeviceName() override
     {
         return "H17";
     }
-    GenericDiskDrive* findDrive(std::string ident)
+    GenericDiskDrive* findDrive(std::string ident) override
     {
         return nullptr;
     }
-    std::string getDriveName(int index)
+    std::string getDriveName(int index) override
     {
         return "";
     }
-    std::string dumpDebug()
+    std::string dumpDebug() override
     {
         return "";
     }
-    void reset() {
+    void reset()  override
+    {
     }
 
   private:
-    virtual void gppNewValue(BYTE gpo);
+    virtual void gppNewValue(BYTE gpo) override;
     static const BYTE h17_gppSideSelectBit_c = 0b01000000;
 
     enum State

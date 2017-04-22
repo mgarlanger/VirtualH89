@@ -101,11 +101,11 @@ CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
     s = props["cpnetdevice_port"];
     if (s.empty())
     {
-        return NULL;
+        return nullptr;
     }
     int           port = 0x18;
-    unsigned long p    = strtoul(s.c_str(), NULL, 0);
-    if (p >= 0 && p <= 255)
+    unsigned long p    = strtoul(s.c_str(), nullptr, 0);
+    if (p <= 255)
     {
         port = p & 0x0ff;
     }
@@ -116,7 +116,7 @@ CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
     s = props["cpnetdevice_clientid"];
     if (!s.empty())
     {
-        unsigned long c = strtoul(s.c_str(), NULL, 0);
+        unsigned long c = strtoul(s.c_str(), nullptr, 0);
         if (c > 0x00 && c < 0xff)
         {
             cid = c & 0x0ff;
@@ -137,9 +137,9 @@ CPNetDevice::install_CPNetDevice(PropertyUtil::PropertyMapT& props)
         if (it->first.compare(0, 18, "cpnetdevice_server") == 0)
         {
             BYTE          sid;
-            unsigned long si = strtoul(it->first.substr(18).c_str(), NULL, 16);
+            unsigned long si = strtoul(it->first.substr(18).c_str(), nullptr, 16);
             // TODO: check for conflicts/duplicates?
-            if (si >= 0 && si < 255)
+            if (si < 255)
             {
                 sid = si & 0x0ff;
             }
@@ -383,7 +383,7 @@ CPNetDevice::sendMsg(BYTE* msgbuf, int len)
     struct         NetworkServer::ndos* hdr = (struct NetworkServer::ndos*) msgbuf;
     NetworkServer* nws = servers[hdr->mdid];
 
-    if (nws == NULL)
+    if (nws == nullptr)
     {
         debugss(ssCPNetDevice, ERROR, "Attempting to send to non-existent server %02x\n",
                 hdr->mdid);

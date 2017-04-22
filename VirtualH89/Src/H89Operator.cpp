@@ -53,13 +53,13 @@ H89Operator::findDrive(std::string name)
         DiskController*   dev = devs[x];
         GenericDiskDrive* drv = nullptr;
 
-        if (dev != NULL && (drv = dev->findDrive(name)) != NULL)
+        if (dev != nullptr && (drv = dev->findDrive(name)) != nullptr)
         {
             return drv;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 DiskController*
@@ -71,13 +71,13 @@ H89Operator::findDiskCtrlr(std::string name)
     {
         DiskController* dev = devs[x];
 
-        if (dev != NULL && name.compare(dev->getDeviceName()) == 0)
+        if (dev != nullptr && name.compare(dev->getDeviceName()) == 0)
         {
             return dev;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 std::string
@@ -132,7 +132,7 @@ H89Operator::executeCommand(std::string cmd)
 
         GenericDiskDrive* drv = findDrive(args[1]);
 
-        if (drv == NULL)
+        if (drv == nullptr)
         {
             return "error nodrive: " + args[1];
         }
@@ -152,7 +152,7 @@ H89Operator::executeCommand(std::string cmd)
         {
             DiskController* dev = devs[x];
 
-            if (dev != NULL)
+            if (dev != nullptr)
             {
                 std::vector<GenericDiskDrive*> drives = dev->getDiskDrives();
 
@@ -160,7 +160,7 @@ H89Operator::executeCommand(std::string cmd)
                 {
                     GenericDiskDrive* drv = drives[y];
 
-                    if (drv != NULL)
+                    if (drv != nullptr)
                     {
                         if (count++ > 0)
                         {
@@ -196,7 +196,7 @@ H89Operator::executeCommand(std::string cmd)
         {
             DiskController* dev = findDiskCtrlr(args[2]);
 
-            if (dev == NULL)
+            if (dev == nullptr)
             {
                 return "error no device " + args[2];
             }

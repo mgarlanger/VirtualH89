@@ -23,22 +23,22 @@ class H_17_1: public DiskDrive
 {
   public:
     H_17_1();
-    virtual ~H_17_1();
+    virtual ~H_17_1() override;
 
     void getControlInfo(unsigned long pos,
                         bool&         hole,
                         bool&         trackZero,
-                        bool&         writeProtect);
+                        bool&         writeProtect) override;
 
-    void step(bool direction);
-    void selectSide(BYTE side);
+    void step(bool direction) override;
+    void selectSide(BYTE side) override;
 
-    BYTE readData(unsigned long pos);
+    BYTE readData(unsigned long pos) override;
     void writeData(unsigned long pos,
-                   BYTE          data);
+                   BYTE          data) override;
 
     virtual BYTE readSectorData(BYTE          sector,
-                                unsigned long pos);
+                                unsigned long pos) override;
 
 
   private:

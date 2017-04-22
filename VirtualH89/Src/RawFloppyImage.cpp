@@ -80,9 +80,9 @@ RawFloppyImage::dump()
 // TODO: If constructor fails, the drive should not mount this disk!
 RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
                                std::vector<std::string> argv): GenericFloppyDisk(),
-                                                               imageName_m(NULL),
+                                                               imageName_m(nullptr),
                                                                imageFd_m(-1),
-                                                               trackBuffer_m(NULL),
+                                                               trackBuffer_m(nullptr),
                                                                bufferedTrack_m(-1),
                                                                bufferedSide_m(-1),
                                                                bufferOffset_m(0),
@@ -176,7 +176,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     nbytes       += nbytes / 2;
     trackBuffer_m = new BYTE[nbytes];
 
-    if (trackBuffer_m == NULL)
+    if (trackBuffer_m == nullptr)
     {
         debugss(ssRawFloppyImage, ERROR, "unable to allocate track buffer of %ld bytes\n", nbytes);
         close(fd);
@@ -195,9 +195,9 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     }
 
     BYTE*    tp     = trackBuffer_m;
-    BYTE*    idx    = NULL;
-    BYTE*    dat    = NULL;
-    BYTE*    end    = NULL;
+    BYTE*    idx    = nullptr;
+    BYTE*    dat    = nullptr;
+    BYTE*    end    = nullptr;
     unsigned trklen = 0;
     int      seclen = 0;
     int      numsec = 0;
@@ -212,7 +212,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
     {
         if (*tp == GenericFloppyFormat::INDEX_AM_BYTE)
         {
-            if (idx == NULL)
+            if (idx == nullptr)
             {
                 idx = tp;
             }
@@ -259,7 +259,7 @@ RawFloppyImage::RawFloppyImage(GenericDiskDrive*        drive,
         }
         else if (*tp == GenericFloppyFormat::DATA_AM_BYTE)
         {
-            if (dat == NULL)
+            if (dat == nullptr)
             {
                 dat    = tp + 1;
                 idxgap = (unsigned) (dat - trackBuffer_m);
@@ -822,7 +822,7 @@ RawFloppyImage::isReady()
 std::string
 RawFloppyImage::getMediaName()
 {
-    if (imageName_m == NULL)
+    if (imageName_m == nullptr)
     {
         return "BAD";
     }

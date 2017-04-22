@@ -27,7 +27,7 @@ class WD1797: public ClockUser
   public:
 
     WD1797(WD179xUserIf* userIf);
-    virtual ~WD1797();
+    virtual ~WD1797() override;
 
     virtual BYTE in(BYTE addr);
     virtual void out(BYTE addr,
@@ -37,7 +37,7 @@ class WD1797: public ClockUser
 
     virtual void reset(void);
 
-    void notification(unsigned int cycleCount);
+    void notification(unsigned int cycleCount) override;
 
     void eject(char const* file);
     void dump();

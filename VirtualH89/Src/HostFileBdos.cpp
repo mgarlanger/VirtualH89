@@ -50,7 +50,7 @@ enum logLevel
 HostFileBdos::HostFileBdos(PropertyUtil::PropertyMapT& props,
                            std::vector<std::string> args, uint8_t srvId, uint8_t cltId):
     NetworkServer(),
-    dir(NULL),
+    dir(nullptr),
     serverId(srvId),
     clientId(cltId),
     curDsk(-1),
@@ -121,12 +121,12 @@ HostFileBdos::~HostFileBdos()
     if (curSearch.find.dir)
     {
         closedir(curSearch.find.dir);
-        curSearch.find.dir = NULL;
+        curSearch.find.dir = nullptr;
     }
-    if (dir != NULL)
+    if (dir != nullptr)
     {
         free(dir);
-        dir = NULL;
+        dir = nullptr;
     }
 }
 
@@ -143,7 +143,7 @@ HostFileBdos::sendMsg(uint8_t* msgbuf, int len)
 {
     struct   NetworkServer::ndos* hdr = (struct NetworkServer::ndos*) msgbuf;
     uint8_t* msg = msgbuf + sizeof(*hdr);
-    if (bdosFunctions[hdr->mfunc] == NULL)
+    if (bdosFunctions[hdr->mfunc] == nullptr)
     {
         msg[0] = 255;
         msg[1] = 12;
@@ -341,7 +341,7 @@ HostFileBdos::searchFirst(uint8_t* msgbuf, int len)
         memset(&fcb->name[0], '?', 12);
     }
     const char* f = startSearch(fcb, &curSearch, u);
-    if (f == NULL)
+    if (f == nullptr)
     {
         if (errno == ENXIO)
         {
@@ -863,7 +863,7 @@ HostFileBdos::readFStamps(uint8_t* msgbuf, int len)
 int
 HostFileBdos::getTime(uint8_t* msgbuf, int len)
 {
-    time_t          now = time(NULL);
+    time_t          now = time(nullptr);
     struct cpmdate* cpm = (struct cpmdate*) &msgbuf[0];
     unix2cpmdate(now, cpm);
     debugss(ssHostFileBdos, INFO, "getTime: %04x %02x %02x %02x\n",
@@ -957,7 +957,7 @@ HostFileBdos::cpmFindInit(struct search::find* find, int drive, char* pattern)
     find->pat[sizeof(find->pat) - 1] = '\0';
     find->dirlen                     = cpmDrive(find->path, drive);
     find->dir                        = opendir(find->path);
-    // NULL check done later...
+    // nullptr check done later...
     if (!find->dir)
     {
         debugss(ssHostFileBdos, INFO, "no dir: %s\n", find->path);
@@ -971,7 +971,7 @@ HostFileBdos::cpmFind(struct search::find* find)
     if (!find->dir)
     {
         errno = ENXIO;
-        return NULL;
+        return nullptr;
     }
     do
     {
@@ -979,7 +979,7 @@ HostFileBdos::cpmFind(struct search::find* find)
         if (!de)
         {
             errno = ENOENT;
-            return NULL;
+            return nullptr;
         }
         if (de->d_name[0] == '.')
         {
@@ -1151,7 +1151,7 @@ HostFileBdos::copyOutSearch(uint8_t* buf, const char* name)
         int nb = 16, x;
         if (len <= phyExt)
         {
-            nb       = (len + curDpb.blm) >> curDpb.bsh;
+            nb       = (int) ((len + curDpb.blm) >> curDpb.bsh);
             fcb->ext = len / 128; // num logical extents
             fcb->rc  = len & 0x7f;
             if (len > 0 && fcb->rc == 0)
@@ -1198,7 +1198,7 @@ HostFileBdos::commonSearch(struct search* search)
     const char* f = cpmFind(&search->find);
     if (!f)
     {
-        return NULL;
+        return nullptr;
     }
     if (search->ext == '?') // this includes search->full
     {                       // return size of file... by some definition...
@@ -1236,7 +1236,7 @@ HostFileBdos::fullSearch(uint8_t* dirbuf, struct search* search, const char* ff)
         ++ix;
         ff      = doSearch(search);
     }
-    while (ff != NULL && ix < search->maxdc); // never includes SFCB
+    while (ff != nullptr && ix < search->maxdc); // never includes SFCB
     search->lastit = search->iter;            // if >= saveIter+maxdc then no error
     search->iter   = saveIter;
     while (ix < 4)

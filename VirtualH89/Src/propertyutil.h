@@ -30,10 +30,10 @@ class PropertyUtil
                      PropertyMapT& map);
     static void write(const char*   filename,
                       PropertyMapT& map,
-                      const char*   header = NULL);
+                      const char*   header = nullptr);
     static void write(std::ostream& os,
                       PropertyMapT& map,
-                      const char*   header = NULL);
+                      const char*   header = nullptr);
     static void print(std::ostream& os,
                       PropertyMapT& map);
     static std::vector<std::string> splitArgs(std::string prop);

@@ -10,13 +10,13 @@
 
 #include "Console.h"
 #include "ClockUser.h"
+// H19 needs access to the GUI engine.
+#include "GUI.h"
 
 /// \cond
 #include <queue>
 /// \endcond
 
-// H19 needs access to the GUI engine.
-#include "GUI.h"
 
 /// \brief Virtual %H19 %Terminal Screen Buffer
 ///

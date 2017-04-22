@@ -51,29 +51,33 @@ class GenericSASIDrive: public GenericDiskDrive
                      std::string media,
                      int         cnum,
                      int         sectorSize);
-    virtual ~GenericSASIDrive();
+    virtual ~GenericSASIDrive() override;
     static GenericSASIDrive* getInstance(std::string type,
                                          std::string path,
                                          int         unitNum);
 
     // not used:
-    int getRawBytesPerTrack()
+    int getRawBytesPerTrack() override
     {
         return 0;
     }
-    int getNumTracks()
+    int getNumTracks() override
     {
         return 0;
     }
-    bool isReady()
+    bool isReady() override
     {
         return true;
     }
-    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk)
+    bool isWriteProtect() override
+    {
+        return false;
+    }
+    void insertDisk(std::shared_ptr<GenericFloppyDisk> disk) override
     {
     }
 
-    std::string getMediaName();
+    std::string getMediaName() override;
 
     // These are called by the host to indicate change events on ctl bits.
     void resetSASI(BYTE& data,

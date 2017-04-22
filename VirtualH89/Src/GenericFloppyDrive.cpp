@@ -80,7 +80,7 @@ GenericFloppyDrive::getInstance(std::string type)
     else
     {
         debugss(ssGenericFloppyDrive, ERROR, "disk size not specified\n");
-        return NULL;
+        return nullptr;
     }
 
     if (type.find("SS") != std::string::npos)
@@ -251,7 +251,7 @@ GenericFloppyDrive::writeData(bool dd,
 void
 GenericFloppyDrive::notification(unsigned int cycleCount)
 {
-    if (disk_m == NULL || !motor_m)
+    if (disk_m == nullptr || !motor_m)
     {
         return;
     }
@@ -267,7 +267,7 @@ GenericFloppyDrive::notification(unsigned int cycleCount)
 unsigned long
 GenericFloppyDrive::getCharPos(bool doubleDensity)
 {
-    // if disk_m == NULL || !motor_m then cycleCount_m won't be updating
+    // if disk_m == nullptr || !motor_m then cycleCount_m won't be updating
     // and so CharPos also does not update.  Callers checks this.
     unsigned long bytes = rawSDBytesPerTrack_m;
 
@@ -285,9 +285,9 @@ GenericFloppyDrive::readAddress(int& trackNum,
                                 int& sectorNum,
                                 int& sideNum)
 {
-    if (disk_m == NULL || !motor_m)
+    if (disk_m == nullptr || !motor_m)
     {
-        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == NULL,
+        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == nullptr,
                 motor_m);
         return false;
     }
@@ -304,9 +304,9 @@ bool
 GenericFloppyDrive::verifyTrackSector(BYTE trackNum,
                                       BYTE sectorNum)
 {
-    if (disk_m == NULL || !motor_m)
+    if (disk_m == nullptr || !motor_m)
     {
-        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == NULL,
+        debugss(ssGenericFloppyDrive, ERROR, "drive or motor not set %d:%d\n", disk_m == nullptr,
                 motor_m);
         return false;
     }
@@ -343,19 +343,19 @@ GenericFloppyDrive::motor(bool on)
 bool
 GenericFloppyDrive::isReady()
 {
-    return (disk_m != NULL && disk_m->isReady());
+    return (disk_m != nullptr && disk_m->isReady());
 }
 
 bool
 GenericFloppyDrive::isWriteProtect()
 {
-    return (disk_m != NULL && disk_m->checkWriteProtect());
+    return (disk_m != nullptr && disk_m->checkWriteProtect());
 }
 
 std::string
 GenericFloppyDrive::getMediaName()
 {
-    return (disk_m != NULL ? disk_m->getMediaName() : "");
+    return (disk_m != nullptr ? disk_m->getMediaName() : "");
 }
 
 void

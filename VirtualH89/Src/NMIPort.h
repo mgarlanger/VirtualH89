@@ -27,12 +27,13 @@ class NMIPort: public virtual IODevice
     NMIPort(CPU* cpu,
             BYTE base,
             BYTE size);
-    virtual ~NMIPort();
+    virtual ~NMIPort() override;
 
-    virtual BYTE in(BYTE addr);
+    virtual BYTE in(BYTE addr) override;
     virtual void out(BYTE addr,
-                     BYTE val);
-    void reset() {
+                     BYTE val) override;
+    void reset()  override
+    {
     }
   private:
     CPU* cpu_m;

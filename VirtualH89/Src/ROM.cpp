@@ -67,7 +67,7 @@ ROM::getROM(const char* filename,
     file.read((char*) buf, fileSize);
     file.close();
 
-    rom = new ROM(fileSize);
+    rom = new ROM((int) fileSize);
     rom->setBaseAddress(addr);
     rom->initialize(buf, fileSize);
     return rom;
