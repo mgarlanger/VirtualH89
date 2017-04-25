@@ -18,7 +18,10 @@
 #include "StdioProxyConsole.h"
 #include "logger.h"
 #include "propertyutil.h"
+
+#if defined(__GUIglut__)
 #include "GUIglut.h"
+#endif
 
 /// \cond
 #include <iostream>
@@ -124,9 +127,15 @@ cpuThreadFunc(void* v)
 //
 const char* getopts = "g:lq";
 
+#if defined(__GUIwx__)
+int
+VirtualH89main(int   argc,
+     char* argv[])
+#else
 int
 main(int   argc,
      char* argv[])
+#endif
 {
     int          c;
     extern char* optarg;
@@ -134,8 +143,10 @@ main(int   argc,
     int          quiet = 0;
     setDebugLevel();
 
+#if defined(__GUIglut__)
     // Start a GUI engine.
-    TheGUI = new GUIglut;
+    TheGUI = new GUIglut();
+#endif
 
     while ((c = getopt(argc, argv, getopts)) != EOF)
     {

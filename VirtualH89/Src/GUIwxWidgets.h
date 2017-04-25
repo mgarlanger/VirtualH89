@@ -1,15 +1,18 @@
-#if defined(__GUIglut__)
+#if defined(__GUIwx__)
 ///
-/// \name GUIglut.h
+/// \name GUIwxWidgets.h
 ///
-/// A GUI implementation based on glut.
+/// A GUI implementation based on wxWidgets.
 ///
 /// \date Apr 20, 2017
 /// \author David Troendle and Mark Garlanger
 ///
 
-#ifndef GUIGLUT_H_
-#define GUIGLUT_H_
+#ifndef GUIWXWIDGETS_H_
+#define GUIWXWIDGETS_H_
+
+#include <wx/panel.h>
+#include <wx/thread.h>
 
 #include "GUI.h"
 #include "h19.h"
@@ -18,22 +21,27 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <assert.h>
+/// \cond
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-/// \endcond
+class wxGUIThread : public wxThread
+{
+public:
+  wxGUIThread(tDisplayFunc  _GUITimerFunc, unsigned int _Period)
+        : wxThread(wxTHREAD_DETACHED), GUITimerFunc(_GUITimerFunc), Period(_Period)
+        { return; }
+    ~wxGUIThread(void) { return;}
 
-typedef void (* tGLUTKeyboardFunc)(unsigned char Key, int x, int y);
+protected:
+    ExitCode Entry(void);
+    tDisplayFunc  GUITimerFunc;
+    unsigned int  Period;
+};
 
-class GUIglut: public GUI
+class GUIwxWidgets: public GUI
 {
   public:
-    GUIglut();
-    virtual ~GUIglut() override;
+    GUIwxWidgets();
+    virtual ~GUIwxWidgets() override;
 
     // Interface functions.
     virtual void GUIDisplay(void) override;
@@ -45,29 +53,23 @@ class GUIglut: public GUI
     virtual void SetDisplayFunc(tDisplayFunc DisplayFunc) override;
     virtual void SetTimerFunc(unsigned int ms, tTimerFunc TimerFunc) override;
 
-  private:
-    static void GLUTTimerFunc(int i);
+    static tKeyboardFunc GUIKeyboardFunc;
     static tDisplayFunc  GUITimerFunc;
+
+  private:
     static unsigned int  m_ms;
 
-    static void GLUTDisplayFunc(void);
+    static void GUIwxWidgetsDisplayFunc(void);
     static tDisplayFunc  GUIDisplayFunc;
 
-    static void GLUTKeyboardFunc(unsigned char Key, int x, int y);
-    static tKeyboardFunc GUIKeyboardFunc;
-
-    static void reshape(int w,
-                        int h);
-
-    static void special(int key,
-                        int x,
-                        int y);
 
     unsigned int   fontOffset_m;
 
     unsigned char* fontTable;
 
+    wxGUIThread *Thread;
+
 };
 
-#endif /* GUIGLUT_H_ */
+#endif
 #endif

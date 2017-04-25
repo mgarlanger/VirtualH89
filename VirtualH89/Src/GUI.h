@@ -37,5 +37,7 @@ class GUI
 // Access is achieved by adding #include "GUI.h".  The include gives the access.
 
 extern GUI* TheGUI;
+extern const unsigned char fontTableForward[];
+extern const unsigned char fontTableInverted[];
 
 #endif /* GUI_H_ */

@@ -1,3 +1,4 @@
+#if defined(__GUIglut__)
 ///
 /// \name GUIglut.h
 ///
@@ -9,8 +10,6 @@
 
 #include <cassert>
 #include "GUIglut.h"
-
-#include "h19-font.h"
 
 tKeyboardFunc GUIglut::GUIKeyboardFunc = nullptr;
 tDisplayFunc  GUIglut::GUIDisplayFunc;
@@ -298,3 +297,4 @@ GUIglut::special(int key,
 
     return;
 }
+#endif
