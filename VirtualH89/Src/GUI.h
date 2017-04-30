@@ -23,9 +23,12 @@
 #define __GUIDefined__
 #endif
 
-#if !defined(__GUIDefined__)
-#error No GUI configured.  Choices are -D__GUIglut__ and -D__GUIwx__.  Please choose exactly 1.
-#endif
+// More checks as other GUIs added go here>
+//#if defined(__GUI??__) && defined(__GUIDefined__)
+//#error Configured for more than 1 GUI.  Choices are -D__GUIglut__, -D__GUIwx__, ....  Please choose exactly 1.
+//#elif defined(__GUI??__)
+//#define __GUIDefined__
+//#endif
 
 typedef void (* tKeyboardFunc)(unsigned char Key);
 typedef void (* tDisplayFunc)(void);

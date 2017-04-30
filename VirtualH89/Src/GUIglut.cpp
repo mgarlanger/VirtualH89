@@ -1,4 +1,4 @@
-#if defined(__GUIglut__)
+#if defined(__GUIglut__) || !defined(__GUIwx__)
 ///
 /// \name GUIglut.h
 ///

@@ -6159,7 +6159,9 @@ const unsigned char fontTableForward[] =
   0xFFu,  // |@@@@@@@@|
           // +--------+
 };
-#elif defined(__GUIglut__)
+#endif
+
+#if defined(__GUIglut__) || !defined(__GUIwx__)
 const unsigned char fontTableInverted[] =
 {
     ///
