@@ -12314,8 +12314,6 @@ const unsigned char fontTableInverted[] =
     0x00
 };        // 00 (000) |        |
 //          +--------+
-#else
-#error Not configured for any GUI.  Choices are -D__GUIglut__ and -D__GUIwx__
 #endif
 
 #endif //  __H19_FONT_H__
