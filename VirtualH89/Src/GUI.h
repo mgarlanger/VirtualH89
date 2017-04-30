@@ -11,6 +11,25 @@
 #ifndef GUI_H_
 #define GUI_H_
 
+// Ensure exactly one GUI defined.
+#undef __GUIDefined__
+#if defined(__GUIglut__)
+#define __GUIDefined__
+#endif
+
+#if defined(__GUIwx__) && defined(__GUIDefined__)
+#error Configured for more than 1 GUI.  Choices are -D__GUIglut__ and -D__GUIwx__.  Please choose exactly 1.
+#elif defined(__GUIwx__)
+#define __GUIDefined__
+#endif
+
+// More checks as other GUIs added go here>
+//#if defined(__GUI??__) && defined(__GUIDefined__)
+//#error Configured for more than 1 GUI.  Choices are -D__GUIglut__, -D__GUIwx__, ....  Please choose exactly 1.
+//#elif defined(__GUI??__)
+//#define __GUIDefined__
+//#endif
+
 typedef void (* tKeyboardFunc)(unsigned char Key);
 typedef void (* tDisplayFunc)(void);
 typedef void (* tTimerFunc)(void);
@@ -37,5 +56,7 @@ class GUI
 // Access is achieved by adding #include "GUI.h".  The include gives the access.
 
 extern GUI* TheGUI;
+extern const unsigned char fontTableForward[];
+extern const unsigned char fontTableInverted[];
 
 #endif /* GUI_H_ */

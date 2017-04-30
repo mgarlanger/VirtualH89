@@ -45,6 +45,7 @@ class H19Screen
 
     bool                      curCursor_m;
     unsigned int              posX_m, posY_m;
+    static const unsigned int screenRefresh_c = 1000 / 60;
     bool                      cursorBlock_m;
     bool                      cursorOff_m;
 };
@@ -85,7 +86,6 @@ class H19: public Console, public ClockUser, public H19Screen // , public BaseTh
     static void timer(void);
     static void keyboard(unsigned char key);
     static H19*               h19; // for static callback funcs
-    static const unsigned int screenRefresh_c = 1000 / 60;
     static unsigned int       screenRefresh_m;
 
     void consoleLog(std::string message);

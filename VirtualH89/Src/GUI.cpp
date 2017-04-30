@@ -12,6 +12,8 @@
 
 #include "GUI.h"
 
+#include "h19-font.h"
+
 // All GUI access is through this pointer to the base GUI class.
 GUI* TheGUI = nullptr;
 
