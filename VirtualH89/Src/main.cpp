@@ -19,7 +19,7 @@
 #include "logger.h"
 #include "propertyutil.h"
 
-#if defined(__GUIglut__)
+#if !defined(__GUIwx__)
 #include "GUIglut.h"
 #endif
 
@@ -143,7 +143,7 @@ main(int   argc,
     int          quiet = 0;
     setDebugLevel();
 
-#if defined(__GUIglut__)
+#if !defined(__GUIwx__)
     // Start a GUI engine.
     TheGUI = new GUIglut();
 #endif
