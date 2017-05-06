@@ -23,6 +23,10 @@
 
 ////@begin includes
 ////@end includes
+#undef wxUSE_LIBPNG
+#undef wxUSE_LIBJPEG
+#undef wxUSE_GIF
+#undef wxUSE_INTL
 
 #include "VirtualH89App.h"
 

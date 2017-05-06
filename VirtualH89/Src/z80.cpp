@@ -1906,7 +1906,7 @@ Z80::execute(WORD numInst)
 ///
 /// \brief No Operation
 ///
-/// \details
+/// \details No operation
 ///
 /// Operation: -
 ///
@@ -1937,7 +1937,7 @@ Z80::op_nop(void)
 ///
 /// \brief Halt
 ///
-/// \details
+/// \details Halts the CPU
 ///
 /// Operation: -
 ///
@@ -5923,7 +5923,8 @@ Z80::op_adc_hl_xx(void)
 
 
 ///
-/// \brief
+/// \brief sbc16
+/// \details 16-bit subtract with carry
 ///
 /// \retval none
 ///
