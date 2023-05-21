@@ -1,4 +1,4 @@
-SOURCES = $(wildcard *.cpp)
+SOURCES = $(wildcard VirtualH89/Src/*.cpp)
 
 CHECK = `which scan-build`
 UNCRUSTIFY = uncrustify
