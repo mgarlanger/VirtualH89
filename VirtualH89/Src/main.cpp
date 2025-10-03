@@ -19,7 +19,9 @@
 #include "logger.h"
 #include "propertyutil.h"
 
-#if !defined(__GUIwx__)
+#if defined(__GUIimgui__)
+#include "GUIimgui.h"
+#elif !defined(__GUIwx__)
 #include "GUIglut.h"
 #endif
 
@@ -28,6 +30,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string>
+#include <cstring>
 #include <unistd.h>
 /// \endcond
 
@@ -70,12 +73,12 @@ displayLogo()
 void
 usage(char* pn)
 {
-    cerr << "usage: " << pn << usage_str << endl;
-    // cerr << "\ts = save core and cpu" << endl;
-    // cerr << "\tl = load core and cpu" << endl;
-    cerr << "\tg = specify gui to use, default is built-in H19 emulation" << endl;
-    cerr << "\tq = quiet - don't display opening banner" << endl;
-    exit(1);
+    cout << "Virtual Heathkit H-89 All-in-One Computer Emulator" << endl;
+    cout << "usage: " << pn << usage_str << endl << endl;
+    cout << "Options:" << endl;
+    cout << "  -g <gui>        Specify GUI to use (default: built-in H19 emulation)" << endl;
+    cout << "  -h, --help      Show this help message" << endl;
+    cout << "  -q              Quiet mode - don't display opening banner" << endl << endl;
 }
 
 static void*
@@ -122,6 +125,7 @@ cpuThreadFunc(void* v)
 //
 //	option		owner
 //	-g <gui>	main.cpp
+//	-h		main.cpp (handled by early check, not getopt)
 //	-l		StdioProxyConsole.cpp
 //	-q		main.cpp
 //
@@ -137,14 +141,25 @@ main(int   argc,
      char* argv[])
 #endif
 {
+    // Check for help flag FIRST, before any initialization
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            usage(argv[0]);
+            _exit(0);  // Fast exit without static destructors (prevents segfault)
+        }
+    }
+
     int          c;
     extern char* optarg;
     string       gui("H19");
     int          quiet = 0;
     setDebugLevel();
 
-#if !defined(__GUIwx__)
-    // Start a GUI engine.
+#if defined(__GUIimgui__)
+    // Start ImGui GUI engine
+    TheGUI = new GUIimgui();
+#elif !defined(__GUIwx__)
+    // Start GLUT GUI engine
     TheGUI = new GUIglut();
 #endif
 

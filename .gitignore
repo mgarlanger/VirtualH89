@@ -21,3 +21,14 @@ build/
 xcuserdata/
 *.moved-aside
 /Debug/
+
+.vscode/
+console.out
+h17_saveDisk*
+imgui.ini
+op.out
+v89-*
+v89
+
+conf/
+images/
